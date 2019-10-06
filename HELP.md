@@ -1,22 +1,11 @@
-# Getting Started
+# AngularPortfolioMgr
 
-### Reference Documentation
-For further reference, please consider the following sections:
+Author: Sven Loesekann
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/gradle-plugin/reference/html/)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/{bootVersion}/reference/htmlsingle/#boot-features-developing-web-applications)
-* [Spring Data Reactive MongoDB](https://docs.spring.io/spring-boot/docs/{bootVersion}/reference/htmlsingle/#boot-features-mongodb)
+Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Spring Webflux, Spring Data R2DBC, Gradle, Docker
 
-### Guides
-The following guides illustrate how to use some features concretely:
+## What is the goal?
+The goal is to provide an Angular based Web App with a reactive backend server that uses Webflux and Spring R2DBC technology. The build tool is Gradle.
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
-
-### Additional Links
-These additional references should also help you:
-
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-
+## Current state of the project
+The project is a work in progress that uses experimental features of Spring. It is under development and will use new features when they become available. The project state is experimental too.
