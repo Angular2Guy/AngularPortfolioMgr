@@ -16,10 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePopulator;
+import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
+import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import ch.xxx.manager.init.MyConnectionFactoryInitializer;
 import io.r2dbc.proxy.ProxyConnectionFactory;
 import io.r2dbc.proxy.support.QueryExecutionInfoFormatter;
 import io.r2dbc.spi.ConnectionFactories;
@@ -33,14 +38,28 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 class ApplicationConfig extends AbstractR2dbcConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
-  @Bean
-  public ConnectionFactory connectionFactory() {
-    ConnectionFactory connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
-    QueryExecutionInfoFormatter.showAll();
-    
-    return ProxyConnectionFactory
-    		.builder(connectionFactory)
-    		.onAfterQuery(queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
-    		.build();
-  }
+	@Bean
+	public ConnectionFactory connectionFactory() {
+		ConnectionFactory connectionFactory = ConnectionFactories
+				.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
+		QueryExecutionInfoFormatter.showAll();
+
+		return ProxyConnectionFactory.builder(connectionFactory).onAfterQuery(
+				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo.block())))
+				.build();
+	}
+
+	@Bean
+	public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
+
+		MyConnectionFactoryInitializer initializer = new MyConnectionFactoryInitializer();
+		initializer.setConnectionFactory(connectionFactory);
+
+		CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
+		populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/schema.sql")));
+		populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/data.sql")));
+		initializer.setDatabasePopulator(populator);
+		
+		return initializer;
+	}
 }

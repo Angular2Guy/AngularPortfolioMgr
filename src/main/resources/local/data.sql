@@ -1,0 +1,1 @@
+insert into appuser (name, firstname, birthdate) values ('Max', 'Smith', now());

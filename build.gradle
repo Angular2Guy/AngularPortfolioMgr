@@ -11,7 +11,7 @@
    limitations under the License.
  */
 plugins {
-	id 'org.springframework.boot' version '2.2.0.BUILD-SNAPSHOT'
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 	id 'java'
 }
@@ -23,18 +23,17 @@ sourceCompatibility = '11'
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-dependencies {
-	implementation 'org.springframework.boot.experimental:spring-boot-starter-data-r2dbc'	
+dependencies {	
+	implementation 'org.springframework.boot.experimental:spring-boot-starter-data-r2dbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	compile 'io.r2dbc:r2dbc-proxy:1.0.0.M7'
 	compile 'io.netty:netty-codec-http'
 	compile 'org.tuckey:urlrewritefilter:4.0.4'	
 	compile 'io.springfox:springfox-swagger2:2.9.2'
-	compile 'io.springfox:springfox-swagger-ui:2.9.2'	
-	implementation platform('io.r2dbc:r2dbc-bom:Arabba-RC1')
+	compile 'io.springfox:springfox-swagger-ui:2.9.2'		
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
@@ -53,7 +52,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom 'org.springframework.boot.experimental:spring-boot-bom-r2dbc:0.1.0.BUILD-SNAPSHOT'
+		mavenBom 'org.springframework.boot.experimental:spring-boot-bom-r2dbc:0.1.0.M2'
 	}
 }
 
