@@ -22,6 +22,7 @@ import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePo
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import ch.xxx.manager.init.MyConnectionFactoryInitializer;
@@ -33,16 +34,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableR2dbcRepositories
-@EnableTransactionManagement
+//@EnableTransactionManagement
 @EnableSwagger2
+@EnableScheduling
 class ApplicationConfig extends AbstractR2dbcConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
+	@Override
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		ConnectionFactory connectionFactory = ConnectionFactories
 				.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
-		QueryExecutionInfoFormatter.showAll();
 
 		return ProxyConnectionFactory.builder(connectionFactory).onAfterQuery(
 				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo.block())))
