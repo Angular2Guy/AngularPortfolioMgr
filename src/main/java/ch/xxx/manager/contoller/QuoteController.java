@@ -1,9 +1,8 @@
 package ch.xxx.manager.contoller;
 
-import javax.websocket.server.PathParam;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +17,7 @@ public class QuoteController {
 	private QuoteService quoteService;
 	
 	@GetMapping("/symbol/{symbol}")
-	public Flux<DailyQuoteExportDto> getDailyQuotes(@PathParam("symbol") String symbol) {
+	public Flux<DailyQuoteExportDto> getDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getDailyQuotes(symbol);
 	}
 }

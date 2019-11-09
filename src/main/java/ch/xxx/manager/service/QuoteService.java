@@ -13,8 +13,7 @@ public class QuoteService {
 	private DailyQuoteRepository dailyQuoteRepository;
 	
 	public Flux<DailyQuoteExportDto> getDailyQuotes(String symbol) {
-		return this.dailyQuoteRepository.findAll().flatMapSequential(quote -> convert(quote));
-//		return this.dailyQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
+		return this.dailyQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
 	}
 	
 	private Flux<DailyQuoteExportDto> convert(DailyQuoteEntity entity) {

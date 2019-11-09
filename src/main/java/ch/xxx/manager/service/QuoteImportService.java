@@ -33,15 +33,15 @@ public class QuoteImportService {
 	private AlphavatageController alphavatageController;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
-	@Autowired
-	private ConnectionFactory connectionFactory;
 
 	@Scheduled(initialDelay = 1000, fixedRate = 1000000)
 	public void importQuoteHistory() {
 		LOGGER.info("importQuoteHistory() called");
 		final String symbol = "MSFT";
-		this.alphavatageController.getTimeseriesHistory(symbol).flatMap(wrapper -> this.convert(symbol, wrapper))
-				.subscribe(quotes -> this.saveAll(quotes));
+		this.alphavatageController.getTimeseriesHistory(symbol)
+			.flatMap(wrapper -> this.convert(symbol, wrapper))
+			.flatMapMany(value -> this.saveAll(value)).blockLast();
+		LOGGER.info("importQuoteHistory() finished");
 	}
 
 	private Mono<List<DailyQuoteEntity>> convert(String symbol, DailyWrapperImportDto wrapper) {
@@ -58,24 +58,8 @@ public class QuoteImportService {
 	}
 
 	private Flux<DailyQuoteEntity> saveAll(Collection<DailyQuoteEntity> entities) {
-		return this.dailyQuoteRepository.saveAll(entities);
-		/*
-		ConnectionFactory connectionFactoryProxy = ProxyConnectionFactory.builder(connectionFactory).onAfterQuery(
-				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo.block())))
-				.build();
-		DatabaseClient databaseClient = DatabaseClient.create(connectionFactoryProxy);
-		for (Iterator<DailyQuoteEntity> iter = entities.iterator(); iter.hasNext();) {
-			DailyQuoteEntity entity = iter.next();			
-			databaseClient.execute(
-//					"insert into dailyquote (symbol, open, high, low, close, volume, day) values ($1, $2, $3, $4, $5, $6, $7)")
-					"insert into dailyquote (symbol) values ('MSFT')") 
-//					.bind(1, entity.getSymbol()).bind(2, entity.getOpen()).bind(3, entity.getHigh())
-//					.bind(4, entity.getLow()).bind(5, entity.getClose()).bind(6, entity.getVolume())
-//					.bind(7, entity.getDay())
-					.fetch().rowsUpdated().then().subscribe();
-//			databaseClient.insert().into(DailyQuoteEntity.class).using(entity).fetch().rowsUpdated().subscribe();
-		}	
-		return Flux.empty();
-		*/
+		LOGGER.info("importQuoteHistory() {} to import", entities.size());
+		return this.dailyQuoteRepository.saveAll(entities);		
+		
 	}
 }

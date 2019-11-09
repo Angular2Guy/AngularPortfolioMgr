@@ -12,10 +12,10 @@
  */
 package ch.xxx.manager.service;
 
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 
 import ch.xxx.manager.entity.AppUserEntity;
 
-public interface AppUserRepository extends ReactiveCrudRepository<AppUserEntity, Long> {
+public interface AppUserRepository extends R2dbcRepository<AppUserEntity, Long> {
 	
 }
