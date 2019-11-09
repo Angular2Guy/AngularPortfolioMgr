@@ -1,18 +1,27 @@
+/**
+ *    Copyright 2019 Sven Loesekann
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
 package ch.xxx.manager.service;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +29,6 @@ import ch.xxx.manager.contoller.AlphavatageController;
 import ch.xxx.manager.dto.DailyQuoteImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
-import io.r2dbc.proxy.ProxyConnectionFactory;
-import io.r2dbc.proxy.support.QueryExecutionInfoFormatter;
-import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

@@ -1,5 +1,3 @@
-package ch.xxx.manager.entity;
-
 /**
  *    Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +10,8 @@ package ch.xxx.manager.entity;
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+package ch.xxx.manager.entity;
+
 import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;

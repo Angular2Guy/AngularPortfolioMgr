@@ -23,7 +23,6 @@ import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryIn
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import ch.xxx.manager.init.MyConnectionFactoryInitializer;
 import io.r2dbc.proxy.ProxyConnectionFactory;
@@ -34,7 +33,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableR2dbcRepositories
-//@EnableTransactionManagement
 @EnableSwagger2
 @EnableScheduling
 class ApplicationConfig extends AbstractR2dbcConfiguration {
