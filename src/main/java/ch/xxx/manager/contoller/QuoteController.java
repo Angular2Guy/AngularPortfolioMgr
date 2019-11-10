@@ -19,17 +19,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.dto.DailyQuoteExportDto;
+import ch.xxx.manager.service.QuoteImportService;
 import ch.xxx.manager.service.QuoteService;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("rest/quotes")
+@RequestMapping("rest/quote")
 public class QuoteController {
 	@Autowired
 	private QuoteService quoteService;
+	@Autowired
+	private QuoteImportService quoteImportService;
 	
-	@GetMapping("/symbol/{symbol}")
+	@GetMapping("/daily/all/symbol/{symbol}")
 	public Flux<DailyQuoteExportDto> getDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getDailyQuotes(symbol);
+	}
+	
+	@GetMapping("/import/daily/symbol/{symbol}")
+	public Mono<Long> importDailyQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteImportService.importQuoteHistory(symbol);
 	}
 }

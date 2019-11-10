@@ -25,8 +25,8 @@ import ch.xxx.manager.dto.DailyWrapperImportDto;
 import reactor.core.publisher.Mono;
 
 @Component
-public class AlphavatageController {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AlphavatageController.class);
+public class AlphavatageConnector {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AlphavatageConnector.class);
 	@Value("${api.key}")
 	private String apiKey;
 	

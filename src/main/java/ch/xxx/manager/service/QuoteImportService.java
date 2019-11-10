@@ -22,10 +22,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.contoller.AlphavatageController;
+import ch.xxx.manager.contoller.AlphavatageConnector;
 import ch.xxx.manager.dto.DailyQuoteImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
@@ -36,18 +35,15 @@ import reactor.core.publisher.Mono;
 public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	@Autowired
-	private AlphavatageController alphavatageController;
+	private AlphavatageConnector alphavatageController;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
 
-	@Scheduled(initialDelay = 1000, fixedRate = 1000000)
-	public void importQuoteHistory() {
-		LOGGER.info("importQuoteHistory() called");
-		final String symbol = "MSFT";
-		this.alphavatageController.getTimeseriesHistory(symbol)
+	public Mono<Long> importQuoteHistory(String symbol) {
+		LOGGER.info("importQuoteHistory() called");		
+		return this.alphavatageController.getTimeseriesHistory(symbol)
 			.flatMap(wrapper -> this.convert(symbol, wrapper))
-			.flatMapMany(value -> this.saveAll(value)).blockLast();
-		LOGGER.info("importQuoteHistory() finished");
+			.flatMapMany(value -> this.saveAll(value)).count();
 	}
 
 	private Mono<List<DailyQuoteEntity>> convert(String symbol, DailyWrapperImportDto wrapper) {
