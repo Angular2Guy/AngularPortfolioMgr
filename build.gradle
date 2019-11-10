@@ -14,6 +14,7 @@ plugins {
 	id 'org.springframework.boot' version '2.2.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 	id 'java'
+    id 'com.palantir.docker' version '0.22.1'
 }
 
 group = 'ch.xxx'
@@ -56,13 +57,17 @@ dependencyManagement {
 	}
 }
 
+bootJar {
+   archiveFileName = 'portfoliomgr.jar'
+}
+
 test {
 	useJUnitPlatform()
 }
 
 task cleanAngular {
-	if(project.hasProperty('withAngular')) {
-		delete('src/angular/manager/node_modules/**')
+	if(project.hasProperty('withAngular')) {		
+		delete('src/angular/manager/node_modules')
 	}
 }
 
@@ -94,8 +99,20 @@ task testAngular {
 			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
 				commandLine('npm.cmd', 'run', 'test')
 			} else {
-				commandLine('npm', 'run', 'test-chromium')
+				//commandLine('npm', 'run', 'test-chromium')
+				commandLine('npm', 'run', 'test')
 			}
+		}
+	}
+}
+
+task buildDockerImage {
+	if(project.hasProperty('buildDockerImage')) {
+		docker {
+			name 'angular2guy/angularportfoliomgr:latest'
+			buildArgs([JAR_FILE: 'portfoliomgr.jar'])
+			pull true
+    		noCache true
 		}
 	}
 }

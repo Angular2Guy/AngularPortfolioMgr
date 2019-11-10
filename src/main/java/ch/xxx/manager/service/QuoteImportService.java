@@ -61,7 +61,6 @@ public class QuoteImportService {
 
 	private Flux<DailyQuoteEntity> saveAll(Collection<DailyQuoteEntity> entities) {
 		LOGGER.info("importQuoteHistory() {} to import", entities.size());
-		return this.dailyQuoteRepository.saveAll(entities);		
-		
+		return this.dailyQuoteRepository.saveAll(entities);				
 	}
 }
