@@ -107,14 +107,11 @@ task testAngular {
 }
 
 task buildDockerImage {
-	if(project.hasProperty('buildDockerImage')) {
-		exec {
-			commandLine('ls', 'build')
-			commandLine('ls', 'build/libs')
-		}
+	if(project.hasProperty('buildDockerImage')) {		
 		docker {
 			name 'angular2guy/angularportfoliomgr:latest'
 			buildArgs([JAR_FILE: 'portfoliomgr.jar'])
+			files bootJar.archivePath
 			pull true
     		noCache true
 		}
