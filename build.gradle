@@ -108,6 +108,10 @@ task testAngular {
 
 task buildDockerImage {
 	if(project.hasProperty('buildDockerImage')) {
+		exec {
+			commandLine('ls', 'build')
+			commandLine('ls', 'build/libs')
+		}
 		docker {
 			name 'angular2guy/angularportfoliomgr:latest'
 			buildArgs([JAR_FILE: 'portfoliomgr.jar'])
