@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AlphavatageConnector {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlphavatageConnector.class);
-	@Value("${api.key}")
+	@Value("${api.key:xxx}")
 	private String apiKey;
 	
 	public void getQuote(String symbol) {
