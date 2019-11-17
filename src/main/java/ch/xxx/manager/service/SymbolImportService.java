@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +25,12 @@ import reactor.core.publisher.Mono;
 @Service
 @Transactional
 public class SymbolImportService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
 	@Autowired
 	private NasdaqConnector connector;
 	@Autowired
-	private SymbolRepository repository;
-		
+	private SymbolRepository repository;			
+	
 	public Mono<Long> importSymbols() {
 		return this.connector.importSymbols().filter(str -> filter(str))
 				.flatMap(symbolStr -> this.convert(symbolStr))
@@ -45,8 +48,10 @@ public class SymbolImportService {
 	}
 	
 	private Mono<SymbolEntity> convert(String symbolLine) {
-		String[] strParts = symbolLine.split("|");
-		SymbolEntity entity = new SymbolEntity(null, strParts[0], strParts[1]);
+		String[] strParts = symbolLine.split("\\|");
+		SymbolEntity entity = new SymbolEntity(null, 
+				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15), 
+				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));		
 		return Mono.just(entity);
 	}
 }

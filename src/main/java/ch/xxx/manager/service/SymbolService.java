@@ -10,34 +10,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.contoller;
+package ch.xxx.manager.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.dto.SymbolDto;
-import ch.xxx.manager.service.SymbolImportService;
-import ch.xxx.manager.service.SymbolService;
+import ch.xxx.manager.entity.SymbolEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("rest/symbol")
-public class SymbolController {
+@Service
+@Transactional
+public class SymbolService {
 	@Autowired
-	private SymbolImportService importService;
-	@Autowired
-	private SymbolService service;
+	private SymbolRepository repository;
 	
-	@GetMapping("/import/all")
-	public Mono<Long> importSymbols() {
-		return this.importService.importSymbols();
+	public Flux<SymbolDto> getAllSymbols() {
+		return this.repository.findAll().flatMap(entity -> convert(entity));
 	}
 	
-	@GetMapping("/all")
-	public Flux<SymbolDto> getAllSymbols() {
-		return this.service.getAllSymbols();
+	private Mono<SymbolDto> convert(SymbolEntity entity) {
+		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName()));
 	}
 }
