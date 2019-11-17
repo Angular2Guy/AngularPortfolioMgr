@@ -34,7 +34,8 @@ dependencies {
 	compile 'io.netty:netty-codec-http'
 	compile 'org.tuckey:urlrewritefilter:4.0.4'	
 	compile 'io.springfox:springfox-swagger2:2.9.2'
-	compile 'io.springfox:springfox-swagger-ui:2.9.2'		
+	compile 'io.springfox:springfox-swagger-ui:2.9.2'
+	compile 'commons-net:commons-net:3.6'		
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
