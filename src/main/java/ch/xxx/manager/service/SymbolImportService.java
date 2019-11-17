@@ -14,18 +14,20 @@ package ch.xxx.manager.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.contoller.NasdaqConnector;
 import ch.xxx.manager.entity.SymbolEntity;
 import reactor.core.publisher.Mono;
 
 @Service
+@Transactional
 public class SymbolImportService {
 	@Autowired
 	private NasdaqConnector connector;
 	@Autowired
 	private SymbolRepository repository;
-	
+		
 	public Mono<Long> importSymbols() {
 		return this.connector.importSymbols().filter(str -> filter(str))
 				.flatMap(symbolStr -> this.convert(symbolStr))

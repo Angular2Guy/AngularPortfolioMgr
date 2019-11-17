@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.contoller.AlphavatageConnector;
 import ch.xxx.manager.dto.DailyQuoteImportDto;
@@ -32,13 +33,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@Transactional
 public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	@Autowired
 	private AlphavatageConnector alphavatageController;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
-
+	
 	public Mono<Long> importQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called");		
 		return this.alphavatageController.getTimeseriesHistory(symbol)

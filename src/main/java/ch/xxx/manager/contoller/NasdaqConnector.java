@@ -59,6 +59,7 @@ public class NasdaqConnector {
 		return Flux.concat(this.importSymbols(IMPORT_FILES.get(0), ftp), this.importSymbols(IMPORT_FILES.get(1), ftp))
 				.doAfterTerminate(() -> {
 					try {
+						ftp.logout();
 						ftp.disconnect();
 					} catch (IOException e) {
 						throw new RuntimeException(String.format("Failed to close ftp connection to: %s", HOST));
