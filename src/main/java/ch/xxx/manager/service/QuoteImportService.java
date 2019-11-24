@@ -43,11 +43,23 @@ public class QuoteImportService {
 	
 	public Mono<Long> importQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called");		
-		return this.alphavatageController.getTimeseriesHistory(symbol)
+		return this.alphavatageController.getTimeseriesHistory(symbol, true)
 			.flatMap(wrapper -> this.convert(symbol, wrapper))
 			.flatMapMany(value -> this.saveAll(value)).count();
 	}
 
+	public Mono<Long> importUpdateDailyQuotes(String symbol) {
+		LOGGER.info("importNewDailyQuotes() called");
+		return this.dailyQuoteRepository.findBySymbol(symbol).collectList()
+			.flatMap(entities -> entities.isEmpty() ? 
+					this.alphavatageController.getTimeseriesHistory(symbol, true)
+						.flatMap(wrapper -> this.convert(symbol, wrapper)) 
+					: this.alphavatageController.getTimeseriesHistory(symbol, false)
+						.flatMap(wrapper -> this.convert(symbol, wrapper))
+						.map(dtos -> dtos.stream().filter(myDto -> 0 != entities.get(0).getDay().compareTo(myDto.getDay())).collect(Collectors.toList()))).
+			flatMapMany(value -> this.saveAll(value)).count();
+	}
+	
 	private Mono<List<DailyQuoteEntity>> convert(String symbol, DailyWrapperImportDto wrapper) {
 		List<DailyQuoteEntity> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbol, entry.getKey(), entry.getValue())).collect(Collectors.toList());

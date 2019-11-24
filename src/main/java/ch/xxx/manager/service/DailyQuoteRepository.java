@@ -19,6 +19,6 @@ import ch.xxx.manager.entity.DailyQuoteEntity;
 import reactor.core.publisher.Flux;
 
 public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, Long> {
-	@Query("select * from dailyquote where symbol = :symbol")
+	@Query("select * from dailyquote where symbol = :symbol order by day desc")
 	Flux<DailyQuoteEntity> findBySymbol(String symbol);
 }

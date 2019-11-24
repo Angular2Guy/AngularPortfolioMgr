@@ -30,18 +30,22 @@ public class AlphavatageConnector {
 	@Value("${api.key:xxx}")
 	private String apiKey;
 	
-	public void getQuote(String symbol) {
-		
-	}
-	
-	public void getTimeseriesToday(String symbol) {
-		
-	}
-	
-	public Mono<DailyWrapperImportDto> getTimeseriesHistory(String symbol) {
+	public Mono<DailyWrapperImportDto> getTimeseriesToday(String symbol) {
 		try {
 			return WebClient.create().get()
-				.uri(new URI(String.format("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s&outputsize=full&apikey=%s", symbol, this.apiKey)))
+				.uri(new URI(String.format("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s", symbol, this.apiKey)))
+				.retrieve().bodyToMono(DailyWrapperImportDto.class);
+		} catch (URISyntaxException e) {
+			LOGGER.error("getTimeseriesHistory failed.",e);
+		}
+		return Mono.empty();
+	}
+	
+	public Mono<DailyWrapperImportDto> getTimeseriesHistory(String symbol, boolean fullSeries) {
+		try {
+			String fullSeriesStr = fullSeries ? "&outputsize=full" : ""; 
+			return WebClient.create().get()
+				.uri(new URI(String.format("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s", symbol, fullSeriesStr, this.apiKey)))
 				.retrieve().bodyToMono(DailyWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.",e);
