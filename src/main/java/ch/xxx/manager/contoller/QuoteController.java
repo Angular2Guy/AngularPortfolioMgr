@@ -39,6 +39,11 @@ public class QuoteController {
 	
 	@GetMapping("/import/daily/symbol/{symbol}")
 	public Mono<Long> importDailyQuotes(@PathVariable("symbol") String symbol) {
-		return this.quoteImportService.importQuoteHistory(symbol);
+		return this.quoteImportService.importDailyQuoteHistory(symbol);
+	}
+	
+	@GetMapping("/import/intraday/symbol/{symbol}")
+	public Mono<Long> importIntraDayQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteImportService.importIntraDayQuotes(symbol);
 	}
 }

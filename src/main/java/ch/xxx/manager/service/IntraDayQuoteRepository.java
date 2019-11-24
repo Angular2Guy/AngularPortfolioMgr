@@ -12,15 +12,17 @@
  */
 package ch.xxx.manager.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.r2dbc.repository.query.Query;
-import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.DailyQuoteEntity;
+import ch.xxx.manager.entity.IntraDayQuoteEntity;
 import reactor.core.publisher.Flux;
 
-@Repository
-public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, Long> {
-	@Query("select * from dailyquote where symbol = :symbol order by day asc")
-	Flux<DailyQuoteEntity> findBySymbol(String symbol);
+public interface IntraDayQuoteRepository extends R2dbcRepository<IntraDayQuoteEntity, Long> {
+	@Query("select * from intradayquote where symbol = :symbol order by localdatetime asc")
+	Flux<IntraDayQuoteEntity> findBySymbol(String symbol);
+	@Query("select * from intradayquote where symbol = :symbol and localdatetime between :start and :end order by localdatetime asc")
+	Flux<IntraDayQuoteEntity> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
 }

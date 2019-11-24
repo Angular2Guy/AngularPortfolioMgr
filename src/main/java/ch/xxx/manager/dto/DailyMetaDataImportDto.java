@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MetaDataImportDto {
+public class DailyMetaDataImportDto {
 	@JsonProperty("1. Information")
 	private String info;
 	@JsonProperty("2. Symbol")

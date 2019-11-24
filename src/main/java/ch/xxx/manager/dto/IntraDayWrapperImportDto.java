@@ -17,22 +17,23 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DailyWrapperImportDto {
+public class IntraDayWrapperImportDto {
 	@JsonProperty("Meta Data")
-	private DailyMetaDataImportDto metaData;	
-	@JsonProperty("Time Series (Daily)")
-	private Map<String,DailyQuoteImportDto> dailyQuotes = new HashMap<>();
+	private IntraDayMetaDataImportDto metaData;	
+	@JsonProperty("Time Series (5min)")
+	private Map<String,IntraDayQuoteImportDto> dailyQuotes = new HashMap<>();
 	
-	public DailyMetaDataImportDto getMetaData() {
-		return metaData;
-	}
-	public void setMetaData(DailyMetaDataImportDto metaData) {
-		this.metaData = metaData;
-	}
-	public Map<String, DailyQuoteImportDto> getDailyQuotes() {
+	public Map<String, IntraDayQuoteImportDto> getDailyQuotes() {
 		return dailyQuotes;
 	}
-	public void setDailyQuotes(Map<String, DailyQuoteImportDto> dailyQuotes) {
+	public void setDailyQuotes(Map<String, IntraDayQuoteImportDto> dailyQuotes) {
 		this.dailyQuotes = dailyQuotes;
 	}
+	public IntraDayMetaDataImportDto getMetaData() {
+		return metaData;
+	}
+	public void setMetaData(IntraDayMetaDataImportDto metaData) {
+		this.metaData = metaData;
+	}
+	
 }

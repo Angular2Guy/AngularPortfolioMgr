@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ch.xxx.manager.dto.DailyWrapperImportDto;
+import ch.xxx.manager.dto.IntraDayWrapperImportDto;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -30,18 +31,18 @@ public class AlphavatageConnector {
 	@Value("${api.key:xxx}")
 	private String apiKey;
 	
-	public Mono<DailyWrapperImportDto> getTimeseriesToday(String symbol) {
+	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
 		try {
 			return WebClient.create().get()
 				.uri(new URI(String.format("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s", symbol, this.apiKey)))
-				.retrieve().bodyToMono(DailyWrapperImportDto.class);
+				.retrieve().bodyToMono(IntraDayWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.",e);
 		}
 		return Mono.empty();
 	}
 	
-	public Mono<DailyWrapperImportDto> getTimeseriesHistory(String symbol, boolean fullSeries) {
+	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : ""; 
 			return WebClient.create().get()
