@@ -18,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.contoller.HkexConnector;
 import ch.xxx.manager.contoller.NasdaqConnector;
+import ch.xxx.manager.dto.HkSymbolImportDto;
 import ch.xxx.manager.entity.SymbolEntity;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -27,14 +30,31 @@ import reactor.core.publisher.Mono;
 public class SymbolImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
 	@Autowired
-	private NasdaqConnector connector;
+	private NasdaqConnector nasdaqConnector;
+	@Autowired
+	private HkexConnector hkexConnector;
 	@Autowired
 	private SymbolRepository repository;			
 	
-	public Mono<Long> importSymbols() {
-		return this.connector.importSymbols().filter(str -> filter(str))
+	public Mono<Long> importUSSymbols() {
+		return this.nasdaqConnector.importSymbols().filter(str -> filter(str))
 				.flatMap(symbolStr -> this.convert(symbolStr))
 			.flatMap(entity -> this.repository.save(entity)).count();
+	}
+	
+	public Mono<Long> importHkSymbols() {
+		return this.hkexConnector.importSymbols().filter(dto -> filter(dto))
+				.flatMap(myDto -> this.convert(myDto))
+				.flatMap(entity -> this.repository.save(entity)).count();
+	}
+	
+	private Flux<SymbolEntity> convert(HkSymbolImportDto dto) {		
+		return Flux.just(new SymbolEntity(null, String.format("%s.HKG", dto.getSymbol()), dto.getName()));
+	}
+	
+	private boolean filter(HkSymbolImportDto dto) {
+		long symbol = Long.parseLong(dto.getSymbol());
+		return symbol < 10000;
 	}
 	
 	private boolean filter(String line) {

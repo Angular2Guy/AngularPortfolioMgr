@@ -31,9 +31,14 @@ public class SymbolController {
 	@Autowired
 	private SymbolService service;
 	
-	@GetMapping("/import/all")
-	public Mono<Long> importSymbols() {
-		return this.importService.importSymbols();
+	@GetMapping("/importus/all")
+	public Mono<Long> importUsSymbols() {
+		return this.importService.importUSSymbols();
+	}
+	
+	@GetMapping("/importhk/all")
+	public Mono<Long> importHkSymbols() {
+		return this.importService.importHkSymbols();
 	}
 	
 	@GetMapping("/all")
