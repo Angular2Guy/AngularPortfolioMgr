@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.entity;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -21,7 +23,14 @@ public class PortfolioToSymbolEntity {
 	private Long id;
 	private Long portfolioId;
 	private Long symbolId;
+	private BigDecimal weight;
 
+	public BigDecimal getWeight() {
+		return weight;
+	}
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
 	public Long getId() {
 		return id;
 	}

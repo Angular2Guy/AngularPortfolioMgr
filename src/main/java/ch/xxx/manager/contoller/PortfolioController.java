@@ -12,10 +12,14 @@
  */
 package ch.xxx.manager.contoller;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,5 +48,15 @@ public class PortfolioController {
 	@PostMapping("/symbol/{symbolId}")
 	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId) {
 		return this.portfolioService.addSymbolToPortfolio(dto, symbolId);
+	}
+	
+	@PutMapping("/symbol/{symbolId}/weight/{weight}")
+	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId, BigDecimal weight) {
+		return this.portfolioService.addSymbolToPortfolio(dto, symbolId);
+	}
+	
+	@DeleteMapping("/{id}/symbol/{symbolId}")
+	public Mono<Boolean> deleteSymbolFromPortfolio(Long portfolioId, Long symbolId) {
+		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId);
 	}
 }

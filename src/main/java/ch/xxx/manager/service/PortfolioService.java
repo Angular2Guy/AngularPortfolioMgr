@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,17 +38,38 @@ public class PortfolioService {
 	}
 	
 	public Mono<Boolean> addPortfolio(PortfolioDto dto) {
-		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> Mono.just(myEntity.getId() != null ? Boolean.TRUE : Boolean.FALSE));
+		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
 	}
 	
 	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId) {
-		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId)).flatMap(myEntity -> Mono.just(myEntity.getId() != null ? Boolean.TRUE : Boolean.FALSE));
+		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
+	}
+	
+	public Mono<Boolean> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, BigDecimal weight) {
+		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId)
+				.flatMap(myEntity -> Flux.just(this.updatePtsEntity(myEntity, weight)))
+				.flatMap(newEntity -> Flux.just(this.portfolioToSymbolRepository.save(newEntity)))
+						.count()
+						.flatMap(num -> Mono.just(num > 0));
+	}
+	
+	public Mono<Boolean> removeSymbolFromPortfolio(Long portfolioId, Long symbolId) {
+		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
+				.flatMap(entity -> Flux.just(this.portfolioToSymbolRepository.delete(entity)))
+				.count()
+				.flatMap(num -> Mono.just(num > 0));				
+	}
+	
+	private PortfolioToSymbolEntity updatePtsEntity(PortfolioToSymbolEntity entity, BigDecimal weight) {
+		entity.setWeight(weight);
+		return entity;
 	}
 	
 	private PortfolioToSymbolEntity createPtsEntity(PortfolioDto dto, Long symbolId) {
 		PortfolioToSymbolEntity entity = new PortfolioToSymbolEntity();
 		entity.setPortfolioId(dto.getId());
 		entity.setSymbolId(symbolId);
+		entity.setWeight(BigDecimal.ZERO);
 		return entity;
 	}
 	

@@ -16,14 +16,15 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.r2dbc.repository.query.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import reactor.core.publisher.Flux;
 
 @Repository
 public interface PortfolioToSymbolRepository extends R2dbcRepository<PortfolioToSymbolEntity, Long> {
-	@Query("select * from portfoliotosymbol where user_id = :userId")
-	Flux<PortfolioEntity> findByUserId(Long userId);
+	@Query("select * from portfoliotosymbol where portfolio_id = :portfolioId")
+	Flux<PortfolioToSymbolEntity> findByPortfolioId(Long portfolioId);
 	@Query("select * from portfoliotosymbol where symbol_id = :symbolId")
-	Flux<PortfolioEntity> findBySymbolId(Long symbolId);
+	Flux<PortfolioToSymbolEntity> findBySymbolId(Long symbolId);
+	@Query("select * from portfoliotosymbol where symbol_id = :symbolId and portfolio_id = :portfolioId")
+	Flux<PortfolioToSymbolEntity> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
 }
