@@ -29,11 +29,12 @@ public class DailyQuoteEntity {
 	private BigDecimal close;
 	private Long volume;
 	private LocalDate day;
+	private Long symbolId;
 	
 	public DailyQuoteEntity() {		
 	}
 	
-	public DailyQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume, LocalDate day) {
+	public DailyQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume, LocalDate day, Long symbolId) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
@@ -43,8 +44,17 @@ public class DailyQuoteEntity {
 		this.close = close;
 		this.volume = volume;
 		this.day = day;
+		this.symbolId = symbolId;
 	}
 	
+	public Long getSymbolId() {
+		return symbolId;
+	}
+
+	public void setSymbolId(Long symbolId) {
+		this.symbolId = symbolId;
+	}
+
 	public LocalDate getDay() {
 		return day;
 	}

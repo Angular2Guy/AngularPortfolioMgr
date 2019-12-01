@@ -35,8 +35,10 @@ import ch.xxx.manager.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.IntraDayQuoteEntity;
+import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.IntraDayQuoteRepository;
+import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -50,6 +52,8 @@ public class QuoteImportService {
 	private DailyQuoteRepository dailyQuoteRepository;
 	@Autowired
 	private IntraDayQuoteRepository intraDayQuoteRepository;
+	@Autowired
+	private SymbolRepository symbolRepository;
 	
 	@Scheduled(cron = "0 0 2 * * ?")
 	public void scheduledImporter() {
@@ -57,45 +61,49 @@ public class QuoteImportService {
 	}
 	
 	public Mono<Long> importIntraDayQuotes(String symbol) {
-		LOGGER.info("importIntraDayQuotes() called");			
-		return this.alphavatageController.getTimeseriesIntraDay(symbol)
-				.flatMap(wrapper -> this.convert(symbol, wrapper))
+		LOGGER.info("importIntraDayQuotes() called");	
+		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity -> 
+			this.alphavatageController.getTimeseriesIntraDay(symbol)
+				.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
 				.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
 				.doAfterTerminate(() -> 
-					this.intraDayQuoteRepository.findBySymbol(symbol)
+					this.intraDayQuoteRepository.findBySymbolId(symbolEntity.getId())
 					.collectList().map(oldQuotes -> this.deleteIntraDayQuotes(oldQuotes))
-					.subscribe());
+					.subscribe()));
 	}
 	
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
-		LOGGER.info("importQuoteHistory() called");		
-		return this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
-			.flatMap(wrapper -> this.convert(symbol, wrapper))
-			.flatMapMany(value -> this.saveAllDailyQuotes(value)).count();
+		LOGGER.info("importQuoteHistory() called");
+		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity -> 
+			this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
+			.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
+			.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called");
-		return this.dailyQuoteRepository.findBySymbol(symbol).collectList()
+		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity ->
+			this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
 			.flatMap(entities -> entities.isEmpty() ? 
 					this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
-						.flatMap(wrapper -> this.convert(symbol, wrapper)) 
+						.flatMap(wrapper -> this.convert(symbolEntity, wrapper)) 
 					: this.alphavatageController.getTimeseriesDailyHistory(symbol, false)
-						.flatMap(wrapper -> this.convert(symbol, wrapper))
+						.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
 						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size()-1).getDay().compareTo(myDto.getDay())).collect(Collectors.toList()))).
-			flatMapMany(value -> this.saveAllDailyQuotes(value)).count();
+			flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 	
-	private Mono<List<IntraDayQuoteEntity>> convert(String symbol, IntraDayWrapperImportDto wrapper) {
+	private Mono<List<IntraDayQuoteEntity>> convert(SymbolEntity symbolEntity, IntraDayWrapperImportDto wrapper) {
 		List<IntraDayQuoteEntity> quotes = wrapper.getDailyQuotes().entrySet().stream()
-				.map(entry -> this.convert(symbol, entry.getKey(), entry.getValue())).collect(Collectors.toList());
+				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue())).collect(Collectors.toList());
 		return Mono.just(quotes);
 	}
 
-	private IntraDayQuoteEntity convert(String symbol, String dateStr, IntraDayQuoteImportDto dto) {
-		IntraDayQuoteEntity entity = new IntraDayQuoteEntity(null, symbol, new BigDecimal(dto.getOpen()),
+	private IntraDayQuoteEntity convert(SymbolEntity symbolEntity, String dateStr, IntraDayQuoteImportDto dto) {
+		IntraDayQuoteEntity entity = new IntraDayQuoteEntity(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()), 
-				Long.parseLong(dto.getVolume()), LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				Long.parseLong(dto.getVolume()), LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				symbolEntity.getId());
 		return entity;
 	}
 
@@ -104,16 +112,17 @@ public class QuoteImportService {
 		return this.intraDayQuoteRepository.saveAll(entities);				
 	}
 	
-	private Mono<List<DailyQuoteEntity>> convert(String symbol, DailyWrapperImportDto wrapper) {
+	private Mono<List<DailyQuoteEntity>> convert(SymbolEntity symbolEntity, DailyWrapperImportDto wrapper) {
 		List<DailyQuoteEntity> quotes = wrapper.getDailyQuotes().entrySet().stream()
-				.map(entry -> this.convert(symbol, entry.getKey(), entry.getValue())).collect(Collectors.toList());
+				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue())).collect(Collectors.toList());
 		return Mono.just(quotes);
 	}
 
-	private DailyQuoteEntity convert(String symbol, String dateStr, DailyQuoteImportDto dto) {
-		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbol, new BigDecimal(dto.getOpen()),
+	private DailyQuoteEntity convert(SymbolEntity symbolEntity, String dateStr, DailyQuoteImportDto dto) {
+		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
-				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE));
+				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
+				symbolEntity.getId());
 		return entity;
 	}
 

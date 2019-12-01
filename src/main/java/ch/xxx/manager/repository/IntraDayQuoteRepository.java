@@ -23,6 +23,8 @@ import reactor.core.publisher.Flux;
 public interface IntraDayQuoteRepository extends R2dbcRepository<IntraDayQuoteEntity, Long> {
 	@Query("select * from intradayquote where symbol = :symbol order by localdatetime asc")
 	Flux<IntraDayQuoteEntity> findBySymbol(String symbol);
+	@Query("select * from intradayquote where symbol_id = :symbolId order by localdatetime asc")
+	Flux<IntraDayQuoteEntity> findBySymbolId(Long symbolId);
 	@Query("select * from intradayquote where symbol = :symbol and localdatetime between :start and :end order by localdatetime asc")
 	Flux<IntraDayQuoteEntity> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
 }

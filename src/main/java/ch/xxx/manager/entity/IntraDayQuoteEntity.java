@@ -29,12 +29,13 @@ public class IntraDayQuoteEntity {
 	private BigDecimal close;
 	private Long volume;
 	private LocalDateTime localdatetime;
+	private Long symbolId;
 
 	public IntraDayQuoteEntity() {		
 	}
 	
 	public IntraDayQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low,
-			BigDecimal close, Long volume, LocalDateTime localdatetime) {
+			BigDecimal close, Long volume, LocalDateTime localdatetime, Long symbolId) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
@@ -44,7 +45,17 @@ public class IntraDayQuoteEntity {
 		this.close = close;
 		this.volume = volume;
 		this.localdatetime = localdatetime;
+		this.symbolId = symbolId;
 	}
+	
+	public Long getSymbolId() {
+		return symbolId;
+	}
+
+	public void setSymbolId(Long symbolId) {
+		this.symbolId = symbolId;
+	}
+
 	public LocalDateTime getLocaldatetime() {
 		return localdatetime;
 	}

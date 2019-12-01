@@ -23,19 +23,29 @@ public class AppUserEntity {
 	private Long id;
 	private String name;
 	private String firstname;
+	private String emailAddress;
 	private LocalDate birthdate;
 	
-	public AppUserEntity(Long id, String name, String firstname, LocalDate birthdate) {
+	public AppUserEntity(Long id, String name, String firstname, String emailAddress, LocalDate birthdate) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.firstname = firstname;
+		this.emailAddress = emailAddress;
 		this.birthdate = birthdate;
 	}
 	
 	public AppUserEntity() {		
 	}
 	
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
 	public Long getId() {
 		return id;
 	}
