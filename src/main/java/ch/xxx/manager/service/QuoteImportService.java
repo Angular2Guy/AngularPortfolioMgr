@@ -15,7 +15,6 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -25,6 +24,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +35,8 @@ import ch.xxx.manager.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.IntraDayQuoteEntity;
+import ch.xxx.manager.repository.DailyQuoteRepository;
+import ch.xxx.manager.repository.IntraDayQuoteRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -49,13 +51,17 @@ public class QuoteImportService {
 	@Autowired
 	private IntraDayQuoteRepository intraDayQuoteRepository;
 	
+	@Scheduled(cron = "0 0 2 * * ?")
+	public void scheduledImporter() {
+		
+	}
+	
 	public Mono<Long> importIntraDayQuotes(String symbol) {
 		LOGGER.info("importIntraDayQuotes() called");			
 		return this.alphavatageController.getTimeseriesIntraDay(symbol)
 				.flatMap(wrapper -> this.convert(symbol, wrapper))
 				.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
 				.doAfterTerminate(() -> 
-//					this.intraDayQuoteRepository.findBySymbolAndLocaldatetimeBetween(symbol, LocalDate.of(2000, 01, 01).atStartOfDay(), LocalTime.MAX.atDate(LocalDate.now().minusDays(1)))
 					this.intraDayQuoteRepository.findBySymbol(symbol)
 					.collectList().map(oldQuotes -> this.deleteIntraDayQuotes(oldQuotes))
 					.subscribe());

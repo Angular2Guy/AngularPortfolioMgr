@@ -10,17 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.service;
+package ch.xxx.manager.repository;
 
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.r2dbc.repository.query.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.DailyQuoteEntity;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.entity.SymbolEntity;
+import reactor.core.publisher.Mono;
 
 @Repository
-public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, Long> {
-	@Query("select * from dailyquote where symbol = :symbol order by day asc")
-	Flux<DailyQuoteEntity> findBySymbol(String symbol);
+public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {
+	@Query("select * from symbol where symbol = :symbol")
+	Mono<SymbolEntity> findBySymbol(String symbol);
 }

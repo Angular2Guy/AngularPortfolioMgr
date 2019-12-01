@@ -15,6 +15,7 @@ package ch.xxx.manager.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import ch.xxx.manager.contoller.HkexConnector;
 import ch.xxx.manager.contoller.NasdaqConnector;
 import ch.xxx.manager.dto.HkSymbolImportDto;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,16 +38,26 @@ public class SymbolImportService {
 	@Autowired
 	private SymbolRepository repository;			
 	
+	@Scheduled(cron = "0 0 1 * * ?")
+	public void scheduledImporter() {
+		this.importUSSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
+		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
+	}
+	
 	public Mono<Long> importUSSymbols() {
 		return this.nasdaqConnector.importSymbols().filter(str -> filter(str))
 				.flatMap(symbolStr -> this.convert(symbolStr))
-			.flatMap(entity -> this.repository.save(entity)).count();
+			.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 	
 	public Mono<Long> importHkSymbols() {
 		return this.hkexConnector.importSymbols().filter(dto -> filter(dto))
 				.flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.repository.save(entity)).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count();
+	}
+	
+	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
+		return this.repository.findBySymbol(entity.getSymbol()).switchIfEmpty(Mono.just(entity)).flatMap(myEntity -> this.repository.save(entity));
 	}
 	
 	private Flux<SymbolEntity> convert(HkSymbolImportDto dto) {		

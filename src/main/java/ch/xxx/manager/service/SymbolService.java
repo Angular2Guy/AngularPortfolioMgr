@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.dto.SymbolDto;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

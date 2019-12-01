@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.service;
+package ch.xxx.manager.repository;
 
 import java.time.LocalDateTime;
 

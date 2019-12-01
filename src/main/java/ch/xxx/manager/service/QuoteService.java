@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.dto.DailyQuoteExportDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
+import ch.xxx.manager.repository.DailyQuoteRepository;
 import reactor.core.publisher.Flux;
 
 @Service

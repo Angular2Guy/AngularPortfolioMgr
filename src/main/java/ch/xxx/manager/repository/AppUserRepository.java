@@ -10,14 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.service;
+package ch.xxx.manager.repository;
 
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
-import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.AppUserEntity;
 
-@Repository
-public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {
-
+public interface AppUserRepository extends R2dbcRepository<AppUserEntity, Long> {
+	
 }
