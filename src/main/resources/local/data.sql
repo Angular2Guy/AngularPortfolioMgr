@@ -1,2 +1,2 @@
-insert into appuser (name, firstname, birthdate) values ('Max', 'Smith', now());
+insert into appuser (name, firstname, email_address, birthdate) values ('Max', 'Smith', 'sven@gmx.de', now());
 --insert into dailyquote (symbol, open, high, low, close, volume, day) values ('MSFT',92.7500,94.5000,91.9380,29.8767,46349000,now());
