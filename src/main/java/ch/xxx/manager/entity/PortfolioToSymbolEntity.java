@@ -22,6 +22,12 @@ public class PortfolioToSymbolEntity {
 	private Long portfolioId;
 	private Long symbolId;
 
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public Long getPortfolioId() {
 		return portfolioId;
 	}

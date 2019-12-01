@@ -17,17 +17,45 @@ import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.dto.PortfolioDto;
 import ch.xxx.manager.entity.PortfolioEntity;
+import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.repository.PortfolioRepository;
+import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @Service
 public class PortfolioService {
 	@Autowired
 	private PortfolioRepository portfolioRepository;
+	@Autowired
+	private PortfolioToSymbolRepository portfolioToSymbolRepository;
 	
 	public Flux<PortfolioDto> getPortfolioByUserId(Long userId) {
 		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> convert(entity));
+	}
+	
+	public Mono<Boolean> addPortfolio(PortfolioDto dto) {
+		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> Mono.just(myEntity.getId() != null ? Boolean.TRUE : Boolean.FALSE));
+	}
+	
+	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId) {
+		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId)).flatMap(myEntity -> Mono.just(myEntity.getId() != null ? Boolean.TRUE : Boolean.FALSE));
+	}
+	
+	private PortfolioToSymbolEntity createPtsEntity(PortfolioDto dto, Long symbolId) {
+		PortfolioToSymbolEntity entity = new PortfolioToSymbolEntity();
+		entity.setPortfolioId(dto.getId());
+		entity.setSymbolId(symbolId);
+		return entity;
+	}
+	
+	private PortfolioEntity convert(PortfolioDto dto) {
+		PortfolioEntity entity = new PortfolioEntity();
+		entity.setId(dto.getId());
+		entity.setName(dto.getName());
+		entity.setUserId(dto.getUserId());
+		return entity;
 	}
 	
 	private Flux<PortfolioDto> convert(PortfolioEntity entity) {

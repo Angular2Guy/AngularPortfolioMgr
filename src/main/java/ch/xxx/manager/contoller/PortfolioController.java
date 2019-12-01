@@ -15,12 +15,15 @@ package ch.xxx.manager.contoller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.dto.PortfolioDto;
 import ch.xxx.manager.service.PortfolioService;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/portfolio")
@@ -30,6 +33,16 @@ public class PortfolioController {
 	
 	@GetMapping("/userid/{userId}")
 	public Flux<PortfolioDto> getPortfolioByUserId(@PathVariable("userId") Long userId) {
-		return null;
+		return this.portfolioService.getPortfolioByUserId(userId);
+	}
+	
+	@PostMapping
+	public Mono<Boolean> createPortfolio(@RequestBody PortfolioDto dto) {
+		return this.portfolioService.addPortfolio(dto);
+	}
+	
+	@PostMapping("/symbol/{symbolId}")
+	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId) {
+		return this.portfolioService.addSymbolToPortfolio(dto, symbolId);
 	}
 }
