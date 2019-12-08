@@ -10,13 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { OverviewComponent } from './component/overview/overview.component';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+const routes: Routes = [
+	{ path: '/portfolios/overview', component: OverviewComponent },
+	{ path: '/portfolios/**', redirectTo: '/portfolios/overview' }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
-export class AppComponent {
-  title = 'manager';
-}
+export class PortfoliosRoutingModule { }

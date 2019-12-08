@@ -10,13 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { PortfoliosRoutingModule } from './portfolios-routing.module';
+import { BaseModule } from '../base/base.module';
+import { OverviewComponent } from './component/overview/overview.component';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+@NgModule({
+  declarations: [OverviewComponent],
+  imports: [
+    BaseModule,
+    PortfoliosRoutingModule
+  ]
 })
-export class AppComponent {
-  title = 'manager';
-}
+export class PortfoliosModule { }

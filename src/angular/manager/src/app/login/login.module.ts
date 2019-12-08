@@ -10,13 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { NgModule } from '@angular/core';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+import { LoginRoutingModule } from './login-routing.module';
+import { LoginComponent } from './component/login/login.component';
+import { BaseModule } from '../base/base.module';
+
+@NgModule({
+  declarations: [LoginComponent],
+  imports: [
+    BaseModule,
+    LoginRoutingModule
+  ]
 })
-export class AppComponent {
-  title = 'manager';
-}
+export class LoginModule { }
