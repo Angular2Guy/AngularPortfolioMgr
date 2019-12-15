@@ -15,8 +15,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { OverviewComponent } from './component/overview/overview.component';
 
 const routes: Routes = [
-	{ path: '/portfolios/overview', component: OverviewComponent },
-	{ path: '/portfolios/**', redirectTo: '/portfolios/overview' }
+	{ path: 'overview', component: OverviewComponent },
+	{ path: '**', redirectTo: 'overview' }
 ];
 
 @NgModule({

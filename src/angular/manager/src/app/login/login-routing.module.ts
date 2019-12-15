@@ -15,8 +15,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { MainComponent } from './component/main/main.component';
 
 const routes: Routes = [
-	{ path: '/login/login', component: MainComponent },
-	{ path: '/login/**', redirectTo: '/login/login' }
+	{ path: 'login', component: MainComponent },
+	{ path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({
