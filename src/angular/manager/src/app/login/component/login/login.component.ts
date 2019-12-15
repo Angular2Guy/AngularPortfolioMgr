@@ -15,7 +15,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MainComponent } from '../main/main.component';
 import { LoginService } from '../../service/login.service';
-import { TokenService } from '../../../base/service/token.service';
+import { TokenService } from '../../../service/token.service';
 import { Login } from '../../model/login';
 
 @Component({

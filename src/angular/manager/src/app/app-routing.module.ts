@@ -13,14 +13,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { SpinnerComponent } from './spinner/spinner.component';
+import { MainGuard } from './service/main.guard';
 
 const routes: Routes = [
-	{ path: '/spinner', component: SpinnerComponent },
-	{ path: '/portfolios',
+	{ path: 'spinner', component: SpinnerComponent },
+	{ path: 'portfolios',
+	  canActivate: [MainGuard],
       loadChildren: () => import('./portfolios/portfolios.module').then(m => m.PortfoliosModule) },
-	{ path: '/login',
+	{ path: 'login',
       loadChildren: () => import('./login/login.module').then(m => m.LoginModule) },
-	{ path: '**', redirectTo: '/spinner' }
+	{ path: '**', redirectTo: 'spinner' }
 ];
 
 @NgModule({
