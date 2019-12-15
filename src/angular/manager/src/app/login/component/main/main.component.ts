@@ -21,27 +21,17 @@ import { LoginService } from '../../service/login.service';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit,OnDestroy {	
+export class MainComponent implements OnInit {	
   login: Login = null;
-  private dialogRef: MatDialogRef<LoginComponent, any> = null;
 
   constructor(private dialog: MatDialog, private loginService: LoginService) { }
 
   ngOnInit() {
   }
 
-  ngOnDestroy(): void {
-	if(this.dialogRef) {
-		this.dialogRef.close();
-	}
-  }
-
   openLoginDialog():void {
-	if(this.dialogRef) {
-		this.dialogRef.close();
-	}
-	this.dialogRef = this.dialog.open(LoginComponent, { width: '500px', data: {login: this.login}});
-	this.dialogRef.afterClosed().subscribe( result => {
+	const dialogRef = this.dialog.open(LoginComponent, { width: '500px', data: {login: this.login}});
+	dialogRef.afterClosed().subscribe( result => {
 		this.login = typeof result == 'undefined' ? null : result;		
 	});
   }
