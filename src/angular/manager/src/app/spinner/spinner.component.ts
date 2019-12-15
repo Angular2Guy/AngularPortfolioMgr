@@ -26,14 +26,17 @@ import { Router } from '@angular/router';
                    transition( '0 => 1', animate( '750ms' ) )
                ])]  
 })
-export class SpinnerComponent implements AfterViewInit {
+export class SpinnerComponent implements OnInit,AfterViewInit {
   myState = false;  
 
   constructor(private router: Router) { }
 
+  ngOnInit(): void {
+    this.myState = true;
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
-		this.myState = true;
 		this.router.navigate(['login']);
 	});
   }

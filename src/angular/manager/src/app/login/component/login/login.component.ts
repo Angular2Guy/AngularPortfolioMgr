@@ -10,18 +10,100 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MainComponent } from '../main/main.component';
+import { LoginService } from '../../service/login.service';
+import { TokenService } from '../../../base/service/token.service';
+import { Login } from '../../model/login';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+	selector: 'app-login',
+	templateUrl: './login.component.html',
+	styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+	signinForm: FormGroup;
+	loginForm: FormGroup;
+	loginFailed = false;
+	signinFailed = false;
+	pwMatching = true;
 
-  constructor() { }
+	constructor(public dialogRef: MatDialogRef<MainComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: any,
+		private loginService: LoginService,
+		private tokenService: TokenService,
+		fb: FormBuilder) {
+		this.signinForm = fb.group({
+			username: ['', Validators.required],
+			password: ['', Validators.required],
+			password2: ['', Validators.required],
+			email: ['', Validators.required]
+		}, {
+				validator: this.validate.bind(this)
+			});
+		this.loginForm = fb.group({
+			username: ['', Validators.required],
+			password: ['', Validators.required]
+		});
+	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+		console.log(this.data);
+	}
 
+	validate(group: FormGroup) {
+		if (group.get('password').touched || group.get('password2').touched) {
+			this.pwMatching = group.get('password').value === group.get('password2').value && group.get('password').value !== '';
+			if (!this.pwMatching) {
+				group.get('password').setErrors({ MatchPassword: true });
+				group.get('password2').setErrors({ MatchPassword: true });
+			} else {
+				group.get('password').setErrors(null);
+				group.get('password2').setErrors(null);
+			}
+		}
+		return this.pwMatching;
+	}
+
+	onSigninClick(): void {
+		const login: Login = { email: null, jwtToken: null, password: null, username: null };
+		login.username = this.signinForm.get('username').value;
+		login.password = this.signinForm.get('password').value;
+		login.email = this.signinForm.get('email').value;
+		this.loginService.postSignin(login).subscribe(res => this.signin(res), err => console.log(err));
+	}
+
+	onLoginClick(): void {
+		const login: Login = {email: null, jwtToken: null, password: null, username: null}; 
+		login.username = this.loginForm.get('username').value;
+		login.password = this.loginForm.get('password').value;
+		this.loginService.postLogin(login).subscribe(res => this.login(res), err => console.log(err));		
+	}
+
+	private signin(login: Login): void {
+		this.data.login = null;
+		if (login.username !== null) {
+			this.signinFailed = false;
+			this.dialogRef.close();
+		} else {
+			this.signinFailed = true;
+		}
+	}
+
+	private login(login: Login): void {
+		if (login.jwtToken) {
+			this.tokenService.token = login.jwtToken;
+			this.data.login = login;
+			this.loginFailed = false;
+			this.dialogRef.close(this.data.login);
+		} else {
+			this.loginFailed = true;
+		}
+	}
+
+	onCancelClick(): void {
+		this.dialogRef.close();
+	}
 }

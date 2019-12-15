@@ -30,8 +30,8 @@
     "rxjs": "~6.4.0",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1",
-    "chart.js": "~2.7.3",
-    "ng2-charts": "1.6.0",
+    "chart.js": "~2.9.3",
+    "ng2-charts": "2.3.0",
     "@angular/material": "^8.0.0",
     "@angular/cdk": "^8.0.0",
     "material-design-icons": "3.0.1"

@@ -15,12 +15,15 @@ import { NgModule } from '@angular/core';
 import { LoginRoutingModule } from './login-routing.module';
 import { LoginComponent } from './component/login/login.component';
 import { BaseModule } from '../base/base.module';
+import { MainComponent } from './component/main/main.component';
+import { LoginService } from './service/login.service';
 
 @NgModule({
-  declarations: [LoginComponent],
+  declarations: [LoginComponent, MainComponent],
   imports: [
     BaseModule,
     LoginRoutingModule
-  ]
+  ],
+  providers: [LoginService]
 })
 export class LoginModule { }

@@ -10,17 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { MainComponent } from './component/main/main.component';
+import { TestBed } from '@angular/core/testing';
 
-const routes: Routes = [
-	{ path: '/login/login', component: MainComponent },
-	{ path: '/login/**', redirectTo: '/login/login' }
-];
+import { TokenService } from './token.service';
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class LoginRoutingModule { }
+/*
+describe('TokenService', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
+
+  it('should be created', () => {
+    const service: TokenService = TestBed.get(TokenService);
+    expect(service).toBeTruthy();
+  });
+});
+*/
