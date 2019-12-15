@@ -24,6 +24,7 @@ import { LoginService } from './service/login.service';
     BaseModule,
     LoginRoutingModule
   ],
+  entryComponents: [LoginComponent],
   providers: [LoginService]
 })
 export class LoginModule { }
