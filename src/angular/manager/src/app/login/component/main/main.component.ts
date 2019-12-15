@@ -15,6 +15,7 @@ import { Login } from '../../model/login';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
 import { LoginService } from '../../service/login.service';
+import { TokenService } from '../../../service/token.service';
 
 @Component({
   selector: 'app-main',
@@ -24,7 +25,7 @@ import { LoginService } from '../../service/login.service';
 export class MainComponent implements OnInit {	
   login: Login = null;
 
-  constructor(private dialog: MatDialog, private loginService: LoginService) { }
+  constructor(private dialog: MatDialog, private loginService: LoginService, private tokenService: TokenService) { }
 
   ngOnInit() {
   }
@@ -37,6 +38,6 @@ export class MainComponent implements OnInit {
   }
 
   logout():void {
-	this.loginService.postLogout(this.login);
+	this.tokenService.token = null;
   }
 }

@@ -32,12 +32,7 @@ export class LoginService {
 	postSignin(login: Login): Observable<Login> {
 		return this.http.post<Login>('/rest/signin', login, { headers: this.tokenService.createTokenHeader() })
 			.pipe(map(res => res, this.handleError('postSignin')));
-	}
-
-	postLogout(login: Login): Observable<boolean> {
-		this.tokenService.token = null;
-		return of(true);
-	}
+	}	
 
 	private handleError<T>(operation = 'operation', result?: T) {
 		return (error: any): Observable<T> => {
