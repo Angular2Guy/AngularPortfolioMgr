@@ -12,12 +12,10 @@
  */
 package ch.xxx.manager.exception;
 
-public class AuthenticationException extends RuntimeException {
+import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
+import org.springframework.stereotype.Component;
 
-	private static final long serialVersionUID = -4778173207515812187L;
-	
-	public AuthenticationException(String message) {
-		super(message);
-	}
+@Component
+public class MyErrorAttributes extends DefaultErrorAttributes {
 
 }

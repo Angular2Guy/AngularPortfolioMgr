@@ -22,6 +22,8 @@ import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePo
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
+import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -64,4 +66,10 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 		
 		return initializer;
 	}
+	
+	@Bean
+	public ServerCodecConfigurer serverCodecConfigurer() {
+		return new DefaultServerCodecConfigurer();
+	}
+	
 }
