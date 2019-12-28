@@ -33,9 +33,11 @@ public class AppUserDto implements UserDetails {
 	private String userRole;
 	private boolean locked;
 	private boolean enabled;
+	private String uuid;
+	private String token;
 	
 	public AppUserDto(Long id, String userName, LocalDate birthdate, String password,
-			String emailAddress, String userRole, boolean locked, boolean enabled) {
+			String emailAddress, String userRole, boolean locked, boolean enabled, String uuid) {
 		super();
 		this.id = id;	
 		this.username = userName;
@@ -45,6 +47,7 @@ public class AppUserDto implements UserDetails {
 		this.userRole = userRole == null ? Role.GUEST.name() : userRole;
 		this.locked = locked;
 		this.enabled = enabled;
+		this.uuid = uuid;
 	}
 
 	public AppUserDto() {		
@@ -141,6 +144,22 @@ public class AppUserDto implements UserDetails {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 	
 }

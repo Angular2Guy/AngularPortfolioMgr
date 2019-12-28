@@ -45,8 +45,6 @@ import reactor.core.publisher.Mono;
 public class AuthenticationController {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
 	@Autowired
-	private PasswordEncoder passwordEncoder;
-	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -54,8 +52,6 @@ public class AuthenticationController {
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
-	@Autowired
-	private JavaMailSender javaMailSender;	
 	@Autowired
 	private AppUserService appUserService;
 	
@@ -69,18 +65,33 @@ public class AuthenticationController {
 		}
 	}
 	
-	@GetMapping("/id/{id}")
-	public Mono<AppUserDto> getUser(@PathVariable Long id) {
-		return this.appUserService.load(id);
+	@PostMapping("/signin")
+	public Mono<Boolean> postUserSignin(@RequestBody AppUserDto myUser) {
+		return this.appUserService.signin(myUser);
 	}
 	
-	@GetMapping("/all")
-	public Flux<AppUserDto> getUsers() {
-		return this.appUserService.loadAll();
+	@GetMapping("/confirm/{uuid}")
+	public Mono<Boolean> getConfirmUuid(@PathVariable String uuid) {
+		return this.appUserService.confirmUuid(uuid);
+	}
+
+	@PostMapping("/login")
+	public Mono<AppUserDto> postUserLogin(@RequestBody AppUserDto myUser) {
+		return this.appUserService.login(myUser);
 	}
 	
-	@PutMapping()
-	public Mono<AppUserEntity> putUser(@RequestBody AppUserDto appUserDto) {
-		return this.appUserService.save(appUserDto);
-	}
+//	@GetMapping("/id/{id}")
+//	public Mono<AppUserDto> getUser(@PathVariable Long id) {
+//		return this.appUserService.load(id);
+//	}
+//	
+//	@GetMapping("/all")
+//	public Flux<AppUserDto> getUsers() {
+//		return this.appUserService.loadAll();
+//	}
+//	
+//	@PutMapping()
+//	public Mono<AppUserEntity> putUser(@RequestBody AppUserDto appUserDto) {
+//		return this.appUserService.save(appUserDto);
+//	}
 }
