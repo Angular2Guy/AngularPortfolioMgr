@@ -40,8 +40,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableScheduling
 @EnableTransactionManagement
 class ApplicationConfig extends AbstractR2dbcConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);	
+	
 	@Override
 	@Bean
 	public ConnectionFactory connectionFactory() {
@@ -63,13 +63,13 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 		populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/schema.sql")));
 		populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/data.sql")));
 		initializer.setDatabasePopulator(populator);
-		
+
 		return initializer;
 	}
-	
+
 	@Bean
 	public ServerCodecConfigurer serverCodecConfigurer() {
 		return new DefaultServerCodecConfigurer();
 	}
-	
+
 }

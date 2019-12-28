@@ -10,17 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.exception;
+package ch.xxx.manager.jwt;
 
-public class AuthenticationException extends RuntimeException {
+import org.springframework.security.core.GrantedAuthority;
 
-	private static final long serialVersionUID = -4778173207515812187L;
+public enum Role implements GrantedAuthority{
+	USERS, GUEST;
+
+	@Override
+	public String getAuthority() {		
+		return this.name();
+	}
 	
-	public AuthenticationException(String message) {
-		super(message);
-	}
-
-	public AuthenticationException(String message, Throwable th) {
-		super(message, th);
-	}
 }

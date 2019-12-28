@@ -10,17 +10,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.exception;
+package ch.xxx.manager.jwt;
 
-public class AuthenticationException extends RuntimeException {
+public class Tuple<A, B> {
+	private final A a;
+	private final B b;
 
-	private static final long serialVersionUID = -4778173207515812187L;
-	
-	public AuthenticationException(String message) {
-		super(message);
+	public Tuple(A a, B b) {
+		this.a = a;
+		this.b = b;
 	}
 
-	public AuthenticationException(String message, Throwable th) {
-		super(message, th);
+	public A getA() {
+		return a;
 	}
+
+	public B getB() {
+		return b;
+	}
+
 }

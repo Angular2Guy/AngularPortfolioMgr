@@ -30,12 +30,16 @@ dependencies {
 	implementation 'org.springframework.boot.experimental:spring-boot-starter-data-r2dbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	compile 'io.r2dbc:r2dbc-proxy:1.0.0.M7'
-	compile 'io.netty:netty-codec-http'
-	compile 'org.tuckey:urlrewritefilter:4.0.4'	
-	compile 'io.springfox:springfox-swagger2:2.9.2'
-	compile 'io.springfox:springfox-swagger-ui:2.9.2'
-	compile 'commons-net:commons-net:3.6'		
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'io.r2dbc:r2dbc-proxy:1.0.0.M7'
+	implementation 'io.netty:netty-codec-http'
+	implementation 'org.tuckey:urlrewritefilter:4.0.4'	
+	implementation 'io.springfox:springfox-swagger2:2.9.2'
+	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	implementation 'commons-net:commons-net:3.6'	
+	implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.10.7'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.10.7'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
@@ -100,8 +104,11 @@ task testAngular {
 			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
 				commandLine('npm.cmd', 'run', 'test')
 			} else {
-				//commandLine('npm', 'run', 'test-chromium')
-				commandLine('npm', 'run', 'test')
+				if(project.hasProperty("useChromium")) { 
+					commandLine('npm', 'run', 'test-chromium')
+				} else {
+					commandLine('npm', 'run', 'test')
+				}
 			}
 		}
 	}
