@@ -13,6 +13,7 @@
 package ch.xxx.manager.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -21,20 +22,28 @@ import org.springframework.data.relational.core.mapping.Table;
 public class AppUserEntity {
 	@Id	
 	private Long id;
-	private String name;
-	private String firstname;
-	private String emailAddress;
+	private String username;
 	private LocalDate birthdate;
+	private LocalDateTime updatedAt = LocalDateTime.now();	
+	private String password;
+	private String emailAddress;
+	private String userRole;
+	private boolean locked;
+	private boolean enabled;
 	
-	public AppUserEntity(Long id, String name, String firstname, String emailAddress, LocalDate birthdate) {
+	public AppUserEntity(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
+			boolean locked, boolean enabled) {
 		super();
 		this.id = id;
-		this.name = name;
-		this.firstname = firstname;
-		this.emailAddress = emailAddress;
+		this.username = userName;
 		this.birthdate = birthdate;
+		this.password = password;
+		this.emailAddress = emailAddress;
+		this.userRole = userRole;
+		this.locked = locked;
+		this.enabled = enabled;
 	}
-	
+
 	public AppUserEntity() {		
 	}
 	
@@ -52,24 +61,59 @@ public class AppUserEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getFirstname() {
-		return firstname;
-	}
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
 	public LocalDate getBirthdate() {
 		return birthdate;
 	}
 	public void setBirthdate(LocalDate birthdate) {
 		this.birthdate = birthdate;
 	}
-	
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(String userRole) {
+		this.userRole = userRole;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	
 }

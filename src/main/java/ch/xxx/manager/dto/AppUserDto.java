@@ -13,21 +13,40 @@
 package ch.xxx.manager.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class AppUserDto {
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import ch.xxx.manager.jwt.Role;
+
+public class AppUserDto implements UserDetails {
+	private static final long serialVersionUID = 821118557600406928L;
 	private Long id;
-	private String name;
-	private String firstname;
+	private String username;
 	private LocalDate birthdate;
+	private LocalDateTime updatedAt = LocalDateTime.now();	
+	private String password;
+	private String emailAddress;
+	private String userRole;
+	private boolean locked;
+	private boolean enabled;
 	
-	public AppUserDto(Long id, String name, String firstname, LocalDate birthdate) {
+	public AppUserDto(Long id, String userName, LocalDate birthdate, String password,
+			String emailAddress, String userRole, boolean locked, boolean enabled) {
 		super();
-		this.id = id;
-		this.name = name;
-		this.firstname = firstname;
+		this.id = id;	
+		this.username = userName;
 		this.birthdate = birthdate;
+		this.password = password;
+		this.emailAddress = emailAddress;
+		this.userRole = userRole == null ? Role.GUEST.name() : userRole;
+		this.locked = locked;
+		this.enabled = enabled;
 	}
-	
+
 	public AppUserDto() {		
 	}
 	
@@ -36,23 +55,92 @@ public class AppUserDto {
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getFirstname() {
-		return firstname;
-	}
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
+	}	
 	public LocalDate getBirthdate() {
 		return birthdate;
 	}
 	public void setBirthdate(LocalDate birthdate) {
 		this.birthdate = birthdate;
 	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		GrantedAuthority auth = () -> this.userRole; 					
+		return Arrays.asList(auth);
+	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.username;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return !this.locked;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(String userRole) {
+		this.userRole = userRole;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
 }

@@ -27,13 +27,8 @@ import reactor.core.publisher.Mono;
 public class AppUserService {
 	@Autowired
 	private AppUserRepository repository;
-	@Autowired
-	private IdService idService;
 		
 	public Mono<AppUserEntity> save(AppUserDto appUser) {
-//		if(appUser.getId() == null) {
-//			appUser.setId(this.idService.getId());
-//		}
 		return this.repository.save(this.convert(appUser));
 	}
 	
@@ -46,20 +41,13 @@ public class AppUserService {
 	}
 	
 	private AppUserDto convert(AppUserEntity entity) {
-		AppUserDto dto = new AppUserDto();
-		dto.setBirthdate(entity.getBirthdate());
-		dto.setFirstname(entity.getFirstname());
-		dto.setId(entity.getId());
-		dto.setName(entity.getName());
+		AppUserDto dto = new AppUserDto(entity.getId(), entity.getUsername(), entity.getBirthdate(), entity.getPassword(), 
+				entity.getEmailAddress(), entity.getUserRole(), entity.isLocked(), entity.isEnabled());
 		return dto;
 	}
 	
 	private AppUserEntity convert(AppUserDto dto) {
-		AppUserEntity entity = new AppUserEntity();
-		entity.setBirthdate(dto.getBirthdate());
-		entity.setFirstname(dto.getFirstname());
-		entity.setId(dto.getId());
-		entity.setName(dto.getName());
+		AppUserEntity entity = new AppUserEntity(dto.getId(), dto.getUsername(), dto.getBirthdate(), dto.getPassword(), dto.getEmailAddress(), dto.getUserRole(), dto.isLocked(), dto.isEnabled());
 		return entity;
 	}
 }
