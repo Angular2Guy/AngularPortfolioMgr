@@ -68,23 +68,23 @@ export class LoginComponent implements OnInit {
 	}
 
 	onSigninClick(): void {
-		const login: Login = { email: null, jwtToken: null, password: null, username: null };
+		const login: Login = { emailAddress: null, token: null, password: null, username: null };
 		login.username = this.signinForm.get('username').value;
 		login.password = this.signinForm.get('password').value;
-		login.email = this.signinForm.get('email').value;
+		login.emailAddress = this.signinForm.get('email').value;
 		this.loginService.postSignin(login).subscribe(res => this.signin(res), err => console.log(err));
 	}
 
 	onLoginClick(): void {
-		const login: Login = {email: null, jwtToken: null, password: null, username: null}; 
+		const login: Login = {emailAddress: null, token: null, password: null, username: null}; 
 		login.username = this.loginForm.get('username').value;
 		login.password = this.loginForm.get('password').value;
 		this.loginService.postLogin(login).subscribe(res => this.login(res), err => console.log(err));		
 	}
 
-	private signin(login: Login): void {
+	private signin(login: boolean): void {
 		this.data.login = null;
-		if (login.username !== null) {
+		if (login) {
 			this.signinFailed = false;
 			this.dialogRef.close();
 		} else {
@@ -93,8 +93,8 @@ export class LoginComponent implements OnInit {
 	}
 
 	private login(login: Login): void {
-		if (login.jwtToken) {
-			this.tokenService.token = login.jwtToken;
+		if (login.token) {
+			this.tokenService.token = login.token;
 			this.data.login = login;
 			this.loginFailed = false;
 			this.dialogRef.close(this.data.login);

@@ -13,6 +13,6 @@
 export interface Login {
 	username: string;
 	password: string;
-	email: string;
-	jwtToken: string;
+	emailAddress: string;
+	token: string;
 }

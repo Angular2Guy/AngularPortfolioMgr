@@ -24,13 +24,13 @@ export class LoginService {
 
 	postLogin(login: Login): Observable<Login> {
 		return this.http.post<Login>('/rest/login', login, { headers: this.tokenService.createTokenHeader() }).pipe(map(res => {
-			this.tokenService.token = res.jwtToken;
+			this.tokenService.token = res.token;
 			return res;
 		}, this.handleError('postLogin')));
 	}
 
-	postSignin(login: Login): Observable<Login> {
-		return this.http.post<Login>('/rest/signin', login, { headers: this.tokenService.createTokenHeader() })
+	postSignin(login: Login): Observable<boolean> {
+		return this.http.post<boolean>('/rest/signin', login, { headers: this.tokenService.createTokenHeader() })
 			.pipe(map(res => res, this.handleError('postSignin')));
 	}	
 

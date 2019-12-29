@@ -101,17 +101,19 @@ public class AppUserService {
 	}
 
 	public Mono<AppUserDto> login(AppUserDto appUserDto) {
-		return this.repository.findByUsername(appUserDto.getUsername()).defaultIfEmpty(new AppUserEntity()).flatMap(entity -> Mono.just(loginHelp(this.convert(entity), appUserDto.getPassword())));
+		return this.repository.findByUsername(appUserDto.getUsername()).defaultIfEmpty(new AppUserEntity()).flatMap(entity -> Mono.just(loginHelp(entity, appUserDto.getPassword())));
 	}
 
-	private AppUserDto loginHelp(AppUserDto user, String passwd) {
+	private AppUserDto loginHelp(AppUserEntity entity, String passwd) {
+		AppUserDto user = this.convert(entity);
 		Optional<Role> myRole = Arrays.stream(Role.values()).filter(role1 -> role1.name().equals(user.getUserRole())).findAny();
-		if (user.getId() != null && myRole.isPresent()) {
+		if (user.getId() != null && myRole.isPresent() && entity.isEnabled()) {
 			if (this.passwordEncoder.matches(passwd, user.getPassword())) {
 				String jwtToken = this.jwtTokenProvider.createToken(user.getUsername(), Arrays.asList(myRole.get()),
 						Optional.empty());
 				user.setToken(jwtToken);
 				user.setPassword("XXX");
+				user.setUuid("XXX");
 				return user;
 			}
 		}
