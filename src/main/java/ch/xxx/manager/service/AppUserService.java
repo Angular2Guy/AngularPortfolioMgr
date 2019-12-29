@@ -67,7 +67,7 @@ public class AppUserService {
 	}
 
 	private Mono<Boolean> checkSaveSignin(AppUserEntity entity) {
-		if (entity.getId() != null) {
+		if (entity.getId() == null) {
 			String encryptedPassword = this.passwordEncoder.encode(entity.getPassword());
 			entity.setPassword(encryptedPassword);
 			UUID uuid = UUID.randomUUID();

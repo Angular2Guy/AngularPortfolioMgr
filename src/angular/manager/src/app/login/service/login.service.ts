@@ -1,6 +1,3 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TokenService } from '../../service/token.service';
 /**
  *    Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +13,9 @@ import { TokenService } from '../../service/token.service';
 import { Observable, of } from 'rxjs';
 import { Login } from '../model/login';
 import { catchError, map, tap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TokenService } from '../../service/token.service';
 
 @Injectable()
 export class LoginService {
@@ -23,14 +23,14 @@ export class LoginService {
 	constructor(private http: HttpClient, private tokenService: TokenService) { }
 
 	postLogin(login: Login): Observable<Login> {
-		return this.http.post<Login>('/rest/login', login, { headers: this.tokenService.createTokenHeader() }).pipe(map(res => {
+		return this.http.post<Login>('/rest/auth/login', login, { headers: this.tokenService.createTokenHeader() }).pipe(map(res => {
 			this.tokenService.token = res.token;
 			return res;
 		}, this.handleError('postLogin')));
 	}
 
 	postSignin(login: Login): Observable<boolean> {
-		return this.http.post<boolean>('/rest/signin', login, { headers: this.tokenService.createTokenHeader() })
+		return this.http.post<boolean>('/rest/auth/signin', login, { headers: this.tokenService.createTokenHeader() })
 			.pipe(map(res => res, this.handleError('postSignin')));
 	}	
 

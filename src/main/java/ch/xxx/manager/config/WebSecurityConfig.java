@@ -38,7 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic()
 		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and().authorizeRequests()
-		.antMatchers("/rest/auth").permitAll()
+		.antMatchers("/rest/auth/**").permitAll()
 		.anyRequest().authenticated()
 		.and().csrf().disable()
 		.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
