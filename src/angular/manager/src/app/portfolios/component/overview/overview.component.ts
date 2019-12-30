@@ -10,7 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { TokenService } from '../../../service/token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-overview',
@@ -18,10 +20,22 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit {
+  windowHeight: number = null;
 
-  constructor() { }
+  constructor(private tokenService: TokenService,
+		private router: Router) { }
 
   ngOnInit() {
+	this.windowHeight = window.innerHeight - 84;
   }
 
+  @HostListener( 'window:resize', ['$event'] )
+  onResize( event: any ) {
+    this.windowHeight = event.target.innerHeight - 84;
+  }
+
+  logout():void {
+	this.tokenService.token = null;
+	this.router.navigate(['/login/login']);
+  }
 }

@@ -1,1 +1,16 @@
-<p>overview works!</p>
+<mat-toolbar color="primary">
+	<span i18n>Portfolio Manager</span>
+	<span class="example-fill-remaining-space"></span>
+	<span *ngIf="login !== null"><button mat-button (click)="logout()" i18n>Logout</button></span>
+</mat-toolbar>
+<mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
+  <mat-sidenav opened mode="side" class="contact-list">
+  	sidebar
+  </mat-sidenav>
+  <mat-sidenav-content opened mode="side">
+  	content
+  </mat-sidenav-content>
+</mat-sidenav-container>
+<div style="display:none">
+	<span id="onlineAgainMsg" i18n="@@onlineAgainMsg">Your token is expired. To reconnect please logout and login again.</span>
+</div>
