@@ -10,18 +10,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { PortfoliosRoutingModule } from './portfolios-routing.module';
-import { BaseModule } from '../base/base.module';
-import { OverviewComponent } from './component/overview/overview.component';
-import { PortfolioService } from './service/portfolio.service';
+import { TestBed } from '@angular/core/testing';
 
-@NgModule({
-  declarations: [OverviewComponent],
-  imports: [
-    BaseModule,
-    PortfoliosRoutingModule
-  ],
-  providers: [PortfolioService]
-})
-export class PortfoliosModule { }
+import { PortfolioService } from './portfolio.service';
+
+/*describe('PortfolioService', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
+
+  it('should be created', () => {
+    const service: PortfolioService = TestBed.get(PortfolioService);
+    expect(service).toBeTruthy();
+  });
+});*/

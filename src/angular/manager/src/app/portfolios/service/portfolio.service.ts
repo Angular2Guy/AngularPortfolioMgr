@@ -10,29 +10,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Observable, of } from 'rxjs';
-import { Login } from '../model/login';
-import { catchError, map, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TokenService } from '../../service/token.service';
+import { Observable, of } from 'rxjs';
+import { Portfolio } from '../model/portfolio'
+import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
-export class LoginService {
+export class PortfolioService {
 
-	constructor(private http: HttpClient, private tokenService: TokenService) { }
+  constructor(private http: HttpClient, private tokenService: TokenService) { }
 
-	postLogin(login: Login): Observable<Login> {
-		return this.http.post<Login>('/rest/auth/login', login, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('postLogin')));
+  	getPortfolio(userId: number): Observable<Portfolio> {
+		return this.http.post<Portfolio>(`/rest/portfolio/userid/${userId}`, { headers: this.tokenService.createTokenHeader() })
+			.pipe(map(res => res, this.handleError('getPortfolio')));
 	}
-
-	postSignin(login: Login): Observable<boolean> {
-		return this.http.post<boolean>('/rest/auth/signin', login, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('postSignin')));
-	}	
-
-	private handleError<T>(operation = 'operation', result?: T) {
+	
+		private handleError<T>(operation = 'operation', result?: T) {
 		return (error: any): Observable<T> => {
 
 			console.error(error); // log to console instead

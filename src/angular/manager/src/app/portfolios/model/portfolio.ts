@@ -10,18 +10,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { PortfoliosRoutingModule } from './portfolios-routing.module';
-import { BaseModule } from '../base/base.module';
-import { OverviewComponent } from './component/overview/overview.component';
-import { PortfolioService } from './service/portfolio.service';
-
-@NgModule({
-  declarations: [OverviewComponent],
-  imports: [
-    BaseModule,
-    PortfoliosRoutingModule
-  ],
-  providers: [PortfolioService]
-})
-export class PortfoliosModule { }
+export interface Portfolio {
+}
