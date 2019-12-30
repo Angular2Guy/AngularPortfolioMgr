@@ -18,16 +18,17 @@ import { HttpHeaders } from '@angular/common/http';
 })
 export class TokenService {
   private myToken: string;
+  private myUserId: number;
 
   constructor() { }
 
-    public createTokenHeader(): HttpHeaders {
-        let reqOptions = new HttpHeaders().set( 'Content-Type', 'application/json' )
-        if(this.token) {
-            reqOptions = new HttpHeaders().set( 'Content-Type', 'application/json' ).set('Authorization', `Bearer ${this.token}`);
-        }
-        return reqOptions;
-    }
+	public createTokenHeader(): HttpHeaders {
+	    let reqOptions = new HttpHeaders().set( 'Content-Type', 'application/json' )
+	    if(this.token) {
+	        reqOptions = new HttpHeaders().set( 'Content-Type', 'application/json' ).set('Authorization', `Bearer ${this.token}`);
+	    }
+	    return reqOptions;
+	}
 
   get token(): string {
 	return this.myToken;
@@ -36,4 +37,12 @@ export class TokenService {
   set token(token: string) {
 	this.myToken = token;
   }
+
+  get userId(): number {
+	return this.myUserId;
+  }
+
+  set userId(userId: number) {
+	this.myUserId = userId;
+}
 }

@@ -5,7 +5,10 @@
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
   <mat-sidenav opened mode="side" class="contact-list">
-  	sidebar
+  	<mat-action-list>
+  		<button mat-list-item (click)="selPortfolio()"> Save </button>
+  		<button mat-list-item (click)="selPortfolio()"> Undo </button>
+	</mat-action-list>
   </mat-sidenav>
   <mat-sidenav-content opened mode="side">
   	content

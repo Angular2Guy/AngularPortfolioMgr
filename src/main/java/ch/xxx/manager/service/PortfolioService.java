@@ -33,7 +33,7 @@ public class PortfolioService {
 	@Autowired
 	private PortfolioToSymbolRepository portfolioToSymbolRepository;
 	
-	public Flux<PortfolioDto> getPortfolioByUserId(Long userId) {
+	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {
 		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> convert(entity));
 	}
 	
@@ -41,8 +41,8 @@ public class PortfolioService {
 		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
 	}
 	
-	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId) {
-		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
+	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, BigDecimal weight) {
+		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId, weight)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
 	}
 	
 	public Mono<Boolean> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, BigDecimal weight) {
@@ -65,11 +65,11 @@ public class PortfolioService {
 		return entity;
 	}
 	
-	private PortfolioToSymbolEntity createPtsEntity(PortfolioDto dto, Long symbolId) {
+	private PortfolioToSymbolEntity createPtsEntity(PortfolioDto dto, Long symbolId, BigDecimal weight) {
 		PortfolioToSymbolEntity entity = new PortfolioToSymbolEntity();
 		entity.setPortfolioId(dto.getId());
 		entity.setSymbolId(symbolId);
-		entity.setWeight(BigDecimal.ZERO);
+		entity.setWeight(weight);
 		return entity;
 	}
 	

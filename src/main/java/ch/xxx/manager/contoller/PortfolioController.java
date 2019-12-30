@@ -36,8 +36,8 @@ public class PortfolioController {
 	private PortfolioService portfolioService;
 	
 	@GetMapping("/userid/{userId}")
-	public Flux<PortfolioDto> getPortfolioByUserId(@PathVariable("userId") Long userId) {
-		return this.portfolioService.getPortfolioByUserId(userId);
+	public Flux<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
+		return this.portfolioService.getPortfoliosByUserId(userId);
 	}
 	
 	@PostMapping
@@ -45,14 +45,14 @@ public class PortfolioController {
 		return this.portfolioService.addPortfolio(dto);
 	}
 	
-	@PostMapping("/symbol/{symbolId}")
-	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId) {
-		return this.portfolioService.addSymbolToPortfolio(dto, symbolId);
+	@PostMapping("/symbol/{symbolId}/weight/{weight}")
+	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId, BigDecimal weight) {
+		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight);
 	}
 	
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId, BigDecimal weight) {
-		return this.portfolioService.addSymbolToPortfolio(dto, symbolId);
+	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, Long symbolId, BigDecimal weight) {
+		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight);
 	}
 	
 	@DeleteMapping("/{id}/symbol/{symbolId}")

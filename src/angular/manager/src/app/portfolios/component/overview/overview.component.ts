@@ -34,6 +34,10 @@ export class OverviewComponent implements OnInit {
     this.windowHeight = event.target.innerHeight - 84;
   }
 
+  selPortfolio() {
+	console.log('hallo');
+  }
+
   logout():void {
 	this.tokenService.token = null;
 	this.router.navigate(['/login/login']);

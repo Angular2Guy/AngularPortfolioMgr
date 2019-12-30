@@ -93,8 +93,9 @@ export class LoginComponent implements OnInit {
 	}
 
 	private login(login: Login): void {
-		if (login.token) {
+		if (login && login.token && login.id) {
 			this.tokenService.token = login.token;
+			this.tokenService.userId = login.id;
 			this.data.login = login;
 			this.loginFailed = false;
 			this.dialogRef.close(this.data.login);
