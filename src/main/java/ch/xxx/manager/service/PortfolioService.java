@@ -18,10 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.dto.PortfolioDto;
+import ch.xxx.manager.dto.SymbolDto;
 import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
+import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +35,8 @@ public class PortfolioService {
 	private PortfolioRepository portfolioRepository;
 	@Autowired
 	private PortfolioToSymbolRepository portfolioToSymbolRepository;
+	@Autowired
+	private SymbolRepository symbolRepository;
 	
 	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {
 		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> convert(entity));
@@ -81,8 +86,19 @@ public class PortfolioService {
 		return entity;
 	}
 	
+	private Mono<PortfolioDto> updatePortfolioDto(PortfolioToSymbolEntity entity, SymbolEntity symbolEntity, PortfolioDto dto) {
+		SymbolDto symbolDto = new SymbolDto(symbolEntity.getId(), symbolEntity.getSymbol(), symbolEntity.getName());
+		symbolDto.setWeight(entity.getWeight());
+		dto.getSymbols().add(symbolDto);
+		return Mono.just(dto);
+	}
+	
+	private Mono<PortfolioDto> convert(PortfolioToSymbolEntity entity, PortfolioDto dto) {
+		return this.symbolRepository.findById(entity.getSymbolId()).flatMap(symbolEntity -> updatePortfolioDto(entity, symbolEntity, dto));
+	}
+	
 	private Flux<PortfolioDto> convert(PortfolioEntity entity) {
-		PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
-		return Flux.just(dto);
+		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
+		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId()).flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
 	}
 }

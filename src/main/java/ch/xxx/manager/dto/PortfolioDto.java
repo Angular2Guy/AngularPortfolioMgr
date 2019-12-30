@@ -12,10 +12,22 @@
  */
 package ch.xxx.manager.dto;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 public class PortfolioDto {
 	private Long id;
 	private Long userId;
 	private String name;
+	private BigDecimal month1;
+	private BigDecimal months6;
+	private BigDecimal year1;
+	private BigDecimal year2;
+	private BigDecimal year5;
+	private BigDecimal year10;
+	private List<SymbolDto> symbols = new ArrayList<>();
+	
 
 	public PortfolioDto() {		
 	}
@@ -45,4 +57,57 @@ public class PortfolioDto {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public BigDecimal getMonth1() {
+		return month1;
+	}
+
+	public void setMonth1(BigDecimal month1) {
+		this.month1 = month1;
+	}
+
+	public BigDecimal getMonths6() {
+		return months6;
+	}
+
+	public void setMonths6(BigDecimal months6) {
+		this.months6 = months6;
+	}
+
+	public BigDecimal getYear1() {
+		return year1;
+	}
+
+	public void setYear1(BigDecimal year1) {
+		this.year1 = year1;
+	}
+
+	public BigDecimal getYear2() {
+		return year2;
+	}
+
+	public void setYear2(BigDecimal year2) {
+		this.year2 = year2;
+	}
+
+	public BigDecimal getYear5() {
+		return year5;
+	}
+
+	public void setYear5(BigDecimal year5) {
+		this.year5 = year5;
+	}
+
+	public BigDecimal getYear10() {
+		return year10;
+	}
+
+	public void setYear10(BigDecimal year10) {
+		this.year10 = year10;
+	}
+
+	public List<SymbolDto> getSymbols() {
+		return symbols;
+	}
+	
 }

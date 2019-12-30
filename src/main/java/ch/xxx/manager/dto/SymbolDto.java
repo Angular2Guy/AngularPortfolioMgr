@@ -12,10 +12,13 @@
  */
 package ch.xxx.manager.dto;
 
+import java.math.BigDecimal;
+
 public class SymbolDto {
 	private Long id;
 	private String symbol;
 	private String name;
+	private BigDecimal weight;
 	
 	public SymbolDto() {
 		
@@ -46,4 +49,13 @@ public class SymbolDto {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
+
+	public BigDecimal getWeight() {
+		return weight;
+	}
+
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+	
 }
