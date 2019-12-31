@@ -22,12 +22,12 @@ export class PortfolioService {
 
   constructor(private http: HttpClient, private tokenService: TokenService) { }
 
-  	getPortfolio(userId: number): Observable<Portfolio> {
-		return this.http.post<Portfolio>(`/rest/portfolio/userid/${userId}`, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('getPortfolio')));
+  	getPortfolio(userId: number): Observable<Portfolio[]> {
+		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`, { headers: this.tokenService.createTokenHeader() })
+			.pipe(map(res => res, err => this.handleError('getPortfolio', err)));
 	}
 	
-		private handleError<T>(operation = 'operation', result?: T) {
+	private handleError<T>(operation = 'operation', result?: T) {
 		return (error: any): Observable<T> => {
 
 			console.error(error); // log to console instead

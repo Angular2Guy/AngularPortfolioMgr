@@ -39,7 +39,7 @@ public class PortfolioService {
 	private SymbolRepository symbolRepository;
 	
 	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {
-		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> convert(entity));
+		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> this.convert(entity));
 	}
 	
 	public Mono<Boolean> addPortfolio(PortfolioDto dto) {

@@ -38,11 +38,13 @@ export class MainComponent implements OnInit {
 	const dialogRef = this.dialog.open(LoginComponent, { width: '500px', data: {login: this.login}});
 	dialogRef.afterClosed().subscribe( result => {
 		this.login = typeof result == 'undefined' ? null : result;	
-		this.router.navigate(['/portfolios/overview']);
+		if(this.login) {
+			this.router.navigate(['/portfolios/overview']);
+		}
 	});
   }
 
   logout():void {
-	this.tokenService.token = null;
+	this.tokenService.clear();
   }
 }

@@ -10,15 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-export interface Portfolio {
+export interface Symbol {
 	id: number;
-	userId: number;
-	name: String;
-	month1: number;
-	months6: number;
-	year1: number;
-	year2: number;
-	year5: number;
-	year10: number;
-	symbols: Symbol[];
+	symbol: string;
+	name: string;
+	weight: number;
 }
