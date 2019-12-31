@@ -13,6 +13,8 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { TokenService } from '../../../service/token.service';
 import { Router } from '@angular/router';
+import { PortfolioService } from '../../service/portfolio.service';
+import { Portfolio } from '../../model/portfolio';
 
 @Component({
   selector: 'app-overview',
@@ -21,12 +23,16 @@ import { Router } from '@angular/router';
 })
 export class OverviewComponent implements OnInit {
   windowHeight: number = null;
+  portfolios: Portfolio[] = [];
+  displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 
   constructor(private tokenService: TokenService,
-		private router: Router) { }
+		private router: Router,
+		private portfolioService: PortfolioService) { }
 
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
+	this.portfolioService.getPortfolio(this.tokenService.userId).subscribe(myPortfolios => this.portfolios = myPortfolios);
   }
 
   @HostListener( 'window:resize', ['$event'] )
@@ -39,7 +45,7 @@ export class OverviewComponent implements OnInit {
   }
 
   logout():void {
-	this.tokenService.token = null;
+	this.tokenService.clear();
 	this.router.navigate(['/login/login']);
   }
 }

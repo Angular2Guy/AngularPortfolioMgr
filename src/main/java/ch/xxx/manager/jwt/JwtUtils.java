@@ -24,7 +24,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 
 public class JwtUtils {
-	public static final String AUTHORIZATION = HttpHeaders.AUTHORIZATION;
+	public static final String AUTHORIZATION = HttpHeaders.AUTHORIZATION.toLowerCase();
 	public static final String TOKENAUTHKEY = "auth";
 	public static final String TOKENLASTMSGKEY = "lastmsg";
 	public static final String BEARER = "Bearer ";

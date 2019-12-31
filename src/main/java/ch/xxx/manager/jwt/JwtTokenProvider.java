@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -95,8 +96,8 @@ public class JwtTokenProvider {
 		for(Role role :Role.values()) {
 			roles.add(role);
 		}
-		Collection<String> rolestrs = (Collection<String>) Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token).getBody().get("auth");
-		return rolestrs.stream().map(str -> roles.stream().filter(r -> r.name().equals(str)).findFirst().orElse(Role.GUEST)).collect(Collectors.toList());
+		Collection<Map<String,String>> rolestrs = (Collection<Map<String,String>>) Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token).getBody().get("auth");
+		return rolestrs.stream().map(str -> roles.stream().filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(Role.GUEST)).collect(Collectors.toList());
 	}
 
 	public String resolveToken(HttpServletRequest req) {
