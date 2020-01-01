@@ -15,6 +15,7 @@ import { TokenService } from '../../../service/token.service';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../service/portfolio.service';
 import { Portfolio } from '../../model/portfolio';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-overview',
@@ -23,7 +24,7 @@ import { Portfolio } from '../../model/portfolio';
 })
 export class OverviewComponent implements OnInit {
   windowHeight: number = null;
-  portfolios: Portfolio[] = [];
+  portfolios = new MatTableDataSource<Portfolio>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 
   constructor(private tokenService: TokenService,
@@ -32,7 +33,12 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
-	this.portfolioService.getPortfolio(this.tokenService.userId).subscribe(myPortfolios => this.portfolios = myPortfolios);
+	this.portfolioService.getPortfolio(this.tokenService.userId).subscribe(myPortfolios => {
+		do{
+			this.portfolios.data.pop();
+		} while(this.portfolios.data.length > 0);
+			myPortfolios.forEach(port => this.portfolios.data.push(port));
+		});
   }
 
   @HostListener( 'window:resize', ['$event'] )

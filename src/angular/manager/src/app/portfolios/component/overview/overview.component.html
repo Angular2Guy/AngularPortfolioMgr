@@ -5,12 +5,12 @@
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
   <mat-sidenav opened mode="side" class="contact-list">
-  	<mat-action-list *ngFor="let portfolio of portfolios">
+  	<mat-action-list *ngFor="let portfolio of portfolios.data">
   		<button mat-list-item (click)="selPortfolio(portfolio)">{{ portfolio.name }}</button>  		
 	</mat-action-list>
   </mat-sidenav>
   <mat-sidenav-content opened mode="side">
-  	<!-- <table mat-table [dataSource]="portfolios">
+  	<table mat-table [dataSource]="portfolios">
 
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef i18n> Name </th>
@@ -19,7 +19,7 @@
 
     <ng-container matColumnDef="stocks">
       <th mat-header-cell *matHeaderCellDef i18n> Stocks </th>
-      <td mat-cell *matCellDef="let element"> {{ !element.symbols ? 0 element.symbols.lenght}} </td>
+      <td mat-cell *matCellDef="let element"> {{ !element.symbols ? 0 : element.symbols.lenght}} </td>
     </ng-container>
 
     <ng-container matColumnDef="month1">
@@ -54,7 +54,7 @@
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table> -->
+  </table>
   </mat-sidenav-content>
 </mat-sidenav-container>
 <div style="display:none">

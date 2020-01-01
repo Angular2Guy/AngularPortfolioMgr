@@ -93,6 +93,7 @@ import { HttpClientModule }    from '@angular/common/http';
 	],
 	exports: [		
 		CommonModule,
+		HttpClientModule,
 		ReactiveFormsModule,
 		MatAutocompleteModule,
 		MatCheckboxModule,
