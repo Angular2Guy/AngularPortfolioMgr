@@ -46,8 +46,12 @@ export class OverviewComponent implements OnInit {
     this.windowHeight = event.target.innerHeight - 84;
   }
 
-  selPortfolio() {
-	console.log('hallo');
+  newPortfolio() {
+	console.log('new Portfolio');
+  }
+
+  selPortfolio(portfolio: Portfolio) {
+	console.log(portfolio);
   }
 
   logout():void {

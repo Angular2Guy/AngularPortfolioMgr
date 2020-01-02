@@ -5,6 +5,9 @@
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
   <mat-sidenav opened mode="side" class="contact-list">
+  	<div class="new-portfolio">
+  		<button mat-raised-button (click)="newPortfolio()" i18n>New Portfolio</button>
+  	</div>
   	<mat-action-list *ngFor="let portfolio of portfolios.data">
   		<button mat-list-item (click)="selPortfolio(portfolio)">{{ portfolio.name }}</button>  		
 	</mat-action-list>
