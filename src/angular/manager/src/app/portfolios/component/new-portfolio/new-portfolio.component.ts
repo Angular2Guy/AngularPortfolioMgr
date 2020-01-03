@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Portfolio } from '../../model/portfolio';
 import { PortfolioService } from '../../service/portfolio.service';
 import { NewPortfolioData } from '../../model/new-portfolio-data';
+import { TokenService } from '../../../service/token.service';
 
 @Component({
   selector: 'app-new-portfolio',
@@ -17,7 +18,7 @@ export class NewPortfolioComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: NewPortfolioData,
-		private portfolioService: PortfolioService,
+		private tokenService: TokenService,
 		private fb: FormBuilder) { 
 	this.portfolioForm = fb.group({
 		portfolioName: ['', Validators.required]
@@ -31,12 +32,11 @@ export class NewPortfolioComponent implements OnInit {
 
   onAddClick(): void {
 		const portfolio: Portfolio = {id: null, month1: null, months6: null, name: this.portfolioForm.get('portfolioName').value, 
-			symbols: [], userId: null, year1: null, year10: null, year2: null, year5: null }; 		
+			symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
 		this.dialogRef.close(portfolio);		
   }
 
   onCancelClick(): void {
-	this.data.portfolio = null;
 	this.dialogRef.close();
   }
 

@@ -95,11 +95,14 @@ public class PortfolioService {
 	}
 	
 	private Mono<PortfolioDto> convert(PortfolioToSymbolEntity entity, PortfolioDto dto) {
+		if(entity.getId() == null) {
+			return Mono.just(dto);
+		}
 		return this.symbolRepository.findById(entity.getSymbolId()).flatMap(symbolEntity -> updatePortfolioDto(entity, symbolEntity, dto));
 	}
 	
 	private Flux<PortfolioDto> convert(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
-		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId()).flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
+		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId()).switchIfEmpty(Flux.just(new PortfolioToSymbolEntity())).flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
 	}
 }
