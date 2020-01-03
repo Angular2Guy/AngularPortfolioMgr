@@ -41,7 +41,7 @@ public class PortfolioController {
 	}
 	
 	@PostMapping
-	public Mono<Boolean> createPortfolio(@RequestBody PortfolioDto dto) {
+	public Mono<PortfolioDto> createPortfolio(@RequestBody PortfolioDto dto) {
 		return this.portfolioService.addPortfolio(dto);
 	}
 	

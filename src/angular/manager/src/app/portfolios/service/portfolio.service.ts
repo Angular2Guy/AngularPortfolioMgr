@@ -27,6 +27,11 @@ export class PortfolioService {
 			.pipe(map(res => res, err => this.handleError('getPortfolio', err)));
 	}
 	
+	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
+		return this.http.post<Portfolio>('/rest/portfolio', portfolio, { headers: this.tokenService.createTokenHeader() })
+			.pipe(map(res => res, err => this.handleError('postPortfolio', err)));
+	}
+	
 	private handleError<T>(operation = 'operation', result?: T) {
 		return (error: any): Observable<T> => {
 

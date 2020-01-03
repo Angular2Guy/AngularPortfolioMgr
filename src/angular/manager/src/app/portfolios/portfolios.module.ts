@@ -15,13 +15,15 @@ import { PortfoliosRoutingModule } from './portfolios-routing.module';
 import { BaseModule } from '../base/base.module';
 import { OverviewComponent } from './component/overview/overview.component';
 import { PortfolioService } from './service/portfolio.service';
+import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.component';
 
 @NgModule({
-  declarations: [OverviewComponent],
+  declarations: [OverviewComponent, NewPortfolioComponent],
   imports: [
     BaseModule,
     PortfoliosRoutingModule
   ],
+  entryComponents: [NewPortfolioComponent],
   providers: [PortfolioService]
 })
 export class PortfoliosModule { }

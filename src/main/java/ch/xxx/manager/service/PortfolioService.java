@@ -13,6 +13,7 @@
 package ch.xxx.manager.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,10 +43,10 @@ public class PortfolioService {
 		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> this.convert(entity));
 	}
 	
-	public Mono<Boolean> addPortfolio(PortfolioDto dto) {
-		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
+	public Mono<PortfolioDto> addPortfolio(PortfolioDto dto) {
+		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> this.convert(myEntity).singleOrEmpty());
 	}
-	
+
 	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, BigDecimal weight) {
 		return this.portfolioToSymbolRepository.save(this.createPtsEntity(dto, symbolId, weight)).flatMap(myEntity -> Mono.just(myEntity.getId() != null));
 	}

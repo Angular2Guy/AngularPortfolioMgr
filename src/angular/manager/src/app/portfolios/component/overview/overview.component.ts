@@ -16,6 +16,9 @@ import { Router } from '@angular/router';
 import { PortfolioService } from '../../service/portfolio.service';
 import { Portfolio } from '../../model/portfolio';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
+import { NewPortfolioData } from '../../model/new-portfolio-data';
 
 @Component({
   selector: 'app-overview',
@@ -29,7 +32,8 @@ export class OverviewComponent implements OnInit {
 
   constructor(private tokenService: TokenService,
 		private router: Router,
-		private portfolioService: PortfolioService) { }
+		private portfolioService: PortfolioService,
+		private dialog: MatDialog) { }
 
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
@@ -47,7 +51,15 @@ export class OverviewComponent implements OnInit {
   }
 
   newPortfolio() {
-	console.log('new Portfolio');
+	const portfolio: Portfolio = {id: null, month1: null, months6: null, name: null, symbols: [], 
+		userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null};
+	const newPortfolioData: NewPortfolioData = { portfolio: portfolio };
+	const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData});
+	dialogRef.afterClosed().subscribe( result => {
+		if(result) {
+			this.portfolioService.postPortfolio(result).subscribe(myPortfolio => this.portfolios.data.push(myPortfolio));
+		}
+	});
   }
 
   selPortfolio(portfolio: Portfolio) {

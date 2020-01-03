@@ -1,0 +1,25 @@
+<div mat-dialog-content>
+		<form [formGroup]="portfolioForm" novalidate>  
+			<ul>
+				<li>
+					<mat-form-field> 
+						<input matInput
+							i18n-placeholder placeholder="Portfolioname" tabindex="1" formControlName="portfolioName"> 
+					</mat-form-field>
+				</li>
+				<!-- <li>
+					<mat-form-field> 
+						<input matInput
+							i18n-placeholder placeholder="Password" tabindex="2" formControlName="password" type="password">
+					</mat-form-field>
+				</li> -->
+				<li *ngIf="!formValid" i18n class="errorText">
+					Input invalid
+				</li>
+				<li>
+					<button mat-button (click)="onAddClick()" [disabled]="!formValid" tabindex="-1" i18n>Ok</button>
+					<button mat-button (click)="onCancelClick()" tabindex="-1" i18n>Cancel</button>
+				</li>
+			</ul>
+		</form>
+</div>
