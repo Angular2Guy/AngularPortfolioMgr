@@ -14,6 +14,7 @@ package ch.xxx.manager.contoller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,5 +45,18 @@ public class SymbolController {
 	@GetMapping("/all")
 	public Flux<SymbolDto> getAllSymbols() {
 		return this.service.getAllSymbols();
+	}
+	
+	@GetMapping("/symbol/{symbol}")
+	public Mono<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
+		return this.service.getSymbolBySymbol(symbol);
+	}
+	
+	@GetMapping("/name/{name}")
+	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {		
+		if(name != null && name.length() > 2) {
+			return this.service.getSymbolByName(name);
+		} 
+		return Flux.empty();
 	}
 }

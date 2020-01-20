@@ -29,7 +29,15 @@ public class SymbolService {
 	private SymbolRepository repository;
 	
 	public Flux<SymbolDto> getAllSymbols() {
-		return this.repository.findAll().flatMap(entity -> convert(entity));
+		return this.repository.findAll().flatMap(entity -> this.convert(entity));
+	}
+	
+	public Mono<SymbolDto> getSymbolBySymbol(String symbol) {
+		return this.repository.findBySymbol(symbol).flatMap(entity -> this.convert(entity));
+	}
+	
+	public Flux<SymbolDto> getSymbolByName(String name) {
+		return this.repository.findByName(name).flatMap(entity -> this.convert(entity));
 	}
 	
 	private Mono<SymbolDto> convert(SymbolEntity entity) {

@@ -15,6 +15,7 @@ import { PortfoliosRoutingModule } from './portfolios-routing.module';
 import { BaseModule } from '../base/base.module';
 import { OverviewComponent } from './component/overview/overview.component';
 import { PortfolioService } from './service/portfolio.service';
+import { SymbolService } from './service/symbol.service';
 import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.component';
 
 @NgModule({
@@ -24,6 +25,6 @@ import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.c
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
-  providers: [PortfolioService]
+  providers: [PortfolioService, SymbolService]
 })
 export class PortfoliosModule { }
