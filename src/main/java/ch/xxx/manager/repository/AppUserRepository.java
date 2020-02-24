@@ -12,8 +12,8 @@
  */
 package ch.xxx.manager.repository;
 
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
-import org.springframework.data.r2dbc.repository.query.Query;
 
 import ch.xxx.manager.entity.AppUserEntity;
 import reactor.core.publisher.Mono;

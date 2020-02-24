@@ -14,8 +14,8 @@ package ch.xxx.manager.repository;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
-import org.springframework.data.r2dbc.repository.query.Query;
 
 import ch.xxx.manager.entity.IntraDayQuoteEntity;
 import reactor.core.publisher.Flux;

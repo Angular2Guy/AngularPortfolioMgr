@@ -49,7 +49,7 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 				.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
 
 		return ProxyConnectionFactory.builder(connectionFactory).onAfterQuery(
-				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo.block())))
+				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
 				.build();
 	}
 
