@@ -13,7 +13,6 @@
 package ch.xxx.manager.jwt;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -63,18 +62,16 @@ public class JwtTokenProvider {
 		claims.put(JwtUtils.TOKENLASTMSGKEY, new Date().getTime());
 		Date issuedAt = issuedAtOpt.orElse(new Date());
 		Date validity = new Date(issuedAt.getTime() + validityInMilliseconds);
-		String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 
 		return Jwts.builder().setClaims(claims).setIssuedAt(issuedAt).setExpiration(validity)
-				.signWith(SignatureAlgorithm.HS256, encodedSecretKey).compact();
+				.signWith(this.jwtTokenKey, SignatureAlgorithm.HS256).compact();
 	}
 
 	public Optional<Jws<Claims>> getClaims(Optional<String> token) {
 		if (!token.isPresent()) {
 			return Optional.empty();
 		}
-		String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-		return Optional.of(Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token.get()));
+		return Optional.of(Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token.get()));
 	}
 
 	public Authentication getAuthentication(String token) {		
@@ -85,19 +82,21 @@ public class JwtTokenProvider {
 	}
 
 	public String getUsername(String token) {
-		String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-		return Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token).getBody().getSubject();
+		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().getSubject();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Collection<Role> getAuthorities(String token) {
-		String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 		Collection<Role> roles = new LinkedList<>();
 		for(Role role :Role.values()) {
 			roles.add(role);
 		}
-		Collection<Map<String,String>> rolestrs = (Collection<Map<String,String>>) Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token).getBody().get("auth");
-		return rolestrs.stream().map(str -> roles.stream().filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(Role.GUEST)).collect(Collectors.toList());
+		Collection<Map<String,String>> rolestrs = (Collection<Map<String,String>>) Jwts.parserBuilder()
+				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get("auth");
+		return rolestrs.stream()
+				.map(str -> roles.stream().filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, "")))
+						.findFirst().orElse(Role.GUEST))
+				.collect(Collectors.toList());
 	}
 
 	public String resolveToken(HttpServletRequest req) {
@@ -109,9 +108,8 @@ public class JwtTokenProvider {
 	}
 
 	public boolean validateToken(String token) {
-		String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 		try {
-			Jwts.parser().setSigningKey(encodedSecretKey).parseClaimsJws(token);
+			Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token);
 			return true;
 		} catch (JwtException | IllegalArgumentException e) {
 			throw new AuthenticationException("Expired or invalid JWT token",e);
