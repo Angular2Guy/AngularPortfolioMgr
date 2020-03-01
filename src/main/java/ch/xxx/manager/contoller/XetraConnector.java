@@ -31,11 +31,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class XetraConnector {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XetraConnector.class);
+	private static final String XETRA_URL = "https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente";
 	
-	public Flux<String> importXetraSymbols() throws URISyntaxException {
-		return this.getSymbolCsv(WebClient.create().get()
-		.uri(new URI("https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente"))
-		.retrieve().toEntity(String.class).flatMap(htmlPage -> Mono.just(this.findCsvUrl(htmlPage.getBody()))));
+	public Flux<String> importXetraSymbols() {
+		try {
+			return this.getSymbolCsv(WebClient.create().get()
+			.uri(new URI(XETRA_URL))
+			.retrieve().toEntity(String.class).flatMap(htmlPage -> Mono.just(this.findCsvUrl(htmlPage.getBody()))));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(String.format("Page not found: %s", XETRA_URL), e);
+		}
 	}
 	
 	private Flux<String> getSymbolCsv(Mono<String> urlStr) {
@@ -43,7 +48,7 @@ public class XetraConnector {
 			try {
 				return this.loadSymbolsCsv(url);
 			} catch (URISyntaxException e) {
-				throw new RuntimeException("allTradableInstruments.csv not loaded.");
+				throw new RuntimeException("allTradableInstruments.csv not loaded.", e);
 			}
 		});
 	}

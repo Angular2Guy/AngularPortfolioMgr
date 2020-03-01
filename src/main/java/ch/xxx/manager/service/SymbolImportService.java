@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.contoller.HkexConnector;
 import ch.xxx.manager.contoller.NasdaqConnector;
+import ch.xxx.manager.contoller.XetraConnector;
 import ch.xxx.manager.dto.HkSymbolImportDto;
 import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -36,7 +37,9 @@ public class SymbolImportService {
 	@Autowired
 	private HkexConnector hkexConnector;
 	@Autowired
-	private SymbolRepository repository;			
+	private SymbolRepository repository;	
+	@Autowired
+	private XetraConnector xetraConnector;
 	
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void scheduledImporter() {
@@ -45,14 +48,20 @@ public class SymbolImportService {
 	}
 	
 	public Mono<Long> importUSSymbols() {
-		return this.nasdaqConnector.importSymbols().filter(str -> filter(str))
+		return this.nasdaqConnector.importSymbols().filter(this::filter)
 				.flatMap(symbolStr -> this.convert(symbolStr))
 			.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 	
 	public Mono<Long> importHkSymbols() {
-		return this.hkexConnector.importSymbols().filter(dto -> filter(dto))
+		return this.hkexConnector.importSymbols().filter(this::filter)
 				.flatMap(myDto -> this.convert(myDto))
+				.flatMap(entity -> this.replaceEntity(entity)).count();
+	}
+	
+	public Mono<Long> importDeSymbols() {
+		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
+				.flatMap(line -> this.convertXetra(line))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 	
@@ -73,10 +82,25 @@ public class SymbolImportService {
 		if(line.isBlank() 
 			|| line.contains("ACT Symbol|Security Name|Exchange|")
 			|| line.contains("File Creation Time:")
-			|| line.contains("Symbol|Security Name|Market Category|")) {
+			|| line.contains("Symbol|Security Name|Market Category|")
+			|| line.contains("Market:")
+			|| line.contains("Date Last Update:")
+			|| line.contains("Product Status;Instrument Status;")) {
 			return false;
 		}
 		return true;
+	}
+	
+	private boolean filterXetra(String line) {
+		return line.contains("DEUTSCHLAND") || line.contains("DAX");
+	}
+	
+	private Mono<SymbolEntity> convertXetra(String symbolLine) {
+		String[] strParts = symbolLine.split(";");
+		String symbol = String.format("%s.DEX", strParts[7].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15));
+		SymbolEntity entity = new SymbolEntity(null, symbol,
+				strParts[2].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));
+		return Mono.just(entity);
 	}
 	
 	private Mono<SymbolEntity> convert(String symbolLine) {
