@@ -42,6 +42,11 @@ public class SymbolController {
 		return this.importService.importHkSymbols();
 	}
 	
+	@GetMapping("/importde/all")
+	public Mono<Long> importDeSymbols() {
+		return Mono.just(0L);
+	}
+	
 	@GetMapping("/all")
 	public Flux<SymbolDto> getAllSymbols() {
 		return this.service.getAllSymbols();
