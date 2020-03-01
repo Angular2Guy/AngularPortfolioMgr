@@ -66,7 +66,18 @@ public class SymbolImportService {
 	}
 	
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
-		return this.repository.findBySymbol(entity.getSymbol()).switchIfEmpty(Mono.just(entity)).flatMap(myEntity -> this.repository.save(entity));
+		return this.repository.findBySymbol(entity.getSymbol())
+				.switchIfEmpty(Mono.just(entity))
+				.flatMap(localEntity -> this.updateEntity(localEntity, entity))
+				.flatMap(myEntity -> this.repository.save(entity));
+	}
+	
+	private Mono<SymbolEntity> updateEntity(SymbolEntity dbEntity, SymbolEntity importEntity) {
+		if(!dbEntity.equals(importEntity)) {
+			dbEntity.setName(importEntity.getName());
+			dbEntity.setSymbol(importEntity.getSymbol());
+		}
+		return Mono.just(dbEntity);
 	}
 	
 	private Flux<SymbolEntity> convert(HkSymbolImportDto dto) {		
