@@ -62,6 +62,8 @@ public class SymbolImportService {
 	public Mono<Long> importDeSymbols() {
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line))
+				.groupBy(SymbolEntity::getSymbol)
+				.flatMap(group -> group.reduce((a, b) -> a))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 	
@@ -108,9 +110,9 @@ public class SymbolImportService {
 	
 	private Mono<SymbolEntity> convertXetra(String symbolLine) {
 		String[] strParts = symbolLine.split(";");
-		String symbol = String.format("%s.DEX", strParts[7].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15));
+		String symbol = String.format("%s.DEX", strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		SymbolEntity entity = new SymbolEntity(null, symbol,
-				strParts[2].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));
+				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100));
 		return Mono.just(entity);
 	}
 	

@@ -44,7 +44,7 @@ public class SymbolController {
 	
 	@GetMapping("/importde/all")
 	public Mono<Long> importDeSymbols() {
-		return this.importDeSymbols();
+		return this.importService.importDeSymbols();
 	}
 	
 	@GetMapping("/all")
