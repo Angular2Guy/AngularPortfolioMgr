@@ -29,7 +29,7 @@ export class TokenService {
 	    }
 	    return reqOptions;
 	}
-
+	
   public clear() {
 	this.myToken = null;
 	this.myUserId = null;

@@ -10,21 +10,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Portfolio } from '../model/portfolio'
-import { HttpClient } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
 
-@Injectable()
-export class PortfolioService {
+import { QuoteService } from './quote.service';
 
-  constructor(private http: HttpClient) { }
+/*describe('QuoteService', () => {
+  let service: QuoteService;
 
-  	getPortfolio(userId: number): Observable<Portfolio[]> {
-		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`);
-	}
-	
-	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
-		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
-	}
-}
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(QuoteService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});*/

@@ -11,20 +11,15 @@
    limitations under the License.
  */
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Portfolio } from '../model/portfolio'
 import { HttpClient } from '@angular/common/http';
+import { TokenService } from '../../service/token.service';
+import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
-export class PortfolioService {
+export class QuoteService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private tokenService: TokenService) { }
 
-  	getPortfolio(userId: number): Observable<Portfolio[]> {
-		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`);
-	}
-	
-	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
-		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
-	}
+
 }

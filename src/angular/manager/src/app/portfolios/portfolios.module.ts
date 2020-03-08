@@ -16,7 +16,10 @@ import { BaseModule } from '../base/base.module';
 import { OverviewComponent } from './component/overview/overview.component';
 import { PortfolioService } from './service/portfolio.service';
 import { SymbolService } from './service/symbol.service';
+import { QuoteService } from './service/quote.service';
 import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from '../service/token.interceptor';
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent],
@@ -25,6 +28,7 @@ import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.c
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
-  providers: [PortfolioService, SymbolService]
+  providers: [PortfolioService, SymbolService, QuoteService,
+	  { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
 })
 export class PortfoliosModule { }

@@ -12,39 +12,18 @@
  */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TokenService } from '../../service/token.service';
-import { map } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Injectable()
 export class SymbolService {
 
-	constructor(private http: HttpClient, private tokenService: TokenService) { }
+	constructor(private http: HttpClient) { }
 
 	getSymbolBySymbol(symbol: string): Observable<Symbol> {
-		return this.http.get<Symbol>(`/rest/symbol/symbol/${symbol}`, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, err => this.handleError('getSymbolBySymbol', err)));
+		return this.http.get<Symbol>(`/rest/symbol/symbol/${symbol}`);
 	}
 
 	getSymbolByName(name: string): Observable<Symbol[]> {
-		return this.http.get<Symbol[]>(`/rest/symbol/name/${name}`, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, err => this.handleError('getSymbolByName', err)));
-	}
-
-	private handleError<T>(operation = 'operation', result?: T) {
-		return (error: any): Observable<T> => {
-
-			console.error(error); // log to console instead
-
-			this.log(`${operation} failed: ${error.message}`);
-
-			return of(result as T);
-		};
-	}
-
-	private log(message: string) {
-		console.log(message);
+		return this.http.get<Symbol[]>(`/rest/symbol/name/${name}`);
 	}
 }
