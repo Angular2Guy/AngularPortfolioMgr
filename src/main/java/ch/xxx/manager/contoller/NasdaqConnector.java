@@ -15,11 +15,13 @@ package ch.xxx.manager.contoller;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -33,16 +35,16 @@ import reactor.core.publisher.Flux;
 public class NasdaqConnector {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NasdaqConnector.class);
 	private static final String HOST = "ftp.nasdaqtrader.com";
-	private static final String DIR = "/SymbolDirectory/";
+	private static final String DIR = "/symboldirectory/";
 	private static final List<String> IMPORT_FILES = Arrays.asList("nasdaqlisted.txt", "otherlisted.txt");
 
 	public Flux<String> importSymbols() {
 		FTPClient ftp = new FTPClient();
-//		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 		try {
 			ftp.setStrictReplyParsing(false);
+			ftp.connect(HOST);			
 			ftp.enterLocalPassiveMode();
-			ftp.connect(HOST);
 			ftp.login("anonymous", "sven@gmx.de");
 			if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
 				ftp.disconnect();

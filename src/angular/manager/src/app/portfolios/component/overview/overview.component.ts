@@ -19,6 +19,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
 import { NewPortfolioData } from '../../model/new-portfolio-data';
+import { SymbolImportService } from '../../service/symbol-import.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-overview',
@@ -33,6 +35,7 @@ export class OverviewComponent implements OnInit {
   constructor(private tokenService: TokenService,
 		private router: Router,
 		private portfolioService: PortfolioService,
+		private symbolImportService: SymbolImportService,
 		private dialog: MatDialog) { }
 
   ngOnInit() {
@@ -64,6 +67,15 @@ export class OverviewComponent implements OnInit {
 
   selPortfolio(portfolio: Portfolio) {
 	console.log(portfolio);
+  }
+
+  importSymbols():void {
+	forkJoin(
+		this.symbolImportService.getSymbolImportUs(),
+		this.symbolImportService.getSymbolImportHk(),
+		this.symbolImportService.getSymbolImportDe())
+		.subscribe(([resultUs, resultHk, resultDe]) => 
+			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}`));
   }
 
   logout():void {

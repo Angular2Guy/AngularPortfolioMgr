@@ -43,11 +43,11 @@ public class SymbolImportService {
 	
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void scheduledImporter() {
-		this.importUSSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
+		this.importUsSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
 		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
 	}
 	
-	public Mono<Long> importUSSymbols() {
+	public Mono<Long> importUsSymbols() {
 		return this.nasdaqConnector.importSymbols().filter(this::filter)
 				.flatMap(symbolStr -> this.convert(symbolStr))
 			.flatMap(entity -> this.replaceEntity(entity)).count();

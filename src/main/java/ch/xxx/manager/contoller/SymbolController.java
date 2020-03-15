@@ -34,7 +34,7 @@ public class SymbolController {
 	
 	@GetMapping("/importus/all")
 	public Mono<Long> importUsSymbols() {
-		return this.importService.importUSSymbols();
+		return this.importService.importUsSymbols();
 	}
 	
 	@GetMapping("/importhk/all")
