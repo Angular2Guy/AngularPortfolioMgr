@@ -3,8 +3,7 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { OverviewComponent } from '../overview/overview.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Portfolio } from '../../model/portfolio';
-import { PortfolioService } from '../../service/portfolio.service';
-import { NewPortfolioData } from '../../model/new-portfolio-data';
+import { PortfolioData } from '../../model/portfolio-data';
 import { TokenService } from '../../../service/token.service';
 
 @Component({
@@ -17,7 +16,7 @@ export class NewPortfolioComponent implements OnInit {
   formValid = true;
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: NewPortfolioData,
+		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private tokenService: TokenService,
 		private fb: FormBuilder) { 
 	this.portfolioForm = fb.group({

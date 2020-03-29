@@ -18,9 +18,10 @@ import { Portfolio } from '../../model/portfolio';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
-import { NewPortfolioData } from '../../model/new-portfolio-data';
+import { PortfolioData } from '../../model/portfolio-data';
 import { SymbolImportService } from '../../service/symbol-import.service';
 import { forkJoin } from 'rxjs';
+import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
 
 @Component({
   selector: 'app-overview',
@@ -56,7 +57,7 @@ export class OverviewComponent implements OnInit {
   newPortfolio() {
 	const portfolio: Portfolio = {id: null, month1: null, months6: null, name: null, symbols: [], 
 		userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null};
-	const newPortfolioData: NewPortfolioData = { portfolio: portfolio };
+	const newPortfolioData: PortfolioData = { portfolio: portfolio };
 	const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData});
 	dialogRef.afterClosed().subscribe( result => {
 		if(result) {
@@ -70,7 +71,13 @@ export class OverviewComponent implements OnInit {
   }
 
   addSymbol(portfolio: Portfolio) {
-	console.log(portfolio);
+	const portfolioData: PortfolioData = { portfolio: portfolio };
+	const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData});
+	dialogRef.afterClosed().subscribe( result => {
+		if(result) {
+			console.log(result);
+		}
+	});
   }
 
   importSymbols():void {

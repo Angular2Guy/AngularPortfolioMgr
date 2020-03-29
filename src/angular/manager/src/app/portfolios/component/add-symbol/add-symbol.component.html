@@ -1,0 +1,40 @@
+<div mat-dialog-content>
+    <form [formGroup]="symbolForm" novalidate>  
+			<ul>
+				<li>
+					<mat-form-field> 
+						<input matInput type="text" [matAutocomplete]="auto" [formControl]="symbolFormControl"
+							i18n-placeholder placeholder="symbolName" tabindex="1" (keyup.enter)="findSymbolByName()">
+						<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      						<mat-option *ngFor="let symbol of symbols | async" [value]="symbol.name">
+        						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
+      						</mat-option>
+    					</mat-autocomplete> 
+					</mat-form-field>
+				</li>
+				<li>
+					<mat-form-field> 
+						<input matInput type="text"
+							i18n-placeholder placeholder="symbol" tabindex="2" formControlName="symbolSymbol">
+					</mat-form-field>
+				</li>
+				<li *ngIf="!selSymbol && !loading" i18n>
+					No Symbol selected.
+				</li>
+				<li *ngIf="loading" i18n>
+					Loading...
+				</li>
+				<li *ngIf="selSymbol && !loading">
+					<div class="symbol-data">
+						<div i18n>Symbol: {{selSymbol.symbol}}</div>
+						<div i18n>Name: {{selSymbol.name}}</div>
+						<div i18n>Weight: {{selSymbol.weight}}</div>
+					</div>
+				</li>
+				<li>
+					<button mat-button (click)="onAddClick()" [disabled]="!selSymbol" tabindex="-1" i18n>Ok</button>
+					<button mat-button (click)="onCancelClick()" tabindex="-1" i18n>Cancel</button>
+				</li>
+			</ul>
+	</form>
+</div>

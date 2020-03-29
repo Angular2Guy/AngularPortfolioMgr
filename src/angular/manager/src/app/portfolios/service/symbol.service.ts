@@ -13,6 +13,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Symbol } from '../model/symbol';
 
 @Injectable()
 export class SymbolService {

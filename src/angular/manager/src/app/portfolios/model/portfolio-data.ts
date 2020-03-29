@@ -1,5 +1,5 @@
 import { Portfolio } from './portfolio';
 
-export interface NewPortfolioData {
+export interface PortfolioData {
 	portfolio: Portfolio
 }

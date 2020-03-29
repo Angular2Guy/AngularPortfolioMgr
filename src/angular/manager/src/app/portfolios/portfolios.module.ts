@@ -21,9 +21,10 @@ import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.c
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from '../service/token.interceptor';
 import { SymbolImportService } from './service/symbol-import.service';
+import { AddSymbolComponent } from './component/add-symbol/add-symbol.component';
 
 @NgModule({
-  declarations: [OverviewComponent, NewPortfolioComponent],
+  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent],
   imports: [
     BaseModule,
     PortfoliosRoutingModule
