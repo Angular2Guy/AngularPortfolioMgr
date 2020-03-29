@@ -31,37 +31,34 @@ public class SymbolController {
 	private SymbolImportService importService;
 	@Autowired
 	private SymbolService service;
-	
+
 	@GetMapping("/importus/all")
 	public Mono<Long> importUsSymbols() {
 		return this.importService.importUsSymbols();
 	}
-	
+
 	@GetMapping("/importhk/all")
 	public Mono<Long> importHkSymbols() {
 		return this.importService.importHkSymbols();
 	}
-	
+
 	@GetMapping("/importde/all")
 	public Mono<Long> importDeSymbols() {
 		return this.importService.importDeSymbols();
 	}
-	
+
 	@GetMapping("/all")
 	public Flux<SymbolDto> getAllSymbols() {
 		return this.service.getAllSymbols();
 	}
-	
+
 	@GetMapping("/symbol/{symbol}")
 	public Mono<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
 		return this.service.getSymbolBySymbol(symbol);
 	}
-	
+
 	@GetMapping("/name/{name}")
-	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {		
-		if(name != null && name.length() > 2) {
-			return this.service.getSymbolByName(name);
-		} 
-		return Flux.empty();
+	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
+		return this.service.getSymbolByName(name);
 	}
 }

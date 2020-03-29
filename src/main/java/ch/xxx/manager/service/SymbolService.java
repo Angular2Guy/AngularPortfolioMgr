@@ -37,7 +37,10 @@ public class SymbolService {
 	}
 	
 	public Flux<SymbolDto> getSymbolByName(String name) {
-		return this.repository.findByName(name).flatMap(entity -> this.convert(entity));
+		if(name != null && name.trim().length() > 2) {
+			return this.repository.findByName("%"+name.trim().toLowerCase()+"%").flatMap(entity -> this.convert(entity));
+		}
+		return Flux.empty();
 	}
 	
 	private Mono<SymbolDto> convert(SymbolEntity entity) {

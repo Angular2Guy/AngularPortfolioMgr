@@ -1,21 +1,21 @@
 <div mat-dialog-content>
     <form [formGroup]="symbolForm" novalidate>  
-			<ul>
+			<ul class="list-style">
 				<li>
-					<mat-form-field> 
+					<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="auto" [formControl]="symbolFormControl"
 							i18n-placeholder placeholder="symbolName" tabindex="1" (keyup.enter)="findSymbolByName()">
 						<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      						<mat-option *ngFor="let symbol of symbols | async" [value]="symbol.name">
+      						<mat-option *ngFor="let symbol of symbols | async" [value]="symbol.name" class="symbol-text">
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
 					</mat-form-field>
 				</li>
 				<li>
-					<mat-form-field> 
+					<mat-form-field class="form-field"> 
 						<input matInput type="text"
-							i18n-placeholder placeholder="symbol" tabindex="2" formControlName="symbolSymbol">
+							i18n-placeholder placeholder="symbol" tabindex="2" formControlName="symbolSymbol" (keyup.enter)="findSymbolBySymbol()">
 					</mat-form-field>
 				</li>
 				<li *ngIf="!selSymbol && !loading" i18n>
@@ -25,7 +25,7 @@
 					Loading...
 				</li>
 				<li *ngIf="selSymbol && !loading">
-					<div class="symbol-data">
+					<div class="symbol-data symbol-text">
 						<div i18n>Symbol: {{selSymbol.symbol}}</div>
 						<div i18n>Name: {{selSymbol.name}}</div>
 						<div i18n>Weight: {{selSymbol.weight}}</div>

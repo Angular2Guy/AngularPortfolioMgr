@@ -7,7 +7,7 @@ import { Portfolio } from '../../model/portfolio';
 import { Symbol } from '../../model/symbol';
 import { SymbolService } from '../../service/symbol.service';
 import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap, switchMap, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-symbol',
@@ -41,7 +41,7 @@ export class AddSymbolComponent implements OnInit {
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
-        switchMap( name => this.symbolService.getSymbolByName( name ) ),
+        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolByName( name ) : of([])),
         tap(() => this.loading = false )
 	);
   }
@@ -51,8 +51,8 @@ export class AddSymbolComponent implements OnInit {
 		.subscribe(mySymbols => this.selSymbol = mySymbols.length === 1 ? mySymbols[0] : null);
   }
 
-  findSymbolBySymbol(symbolStr: string) {
-	this.symbolService.getSymbolBySymbol(symbolStr)
+  findSymbolBySymbol() {
+	this.symbolService.getSymbolBySymbol(this.symbolForm.controls.symbolSymbol.value)
 	  .subscribe(mySymbol => this.selSymbol = mySymbol);
   }
 

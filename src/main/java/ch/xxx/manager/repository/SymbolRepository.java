@@ -22,9 +22,9 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {
-	@Query("select * from symbol s where s.symbol = :symbol")
+	@Query("select * from symbol s where lower(s.symbol) = :symbol")
 	Mono<SymbolEntity> findBySymbol(String symbol);
-	@Query("select * from symbol s where s.name like(:name)")
+	@Query("select * from symbol s where lower(s.name) like :name")
 	Flux<SymbolEntity> findByName(String name);
 	@Query("select * from symbol s, portfoliotosymbol pts where s.id = pts.symbol_id and pts.portfolio_id = :portfolioId")
 	Flux<SymbolEntity> findByPortfolioId(Long portfolioId);
