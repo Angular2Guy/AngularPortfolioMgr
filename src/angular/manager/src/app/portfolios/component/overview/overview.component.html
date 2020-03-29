@@ -5,12 +5,15 @@
 	<span><button mat-button (click)="logout()" i18n>Logout</button></span>
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
-  <mat-sidenav opened mode="side" class="contact-list">
+  <mat-sidenav opened mode="side" class="portfolio-list">
   	<div class="new-portfolio">
   		<button mat-raised-button (click)="newPortfolio()" i18n>New Portfolio</button>
   	</div>
   	<mat-action-list *ngFor="let portfolio of portfolios.data">
-  		<button mat-list-item (click)="selPortfolio(portfolio)">{{ portfolio.name }}</button>  		
+  		<div class="portfolio-line">
+  			<button mat-list-item (click)="selPortfolio(portfolio)">{{ portfolio.name }}</button>
+  			<button mat-list-item (click)="addSymbol(portfolio)" class="add-button"><mat-icon>add</mat-icon></button>  			
+  		</div> 		
 	</mat-action-list>
   </mat-sidenav>
   <mat-sidenav-content opened mode="side">

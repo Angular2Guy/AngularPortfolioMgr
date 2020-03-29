@@ -23,10 +23,17 @@ table {
   width: 100%;
 }
 
-.contact-list {
+.portfolio-list {	
 	width: 300px;
 	overflow-x: hidden;
 	overflow-y: auto;	
+	.portfolio-line {
+		display: flex;	
+		align-items: center;
+		.add-button {
+			width: 56px;
+		}		
+	}
 }
 
 .popup {

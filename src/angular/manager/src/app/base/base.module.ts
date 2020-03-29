@@ -89,7 +89,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatTooltipModule,
 		MatPaginatorModule,
 		MatSortModule,
-		MatTableModule
+		MatTableModule,
+		MatIconModule
 	],
 	exports: [		
 		CommonModule,
@@ -128,7 +129,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatTooltipModule,
 		MatPaginatorModule,
 		MatSortModule,
-		MatTableModule
+		MatTableModule,
+		MatIconModule
 		]
 })
 export class BaseModule { }

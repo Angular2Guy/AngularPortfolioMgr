@@ -69,6 +69,10 @@ export class OverviewComponent implements OnInit {
 	console.log(portfolio);
   }
 
+  addSymbol(portfolio: Portfolio) {
+	console.log(portfolio);
+  }
+
   importSymbols():void {
 	forkJoin(
 		this.symbolImportService.getSymbolImportUs(),
