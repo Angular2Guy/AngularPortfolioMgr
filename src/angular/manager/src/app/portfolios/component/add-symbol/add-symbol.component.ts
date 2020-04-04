@@ -7,7 +7,7 @@ import { Portfolio } from '../../model/portfolio';
 import { Symbol } from '../../model/symbol';
 import { SymbolService } from '../../service/symbol.service';
 import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, tap, switchMap, filter } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap, switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-symbol',
@@ -43,16 +43,22 @@ export class AddSymbolComponent implements OnInit {
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
-        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolByName( name ) : this.clearSymbol()),
+        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolByName( name )
+			.pipe(map(localSymbols => this.filterPortfolioSymbols(localSymbols))) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
 	this.symbolsSymbol = this.symbolSymbolFormControl.valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
-        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolBySymbol( name ) : this.clearSymbol()),
+        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolBySymbol( name )
+			.pipe(map(localSymbols => this.filterPortfolioSymbols(localSymbols))) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
+  }
+
+  private filterPortfolioSymbols(symbols: Symbol[]): Symbol[] {
+	return symbols.filter(symbol => this.portfolio.symbols.filter(mySymbol => symbol.symbol === mySymbol.symbol));
   }
 
   private clearSymbol(): Observable<Symbol[]> {
@@ -71,9 +77,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   onAddClick(): void {
-		//const portfolio: Portfolio = {id: null, month1: null, months6: null, name: this.portfolioForm.get('portfolioName').value, 
-		//	symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
-		this.dialogRef.close(this.portfolio);		
+	this.dialogRef.close(this.selSymbol);		
   }
 
   onCancelClick(): void {

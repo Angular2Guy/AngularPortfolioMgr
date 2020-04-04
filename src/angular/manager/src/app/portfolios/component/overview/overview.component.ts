@@ -22,6 +22,7 @@ import { PortfolioData } from '../../model/portfolio-data';
 import { SymbolImportService } from '../../service/symbol-import.service';
 import { forkJoin } from 'rxjs';
 import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
+import { Symbol } from '../../model/symbol';
 
 @Component({
   selector: 'app-overview',
@@ -45,7 +46,10 @@ export class OverviewComponent implements OnInit {
 		do{
 			this.portfolios.data.pop();
 		} while(this.portfolios.data.length > 0);
-			myPortfolios.forEach(port => this.portfolios.data.push(port));
+			myPortfolios.forEach(port => { 
+				port.symbols = !port.symbols ?  [] : port.symbols;
+			  	this.portfolios.data.push(port);
+			});
 		});
   }
 
@@ -73,9 +77,11 @@ export class OverviewComponent implements OnInit {
   addSymbol(portfolio: Portfolio) {
 	const portfolioData: PortfolioData = { portfolio: portfolio };
 	const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData});
-	dialogRef.afterClosed().subscribe( result => {
-		if(result) {
-			console.log(result);
+	dialogRef.afterClosed().subscribe( (symbol: Symbol) => {
+		if(symbol) {
+			portfolio.symbols.push(symbol);
+			this.portfolioService.postPortfolio(portfolio)
+				.subscribe(myPortfolio => this.portfolios.data.map(localPort => localPort.id === portfolio.id ? myPortfolio : localPort));
 		}
 	});
   }
