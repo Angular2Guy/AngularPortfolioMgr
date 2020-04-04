@@ -46,12 +46,12 @@ public class PortfolioController {
 	}
 	
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") BigDecimal weight) {
+	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") Long weight) {
 		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight);
 	}
 	
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") BigDecimal weight) {
+	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") Long weight) {
 		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight);
 	}
 	

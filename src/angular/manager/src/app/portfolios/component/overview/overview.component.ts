@@ -79,9 +79,8 @@ export class OverviewComponent implements OnInit {
 	const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData});
 	dialogRef.afterClosed().subscribe( (symbol: Symbol) => {
 		if(symbol) {
-			portfolio.symbols.push(symbol);
-			this.portfolioService.postPortfolio(portfolio)
-				.subscribe(myPortfolio => this.portfolios.data.map(localPort => localPort.id === portfolio.id ? myPortfolio : localPort));
+			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, 1)
+				.subscribe(result => {if(result) {portfolio.symbols.push(symbol);}});
 		}
 	});
   }

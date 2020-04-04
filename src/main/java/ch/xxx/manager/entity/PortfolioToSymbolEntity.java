@@ -23,12 +23,12 @@ public class PortfolioToSymbolEntity {
 	private Long id;
 	private Long portfolioId;
 	private Long symbolId;
-	private BigDecimal weight;
+	private Long weight;
 
-	public BigDecimal getWeight() {
+	public Long getWeight() {
 		return weight;
 	}
-	public void setWeight(BigDecimal weight) {
+	public void setWeight(Long weight) {
 		this.weight = weight;
 	}
 	public Long getId() {

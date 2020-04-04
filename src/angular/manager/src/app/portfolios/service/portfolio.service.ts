@@ -27,4 +27,17 @@ export class PortfolioService {
 	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
 		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
 	}
+	
+	postSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
+		return this.http.post<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}`, portfolio);
+	}
+	
+	putSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
+		return this.http.put<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}`, portfolio);
+	}
+	
+	deleteSymbolFromPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
+		const id = portfolio.id;
+		return this.http.delete<boolean>(`/rest/portfolio/${id}/symbol/${symbolId}`);
+	}
 }

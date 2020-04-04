@@ -18,7 +18,7 @@ public class SymbolDto {
 	private Long id;
 	private String symbol;
 	private String name;
-	private BigDecimal weight;
+	private Long weight;
 	
 	public SymbolDto() {
 		
@@ -50,11 +50,11 @@ public class SymbolDto {
 		this.symbol = symbol;
 	}
 
-	public BigDecimal getWeight() {
+	public Long getWeight() {
 		return weight;
 	}
 
-	public void setWeight(BigDecimal weight) {
+	public void setWeight(Long weight) {
 		this.weight = weight;
 	}
 	
