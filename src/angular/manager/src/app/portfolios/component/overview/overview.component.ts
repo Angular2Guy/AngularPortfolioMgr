@@ -43,13 +43,8 @@ export class OverviewComponent implements OnInit {
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
 	this.portfolioService.getPortfolio(this.tokenService.userId).subscribe(myPortfolios => {
-		do{
-			this.portfolios.data.pop();
-		} while(this.portfolios.data.length > 0);
-			myPortfolios.forEach(port => { 
-				port.symbols = !port.symbols ?  [] : port.symbols;
-			  	this.portfolios.data.push(port);
-			});
+			myPortfolios.forEach(port => port.symbols = !port.symbols ?  [] : port.symbols);
+			this.portfolios.data = myPortfolios;
 		});
   }
 
@@ -65,7 +60,8 @@ export class OverviewComponent implements OnInit {
 	const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData});
 	dialogRef.afterClosed().subscribe( result => {
 		if(result) {
-			this.portfolioService.postPortfolio(result).subscribe(myPortfolio => this.portfolios.data.push(myPortfolio));
+			this.portfolioService.postPortfolio(result)
+				.subscribe(myPortfolio => this.portfolios.data = [...this.portfolios.data, myPortfolio]);
 		}
 	});
   }
@@ -80,7 +76,12 @@ export class OverviewComponent implements OnInit {
 	dialogRef.afterClosed().subscribe( (symbol: Symbol) => {
 		if(symbol) {
 			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, 1)
-				.subscribe(result => {if(result) {portfolio.symbols.push(symbol);}});
+				.subscribe(result => {
+					if(result) {
+						portfolio.symbols.push(symbol);
+						this.portfolios.data = this.portfolios.data;
+					}
+				});
 		}
 	});
   }
