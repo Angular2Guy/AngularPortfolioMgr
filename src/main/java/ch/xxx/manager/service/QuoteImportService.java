@@ -62,7 +62,7 @@ public class QuoteImportService {
 	
 	public Mono<Long> importIntraDayQuotes(String symbol) {
 		LOGGER.info("importIntraDayQuotes() called");	
-		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity -> 
+		return this.symbolRepository.findBySymbolSingle(symbol).flatMap(symbolEntity -> 
 			this.alphavatageController.getTimeseriesIntraDay(symbol)
 				.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
 				.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
@@ -74,7 +74,7 @@ public class QuoteImportService {
 	
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called");
-		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity -> 
+		return this.symbolRepository.findBySymbolSingle(symbol).flatMap(symbolEntity -> 
 			this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
 			.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
 			.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
@@ -82,7 +82,7 @@ public class QuoteImportService {
 
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called");
-		return this.symbolRepository.findBySymbol(symbol).flatMap(symbolEntity ->
+		return this.symbolRepository.findBySymbolSingle(symbol).flatMap(symbolEntity ->
 			this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
 			.flatMap(entities -> entities.isEmpty() ? 
 					this.alphavatageController.getTimeseriesDailyHistory(symbol, true)

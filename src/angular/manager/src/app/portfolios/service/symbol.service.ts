@@ -20,8 +20,8 @@ export class SymbolService {
 
 	constructor(private http: HttpClient) { }
 
-	getSymbolBySymbol(symbol: string): Observable<Symbol> {
-		return this.http.get<Symbol>(`/rest/symbol/symbol/${symbol}`);
+	getSymbolBySymbol(symbol: string): Observable<Symbol[]> {
+		return this.http.get<Symbol[]>(`/rest/symbol/symbol/${symbol}`);
 	}
 
 	getSymbolByName(name: string): Observable<Symbol[]> {

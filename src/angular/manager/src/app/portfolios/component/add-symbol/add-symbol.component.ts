@@ -18,10 +18,12 @@ export class AddSymbolComponent implements OnInit {
   private portfolio: Portfolio = null;
   symbolForm: FormGroup;  
   selSymbol: Symbol = null;
-  symbols: Observable<Symbol[]> = of([]);
+  symbolsName: Observable<Symbol[]> = of([]);
+  symbolsSymbol: Observable<Symbol[]> = of([]);
   loading = false;
   formValid = true;
-  symbolFormControl = new FormControl();
+  symbolNameFormControl = new FormControl();
+  symbolSymbolFormControl = new FormControl();
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
@@ -37,23 +39,35 @@ export class AddSymbolComponent implements OnInit {
   }
 
   ngOnInit() {	
-	this.symbols = this.symbolFormControl.valueChanges.pipe(
+	this.symbolsName = this.symbolNameFormControl.valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
-        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolByName( name ) : of([])),
+        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolByName( name ) : this.clearSymbol()),
+        tap(() => this.loading = false )
+	);
+	this.symbolsSymbol = this.symbolSymbolFormControl.valueChanges.pipe(
+		debounceTime( 400 ),
+        distinctUntilChanged(),
+        tap(() => this.loading = true ),
+        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolBySymbol( name ) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
   }
 
+  private clearSymbol(): Observable<Symbol[]> {
+	this.selSymbol = null;
+	return of([]) as Observable<Symbol[]>;
+  }
+
   findSymbolByName() {
-	this.symbolService.getSymbolByName(this.symbolFormControl.value)
+	this.symbolService.getSymbolByName(this.symbolNameFormControl.value)
 		.subscribe(mySymbols => this.selSymbol = mySymbols.length === 1 ? mySymbols[0] : null);
   }
 
   findSymbolBySymbol() {
-	this.symbolService.getSymbolBySymbol(this.symbolForm.controls.symbolSymbol.value)
-	  .subscribe(mySymbol => this.selSymbol = mySymbol);
+	this.symbolService.getSymbolBySymbol(this.symbolSymbolFormControl.value)
+		.subscribe(mySymbols => this.selSymbol = mySymbols.length === 1 ? mySymbols[0] : null);
   }
 
   onAddClick(): void {

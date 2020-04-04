@@ -27,22 +27,26 @@ import reactor.core.publisher.Mono;
 public class SymbolService {
 	@Autowired
 	private SymbolRepository repository;
-	
+
 	public Flux<SymbolDto> getAllSymbols() {
 		return this.repository.findAll().flatMap(entity -> this.convert(entity));
 	}
-	
-	public Mono<SymbolDto> getSymbolBySymbol(String symbol) {
-		return this.repository.findBySymbol(symbol).flatMap(entity -> this.convert(entity));
-	}
-	
-	public Flux<SymbolDto> getSymbolByName(String name) {
-		if(name != null && name.trim().length() > 2) {
-			return this.repository.findByName("%"+name.trim().toLowerCase()+"%").flatMap(entity -> this.convert(entity));
+
+	public Flux<SymbolDto> getSymbolBySymbol(String symbol) {
+		if (symbol != null && symbol.trim().length() > 2) {
+			return this.repository.findBySymbol(symbol).flatMap(entity -> this.convert(entity));
 		}
 		return Flux.empty();
 	}
-	
+
+	public Flux<SymbolDto> getSymbolByName(String name) {
+		if (name != null && name.trim().length() > 2) {
+			return this.repository.findByName("%" + name.trim().toLowerCase() + "%")
+					.flatMap(entity -> this.convert(entity));
+		}
+		return Flux.empty();
+	}
+
 	private Mono<SymbolDto> convert(SymbolEntity entity) {
 		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName()));
 	}

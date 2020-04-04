@@ -53,7 +53,7 @@ public class SymbolController {
 	}
 
 	@GetMapping("/symbol/{symbol}")
-	public Mono<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
+	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
 		return this.service.getSymbolBySymbol(symbol);
 	}
 

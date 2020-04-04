@@ -68,7 +68,7 @@ public class SymbolImportService {
 	}
 	
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
-		return this.repository.findBySymbol(entity.getSymbol())
+		return this.repository.findBySymbolSingle(entity.getSymbol())
 				.switchIfEmpty(Mono.just(entity))
 				.flatMap(localEntity -> this.updateEntity(localEntity, entity))
 				.flatMap(myEntity -> this.repository.save(entity));
