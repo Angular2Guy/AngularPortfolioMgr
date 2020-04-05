@@ -28,7 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.contoller.AlphavatageConnector;
+import ch.xxx.manager.connector.AlphavatageConnector;
 import ch.xxx.manager.dto.DailyQuoteImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.dto.IntraDayQuoteImportDto;
