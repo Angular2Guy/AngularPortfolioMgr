@@ -13,24 +13,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Quote } from '../model/quote';
 
 @Injectable()
-export class QuoteService {
+export class QuoteImportService {
 
   constructor(private http: HttpClient) { }
 
-  getAllDailyQuotes(symbol: string): Observable<Quote[]> {
-	return this.http.get<Quote[]>(`/rest/quote/daily/all/symbol/${symbol}`);
-  }
+  importDailyQuotes(symbol: string): Observable<number> {
+	return this.http.get<number>(`/rest/quote/daily/all/symbol/${symbol}`);
+  }  
 
-  getIntraDayQuotes(symbol: string): Observable<Quote[]> {
-	return this.http.get<Quote[]>(`/rest/quote/intraday/symbol/${symbol}`);
-  }
-
-  getDailyQuotesFromStartToEnd(symbol: string, start: Date, end: Date): Observable<Quote[]> {
-	const startStr = start.toISOString();
-	const endStr = end.toISOString();
-	return this.http.get<Quote[]>(`/rest/quote//daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
+  importIntraDayQuotes(symbol: string): Observable<number> {
+	return this.http.get<number>(`/rest/quote//import/intraday/symbol/${symbol}`);
   }
 }
