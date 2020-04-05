@@ -12,13 +12,16 @@
  */
 package ch.xxx.manager.contoller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.dto.DailyQuoteExportDto;
+import ch.xxx.manager.dto.QuoteDto;
 import ch.xxx.manager.service.QuoteImportService;
 import ch.xxx.manager.service.QuoteService;
 import reactor.core.publisher.Flux;
@@ -33,8 +36,21 @@ public class QuoteController {
 	private QuoteImportService quoteImportService;
 	
 	@GetMapping("/daily/all/symbol/{symbol}")
-	public Flux<DailyQuoteExportDto> getDailyQuotes(@PathVariable("symbol") String symbol) {
+	public Flux<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getDailyQuotes(symbol);
+	}
+	
+	@GetMapping("/intraday/symbol/{symbol}")
+	public Flux<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteService.getIntraDayQuotes(symbol);
+	}
+	
+	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
+	public Flux<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol, 
+			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
+		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
+		return this.quoteService.getDailyQuotes(symbol, start, end);
 	}
 	
 	@GetMapping("/import/daily/symbol/{symbol}")

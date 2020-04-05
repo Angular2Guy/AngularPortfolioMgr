@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.connector;
+package ch.xxx.manager.contoller;
 
 
 import java.util.Map;

@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.repository;
 
+import java.time.LocalDate;
+
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
@@ -26,4 +28,7 @@ public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, 
 	
 	@Query("select * from dailyquote where symbol_id = :symbolId order by day asc")
 	Flux<DailyQuoteEntity> findBySymbolId(Long symbolId);
+	
+	@Query("select * from dailyquote where symbol = :symbol and day between :start and :end order by day asc")
+	Flux<DailyQuoteEntity> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

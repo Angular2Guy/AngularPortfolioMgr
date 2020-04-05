@@ -13,29 +13,29 @@
 package ch.xxx.manager.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class DailyQuoteExportDto {
+public class QuoteDto {
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
 	private BigDecimal close;
 	private Long volume;
-	private LocalDate day;
+	private LocalDateTime timestamp;
 	private String symbol;
 	
-	public DailyQuoteExportDto() {		
+	public QuoteDto() {		
 	}
 
-	public DailyQuoteExportDto(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume,
-			LocalDate day, String symbol) {
+	public QuoteDto(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume,
+			LocalDateTime timestamp, String symbol) {
 		super();
 		this.open = open;
 		this.high = high;
 		this.low = low;
 		this.close = close;
 		this.volume = volume;
-		this.day = day;
+		this.timestamp = timestamp;
 		this.symbol = symbol;
 	}
 
@@ -79,12 +79,12 @@ public class DailyQuoteExportDto {
 		this.volume = volume;
 	}
 
-	public LocalDate getDay() {
-		return day;
+	public LocalDateTime getTimestamp() {
+		return timestamp;
 	}
 
-	public void setDay(LocalDate day) {
-		this.day = day;
+	public void setTimestamp(LocalDateTime day) {
+		this.timestamp = day;
 	}
 
 	public String getSymbol() {

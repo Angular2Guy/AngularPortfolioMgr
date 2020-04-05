@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.connector.HkexConnector;
+import ch.xxx.manager.connector.NasdaqConnector;
 import ch.xxx.manager.connector.XetraConnector;
-import ch.xxx.manager.contoller.NasdaqConnector;
 import ch.xxx.manager.dto.HkSymbolImportDto;
 import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.SymbolRepository;
