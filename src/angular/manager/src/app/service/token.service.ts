@@ -13,13 +13,17 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Observable, of, timer, Subscription } from 'rxjs';
-import { shareReplay, switchMap } from 'rxjs/operators';
+import { shareReplay, switchMap, map } from 'rxjs/operators';
+
+export interface RefreshTokenResponse {
+	refreshToken: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenService {
-  private myTokenCache: Observable<string>; 	
+  private myTokenCache: Observable<RefreshTokenResponse>; 	
   private readonly CACHE_SIZE = 1;
   private readonly REFRESH_INTERVAL = 45000; //45 sec
   private myToken: string;
@@ -28,8 +32,8 @@ export class TokenService {
 
   constructor(private http: HttpClient) { }
 
-  private refreshToken(): Observable<string> {	
-	return this.http.get<string>('/rest/auth/refreshToken', {
+  private refreshToken(): Observable<RefreshTokenResponse> {	
+	return this.http.get<RefreshTokenResponse>('/rest/auth/refreshToken', {
 		headers: this.createTokenHeader()
 	});
   }
@@ -50,7 +54,7 @@ export class TokenService {
   }
 
   get tokenStream(): Observable<string> {
-	return this.myTokenCache;
+	return this.myTokenCache.pipe(map(response => response.refreshToken));
   }
 
   get token(): string {	
@@ -64,7 +68,7 @@ export class TokenService {
 		this.myTokenCache = myTimer.pipe(
 			switchMap(() => this.refreshToken()),
 			shareReplay(this.CACHE_SIZE));
-		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken);
+		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken);
 	}
   }
 

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.dto.AppUserDto;
+import ch.xxx.manager.dto.RefreshTokenDto;
 import ch.xxx.manager.entity.AppUserEntity;
 import ch.xxx.manager.jwt.JwtTokenProvider;
 import ch.xxx.manager.jwt.Role;
@@ -55,13 +56,14 @@ public class AppUserService {
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
 	
-	public Mono<String> refreshToken(String bearerToken) {
+	public Mono<RefreshTokenDto> refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);
 		if(tokenOpt.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token");
 		}
 		String newToken = this.jwtTokenProvider.refreshToken(tokenOpt.get());
-		return Mono.just(newToken);
+		LOGGER.info("Jwt Token refreshed.");
+		return Mono.just(new RefreshTokenDto(newToken));
 	}
 
 	public Mono<AppUserEntity> save(AppUserDto appUser) {

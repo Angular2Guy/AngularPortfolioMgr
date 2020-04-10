@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.dto.AppUserDto;
 import ch.xxx.manager.dto.AuthCheckDto;
+import ch.xxx.manager.dto.RefreshTokenDto;
 import ch.xxx.manager.jwt.JwtTokenProvider;
 import ch.xxx.manager.jwt.JwtUtils;
 import ch.xxx.manager.jwt.Role;
@@ -78,7 +79,7 @@ public class AuthenticationController {
 	}
 	
 	@GetMapping("/refreshToken")
-	public Mono<String> getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
+	public Mono<RefreshTokenDto> getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
 		return this.appUserService.refreshToken(bearerStr);
 	}
 	
