@@ -28,8 +28,10 @@ export class TokenService {
 
   constructor(private http: HttpClient) { }
 
-  private refreshToken(): Observable<string> {
-	return this.http.get<string>('/rest/auth/refreshToken');
+  private refreshToken(): Observable<string> {	
+	return this.http.get<string>('/rest/auth/refreshToken', {
+		headers: this.createTokenHeader()
+	});
   }
 
 	public createTokenHeader(): HttpHeaders {
@@ -56,6 +58,7 @@ export class TokenService {
   }
  
   set token(token: string) {
+	this.myToken = token;
 	if(token && !this.myTokenCache) {
 		const myTimer = timer(0, this.REFRESH_INTERVAL);
 		this.myTokenCache = myTimer.pipe(
@@ -63,7 +66,6 @@ export class TokenService {
 			shareReplay(this.CACHE_SIZE));
 		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken);
 	}
-	this.myToken = token;
   }
 
   get userId(): number {
