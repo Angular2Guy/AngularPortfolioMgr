@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Observable, of, timer, Subscription } from 'rxjs';
 import { shareReplay, switchMap, map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 export interface RefreshTokenResponse {
 	refreshToken: string;
@@ -30,7 +31,7 @@ export class TokenService {
   private myUserId: number;
   private myTokenSubscription: Subscription;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   private refreshToken(): Observable<RefreshTokenResponse> {	
 	return this.http.get<RefreshTokenResponse>('/rest/auth/refreshToken', {
@@ -51,6 +52,7 @@ export class TokenService {
 	this.myTokenCache = null;
 	this.myToken = null;
 	this.myUserId = null;
+	this.router.navigate(['/login']);
   }
 
   get tokenStream(): Observable<string> {
@@ -68,7 +70,7 @@ export class TokenService {
 		this.myTokenCache = myTimer.pipe(
 			switchMap(() => this.refreshToken()),
 			shareReplay(this.CACHE_SIZE));
-		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken);
+		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken, () => this.clear());
 	}
   }
 
