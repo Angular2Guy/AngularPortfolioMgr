@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,15 @@ public class AppUserService {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+	
+	public Mono<String> refreshToken(String bearerToken) {
+		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);
+		if(tokenOpt.isEmpty()) {
+			throw new AuthorizationServiceException("Invalid token");
+		}
+		String newToken = this.jwtTokenProvider.refreshToken(tokenOpt.get());
+		return Mono.just(newToken);
+	}
 
 	public Mono<AppUserEntity> save(AppUserDto appUser) {
 		return this.repository.save(this.convert(appUser));
