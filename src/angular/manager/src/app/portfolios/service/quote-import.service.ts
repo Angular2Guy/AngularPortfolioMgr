@@ -20,10 +20,10 @@ export class QuoteImportService {
   constructor(private http: HttpClient) { }
 
   importDailyQuotes(symbol: string): Observable<number> {
-	return this.http.get<number>(`/rest/quote/daily/all/symbol/${symbol}`);
+	return this.http.get<number>(`/rest/quote/import/daily/symbol/${symbol}`);
   }  
 
   importIntraDayQuotes(symbol: string): Observable<number> {
-	return this.http.get<number>(`/rest/quote//import/intraday/symbol/${symbol}`);
+	return this.http.get<number>(`/rest/quote/import/intraday/symbol/${symbol}`);
   }
 }
