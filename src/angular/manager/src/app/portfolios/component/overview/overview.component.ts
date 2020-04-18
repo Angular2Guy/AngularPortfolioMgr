@@ -75,7 +75,8 @@ export class OverviewComponent implements OnInit {
 	const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData});
 	dialogRef.afterClosed().subscribe( (symbol: Symbol) => {
 		if(symbol) {
-			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, 1)
+			symbol.weight = !symbol.weight ? 0 : symbol.weight;
+			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight)
 				.subscribe(result => {
 					if(result) {
 						portfolio.symbols.push(symbol);

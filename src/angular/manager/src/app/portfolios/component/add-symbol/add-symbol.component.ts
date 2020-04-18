@@ -33,7 +33,7 @@ export class AddSymbolComponent implements OnInit {
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
   loading = false;
-  formValid = true;
+  formValid = true;  
   symbolNameFormControl = new FormControl();
   symbolSymbolFormControl = new FormControl();
 
@@ -43,7 +43,8 @@ export class AddSymbolComponent implements OnInit {
 		private fb: FormBuilder) { 
 			this.symbolForm = fb.group({
 				symbolSymbol: '',	
-				symbolName: ''
+				symbolName: '',
+				symbolWeight: 0
 			}, {
 				validators: [this.validate]
 			} as AbstractControlOptions);
@@ -89,6 +90,9 @@ export class AddSymbolComponent implements OnInit {
   }
 
   onAddClick(): void {
+	if(this.selSymbol) {
+		this.selSymbol.weight = this.symbolForm.controls['weight'].value;
+	}
 	this.dialogRef.close(this.selSymbol);		
   }
 
