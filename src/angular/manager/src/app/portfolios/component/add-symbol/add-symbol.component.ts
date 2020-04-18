@@ -83,24 +83,27 @@ export class AddSymbolComponent implements OnInit {
   }
 
   findSymbolByName() {
-	this.symbolService.getSymbolByName(this.symbolNameFormControl.value)
-		.subscribe(mySymbols => this.updateSelectedSymbol(mySymbols));
+	const symbolNameStr = this.symbolNameFormControl.value;
+	this.symbolService.getSymbolByName(symbolNameStr)
+		.subscribe(mySymbols => {
+			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.name === symbolNameStr)[0] : null;
+			this.updateSymbolWeight();
+		});
   }
 
   findSymbolBySymbol() {
-	this.symbolService.getSymbolBySymbol(this.symbolSymbolFormControl.value)
-		.subscribe(mySymbols => this.updateSelectedSymbol(mySymbols));
+	const symbolStr = this.symbolSymbolFormControl.value;
+	this.symbolService.getSymbolBySymbol(symbolStr)
+		.subscribe(mySymbols => {
+			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.symbol === symbolStr)[0] : null;
+			this.updateSymbolWeight();
+		});
   }
 
   updateSymbolWeight() {
 	if(this.selSymbol) {
 		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
 	}
-  }
-
-  private updateSelectedSymbol(symbols: Symbol[]): void {
-	this.selSymbol = symbols.length === 1 ? symbols[0] : null;
-	this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;	
   }
 
   onAddClick(): void {
