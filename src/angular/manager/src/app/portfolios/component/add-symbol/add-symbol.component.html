@@ -1,12 +1,12 @@
 <div mat-dialog-content>
-    <form [formGroup]="symbolForm" novalidate>  
+    <form [formGroup]="symbolForm" novalidate *ngIf="!importingQuotes">  
 			<ul class="list-style">
 				<li>
 					<mat-form-field class="form-field"> 
-						<input matInput type="text" [matAutocomplete]="auto" [formControl]="symbolNameFormControl"
+						<input matInput type="text" [matAutocomplete]="autoName" [formControl]="symbolNameFormControl"
 							i18n-placeholder placeholder="symbolName" tabindex="1" (keyup.enter)="findSymbolByName()">
-						<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol.name" class="symbol-text">
+						<mat-autocomplete autoActiveFirstOption #autoName="matAutocomplete">
+      						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol.name" class="symbol-text" i18n>
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
@@ -14,10 +14,10 @@
 				</li>
 				<li>
 					<mat-form-field class="form-field"> 
-						<input matInput type="text" [matAutocomplete]="auto" [formControl]="symbolNameFormControl"
-							i18n-placeholder placeholder="symbolName" tabindex="2" (keyup.enter)="findSymbolByName()">
-						<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol.symbol" class="symbol-text">
+						<input matInput type="text" [matAutocomplete]="autoSymbol" [formControl]="symbolSymbolFormControl"
+							i18n-placeholder placeholder="symbol" tabindex="2" (keyup.enter)="findSymbolBySymbol()">
+						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete">
+      						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol.symbol" class="symbol-text" i18n>
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
@@ -25,7 +25,8 @@
 				</li>
 				<li>
 					<mat-form-field class="form-field"> 
-						<input matInput type="text" formControlName="weight" i18n-placeholder placeholder="weight" tabindex="3">
+						<input matInput type="text" formControlName="symbolWeight" (keyup)="updateSymbolWeight()" 
+							i18n-placeholder placeholder="weight" tabindex="3">
 					</mat-form-field>
 				</li>
 				<li *ngIf="!selSymbol && !loading" i18n>
@@ -35,11 +36,9 @@
 					Loading...
 				</li>
 				<li *ngIf="selSymbol && !loading">
-					<div class="symbol-data symbol-text">
-						<div i18n>Symbol: {{selSymbol.symbol}}</div>
-						<div i18n>Name: {{selSymbol.name}}</div>
-						<div i18n>Weight: {{selSymbol.weight}}</div>
-					</div>
+					<div class="symbol-element" i18n>Symbol: {{selSymbol.symbol}}</div>
+					<div class="symbol-element" i18n>Name: {{selSymbol.name}}</div>
+					<div class="symbol-element" i18n>Weight: {{selSymbol.weight}}</div>
 				</li>
 				<li>
 					<button mat-button (click)="onAddClick()" [disabled]="!selSymbol" tabindex="-1" i18n>Ok</button>
@@ -47,4 +46,17 @@
 				</li>
 			</ul>
 	</form>
+	<div *ngIf="importingQuotes">
+		<div class="container">
+			<div class="content" i18n>Importing Quotes...</div>							
+		</div>
+		<div class="container">
+			<div class="content">
+				<mat-progress-spinner
+					class="example-margin"
+					mode="indeterminate"
+					color="primary"></mat-progress-spinner>
+			</div>
+		</div>
+	</div>
 </div>

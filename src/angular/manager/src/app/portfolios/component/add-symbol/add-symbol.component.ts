@@ -18,8 +18,9 @@ import { PortfolioData } from '../../model/portfolio-data';
 import { Portfolio } from '../../model/portfolio';
 import { Symbol } from '../../model/symbol';
 import { SymbolService } from '../../service/symbol.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap, map } from 'rxjs/operators';
+import { QuoteImportService } from '../../service/quote-import.service';
 
 @Component({
   selector: 'app-add-symbol',
@@ -33,6 +34,7 @@ export class AddSymbolComponent implements OnInit {
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
   loading = false;
+  importingQuotes = false;
   formValid = true;  
   symbolNameFormControl = new FormControl();
   symbolSymbolFormControl = new FormControl();
@@ -40,6 +42,7 @@ export class AddSymbolComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private symbolService: SymbolService,
+		private quoteImportService: QuoteImportService,
 		private fb: FormBuilder) { 
 			this.symbolForm = fb.group({
 				symbolSymbol: '',	
@@ -81,19 +84,38 @@ export class AddSymbolComponent implements OnInit {
 
   findSymbolByName() {
 	this.symbolService.getSymbolByName(this.symbolNameFormControl.value)
-		.subscribe(mySymbols => this.selSymbol = mySymbols.length === 1 ? mySymbols[0] : null);
+		.subscribe(mySymbols => this.updateSelectedSymbol(mySymbols));
   }
 
   findSymbolBySymbol() {
 	this.symbolService.getSymbolBySymbol(this.symbolSymbolFormControl.value)
-		.subscribe(mySymbols => this.selSymbol = mySymbols.length === 1 ? mySymbols[0] : null);
+		.subscribe(mySymbols => this.updateSelectedSymbol(mySymbols));
+  }
+
+  updateSymbolWeight() {
+	if(this.selSymbol) {
+		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
+	}
+  }
+
+  private updateSelectedSymbol(symbols: Symbol[]): void {
+	this.selSymbol = symbols.length === 1 ? symbols[0] : null;
+	this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;	
   }
 
   onAddClick(): void {
 	if(this.selSymbol) {
-		this.selSymbol.weight = this.symbolForm.controls['weight'].value;
+		this.importingQuotes = true;
+		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
+		forkJoin(
+			this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
+			this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol))
+		.subscribe(([resultDaily, resultIntraDay]) => {
+			console.log(`Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`);
+			this.importingQuotes = false;
+			this.dialogRef.close(this.selSymbol);
+		});
 	}
-	this.dialogRef.close(this.selSymbol);		
   }
 
   onCancelClick(): void {

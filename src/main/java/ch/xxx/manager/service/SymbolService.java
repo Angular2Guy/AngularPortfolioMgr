@@ -34,7 +34,7 @@ public class SymbolService {
 
 	public Flux<SymbolDto> getSymbolBySymbol(String symbol) {
 		if (symbol != null && symbol.trim().length() > 2) {
-			return this.repository.findBySymbol(symbol).flatMap(entity -> this.convert(entity));
+			return this.repository.findBySymbol("%" + symbol.trim().toLowerCase() + "%").flatMap(entity -> this.convert(entity));
 		}
 		return Flux.empty();
 	}

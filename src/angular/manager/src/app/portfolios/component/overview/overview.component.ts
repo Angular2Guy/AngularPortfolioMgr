@@ -37,7 +37,7 @@ export class OverviewComponent implements OnInit {
   constructor(private tokenService: TokenService,
 		private router: Router,
 		private portfolioService: PortfolioService,
-		private symbolImportService: SymbolImportService,
+		private symbolImportService: SymbolImportService,		
 		private dialog: MatDialog) { }
 
   ngOnInit() {
