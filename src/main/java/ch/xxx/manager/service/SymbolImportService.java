@@ -37,90 +37,86 @@ public class SymbolImportService {
 	@Autowired
 	private HkexConnector hkexConnector;
 	@Autowired
-	private SymbolRepository repository;	
+	private SymbolRepository repository;
 	@Autowired
 	private XetraConnector xetraConnector;
-	
+
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void scheduledImporter() {
 		this.importUsSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
 		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
 	}
-	
+
 	public Mono<Long> importUsSymbols() {
-		return this.nasdaqConnector.importSymbols().filter(this::filter)
-				.flatMap(symbolStr -> this.convert(symbolStr))
-			.flatMap(entity -> this.replaceEntity(entity)).count();
-	}
-	
-	public Mono<Long> importHkSymbols() {
-		return this.hkexConnector.importSymbols().filter(this::filter)
-				.flatMap(myDto -> this.convert(myDto))
+		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
-	
+
+	public Mono<Long> importHkSymbols() {
+		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
+				.flatMap(entity -> this.replaceEntity(entity)).count();
+	}
+
 	public Mono<Long> importDeSymbols() {
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
-				.flatMap(line -> this.convertXetra(line))
-				.groupBy(SymbolEntity::getSymbol)
-				.flatMap(group -> group.reduce((a, b) -> a))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
+				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count();
 	}
-	
+
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
-		return this.repository.findBySymbolSingle(entity.getSymbol().toLowerCase())
-				.switchIfEmpty(Mono.just(entity))
+		return this.repository.findBySymbolSingle(entity.getSymbol().toLowerCase()).switchIfEmpty(Mono.just(entity))
 				.flatMap(localEntity -> this.updateEntity(localEntity, entity))
 				.flatMap(myEntity -> this.repository.save(entity));
 	}
-	
+
 	private Mono<SymbolEntity> updateEntity(SymbolEntity dbEntity, SymbolEntity importEntity) {
-		if(!dbEntity.equals(importEntity)) {
+		if (!dbEntity.equals(importEntity)) {
 			dbEntity.setName(importEntity.getName());
 			dbEntity.setSymbol(importEntity.getSymbol());
 		}
 		return Mono.just(dbEntity);
 	}
-	
-	private Flux<SymbolEntity> convert(HkSymbolImportDto dto) {		
-		return Flux.just(new SymbolEntity(null, String.format("%s.HKG", dto.getSymbol()), dto.getName()));
+
+	private Flux<SymbolEntity> convert(HkSymbolImportDto dto) {
+		String cutSymbol = dto.getSymbol().trim().length() > 4
+				? dto.getSymbol().trim().substring(dto.getSymbol().length() - 4)
+				: dto.getSymbol().trim();
+		return Flux.just(new SymbolEntity(null, String.format("%s.HKG", cutSymbol), dto.getName()));
 	}
-	
+
 	private boolean filter(HkSymbolImportDto dto) {
 		long symbol = Long.parseLong(dto.getSymbol());
 		return symbol < 10000;
 	}
-	
+
 	private boolean filter(String line) {
-		if(line.isBlank() 
-			|| line.contains("ACT Symbol|Security Name|Exchange|")
-			|| line.contains("File Creation Time:")
-			|| line.contains("Symbol|Security Name|Market Category|")
-			|| line.contains("Market:")
-			|| line.contains("Date Last Update:")
-			|| line.contains("Product Status;Instrument Status;")) {
+		if (line.isBlank() || line.contains("ACT Symbol|Security Name|Exchange|")
+				|| line.contains("File Creation Time:") || line.contains("Symbol|Security Name|Market Category|")
+				|| line.contains("Market:") || line.contains("Date Last Update:")
+				|| line.contains("Product Status;Instrument Status;")) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	private boolean filterXetra(String line) {
 		return line.contains("DEUTSCHLAND") || line.contains("DAX");
 	}
-	
+
 	private Mono<SymbolEntity> convertXetra(String symbolLine) {
 		String[] strParts = symbolLine.split(";");
-		String symbol = String.format("%s.DEX", strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
+		String symbol = String.format("%s.DEX",
+				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		SymbolEntity entity = new SymbolEntity(null, symbol,
 				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100));
 		return Mono.just(entity);
 	}
-	
+
 	private Mono<SymbolEntity> convert(String symbolLine) {
 		String[] strParts = symbolLine.split("\\|");
-		SymbolEntity entity = new SymbolEntity(null, 
-				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15), 
-				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));		
+		SymbolEntity entity = new SymbolEntity(null,
+				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15),
+				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));
 		return Mono.just(entity);
 	}
 }

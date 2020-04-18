@@ -29,7 +29,7 @@ public class HkexConnector {
 	
 	public Flux<HkSymbolImportDto> importSymbols() {
 		try {
-			return WebClient.create().get()
+			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
 				.uri(new URI("https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json"))
 				.retrieve().bodyToFlux(HkSymbolImportDto.class);
 		} catch (URISyntaxException e) {

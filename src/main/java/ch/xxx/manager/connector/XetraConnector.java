@@ -54,7 +54,7 @@ public class XetraConnector {
 	}
 
 	private Flux<String> loadSymbolsCsv(String url) throws URISyntaxException {
-		return WebClient.create().get()
+		return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
 				.uri(new URI(url)).retrieve().toEntityList(String.class).flux()
 				.flatMap(line -> Flux.fromIterable(line.getBody()));
 	}
