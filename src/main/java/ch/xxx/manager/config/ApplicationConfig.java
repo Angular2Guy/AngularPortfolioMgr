@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager;
 import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePopulator;
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
@@ -25,6 +26,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import ch.xxx.manager.init.MyConnectionFactoryInitializer;
@@ -40,16 +42,16 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableScheduling
 @EnableTransactionManagement
 class ApplicationConfig extends AbstractR2dbcConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);	
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
+
 	@Override
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		ConnectionFactory connectionFactory = ConnectionFactories
 				.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
 
-		return ProxyConnectionFactory.builder(connectionFactory).onAfterQuery(
-				queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
+		return ProxyConnectionFactory.builder(connectionFactory)
+				.onAfterQuery(queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
 				.build();
 	}
 
@@ -72,4 +74,8 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 		return new DefaultServerCodecConfigurer();
 	}
 
+	@Bean
+	public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+		return new R2dbcTransactionManager(connectionFactory);
+	}
 }

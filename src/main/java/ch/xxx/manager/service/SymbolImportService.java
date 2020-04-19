@@ -58,16 +58,19 @@ public class SymbolImportService {
 		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
 	}
 
+	@Transactional
 	public Mono<Long> importUsSymbols() {
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
+	@Transactional
 	public Mono<Long> importHkSymbols() {
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
+	@Transactional
 	public Mono<Long> importDeSymbols() {
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
