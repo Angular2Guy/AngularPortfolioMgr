@@ -56,6 +56,7 @@ public class SymbolImportService {
 	public void scheduledImporter() {
 		this.importUsSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
 		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
+		this.importDeSymbols().subscribe(count -> LOGGER.info("Import of {} de symbols finished.", count));
 	}
 
 	public Mono<Long> importUsSymbols() {
