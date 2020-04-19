@@ -155,8 +155,6 @@ public class QuoteImportService {
 	
 	private Mono<Void> deleteIntraDayQuotes(Collection<IntraDayQuoteEntity> entities) {
 		LOGGER.info("deleteIntraDayQuotes() {} to delete",entities.size());
-		List<LocalDate> myDates = entities.stream().map(entity -> entity.getLocaldatetime().toLocalDate()).distinct().collect(Collectors.toList());
-		List<IntraDayQuoteEntity> toDelete = !myDates.contains(LocalDate.now()) ? new LinkedList<IntraDayQuoteEntity>() : entities.stream().filter(entity -> LocalDate.now().equals(entity.getLocaldatetime().toLocalDate())).collect(Collectors.toList());
-		return this.intraDayQuoteRepository.deleteAll(toDelete);
+		return !entities.isEmpty() ? this.intraDayQuoteRepository.deleteAll(entities) : Mono.empty();
 	}
 }
