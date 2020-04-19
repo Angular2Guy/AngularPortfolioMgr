@@ -12,6 +12,11 @@
  */
 package ch.xxx.manager.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +45,12 @@ public class SymbolImportService {
 	private SymbolRepository repository;
 	@Autowired
 	private XetraConnector xetraConnector;
+	private List<SymbolEntity> allSymbolEntities = new ArrayList<>();
+	
+	@PostConstruct
+	public void init() {
+		this.repository.findAll().subscribe(symbolEnity -> this.allSymbolEntities.add(symbolEnity));
+	}
 
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void scheduledImporter() {
@@ -64,9 +75,11 @@ public class SymbolImportService {
 	}
 
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
-		return this.repository.findBySymbolSingle(entity.getSymbol().toLowerCase()).switchIfEmpty(Mono.just(entity))
-				.flatMap(localEntity -> this.updateEntity(localEntity, entity))
-				.flatMap(myEntity -> this.repository.save(entity));
+		return Flux.fromIterable(this.allSymbolEntities)
+				.filter(filterEntity -> filterEntity.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
+						.switchIfEmpty(Mono.just(entity))
+						.flatMap(localEntity -> this.updateEntity(localEntity, entity))
+						.flatMap(myEntity -> this.repository.save(entity)).single();
 	}
 
 	private Mono<SymbolEntity> updateEntity(SymbolEntity dbEntity, SymbolEntity importEntity) {

@@ -21,7 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {
+public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {	
 	@Query("select * from symbol s where lower(s.symbol) like :symbol")
 	Flux<SymbolEntity> findBySymbol(String symbol);
 	@Query("select * from symbol s where lower(s.symbol) = :symbol")
