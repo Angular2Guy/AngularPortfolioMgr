@@ -14,6 +14,8 @@ package ch.xxx.manager.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import javax.annotation.PostConstruct;
 
@@ -48,8 +50,10 @@ public class SymbolImportService {
 	private List<SymbolEntity> allSymbolEntities = new ArrayList<>();
 	
 	@PostConstruct
-	public void init() {
-		this.repository.findAll().subscribe(symbolEnity -> this.allSymbolEntities.add(symbolEnity));
+	public void init() {		
+		this.repository.findAll().collectList().subscribe(symbolEnities -> {
+			this.allSymbolEntities = symbolEnities;	
+		});
 	}
 
 	@Scheduled(cron = "0 0 1 * * ?")
@@ -61,18 +65,21 @@ public class SymbolImportService {
 
 	public Mono<Long> importUsSymbols() {
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count()
+				.doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importHkSymbols() {
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count()
+				.doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importDeSymbols() {
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
-				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count();
+				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count()
+				.doAfterTerminate(() -> this.init());
 	}
 
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
