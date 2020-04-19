@@ -33,6 +33,7 @@ export class OverviewComponent implements OnInit {
   windowHeight: number = null;
   portfolios = new MatTableDataSource<Portfolio>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
+  importingSymbols = false;
 
   constructor(private tokenService: TokenService,
 		private router: Router,
@@ -88,12 +89,15 @@ export class OverviewComponent implements OnInit {
   }
 
   importSymbols():void {
+	this.importingSymbols = true;
 	forkJoin(
 		this.symbolImportService.getSymbolImportUs(),
 		this.symbolImportService.getSymbolImportHk(),
 		this.symbolImportService.getSymbolImportDe())
-		.subscribe(([resultUs, resultHk, resultDe]) => 
-			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}`));
+		.subscribe(([resultUs, resultHk, resultDe]) => { 
+			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}`);
+			this.importingSymbols = false;
+			});
   }
 
   logout():void {
