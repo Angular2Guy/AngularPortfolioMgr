@@ -16,9 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -68,8 +71,27 @@ public class QuoteImportService {
 				.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
 				.doAfterTerminate(() -> 
 					this.intraDayQuoteRepository.findBySymbolId(symbolEntity.getId())
-					.collectList().map(oldQuotes -> this.deleteIntraDayQuotes(oldQuotes))
+					.groupBy(intraDayQuote -> intraDayQuote.getLocaldatetime().toLocalDate())
+					.flatMap(group -> group.collectList())
+					.map(groupList -> this.createIntraDayQuoteMap(groupList))
+					.map(quotesMap -> this.deleteIntraDayQuotes(this.filterNewestDay(quotesMap)))
 					.subscribe()));
+	}
+	
+	private List<IntraDayQuoteEntity> filterNewestDay(Map<LocalDate,List<IntraDayQuoteEntity>> quotesMap) {
+		LocalDate max = quotesMap.keySet().stream().max(LocalDate::compareTo).get();
+		quotesMap.remove(max);
+		return quotesMap.values().stream().reduce(new ArrayList<IntraDayQuoteEntity>(), (list, entityList) -> { 
+			list.addAll(entityList);
+			return list;
+		});
+		
+	}
+	
+	private Map<LocalDate,List<IntraDayQuoteEntity>> createIntraDayQuoteMap(List<IntraDayQuoteEntity> entities) {
+		Map<LocalDate,List<IntraDayQuoteEntity>> myMap = new HashMap<>();
+		myMap.put(entities.get(0).getLocaldatetime().toLocalDate(), entities);
+		return myMap;
 	}
 	
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
