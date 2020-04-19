@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.connector.HkexConnector;
+import ch.xxx.manager.connector.NasdaqConnector;
+import ch.xxx.manager.connector.XetraConnector;
 import ch.xxx.manager.dto.SymbolDto;
+import ch.xxx.manager.repository.SymbolRepository;
 import ch.xxx.manager.service.SymbolImportService;
 import ch.xxx.manager.service.SymbolService;
 import reactor.core.publisher.Flux;
@@ -31,20 +35,26 @@ public class SymbolController {
 	private SymbolImportService importService;
 	@Autowired
 	private SymbolService service;
+	@Autowired
+	private NasdaqConnector nasdaqConnector;
+	@Autowired
+	private HkexConnector hkexConnector;
+	@Autowired
+	private XetraConnector xetraConnector;
 
 	@GetMapping("/importus/all")
 	public Mono<Long> importUsSymbols() {
-		return this.importService.importUsSymbols();
+		return this.importService.importUsSymbols(this.nasdaqConnector.importSymbols());
 	}
 
 	@GetMapping("/importhk/all")
 	public Mono<Long> importHkSymbols() {
-		return this.importService.importHkSymbols();
+		return this.importService.importHkSymbols(this.hkexConnector.importSymbols());
 	}
 
 	@GetMapping("/importde/all")
 	public Mono<Long> importDeSymbols() {
-		return this.importService.importDeSymbols();
+		return this.importService.importDeSymbols(this.xetraConnector.importXetraSymbols());
 	}
 
 	@GetMapping("/all")

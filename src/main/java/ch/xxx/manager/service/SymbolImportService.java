@@ -56,24 +56,40 @@ public class SymbolImportService {
 
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void scheduledImporter() {
-		this.importUsSymbols().subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
-		this.importHkSymbols().subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
-		this.importDeSymbols().subscribe(count -> LOGGER.info("Import of {} de symbols finished.", count));
+		this.importUsSymbols(null).subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
+		this.importHkSymbols(null).subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
+		this.importDeSymbols(null).subscribe(count -> LOGGER.info("Import of {} de symbols finished.", count));
 	}
 
-	public Mono<Long> importUsSymbols() {
+	public Mono<Long> importUsSymbols(Flux<String> nasdaq) {
+		if(nasdaq != null) {
+			return nasdaq.filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
+					.flatMap(entity -> this.replaceEntity(entity)).count()
+					.doAfterTerminate(() -> this.init());
+		}
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 				.flatMap(entity -> this.replaceEntity(entity)).count()
 				.doAfterTerminate(() -> this.init());
 	}
 
-	public Mono<Long> importHkSymbols() {
+	public Mono<Long> importHkSymbols(Flux<HkSymbolImportDto> hkex) {
+		if(hkex != null) {
+			return hkex.filter(this::filter).flatMap(myDto -> this.convert(myDto))
+					.flatMap(entity -> this.replaceEntity(entity)).count()
+					.doAfterTerminate(() -> this.init());
+		}
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
 				.flatMap(entity -> this.replaceEntity(entity)).count()
 				.doAfterTerminate(() -> this.init());
 	}
 
-	public Mono<Long> importDeSymbols() {
+	public Mono<Long> importDeSymbols(Flux<String> xetra) {
+		if(xetra != null) {
+			return xetra.filter(this::filter).filter(this::filterXetra)
+					.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
+					.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count()
+					.doAfterTerminate(() -> this.init());
+		}
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
 				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count()
@@ -85,7 +101,7 @@ public class SymbolImportService {
 				.filter(filterEntity -> filterEntity.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
 						.switchIfEmpty(Mono.just(entity))
 						.flatMap(localEntity -> this.updateEntity(localEntity, entity))
-						.flatMap(myEntity -> this.repository.save(entity)).single();
+						.flatMap(myEntity -> this.repository.save(myEntity)).single();
 	}
 
 	private Mono<SymbolEntity> updateEntity(SymbolEntity dbEntity, SymbolEntity importEntity) {
