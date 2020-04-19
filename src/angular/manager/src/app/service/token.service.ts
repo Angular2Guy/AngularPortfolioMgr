@@ -12,8 +12,8 @@
  */
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Observable, of, timer, Subscription } from 'rxjs';
-import { shareReplay, switchMap, map } from 'rxjs/operators';
+import { Observable, of, timer, Subscription, Subject } from 'rxjs';
+import { shareReplay, switchMap, map, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 export interface RefreshTokenResponse {
@@ -30,6 +30,7 @@ export class TokenService {
   private myToken: string;
   private myUserId: number;
   private myTokenSubscription: Subscription;
+  private stopTimer: Subject<boolean>;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -49,8 +50,11 @@ export class TokenService {
 	
   public clear() {
 	if(this.myTokenSubscription) {
-		this.myTokenSubscription.unsubscribe();
-		this.myTokenSubscription = null;
+		this.myTokenSubscription.unsubscribe();		
+	}
+	if(this.stopTimer) {		
+		this.stopTimer.next(true);
+		this.stopTimer = null;
 	}
 	this.myTokenCache = null;
 	this.myToken = null;
@@ -69,13 +73,13 @@ export class TokenService {
   set token(token: string) {
 	this.myToken = token;
 	if(token && !this.myTokenCache) {
+		const myStopTimer = new Subject<boolean>();
+		this.stopTimer = myStopTimer;
 		const myTimer = timer(0, this.REFRESH_INTERVAL);
 		this.myTokenCache = myTimer.pipe(
+			takeUntil(myStopTimer),
 			switchMap(() => this.refreshToken()),
 			shareReplay(this.CACHE_SIZE));
-		if(this.myTokenSubscription) {
-			this.myTokenSubscription.unsubscribe();
-		}
 		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken, () => this.clear());
 	}
   }
@@ -86,5 +90,5 @@ export class TokenService {
 
   set userId(userId: number) {
 	this.myUserId = userId;
-}
+  }
 }

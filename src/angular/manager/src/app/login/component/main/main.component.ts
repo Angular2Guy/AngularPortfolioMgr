@@ -30,7 +30,7 @@ export class MainComponent implements OnInit {
 		private router: Router) { }
 
   ngOnInit() {
-	this.tokenService.clear();
+	
   }
 
   openLoginDialog():void {
