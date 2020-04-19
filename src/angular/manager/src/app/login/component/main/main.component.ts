@@ -14,7 +14,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Login } from '../../model/login';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
-import { LoginService } from '../../service/login.service';
 import { TokenService } from '../../../service/token.service';
 import { Router } from '@angular/router';
 
@@ -27,11 +26,11 @@ export class MainComponent implements OnInit {
   login: Login = null;
 
   constructor(private dialog: MatDialog, 
-		private loginService: LoginService, 
 		private tokenService: TokenService,
 		private router: Router) { }
 
   ngOnInit() {
+	this.tokenService.clear();
   }
 
   openLoginDialog():void {

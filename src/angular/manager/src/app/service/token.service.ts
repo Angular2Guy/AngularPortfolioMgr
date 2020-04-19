@@ -48,7 +48,10 @@ export class TokenService {
 	}
 	
   public clear() {
-	this.myTokenSubscription.unsubscribe();
+	if(this.myTokenSubscription) {
+		this.myTokenSubscription.unsubscribe();
+		this.myTokenSubscription = null;
+	}
 	this.myTokenCache = null;
 	this.myToken = null;
 	this.myUserId = null;
@@ -70,6 +73,9 @@ export class TokenService {
 		this.myTokenCache = myTimer.pipe(
 			switchMap(() => this.refreshToken()),
 			shareReplay(this.CACHE_SIZE));
+		if(this.myTokenSubscription) {
+			this.myTokenSubscription.unsubscribe();
+		}
 		this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken, () => this.clear());
 	}
   }

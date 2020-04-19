@@ -101,7 +101,6 @@ export class OverviewComponent implements OnInit {
   }
 
   logout():void {
-	this.tokenService.clear();
-	this.router.navigate(['/login/login']);
+	this.tokenService.clear();	
   }
 }
