@@ -42,6 +42,10 @@ export class PortfolioComponent implements OnInit {
 			this.portfolioName = myPortfolio.name;});
   }
 
+  updateReloadData(state: boolean) {
+	this.reloadData = state;
+  }
+
   selectSymbol(symbol: Symbol): void {
 	this.selSymbol = symbol;
 	console.log(symbol);

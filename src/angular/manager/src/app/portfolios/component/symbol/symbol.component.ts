@@ -10,12 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Symbol } from '../../model/symbol';
 import { QuoteService } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
+import { tap } from 'rxjs/operators';
 
-const enum QuotePeriod {Day, Month, Months3, Months6, Year, Year3, Year5}
+const enum QuotePeriod {Day, Month, Months3, Months6, Year, Year3, Year5, Year10}
 
 @Component({
   selector: 'app-symbol',
@@ -26,12 +27,19 @@ export class SymbolComponent {
   
   private localSymbol: Symbol;
   quotes: Quote[] = [];  
+  @Output()
+  loadingData = new EventEmitter<boolean>();
 
   constructor(private quoteService: QuoteService) { }
 
   private updateQuotes(selPeriod: QuotePeriod): void {
 	if(selPeriod === QuotePeriod.Day) {
-		this.quoteService.getIntraDayQuotes(this.symbol.symbol).subscribe(myQuotes => this.quotes = myQuotes);
+		this.quoteService.getIntraDayQuotes(this.symbol.symbol)
+		  .pipe(tap(() => this.loadingData.emit(true)))
+ 			.subscribe(myQuotes => { 
+				this.quotes = myQuotes; 
+				this.loadingData.emit(false);
+			});
 	}
   }  
 

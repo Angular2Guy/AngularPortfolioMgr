@@ -8,6 +8,7 @@
 					color="primary">
 		</mat-progress-spinner>
 	</span>
+	<span i18n>loading...</span>
 	<span><button mat-button (click)="logout()" i18n>Logout</button></span>
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
@@ -19,6 +20,6 @@
 		</mat-action-list>	
 	</mat-sidenav>
 	<mat-sidenav-content opened mode="side">
-		<app-symbol *ngIf="selSymbol" symbol="selSymbol"></app-symbol>
+		<app-symbol symbol="selSymbol" (loadingData)="updateReloadData($event)"></app-symbol>
 	</mat-sidenav-content>
 </mat-sidenav-container>

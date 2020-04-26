@@ -68,7 +68,7 @@ export class OverviewComponent implements OnInit {
   }
 
   selPortfolio(portfolio: Portfolio) {
-	console.log(portfolio);
+	this.router.navigate(['/portfolios/portfolio/:portfolioId', portfolio.id]);
   }
 
   addSymbol(portfolio: Portfolio) {
