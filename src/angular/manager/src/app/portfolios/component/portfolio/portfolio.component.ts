@@ -10,12 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { Symbol } from '../../model/symbol';
 import { TokenService } from 'src/app/service/token.service';
 import { PortfolioService } from '../../service/portfolio.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -23,24 +24,29 @@ import { PortfolioService } from '../../service/portfolio.service';
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })
-export class PortfolioComponent implements OnInit {    
+export class PortfolioComponent implements OnInit, OnDestroy { 
   symbols: Symbol[] = [];
   reloadData = false;
   windowHeight = 0;
   portfolioName = '';
   selSymbol: Symbol = null;
+  private routeParamSubscription: Subscription;
 
   constructor(private route: ActivatedRoute, private tokenService: TokenService, private portfolioService: PortfolioService) { }
 
   ngOnInit(): void {
 	this.windowHeight = window.innerHeight - 84;
-	this.route.paramMap.pipe(tap(() => this.reloadData = true),
-		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('id')))),
+	this.routeParamSubscription = this.route.paramMap.pipe(tap(() => this.reloadData = true),
+		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
 		tap(() => this.reloadData = false))		
 		.subscribe(myPortfolio => {
 			this.symbols = myPortfolio.symbols;
 			this.portfolioName = myPortfolio.name;});
   }
+
+  ngOnDestroy(): void {
+    this.routeParamSubscription.unsubscribe();
+  }   
 
   updateReloadData(state: boolean) {
 	this.reloadData = state;

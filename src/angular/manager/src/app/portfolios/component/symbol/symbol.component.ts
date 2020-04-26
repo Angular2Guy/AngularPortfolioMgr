@@ -32,10 +32,10 @@ export class SymbolComponent {
 
   constructor(private quoteService: QuoteService) { }
 
-  private updateQuotes(selPeriod: QuotePeriod): void {
+  private updateQuotes(selPeriod: QuotePeriod): void {	
 	if(selPeriod === QuotePeriod.Day) {
-		this.quoteService.getIntraDayQuotes(this.symbol.symbol)
-		  .pipe(tap(() => this.loadingData.emit(true)))
+		this.loadingData.emit(true);
+		this.quoteService.getIntraDayQuotes(this.symbol.symbol)		  
  			.subscribe(myQuotes => { 
 				this.quotes = myQuotes; 
 				this.loadingData.emit(false);
@@ -44,9 +44,11 @@ export class SymbolComponent {
   }  
 
   @Input()
-  set symbol(symbol: Symbol) {
-	this.localSymbol = symbol;
-	this.updateQuotes(QuotePeriod.Day);
+  set symbol(mySymbol: Symbol) {
+	if(mySymbol) {
+	  this.localSymbol = mySymbol;
+	  this.updateQuotes(QuotePeriod.Day);
+	}
   }
 
   get symbol(): Symbol {

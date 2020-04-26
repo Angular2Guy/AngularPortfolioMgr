@@ -5,11 +5,11 @@ table {
   width: 100%;
 }
 
-.portfolio-list {	
+.symbol-list {	
 	width: 300px;
 	overflow-x: hidden;
 	overflow-y: auto;	
-	.portfolio-line {
+	.symbol-line {
 		display: flex;	
 		align-items: center;
 		.add-button {
@@ -25,6 +25,11 @@ table {
 
 .custom-spinner ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
 	stroke: #ffffff !important;
+}
+
+.spinner-text{
+	font-size: 14px;
+	margin-left: 20px;
 }
 	
 .mat-table {
