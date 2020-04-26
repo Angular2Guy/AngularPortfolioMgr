@@ -63,10 +63,6 @@ table {
   flex-direction: column; 
 }
 
-span > mat-progress-spinner > svg {
-	background: #000000;
-}
-
 .custom-spinner ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
 	stroke: #ffffff !important;
 }

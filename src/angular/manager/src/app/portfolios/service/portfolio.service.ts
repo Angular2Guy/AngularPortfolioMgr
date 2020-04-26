@@ -20,8 +20,12 @@ export class PortfolioService {
 
   constructor(private http: HttpClient) { }
 
-  	getPortfolio(userId: number): Observable<Portfolio[]> {
+  	getPortfolioByUserId(userId: number): Observable<Portfolio[]> {
 		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`);
+	}
+	
+	getPortfolioById(portfolioId: number): Observable<Portfolio> {
+		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`);
 	}
 	
 	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {

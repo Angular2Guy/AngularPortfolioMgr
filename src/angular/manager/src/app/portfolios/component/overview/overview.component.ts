@@ -43,7 +43,7 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
-	this.portfolioService.getPortfolio(this.tokenService.userId).subscribe(myPortfolios => {
+	this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
 			myPortfolios.forEach(port => port.symbols = !port.symbols ?  [] : port.symbols);
 			this.portfolios.data = myPortfolios;
 		});
@@ -97,7 +97,7 @@ export class OverviewComponent implements OnInit {
 		.subscribe(([resultUs, resultHk, resultDe]) => { 
 			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}`);
 			this.importingSymbols = false;
-			});
+		});
   }
 
   logout():void {

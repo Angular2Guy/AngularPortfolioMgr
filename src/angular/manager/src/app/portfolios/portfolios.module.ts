@@ -23,9 +23,10 @@ import { TokenInterceptor } from '../service/token.interceptor';
 import { SymbolImportService } from './service/symbol-import.service';
 import { AddSymbolComponent } from './component/add-symbol/add-symbol.component';
 import { QuoteImportService } from './service/quote-import.service';
+import { PortfolioComponent } from './component/portfolio/portfolio.component';
 
 @NgModule({
-  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent],
+  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent],
   imports: [
     BaseModule,
     PortfoliosRoutingModule

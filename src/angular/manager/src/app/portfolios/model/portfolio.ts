@@ -15,7 +15,7 @@ import { Symbol } from './symbol';
 export interface Portfolio {
 	id: number;
 	userId: number;
-	name: String;
+	name: string;
 	month1: number;
 	months6: number;
 	year1: number;

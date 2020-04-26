@@ -38,6 +38,11 @@ public class PortfolioController {
 		return this.portfolioService.getPortfoliosByUserId(userId);
 	}
 	
+	@GetMapping("/id/{portfolioId}")
+	public Mono<PortfolioDto> getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
+		return this.portfolioService.getPortfolioById(portfolioId);
+	}
+	
 	@PostMapping
 	public Mono<PortfolioDto> createPortfolio(@RequestBody PortfolioDto dto) {
 		return this.portfolioService.addPortfolio(dto);

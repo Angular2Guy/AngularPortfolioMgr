@@ -12,9 +12,6 @@
  */
 package ch.xxx.manager.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +37,15 @@ public class PortfolioService {
 	private SymbolRepository symbolRepository;
 	
 	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {
-		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> this.convert(entity));
+		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> this.convertFlux(entity));
+	}
+	
+	public Mono<PortfolioDto> getPortfolioById(Long portfolioId) {
+		return this.portfolioRepository.findById(portfolioId).flatMap(entity -> this.convert(entity));
 	}
 	
 	public Mono<PortfolioDto> addPortfolio(PortfolioDto dto) {
-		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> this.convert(myEntity).singleOrEmpty());
+		return this.portfolioRepository.save(this.convert(dto)).flatMap(myEntity -> this.convertFlux(myEntity).singleOrEmpty());
 	}
 
 	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight) {
@@ -101,7 +102,12 @@ public class PortfolioService {
 		return this.symbolRepository.findById(entity.getSymbolId()).flatMap(symbolEntity -> updatePortfolioDto(entity, symbolEntity, dto));
 	}
 	
-	private Flux<PortfolioDto> convert(PortfolioEntity entity) {
+	private Mono<PortfolioDto> convert(PortfolioEntity entity) {
+		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
+		return this.portfolioToSymbolRepository.findById(dto.getId()).switchIfEmpty(Mono.just(new PortfolioToSymbolEntity())).flatMap(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
+	}
+	
+	private Flux<PortfolioDto> convertFlux(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId()).switchIfEmpty(Flux.just(new PortfolioToSymbolEntity())).flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
 	}

@@ -1,0 +1,38 @@
+.container {		
+}
+
+table {
+  width: 100%;
+}
+
+.portfolio-list {	
+	width: 300px;
+	overflow-x: hidden;
+	overflow-y: auto;	
+	.portfolio-line {
+		display: flex;	
+		align-items: center;
+		.add-button {
+			width: 56px;
+		}		
+	}
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column; 
+}
+
+.custom-spinner ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+	stroke: #ffffff !important;
+}
+	
+.mat-table {
+  overflow: auto;  
+}
+
+.example-fill-remaining-space {
+  // This fills the remaining space, by using flexbox. 
+  // Every toolbar row uses a flexbox row layout.
+  flex: 1 1 auto;
+}
