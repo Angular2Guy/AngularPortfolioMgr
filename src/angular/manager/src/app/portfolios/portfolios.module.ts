@@ -24,9 +24,10 @@ import { SymbolImportService } from './service/symbol-import.service';
 import { AddSymbolComponent } from './component/add-symbol/add-symbol.component';
 import { QuoteImportService } from './service/quote-import.service';
 import { PortfolioComponent } from './component/portfolio/portfolio.component';
+import { SymbolComponent } from './component/symbol/symbol.component';
 
 @NgModule({
-  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent],
+  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent],
   imports: [
     BaseModule,
     PortfoliosRoutingModule
