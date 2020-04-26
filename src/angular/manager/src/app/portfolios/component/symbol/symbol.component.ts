@@ -10,26 +10,35 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Symbol } from '../../model/symbol';
 import { QuoteService } from '../../service/quote.service';
+import { Quote } from '../../model/quote';
+
+const enum QuotePeriod {Day, Month, Months3, Months6, Year, Year3, Year5}
 
 @Component({
   selector: 'app-symbol',
   templateUrl: './symbol.component.html',
   styleUrls: ['./symbol.component.scss']
 })
-export class SymbolComponent implements OnInit {
+export class SymbolComponent {
+  
   private localSymbol: Symbol;
+  quotes: Quote[] = [];  
 
   constructor(private quoteService: QuoteService) { }
 
-  ngOnInit(): void {
-  }
+  private updateQuotes(selPeriod: QuotePeriod): void {
+	if(selPeriod === QuotePeriod.Day) {
+		this.quoteService.getIntraDayQuotes(this.symbol.symbol).subscribe(myQuotes => this.quotes = myQuotes);
+	}
+  }  
 
   @Input()
   set symbol(symbol: Symbol) {
 	this.localSymbol = symbol;
+	this.updateQuotes(QuotePeriod.Day);
   }
 
   get symbol(): Symbol {
