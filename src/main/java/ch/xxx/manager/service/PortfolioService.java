@@ -104,11 +104,17 @@ public class PortfolioService {
 	
 	private Mono<PortfolioDto> convert(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
-		return this.portfolioToSymbolRepository.findById(dto.getId()).switchIfEmpty(Mono.just(new PortfolioToSymbolEntity())).flatMap(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
+		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
+				.switchIfEmpty(Mono.just(new PortfolioToSymbolEntity()))
+				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto))
+				.distinct().single();
 	}
 	
 	private Flux<PortfolioDto> convertFlux(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName());
-		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId()).switchIfEmpty(Flux.just(new PortfolioToSymbolEntity())).flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto));
+		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
+				.switchIfEmpty(Flux.just(new PortfolioToSymbolEntity()))
+				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto))
+				.distinct();
 	}
 }
