@@ -17,60 +17,95 @@ import { Quote } from '../../model/quote';
 import { tap } from 'rxjs/operators';
 import { DOCUMENT } from '@angular/common';
 
-const enum QuotePeriodKeys {Day, Month, Months3, Months6, Year, Year3, Year5, Year10}
+const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
 interface QuotePeriod {
 	periodText: string;
-	quotePeriodKey: QuotePeriodKeys;
+	quotePeriodKey: QuotePeriodKey;
 }
 
 @Component({
-  selector: 'app-symbol',
-  templateUrl: './symbol.component.html',
-  styleUrls: ['./symbol.component.scss']
+	selector: 'app-symbol',
+	templateUrl: './symbol.component.html',
+	styleUrls: ['./symbol.component.scss']
 })
 export class SymbolComponent implements OnInit {
-  quotePeriods: QuotePeriod[] = [];
-  selQuotePeriod: QuotePeriod = null;
-  private localSymbol: Symbol;
-  quotes: Quote[] = [];  
-  @Output()
-  loadingData = new EventEmitter<boolean>();
+	quotePeriods: QuotePeriod[] = [];
+	selQuotePeriod: QuotePeriod = null;
+	private localSymbol: Symbol;
+	quotes: Quote[] = [];
+	@Output()
+	loadingData = new EventEmitter<boolean>();
 
-  constructor(private quoteService: QuoteService, @Inject( DOCUMENT ) private document: Document) { }
+	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document) { }
 
-  ngOnInit(): void { 
-  	this.quotePeriods = [{quotePeriodKey: QuotePeriodKeys.Day, periodText: this.document.getElementById( 'intraDay' ).textContent},
-						{quotePeriodKey: QuotePeriodKeys.Month, periodText: this.document.getElementById( 'oneMonth').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Months3, periodText: this.document.getElementById( 'threeMonths').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Months6, periodText: this.document.getElementById( 'sixMonths').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Year, periodText: this.document.getElementById( 'oneYear').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Year3, periodText: this.document.getElementById( 'threeYears').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Year5, periodText: this.document.getElementById( 'fiveYears').textContent},
-						{quotePeriodKey: QuotePeriodKeys.Year10, periodText: this.document.getElementById( 'tenYears').textContent}];
-	this.selQuotePeriod = this.quotePeriods[0];
-  }
-
-  private updateQuotes(selPeriod: QuotePeriodKeys): void {	
-	if(selPeriod === QuotePeriodKeys.Day) {
-		this.loadingData.emit(true);
-		this.quoteService.getIntraDayQuotes(this.symbol.symbol)		  
- 			.subscribe(myQuotes => { 
-				this.quotes = myQuotes; 
-				this.loadingData.emit(false);
-			});
+	ngOnInit(): void {
+		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: this.document.getElementById('intraDay').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Month, periodText: this.document.getElementById('oneMonth').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: this.document.getElementById('threeMonths').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: this.document.getElementById('sixMonths').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Year, periodText: this.document.getElementById('oneYear').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: this.document.getElementById('threeYears').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: this.document.getElementById('fiveYears').textContent },
+		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: this.document.getElementById('tenYears').textContent }];
+		this.selQuotePeriod = this.quotePeriods[0];
 	}
-  }  
 
-  @Input()
-  set symbol(mySymbol: Symbol) {
-	if(mySymbol) {
-	  this.localSymbol = mySymbol;
-	  this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKeys.Day : this.selQuotePeriod.quotePeriodKey);
+	quotePeriodChanged() {
+		this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
+		console.log(this.selQuotePeriod);
 	}
-  }
 
-  get symbol(): Symbol {
-	return this.localSymbol;
-  }
+	private updateQuotes(selPeriod: QuotePeriodKey): void {
+		if (!this.symbol) { return; }
+		if (selPeriod === QuotePeriodKey.Day) {
+			this.loadingData.emit(true);
+			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
+				.subscribe(myQuotes => {
+					this.quotes = myQuotes;
+					this.loadingData.emit(false);
+				});
+		} else {
+			this.loadingData.emit(true);
+			const startDate = this.createStartDate(selPeriod);			
+			const endDate = new Date();
+			this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
+				.subscribe(myQuotes => {
+					this.quotes = myQuotes;
+					this.loadingData.emit(false);
+				});
+		}
+	}
+
+	private createStartDate(selPeriod: QuotePeriodKey): Date {
+		const startDate = new Date();
+		if(QuotePeriodKey.Month === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 1);
+		} else if(QuotePeriodKey.Months3 === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 3);
+		} else if(QuotePeriodKey.Months6 === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 6);
+		} else if(QuotePeriodKey.Year === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 12);
+		} else if(QuotePeriodKey.Year3 === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 36);
+		} else if(QuotePeriodKey.Year5 === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 60);
+		} else if(QuotePeriodKey.Year10 === selPeriod) {
+			startDate.setMonth(startDate.getMonth() - 120);
+		}
+		return startDate;
+	}
+
+	@Input()
+	set symbol(mySymbol: Symbol) {
+		if (mySymbol) {
+			this.localSymbol = mySymbol;
+			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
+		}
+	}
+
+	get symbol(): Symbol {
+		return this.localSymbol;
+	}
 }

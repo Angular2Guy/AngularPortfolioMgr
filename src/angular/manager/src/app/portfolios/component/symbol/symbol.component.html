@@ -2,7 +2,7 @@
 <label id="my-radio-group-label" i18n>Pick your timeframe:</label>
 <mat-radio-group
   aria-labelledby="my-radio-group-label"
-  class="my-radio-group"
+  class="my-radio-group" (change)="quotePeriodChanged()"
   [(ngModel)]="selQuotePeriod">
   <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod">
     {{myQuotePeriod.periodText}}

@@ -29,8 +29,8 @@ export class QuoteService {
   }
 
   getDailyQuotesFromStartToEnd(symbol: string, start: Date, end: Date): Observable<Quote[]> {
-	const startStr = start.toISOString();
-	const endStr = end.toISOString();
-	return this.http.get<Quote[]>(`/rest/quote//daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
+	const startStr = start.toISOString().split('T')[0];
+	const endStr = end.toISOString().split('T')[0];
+	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
   }
 }
