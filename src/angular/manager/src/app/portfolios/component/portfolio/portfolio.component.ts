@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { Symbol } from '../../model/symbol';
 import { TokenService } from 'src/app/service/token.service';
 import { PortfolioService } from '../../service/portfolio.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 
 @Component({
@@ -32,7 +32,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   selSymbol: Symbol = null;
   private routeParamSubscription: Subscription;
 
-  constructor(private route: ActivatedRoute, private tokenService: TokenService, private portfolioService: PortfolioService) { }
+  constructor(private route: ActivatedRoute, private tokenService: TokenService, 
+              private portfolioService: PortfolioService, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
 	this.windowHeight = window.innerHeight - 84;
@@ -45,16 +46,18 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.routeParamSubscription.unsubscribe();
+    this.routeParamSubscription.unsubscribe();	
   }   
 
   updateReloadData(state: boolean) {
 	this.reloadData = state;
+	this.changeDetectorRef.detectChanges();
+	//console.log('loading:'+state);
   }
 
   selectSymbol(symbol: Symbol): void {
 	this.selSymbol = symbol;
-	console.log(symbol);
+	//console.log(symbol);
   }
 
   logout():void {

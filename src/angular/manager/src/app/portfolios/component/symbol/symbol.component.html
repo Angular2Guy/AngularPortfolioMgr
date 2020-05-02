@@ -1,1 +1,21 @@
 <p>symbol {{!symbol ? 'none' : symbol.name}}</p>
+<label id="my-radio-group-label" i18n>Pick your timeframe:</label>
+<mat-radio-group
+  aria-labelledby="my-radio-group-label"
+  class="my-radio-group"
+  [(ngModel)]="selQuotePeriod">
+  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod">
+    {{myQuotePeriod.periodText}}
+  </mat-radio-button>
+</mat-radio-group>
+
+<div class="invisible-div">
+	<span id="intraDay" i18n="@@intraDay">IntraDay</span>
+	<span id="oneMonth" i18n="@@oneMonth">1 Month</span>
+	<span id="threeMonths" i18n="@@threeMonths">3 Months</span>
+	<span id="sixMonths" i18n="@@sixMonths">6 Months</span>
+	<span id="oneYear" i18n="@@oneYear">1 Year</span>
+	<span id="threeYears" i18n="@@threeYears">3 Years</span>
+	<span id="fiveYears" i18n="@@fiveYears">5 Years</span>
+	<span id="tenYears" i18n="@@tenYears">10 Years</span>
+</div>

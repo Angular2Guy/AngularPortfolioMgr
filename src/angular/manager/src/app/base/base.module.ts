@@ -12,7 +12,7 @@
  */
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -55,6 +55,7 @@ import { HttpClientModule }    from '@angular/common/http';
 	imports: [
 		CommonModule,
 		HttpClientModule,
+		FormsModule,
 		ReactiveFormsModule,
 		MatAutocompleteModule,
 		MatCheckboxModule,
@@ -95,6 +96,7 @@ import { HttpClientModule }    from '@angular/common/http';
 	exports: [		
 		CommonModule,
 		HttpClientModule,
+		FormsModule,
 		ReactiveFormsModule,
 		MatAutocompleteModule,
 		MatCheckboxModule,
