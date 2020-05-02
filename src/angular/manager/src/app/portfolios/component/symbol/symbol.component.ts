@@ -69,11 +69,16 @@ export class SymbolComponent implements OnInit {
 			this.loadingData.emit(true);
 			const startDate = this.createStartDate(selPeriod);			
 			const endDate = new Date();
-			this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
+			this.quoteService.getAllDailyQuotes(this.symbol.symbol)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.loadingData.emit(false);
 				});
+			/*this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
+				.subscribe(myQuotes => {
+					this.quotes = myQuotes;
+					this.loadingData.emit(false);
+				});*/
 		}
 	}
 

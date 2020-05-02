@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,7 +70,7 @@ public class QuoteImportService {
 				.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
 				.doAfterTerminate(() -> 
 					this.intraDayQuoteRepository.findBySymbolId(symbolEntity.getId())
-					.groupBy(intraDayQuote -> intraDayQuote.getLocaldatetime().toLocalDate())
+					.groupBy(intraDayQuote -> intraDayQuote.getLocalDateTime().toLocalDate())
 					.flatMap(group -> group.collectList())
 					.map(groupList -> this.createIntraDayQuoteMap(groupList))
 					.map(quotesMap -> this.deleteIntraDayQuotes(this.filterNewestDay(quotesMap)))
@@ -90,7 +89,7 @@ public class QuoteImportService {
 	
 	private Map<LocalDate,List<IntraDayQuoteEntity>> createIntraDayQuoteMap(List<IntraDayQuoteEntity> entities) {
 		Map<LocalDate,List<IntraDayQuoteEntity>> myMap = new HashMap<>();
-		myMap.put(entities.get(0).getLocaldatetime().toLocalDate(), entities);
+		myMap.put(entities.get(0).getLocalDateTime().toLocalDate(), entities);
 		return myMap;
 	}
 	
@@ -111,7 +110,7 @@ public class QuoteImportService {
 						.flatMap(wrapper -> this.convert(symbolEntity, wrapper)) 
 					: this.alphavatageController.getTimeseriesDailyHistory(symbol, false)
 						.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
-						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size()-1).getDay().compareTo(myDto.getDay())).collect(Collectors.toList()))).
+						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size()-1).getLocalDay().compareTo(myDto.getLocalDay())).collect(Collectors.toList()))).
 			flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 	
@@ -130,7 +129,7 @@ public class QuoteImportService {
 	}
 
 	private Flux<IntraDayQuoteEntity> saveAllIntraDayQuotes(Collection<IntraDayQuoteEntity> entities) {
-		LOGGER.info("importDailyQuotes() {} to import", entities.size());
+		LOGGER.info("importIntraDayQuotes() {} to import", entities.size());
 		return this.intraDayQuoteRepository.saveAll(entities);				
 	}
 	

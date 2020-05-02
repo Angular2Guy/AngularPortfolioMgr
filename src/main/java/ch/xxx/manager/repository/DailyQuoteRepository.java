@@ -23,12 +23,12 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, Long> {
-	@Query("select * from dailyquote where symbol = :symbol order by day asc")
+	@Query("select * from dailyquote where symbol = :symbol order by local_day asc")
 	Flux<DailyQuoteEntity> findBySymbol(String symbol);
 	
-	@Query("select * from dailyquote where symbol_id = :symbolId order by day asc")
+	@Query("select * from dailyquote where symbol_id = :symbolId order by local_day asc")
 	Flux<DailyQuoteEntity> findBySymbolId(Long symbolId);
 	
-	@Query("select * from dailyquote where symbol = :symbol and day between :start and :end order by day asc")
+	@Query("select * from dailyquote where symbol = :symbol and local_day between :start and :end order by local_day asc")
 	Flux<DailyQuoteEntity> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

@@ -44,10 +44,10 @@ public class QuoteService {
 	}
 	
 	private Flux<QuoteDto> convert(IntraDayQuoteEntity entity) {
-		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getLocaldatetime(), entity.getSymbol()));
+		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getLocalDateTime(), entity.getSymbol()));
 	}
 	
 	private Flux<QuoteDto> convert(DailyQuoteEntity entity) {
-		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getDay().atStartOfDay(), entity.getSymbol()));
+		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getLocalDay().atStartOfDay(), entity.getSymbol()));
 	}
 }
