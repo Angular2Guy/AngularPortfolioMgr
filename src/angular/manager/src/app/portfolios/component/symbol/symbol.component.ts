@@ -24,6 +24,16 @@ interface QuotePeriod {
 	quotePeriodKey: QuotePeriodKey;
 }
 
+interface SymbolData {
+	start: Date,
+	end: Date,
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+	avgVolume: number;
+}
+
 @Component({
 	selector: 'app-symbol',
 	templateUrl: './symbol.component.html',
@@ -34,6 +44,7 @@ export class SymbolComponent implements OnInit {
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
 	quotes: Quote[] = [];
+	symbolData = {avgVolume: null, close: null, end: null, high: null, low: null, open: null, start: null} as SymbolData;
 	@Output()
 	loadingData = new EventEmitter<boolean>();
 
@@ -56,6 +67,17 @@ export class SymbolComponent implements OnInit {
 		console.log(this.selQuotePeriod);
 	}
 
+    private updateSymbolData(startDate: Date, endDate: Date) {
+		this.symbolData.start = startDate;
+		this.symbolData.end = endDate;
+		this.symbolData.open = this.quotes && this.quotes.length > 0 ? this.quotes[0].open : null;
+		this.symbolData.close = this.quotes && this.quotes.length > 0 ? this.quotes[this.quotes.length -1].close : null;
+		this.symbolData.high = this.quotes && this.quotes.length > 0 ? Math.max(...this.quotes.map(quote => quote.high)) : null;
+		this.symbolData.low = this.quotes && this.quotes.length > 0 ? Math.min(...this.quotes.map(quote => quote.low)) : null;
+		this.symbolData.avgVolume = this.quotes && this.quotes.length > 0 ? 
+			(this.quotes.map(quote => quote.volume).reduce((result, volume) => result + volume, 0) / this.quotes.length) : null;
+    }
+
 	private updateQuotes(selPeriod: QuotePeriodKey): void {
 		if (!this.symbol) { return; }
 		if (selPeriod === QuotePeriodKey.Day) {
@@ -63,6 +85,7 @@ export class SymbolComponent implements OnInit {
 			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
+					this.updateSymbolData(new Date(), new Date());
 					this.loadingData.emit(false);
 				});
 		} else {
@@ -77,6 +100,7 @@ export class SymbolComponent implements OnInit {
 			this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
+					this.updateSymbolData(startDate, endDate);
 					this.loadingData.emit(false);
 				});
 		}

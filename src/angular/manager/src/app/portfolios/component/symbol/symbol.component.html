@@ -1,14 +1,26 @@
-<p>symbol {{!symbol ? 'none' : symbol.name}}</p>
-<label id="my-radio-group-label" i18n>Pick your timeframe:</label>
-<mat-radio-group
-  aria-labelledby="my-radio-group-label"
-  class="my-radio-group" (change)="quotePeriodChanged()"
-  [(ngModel)]="selQuotePeriod">
-  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod">
-    {{myQuotePeriod.periodText}}
-  </mat-radio-button>
-</mat-radio-group>
-
+<div>
+	<div class="text-container" i18n>Symbol: {{!symbol ? 'none' : symbol.symbol}} Name: {{!symbol ? 'none' : symbol.name}}</div>
+	<div class="text-container">
+		<span class="symbol-data" i18n>Start Date: {{!symbolData.start ? '' : symbolData.start | date:'mediumDate' }}</span>
+		<span class="symbol-data" i18n>End Date: {{!symbolData.end ? '' : symbolData.end | date:'mediumDate' }}</span>
+		<span class="symbol-data" i18n>Open: {{!symbolData.open ? '' :  symbolData.open | number:'1.2-2'}}</span>
+		<span class="symbol-data" i18n>High: {{!symbolData.high ? '' :  symbolData.high | number:'1.2-2'}}</span>
+		<span class="symbol-data" i18n>Low: {{!symbolData.low ? '' :  symbolData.low | number:'1.2-2'}}</span>
+		<span class="symbol-data" i18n>Close: {{!symbolData.close ? '' :  symbolData.close | number:'1.2-2'}}</span>
+		<span class="symbol-data" i18n>Average Volume: {{!symbolData.avgVolume ? '' : symbolData.avgVolume | number:'1.0-0' }}</span>
+	</div>
+</div>
+<div class="text-container">
+	<label id="my-radio-group-label" i18n>Pick your timeframe:</label>
+	<mat-radio-group
+	  aria-labelledby="my-radio-group-label"
+	  class="my-radio-group" (change)="quotePeriodChanged()"
+	  [(ngModel)]="selQuotePeriod">
+	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod">
+	    {{myQuotePeriod.periodText}}
+	  </mat-radio-button>
+	</mat-radio-group>
+</div>
 <div class="invisible-div">
 	<span id="intraDay" i18n="@@intraDay">IntraDay</span>
 	<span id="oneMonth" i18n="@@oneMonth">1 Month</span>
