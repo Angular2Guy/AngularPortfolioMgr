@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { Symbol } from '../../model/symbol';
 import { TokenService } from 'src/app/service/token.service';
@@ -33,7 +33,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   private routeParamSubscription: Subscription;
 
   constructor(private route: ActivatedRoute, private tokenService: TokenService, 
-              private portfolioService: PortfolioService, private changeDetectorRef: ChangeDetectorRef) { }
+              private portfolioService: PortfolioService, private router: Router, 
+			  private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
 	this.windowHeight = window.innerHeight - 84;
@@ -58,6 +59,10 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   selectSymbol(symbol: Symbol): void {
 	this.selSymbol = symbol;
 	//console.log(symbol);
+  }
+
+  back(): void {
+	this.router.navigate(['/portfolios/overview']);
   }
 
   logout():void {

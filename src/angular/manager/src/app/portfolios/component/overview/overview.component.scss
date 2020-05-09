@@ -40,6 +40,10 @@ table {
 	display: none;
 }
 
+.table-cell {
+	cursor: pointer;
+}
+
 .cell:hover {
 	.popup {		
 		display: block;		    

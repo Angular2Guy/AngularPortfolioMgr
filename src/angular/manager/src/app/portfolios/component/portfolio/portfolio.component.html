@@ -9,6 +9,7 @@
 		</mat-progress-spinner>
 	</span>
 	<span *ngIf="reloadData" class="spinner-text" i18n>loading...</span>
+	<span><button mat-button (click)="back()" i18n>Back</button></span>
 	<span><button mat-button (click)="logout()" i18n>Logout</button></span>
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
