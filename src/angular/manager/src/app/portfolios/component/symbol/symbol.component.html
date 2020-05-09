@@ -21,6 +21,20 @@
 	  </mat-radio-button>
 	</mat-radio-group>
 </div>
+<div>
+	<ngx-charts-line-chart	
+	  [legend]="legend"
+	  [showXAxisLabel]="showXAxisLabel"
+	  [showYAxisLabel]="showYAxisLabel"
+	  [xAxis]="xAxis"
+	  [yAxis]="yAxis"
+	  [xAxisLabel]="xAxisLabel"
+	  [yAxisLabel]="yAxisLabel"
+	  [timeline]="timeline"
+	  [autoScale]="autoScale"
+	  [results]="multi">
+	</ngx-charts-line-chart>
+</div>
 <div class="invisible-div">
 	<span id="intraDay" i18n="@@intraDay">IntraDay</span>
 	<span id="oneMonth" i18n="@@oneMonth">1 Month</span>

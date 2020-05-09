@@ -48,6 +48,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { HttpClientModule }    from '@angular/common/http';
 
 @NgModule({
@@ -91,7 +92,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatPaginatorModule,
 		MatSortModule,
 		MatTableModule,
-		MatIconModule
+		MatIconModule,
+		NgxChartsModule
 	],
 	exports: [		
 		CommonModule,
@@ -132,7 +134,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatPaginatorModule,
 		MatSortModule,
 		MatTableModule,
-		MatIconModule
+		MatIconModule,
+		NgxChartsModule
 		]
 })
 export class BaseModule { }

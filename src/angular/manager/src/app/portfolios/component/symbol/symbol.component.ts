@@ -10,12 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID } from '@angular/core';
 import { Symbol } from '../../model/symbol';
 import { QuoteService } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
-import { tap } from 'rxjs/operators';
-import { DOCUMENT } from '@angular/common';
+import { MyChartData, MyChartValue } from '../../model/my-chart-data';
+import { DOCUMENT, formatDate } from '@angular/common';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
@@ -40,15 +40,31 @@ interface SymbolData {
 	styleUrls: ['./symbol.component.scss']
 })
 export class SymbolComponent implements OnInit {
+	private dayInMs = 24 * 60 * 60 * 1000;
+	private hourInMs = 1 * 60 * 60 * 1000;
 	quotePeriods: QuotePeriod[] = [];
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
 	quotes: Quote[] = [];
-	symbolData = {avgVolume: null, close: null, end: null, high: null, low: null, open: null, start: null} as SymbolData;
+	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, open: null, start: null } as SymbolData;
 	@Output()
 	loadingData = new EventEmitter<boolean>();
 
-	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document) { }
+	multi: MyChartData[] = [{ name: 'none', series: [] }];	
+	legend = false;
+	showLabels = true;
+	animations = true;
+	xAxis = true;
+	yAxis = true;
+	showYAxisLabel = true;
+	showXAxisLabel = true;
+	xAxisLabel: string = 'Time';
+	yAxisLabel: string = 'Value';
+	timeline = true;
+	autoScale = true;
+
+	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document, 
+		@Inject(LOCALE_ID) private locale: string) { }
 
 	ngOnInit(): void {
 		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: this.document.getElementById('intraDay').textContent },
@@ -67,16 +83,35 @@ export class SymbolComponent implements OnInit {
 		console.log(this.selQuotePeriod);
 	}
 
-    private updateSymbolData(startDate: Date, endDate: Date) {
-		this.symbolData.start = startDate;
-		this.symbolData.end = endDate;
-		this.symbolData.open = this.quotes && this.quotes.length > 0 ? this.quotes[0].open : null;
-		this.symbolData.close = this.quotes && this.quotes.length > 0 ? this.quotes[this.quotes.length -1].close : null;
-		this.symbolData.high = this.quotes && this.quotes.length > 0 ? Math.max(...this.quotes.map(quote => quote.high)) : null;
-		this.symbolData.low = this.quotes && this.quotes.length > 0 ? Math.min(...this.quotes.map(quote => quote.low)) : null;
-		this.symbolData.avgVolume = this.quotes && this.quotes.length > 0 ? 
-			(this.quotes.map(quote => quote.volume).reduce((result, volume) => result + volume, 0) / this.quotes.length) : null;
-    }
+	private updateSymbolData() {
+		const localQuotes = this.quotes && this.quotes.length > 0 ? this.quotes.
+			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length -1].timestamp).getTime() -this.dayInMs + this.hourInMs) 
+			|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day) : null;
+		this.symbolData.start = localQuotes && localQuotes.length > 0 ? new Date(localQuotes[0].timestamp) : null;
+		this.symbolData.end = localQuotes && localQuotes.length > 0 ? new Date(localQuotes[localQuotes.length -1].timestamp) : null;			
+		this.symbolData.open = localQuotes && localQuotes.length > 0 ? localQuotes[0].open : null;
+		this.symbolData.close = localQuotes && localQuotes.length > 0 ? localQuotes[localQuotes.length - 1].close : null;
+		this.symbolData.high = localQuotes && localQuotes.length > 0 ? Math.max(...localQuotes.map(quote => quote.high)) : null;
+		this.symbolData.low = localQuotes && localQuotes.length > 0 ? Math.min(...localQuotes.map(quote => quote.low)) : null;
+		this.symbolData.avgVolume = localQuotes && localQuotes.length > 0 ?
+			(localQuotes.map(quote => quote.volume).reduce((result, volume) => result + volume, 0) / localQuotes.length) : null;
+		this.updateChartData();
+	}
+
+	private updateChartData(): void {
+		const myChartData = { name: this.symbol.symbol, series: this.createChartValues() } as MyChartData;
+		this.multi = [myChartData];
+		//console.log(this.multi);
+	}
+
+	private createChartValues(): MyChartValue[] {
+		const dateFormatStr = this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day ? 'mediumTime' : 'shortDate';		
+		const myChartValues = this.quotes.
+			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length -1].timestamp).getTime() -this.dayInMs + this.hourInMs) 
+			|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day)
+			.map(quote => ({ name: formatDate(quote.timestamp, dateFormatStr, this.locale), value: quote.close } as MyChartValue));
+		return myChartValues;
+	}
 
 	private updateQuotes(selPeriod: QuotePeriodKey): void {
 		if (!this.symbol) { return; }
@@ -85,22 +120,17 @@ export class SymbolComponent implements OnInit {
 			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
-					this.updateSymbolData(new Date(), new Date());
+					this.updateSymbolData();
 					this.loadingData.emit(false);
 				});
 		} else {
 			this.loadingData.emit(true);
-			const startDate = this.createStartDate(selPeriod);			
+			const startDate = this.createStartDate(selPeriod);
 			const endDate = new Date();
-			/*this.quoteService.getAllDailyQuotes(this.symbol.symbol)
-				.subscribe(myQuotes => {
-					this.quotes = myQuotes;
-					this.loadingData.emit(false);
-				});*/
 			this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
-					this.updateSymbolData(startDate, endDate);
+					this.updateSymbolData();
 					this.loadingData.emit(false);
 				});
 		}
@@ -108,19 +138,19 @@ export class SymbolComponent implements OnInit {
 
 	private createStartDate(selPeriod: QuotePeriodKey): Date {
 		const startDate = new Date();
-		if(QuotePeriodKey.Month === selPeriod) {
+		if (QuotePeriodKey.Month === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 1);
-		} else if(QuotePeriodKey.Months3 === selPeriod) {
+		} else if (QuotePeriodKey.Months3 === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 3);
-		} else if(QuotePeriodKey.Months6 === selPeriod) {
+		} else if (QuotePeriodKey.Months6 === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 6);
-		} else if(QuotePeriodKey.Year === selPeriod) {
+		} else if (QuotePeriodKey.Year === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 12);
-		} else if(QuotePeriodKey.Year3 === selPeriod) {
+		} else if (QuotePeriodKey.Year3 === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 36);
-		} else if(QuotePeriodKey.Year5 === selPeriod) {
+		} else if (QuotePeriodKey.Year5 === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 60);
-		} else if(QuotePeriodKey.Year10 === selPeriod) {
+		} else if (QuotePeriodKey.Year10 === selPeriod) {
 			startDate.setMonth(startDate.getMonth() - 120);
 		}
 		return startDate;

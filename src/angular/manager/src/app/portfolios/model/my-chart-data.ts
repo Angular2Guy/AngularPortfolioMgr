@@ -10,12 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-export interface Quote {
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-	volume: number;
-	timestamp: string;
-	symbol: string;
+export interface MyChartData {
+	name: string;
+	series: MyChartValue[];
+}
+
+export interface MyChartValue {
+	name: string;
+	value: number;
 }
