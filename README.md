@@ -11,4 +11,9 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, S
 The goal is to provide an Angular based Web App with a reactive backend server that uses Webflux and Spring R2DBC technology. The build tool is Gradle.
 
 ## Current state of the project
-The Gradle build is done. The security implementation uses Jwt Tokens and has an auto refresh feature in the frontend and the rest endpoint in the backend. The security setup is done. The project is a work in progress that uses experimental features of Spring.
+The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
+-The Gradle build is done. 
+-The security implementation uses Jwt Tokens and has an auto refresh feature in the frontend and the rest endpoint in the backend. The security setup is done.
+-The setup of the Angular fronted is done. 
+
+The features coming now will be further features on the existing architecture. 
