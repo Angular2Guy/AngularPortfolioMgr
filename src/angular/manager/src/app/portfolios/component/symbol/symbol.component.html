@@ -1,3 +1,4 @@
+<div class="base-container">
 <div>
 	<div class="text-container" i18n>Symbol: {{!symbol ? 'none' : symbol.symbol}} Name: {{!symbol ? 'none' : symbol.name}}</div>
 	<div class="text-container">
@@ -21,7 +22,7 @@
 	  </mat-radio-button>
 	</mat-radio-group>
 </div>
-<div>
+<div #chartContainer class="chart-container">
 	<ngx-charts-line-chart	
 	  [legend]="legend"
 	  [showXAxisLabel]="showXAxisLabel"
@@ -44,4 +45,5 @@
 	<span id="threeYears" i18n="@@threeYears">3 Years</span>
 	<span id="fiveYears" i18n="@@fiveYears">5 Years</span>
 	<span id="tenYears" i18n="@@tenYears">10 Years</span>
+</div>
 </div>

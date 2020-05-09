@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Symbol } from '../../model/symbol';
 import { QuoteService } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
@@ -39,7 +39,7 @@ interface SymbolData {
 	templateUrl: './symbol.component.html',
 	styleUrls: ['./symbol.component.scss']
 })
-export class SymbolComponent implements OnInit {
+export class SymbolComponent implements OnInit {	
 	private dayInMs = 24 * 60 * 60 * 1000;
 	private hourInMs = 1 * 60 * 60 * 1000;
 	quotePeriods: QuotePeriod[] = [];
@@ -76,7 +76,7 @@ export class SymbolComponent implements OnInit {
 		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: this.document.getElementById('fiveYears').textContent },
 		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: this.document.getElementById('tenYears').textContent }];
 		this.selQuotePeriod = this.quotePeriods[0];
-	}
+	}	
 
 	quotePeriodChanged() {
 		this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
