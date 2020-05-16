@@ -13,6 +13,7 @@
 package ch.xxx.manager.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class PortfolioDto {
 	private Long id;
 	private Long userId;
 	private String name;
+	private LocalDate createdAt;
 	private BigDecimal month1;
 	private BigDecimal months6;
 	private BigDecimal year1;
@@ -32,11 +34,20 @@ public class PortfolioDto {
 	public PortfolioDto() {		
 	}
 	
-	public PortfolioDto(Long id, Long userId, String name) {
+	public PortfolioDto(Long id, Long userId, String name, LocalDate createdAt) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.name = name;
+		this.createdAt = createdAt;
+	}
+
+	public LocalDate getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDate createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public Long getId() {

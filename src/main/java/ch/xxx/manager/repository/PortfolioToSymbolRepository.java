@@ -21,10 +21,10 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface PortfolioToSymbolRepository extends R2dbcRepository<PortfolioToSymbolEntity, Long> {
-	@Query("select * from portfoliotosymbol where portfolio_id = :portfolioId")
+	@Query("select * from portfolio_to_symbol where portfolio_id = :portfolioId")
 	Flux<PortfolioToSymbolEntity> findByPortfolioId(Long portfolioId);
-	@Query("select * from portfoliotosymbol where symbol_id = :symbolId")
+	@Query("select * from portfolio_to_symbol where symbol_id = :symbolId")
 	Flux<PortfolioToSymbolEntity> findBySymbolId(Long symbolId);
-	@Query("select * from portfoliotosymbol where symbol_id = :symbolId and portfolio_id = :portfolioId")
+	@Query("select * from portfolio_to_symbol where symbol_id = :symbolId and portfolio_id = :portfolioId")
 	Flux<PortfolioToSymbolEntity> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
 }

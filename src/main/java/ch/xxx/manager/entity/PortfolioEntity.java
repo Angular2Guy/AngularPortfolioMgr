@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.entity;
 
+import java.time.LocalDate;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -21,7 +23,14 @@ public class PortfolioEntity {
 	private Long id;
 	private Long userId;
 	private String name;
+	private LocalDate createdAt;
 
+	public LocalDate getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDate createdAt) {
+		this.createdAt = createdAt;
+	}
 	public Long getId() {
 		return id;
 	}

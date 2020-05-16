@@ -12,25 +12,45 @@
  */
 package ch.xxx.manager.dto;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class SymbolDto {
 	private Long id;
 	private String symbol;
 	private String name;
 	private Long weight;
+	private LocalDate changedAt;
+	private LocalDate removedAt;
 	
 	public SymbolDto() {
 		
 	}
 	
-	public SymbolDto(Long id, String symbol, String name) {
+	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
+		this.changedAt = changedAt;
+		this.removedAt = removedAt;
 	}
 	
+	public LocalDate getChangedAt() {
+		return changedAt;
+	}
+
+	public void setChangedAt(LocalDate changedAt) {
+		this.changedAt = changedAt;
+	}
+
+	public LocalDate getRemovedAt() {
+		return removedAt;
+	}
+
+	public void setRemovedAt(LocalDate removedAt) {
+		this.removedAt = removedAt;
+	}
+
 	public Long getId() {
 		return id;
 	}

@@ -48,6 +48,6 @@ public class SymbolService {
 	}
 
 	private Mono<SymbolDto> convert(SymbolEntity entity) {
-		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName()));
+		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null));
 	}
 }

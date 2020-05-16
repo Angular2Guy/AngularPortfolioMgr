@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("intradayquote")
+@Table("intra_day_quote")
 public class IntraDayQuoteEntity {
 	@Id
 	private Long id;

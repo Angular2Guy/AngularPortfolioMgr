@@ -12,19 +12,33 @@
  */
 package ch.xxx.manager.entity;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("portfoliotosymbol")
+@Table("portfolio_to_symbol")
 public class PortfolioToSymbolEntity {
 	@Id
 	private Long id;
 	private Long portfolioId;
 	private Long symbolId;
 	private Long weight;
+	private LocalDate changedAt;
+	private LocalDate removedAt;
 
+	public LocalDate getChangedAt() {
+		return changedAt;
+	}
+	public void setChangedAt(LocalDate changedAt) {
+		this.changedAt = changedAt;
+	}
+	public LocalDate getRemovedAt() {
+		return removedAt;
+	}
+	public void setRemovedAt(LocalDate removedAt) {
+		this.removedAt = removedAt;
+	}
 	public Long getWeight() {
 		return weight;
 	}
