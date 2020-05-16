@@ -16,6 +16,7 @@ export interface Portfolio {
 	id: number;
 	userId: number;
 	name: string;
+	createdAt: string;
 	month1: number;
 	months6: number;
 	year1: number;
