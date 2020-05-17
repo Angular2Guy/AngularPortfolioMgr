@@ -15,7 +15,6 @@ import { TokenService } from '../../../service/token.service';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../service/portfolio.service';
 import { Portfolio } from '../../model/portfolio';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
 import { PortfolioData } from '../../model/portfolio-data';
@@ -31,9 +30,10 @@ import { Symbol } from '../../model/symbol';
 })
 export class OverviewComponent implements OnInit {
   windowHeight: number = null;
-  portfolios = new MatTableDataSource<Portfolio>([]);
+  portfolios: Portfolio[] = [];
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
   importingSymbols = false;
+  showPortfolioTable = true;
 
   constructor(private tokenService: TokenService,
 		private router: Router,
@@ -45,7 +45,7 @@ export class OverviewComponent implements OnInit {
 	this.windowHeight = window.innerHeight - 84;
 	this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
 			myPortfolios.forEach(port => port.symbols = !port.symbols ?  [] : port.symbols);
-			this.portfolios.data = myPortfolios;
+			this.portfolios = myPortfolios;
 		});
   }
 
@@ -55,14 +55,14 @@ export class OverviewComponent implements OnInit {
   }
 
   newPortfolio() {
-	const portfolio: Portfolio = {id: null, createdAt: JSON.stringify(new Date()), month1: null, months6: null, name: null, symbols: [], 
+	const portfolio: Portfolio = {id: null, createdAt: new Date().toISOString(), month1: null, months6: null, name: null, symbols: [], 
 		userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null};
 	const newPortfolioData: PortfolioData = { portfolio: portfolio };
 	const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData});
 	dialogRef.afterClosed().subscribe( result => {
 		if(result) {
 			this.portfolioService.postPortfolio(result)
-				.subscribe(myPortfolio => this.portfolios.data = [...this.portfolios.data, myPortfolio]);
+				.subscribe(myPortfolio => this.portfolios = [...this.portfolios, myPortfolio]);
 		}
 	});
   }
@@ -81,7 +81,8 @@ export class OverviewComponent implements OnInit {
 				.subscribe(result => {
 					if(result) {
 						portfolio.symbols.push(symbol);
-						this.portfolios.data = this.portfolios.data;
+						const filteredPortfolios = this.portfolios.filter(port => port.id === portfolio.id);
+						this.portfolios = [...filteredPortfolios, portfolio];
 					}
 				});
 		}

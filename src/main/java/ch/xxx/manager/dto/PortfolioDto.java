@@ -14,14 +14,19 @@ package ch.xxx.manager.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class PortfolioDto {
 	private Long id;
 	private Long userId;
 	private String name;
-	private LocalDate createdAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+	private LocalDateTime createdAt;
 	private BigDecimal month1;
 	private BigDecimal months6;
 	private BigDecimal year1;
@@ -39,14 +44,14 @@ public class PortfolioDto {
 		this.id = id;
 		this.userId = userId;
 		this.name = name;
-		this.createdAt = createdAt;
+		this.createdAt = LocalDateTime.of(createdAt, LocalTime.now());
 	}
 
-	public LocalDate getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDate createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 

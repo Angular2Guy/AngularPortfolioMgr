@@ -13,6 +13,8 @@
 package ch.xxx.manager.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +84,7 @@ public class PortfolioService {
 		entity.setPortfolioId(dto.getId());
 		entity.setSymbolId(symbolId);
 		entity.setWeight(weight);
-		entity.setChangedAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDate.now());
+		entity.setChangedAt(dto.getCreatedAt() != null ? dto.getCreatedAt().toLocalDate() : LocalDate.now());
 		return entity;
 	}
 
@@ -91,7 +93,7 @@ public class PortfolioService {
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
 		entity.setUserId(dto.getUserId());
-		entity.setCreatedAt(dto.getCreatedAt() == null ? LocalDate.now() : dto.getCreatedAt());
+		entity.setCreatedAt(dto.getCreatedAt() == null ? LocalDate.now() : dto.getCreatedAt().toLocalDate());
 		return entity;
 	}
 

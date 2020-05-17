@@ -30,6 +30,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import ch.xxx.manager.init.MyConnectionFactoryInitializer;
 import io.r2dbc.proxy.ProxyConnectionFactory;
 import io.r2dbc.proxy.support.QueryExecutionInfoFormatter;
@@ -47,7 +51,14 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 
 	@Value("${spring.profiles.active:}")
 	private String activeProfile;
-
+	
+	@Bean
+	public ObjectMapper createObjectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		return objectMapper;
+	}
+	
 	@Override
 	@Bean
 	public ConnectionFactory connectionFactory() {

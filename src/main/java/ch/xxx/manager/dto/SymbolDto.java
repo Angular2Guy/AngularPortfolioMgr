@@ -13,14 +13,20 @@
 package ch.xxx.manager.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class SymbolDto {
 	private Long id;
 	private String symbol;
 	private String name;
 	private Long weight;
-	private LocalDate changedAt;
-	private LocalDate removedAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+	private LocalDateTime changedAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+	private LocalDateTime removedAt;
 	
 	public SymbolDto() {
 		
@@ -31,23 +37,23 @@ public class SymbolDto {
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
-		this.changedAt = changedAt;
-		this.removedAt = removedAt;
+		this.changedAt = LocalDateTime.of(changedAt, LocalTime.now());
+		this.removedAt = LocalDateTime.of(removedAt, LocalTime.now());
 	}
 	
-	public LocalDate getChangedAt() {
+	public LocalDateTime getChangedAt() {
 		return changedAt;
 	}
 
-	public void setChangedAt(LocalDate changedAt) {
+	public void setChangedAt(LocalDateTime changedAt) {
 		this.changedAt = changedAt;
 	}
 
-	public LocalDate getRemovedAt() {
+	public LocalDateTime getRemovedAt() {
 		return removedAt;
 	}
 
-	public void setRemovedAt(LocalDate removedAt) {
+	public void setRemovedAt(LocalDateTime removedAt) {
 		this.removedAt = removedAt;
 	}
 

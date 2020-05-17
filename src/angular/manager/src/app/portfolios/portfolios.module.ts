@@ -25,9 +25,11 @@ import { AddSymbolComponent } from './component/add-symbol/add-symbol.component'
 import { QuoteImportService } from './service/quote-import.service';
 import { PortfolioComponent } from './component/portfolio/portfolio.component';
 import { SymbolComponent } from './component/symbol/symbol.component';
+import { PortfolioTableComponent } from './component/portfolio-table/portfolio-table.component';
+import { PortfolioChartsComponent } from './component/portfolio-charts/portfolio-charts.component';
 
 @NgModule({
-  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent],
+  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
   imports: [
     BaseModule,
     PortfoliosRoutingModule
