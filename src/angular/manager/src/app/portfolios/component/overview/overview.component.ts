@@ -81,7 +81,7 @@ export class OverviewComponent implements OnInit {
 				.subscribe(result => {
 					if(result) {
 						portfolio.symbols.push(symbol);
-						const filteredPortfolios = this.portfolios.filter(port => port.id === portfolio.id);
+						const filteredPortfolios = this.portfolios.filter(port => port !== portfolio);
 						this.portfolios = [...filteredPortfolios, portfolio];
 					}
 				});
