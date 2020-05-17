@@ -22,17 +22,23 @@ import { Router } from '@angular/router';
 })
 export class PortfolioTableComponent implements OnInit {
   portfolios = new MatTableDataSource<Portfolio>([]);
-  displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
-  @Input()
-  private myPortfolios: Portfolio[];
+  displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];  
 
   constructor(private router: Router) { }
 
-  ngOnInit(): void {
-	this.portfolios.data = this.myPortfolios;
+  ngOnInit(): void {	
   }
 
   selPortfolio(portfolio: Portfolio) {
 	this.router.navigate(['/portfolios/portfolio', portfolio.id]);
   }
+
+  @Input()
+  set localPortfolios(localPortfolios: Portfolio[]) {
+	this.portfolios.data = localPortfolios;  
+  }
+
+  get localPortfolios(): Portfolio[] {
+	return this.portfolios.data;
+}
 }
