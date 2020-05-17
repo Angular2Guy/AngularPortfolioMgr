@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +38,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("rest/portfolio")
 public class PortfolioController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioController.class);
+	
 	@Autowired
 	private PortfolioService portfolioService;
 
@@ -77,6 +81,7 @@ public class PortfolioController {
 			return LocalDateTime.now();
 		}
 		String changedAtStr = UriUtils.decode(isoString, StandardCharsets.UTF_8.name());
+		LOGGER.info(changedAtStr);
 		return LocalDateTime.parse(changedAtStr, DateTimeFormatter.ISO_DATE_TIME);
 	}
 }

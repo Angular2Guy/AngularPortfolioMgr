@@ -112,6 +112,7 @@ export class AddSymbolComponent implements OnInit {
 		this.importingQuotes = true;
 		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
 		const changedAt = this.symbolForm.controls['createdAt'].value as Date;
+		changedAt.setMinutes(changedAt.getMinutes() - changedAt.getTimezoneOffset());
 		this.selSymbol.changedAt = changedAt.toISOString();
 		forkJoin(
 			this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
