@@ -37,8 +37,8 @@ public class SymbolDto {
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
-		this.changedAt = LocalDateTime.of(changedAt, LocalTime.now());
-		this.removedAt = LocalDateTime.of(removedAt, LocalTime.now());
+		this.changedAt = changedAt == null ? null : LocalDateTime.of(changedAt, LocalTime.now());
+		this.removedAt = removedAt == null ? null : LocalDateTime.of(removedAt, LocalTime.now());
 	}
 	
 	public LocalDateTime getChangedAt() {
