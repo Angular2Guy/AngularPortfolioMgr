@@ -29,6 +29,14 @@
 							i18n-placeholder placeholder="weight" tabindex="3">
 					</mat-form-field>
 				</li>
+				<li>
+					<mat-form-field> 
+						<mat-label>Add date</mat-label>
+  						<input matInput [matDatepicker]="picker1" formControlName="createdAt">
+  						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+  						<mat-datepicker #picker1></mat-datepicker>
+					</mat-form-field>
+				</li>
 				<li *ngIf="!selSymbol && !loading" i18n>
 					No Symbol selected.
 				</li>

@@ -12,6 +12,10 @@
  */
 package ch.xxx.manager.contoller;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
 
 import ch.xxx.manager.dto.PortfolioDto;
 import ch.xxx.manager.service.PortfolioService;
@@ -32,34 +38,45 @@ import reactor.core.publisher.Mono;
 public class PortfolioController {
 	@Autowired
 	private PortfolioService portfolioService;
-	
+
 	@GetMapping("/userid/{userId}")
 	public Flux<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
 		return this.portfolioService.getPortfoliosByUserId(userId);
 	}
-	
+
 	@GetMapping("/id/{portfolioId}")
 	public Mono<PortfolioDto> getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
 		return this.portfolioService.getPortfolioById(portfolioId);
 	}
-	
+
 	@PostMapping
 	public Mono<PortfolioDto> createPortfolio(@RequestBody PortfolioDto dto) {
 		return this.portfolioService.addPortfolio(dto);
 	}
-	
+
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") Long weight) {
-		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight);
+	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
+			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
+		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 	}
-	
+
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId, @PathVariable("weight") Long weight) {
-		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight);
+	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
+			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
+		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
+	}
+
+	@DeleteMapping("/{id}/symbol/{symbolId}")
+	public Mono<Boolean> deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
+			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
+		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
 	}
 	
-	@DeleteMapping("/{id}/symbol/{symbolId}")
-	public Mono<Boolean> deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId, @PathVariable("symbolId") Long symbolId) {
-		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId);
+	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {
+		if(isoString == null || isoString.trim().isBlank()) {
+			return LocalDateTime.now();
+		}
+		String changedAtStr = UriUtils.decode(isoString, StandardCharsets.UTF_8.name());
+		return LocalDateTime.parse(changedAtStr, DateTimeFormatter.ISO_DATE_TIME);
 	}
 }

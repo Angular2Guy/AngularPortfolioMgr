@@ -32,16 +32,16 @@ export class PortfolioService {
 		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
 	}
 	
-	postSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
-		return this.http.post<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}`, portfolio);
+	postSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number, changedAt: string): Observable<boolean> {
+		return this.http.post<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(changedAt)}`, portfolio);
 	}
 	
-	putSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
-		return this.http.put<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}`, portfolio);
+	putSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number, changedAt: string): Observable<boolean> {
+		return this.http.put<boolean>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(changedAt)}`, portfolio);
 	}
 	
-	deleteSymbolFromPortfolio(portfolio: Portfolio, symbolId: number, weight: number): Observable<boolean> {
+	deleteSymbolFromPortfolio(portfolio: Portfolio, symbolId: number, removedAt: string): Observable<boolean> {
 		const id = portfolio.id;
-		return this.http.delete<boolean>(`/rest/portfolio/${id}/symbol/${symbolId}`);
+		return this.http.delete<boolean>(`/rest/portfolio/${id}/symbol/${symbolId}?removedAt=${encodeURI(removedAt)}`);
 	}
 }

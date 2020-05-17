@@ -7,12 +7,14 @@
 							i18n-placeholder placeholder="Portfolioname" tabindex="1" formControlName="portfolioName"> 
 					</mat-form-field>
 				</li>
-				<!-- <li>
+				<li>
 					<mat-form-field> 
-						<input matInput
-							i18n-placeholder placeholder="Password" tabindex="2" formControlName="password" type="password">
+						<mat-label i18n>Creation date</mat-label>
+  						<input matInput [matDatepicker]="picker1" formControlName="createdAt">
+  						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+  						<mat-datepicker #picker1></mat-datepicker>
 					</mat-form-field>
-				</li> -->
+				</li>
 				<li *ngIf="!formValid" i18n class="errorText">
 					Input invalid
 				</li>

@@ -33,7 +33,7 @@ export class NewPortfolioComponent implements OnInit {
 		private fb: FormBuilder) { 
 	this.portfolioForm = fb.group({
 		portfolioName: ['', Validators.required],
-		createdAt: [data.portfolio.createdAt, Validators.required]
+		createdAt: [new Date(data.portfolio.createdAt), Validators.required]
 	}, {
 		validator: this.validate.bind(this)
 	});
@@ -43,10 +43,11 @@ export class NewPortfolioComponent implements OnInit {
   }
 
   onAddClick(): void {
-		const portfolio: Portfolio = {id: null,createdAt: this.portfolioForm.get('createdAt').value,
-			 month1: null, months6: null, name: this.portfolioForm.get('portfolioName').value, 
-			symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
-		this.dialogRef.close(portfolio);		
+	const createdAt = this.portfolioForm.get('createdAt').value as Date;
+	const portfolio: Portfolio = {id: null,createdAt: createdAt.toISOString(),
+		 month1: null, months6: null, name: this.portfolioForm.get('portfolioName').value, 
+		symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
+	this.dialogRef.close(portfolio);		
   }
 
   onCancelClick(): void {

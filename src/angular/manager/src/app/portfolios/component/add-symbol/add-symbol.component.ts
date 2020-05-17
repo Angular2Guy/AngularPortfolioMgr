@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControlOptions, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControlOptions, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
 import { PortfolioData } from '../../model/portfolio-data';
@@ -47,7 +47,8 @@ export class AddSymbolComponent implements OnInit {
 			this.symbolForm = fb.group({
 				symbolSymbol: '',	
 				symbolName: '',
-				symbolWeight: 0
+				symbolWeight: 0,
+				createdAt: [new Date(), Validators.required]
 			}, {
 				validators: [this.validate]
 			} as AbstractControlOptions);
@@ -110,6 +111,8 @@ export class AddSymbolComponent implements OnInit {
 	if(this.selSymbol) {
 		this.importingQuotes = true;
 		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
+		const changedAt = this.symbolForm.controls['createdAt'].value as Date;
+		this.selSymbol.changedAt = changedAt.toISOString();
 		forkJoin(
 			this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
 			this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol))
