@@ -15,9 +15,7 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -160,9 +158,9 @@ public class PortfolioService {
 				.flatMap(data -> Mono.just(new Tuple<>(data.getT1(), data.getT2())))
 				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
 						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
-//		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
-//				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio.getId() != null));
-		return Mono.just(Boolean.TRUE);
+		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
+				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio.getId() != null));
+//		return Mono.just(Boolean.TRUE);
 	}
 
 	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity,
