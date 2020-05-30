@@ -39,12 +39,19 @@ public class PortfolioDto {
 	public PortfolioDto() {		
 	}
 	
-	public PortfolioDto(Long id, Long userId, String name, LocalDate createdAt) {
+	public PortfolioDto(Long id, Long userId, String name, LocalDateTime createdAt, BigDecimal month1,
+			BigDecimal months6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.name = name;
-		this.createdAt = LocalDateTime.of(createdAt, LocalTime.now());
+		this.createdAt = createdAt;
+		this.month1 = month1;
+		this.months6 = months6;
+		this.year1 = year1;
+		this.year2 = year2;
+		this.year5 = year5;
+		this.year10 = year10;
 	}
 
 	public LocalDateTime getCreatedAt() {

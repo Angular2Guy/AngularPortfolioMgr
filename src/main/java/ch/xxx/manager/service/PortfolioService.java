@@ -15,6 +15,7 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,8 @@ public class PortfolioService {
 	public Mono<Boolean> removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
 				.flatMap(entity -> Flux.just(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
-						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate()))))).count()
-				.flatMap(num -> this.calculatePortfolio(portfolioId));
+						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
+				.count().flatMap(num -> this.calculatePortfolio(portfolioId));
 	}
 
 	private PortfolioToSymbolEntity updatePtsEntity(PortfolioToSymbolEntity entity, Optional<Long> weightOpt,
@@ -131,7 +132,8 @@ public class PortfolioService {
 
 	private Mono<PortfolioDto> convert(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName(),
-				entity.getCreatedAt());
+				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonths6(), entity.getYear1(),
+				entity.getYear2(), entity.getYear5(), entity.getYear10());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
 				.switchIfEmpty(Mono.just(new PortfolioToSymbolEntity()))
 				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto)).distinct().single();
@@ -139,7 +141,8 @@ public class PortfolioService {
 
 	private Flux<PortfolioDto> convertFlux(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName(),
-				entity.getCreatedAt());
+				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonths6(), entity.getYear1(),
+				entity.getYear2(), entity.getYear5(), entity.getYear10());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
 				.switchIfEmpty(Flux.just(new PortfolioToSymbolEntity()))
 				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto)).distinct();
@@ -152,20 +155,21 @@ public class PortfolioService {
 						this.symbolRepository.findByPortfolioId(portfolioId)
 								.collectMap(localEntity -> localEntity.getId(), localEntity -> localEntity))
 				.flatMap(data -> Mono.just(new Tuple<>(data.getT1(), data.getT2())))
-				.flatMap(tuple -> createMultiMap(tuple))
-				.flatMap(myTuple -> this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());				
+				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
+						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
 //		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
 //				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio.getId() != null));
 		return Mono.just(Boolean.TRUE);
 	}
 
-	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity, Mono<List<DailyQuoteEntity>> portfolioQuotesRef) {
-		//Now all the portfolioQuotes are needed for the calculation!!!
+	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity,
+			Mono<List<DailyQuoteEntity>> portfolioQuotesRef) {
+		// Now all the portfolioQuotes are needed for the calculation!!!
 		List<DailyQuoteEntity> portfolioQuotes = portfolioQuotesRef.block();
 //		entity.set
 		return Mono.just(entity);
 	}
-	
+
 	private List<DailyQuoteEntity> updatePortfolioSymbol(
 			Tuple3<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>> tuple3) {
 		Optional<SymbolEntity> symbolEntityOpt = tuple3.getB().values().stream()
@@ -187,8 +191,9 @@ public class PortfolioService {
 				});
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
 
-		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream().collect(Collectors.groupingBy(tuple -> tuple.getB()))
-				.entrySet().stream().flatMap(entry -> Stream.of(entry.getValue().stream()
+		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream()
+				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream()
+				.flatMap(entry -> Stream.of(entry.getValue().stream()
 						.reduce(new Tuple3<Long, LocalDate, BigDecimal>(entry.getValue().get(0).getA(),
 								entry.getValue().get(0).getB(), BigDecimal.ZERO),
 								(t1, t2) -> new Tuple3<Long, LocalDate, BigDecimal>(t1.getA(), t1.getB(),
