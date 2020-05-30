@@ -149,7 +149,7 @@ public class PortfolioService {
 				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto)).distinct();
 	}
 
-	private Mono<Boolean> calculatePortfolio(Long portfolioId) {
+	public Mono<Boolean> calculatePortfolio(Long portfolioId) {
 		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono
 				.zip(this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
 						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),
