@@ -15,8 +15,11 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -166,8 +169,20 @@ public class PortfolioService {
 			Mono<List<DailyQuoteEntity>> portfolioQuotesRef) {
 		// Now all the portfolioQuotes are needed for the calculation!!!
 		List<DailyQuoteEntity> portfolioQuotes = portfolioQuotesRef.block();
-//		entity.set
+		entity.setMonth1(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(1, ChronoUnit.MONTHS)));
+		entity.setMonths6(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(6, ChronoUnit.MONTHS)));
+		entity.setYear1(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(1, ChronoUnit.YEARS)));
+		entity.setYear2(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(2, ChronoUnit.YEARS)));
+		entity.setYear5(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(5, ChronoUnit.YEARS)));
+		entity.setYear10(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(10, ChronoUnit.YEARS)));
 		return Mono.just(entity);
+	}
+
+	private BigDecimal calcPortfolioValueAtDate(List<DailyQuoteEntity> portfolioQuotes, LocalDate dateAt) {
+		return portfolioQuotes.stream()
+				.sorted(Comparator.comparing(DailyQuoteEntity::getLocalDay, (a, b) -> a.compareTo(b)).reversed())
+				.filter(quote -> quote.getLocalDay().isBefore(dateAt)).flatMap(quote -> Stream.of(quote.getClose()))
+				.findFirst().orElse(BigDecimal.ZERO);
 	}
 
 	private List<DailyQuoteEntity> updatePortfolioSymbol(
