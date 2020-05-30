@@ -28,6 +28,6 @@ public interface SymbolRepository extends R2dbcRepository<SymbolEntity, Long> {
 	Mono<SymbolEntity> findBySymbolSingle(String symbol);
 	@Query("select * from symbol s where lower(s.name) like :name")
 	Flux<SymbolEntity> findByName(String name);
-	@Query("select * from symbol s, portfolio_to_symboll pts where s.id = pts.symbol_id and pts.portfolio_id = :portfolioId")
+	@Query("select * from symbol s, portfolio_to_symbol pts where s.id = pts.symbol_id and pts.portfolio_id = :portfolioId")
 	Flux<SymbolEntity> findByPortfolioId(Long portfolioId);
 }
