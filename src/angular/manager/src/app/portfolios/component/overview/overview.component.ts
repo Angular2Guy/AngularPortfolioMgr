@@ -84,7 +84,9 @@ export class OverviewComponent implements OnInit {
 			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight, symbol.changedAt)
 				.subscribe(result => {
 					if(result) {
-						this.refreshPortfolios();
+						const filteredPortfolios = this.portfolios.filter(port => port.id !== result.id);
+						this.portfolios = [...filteredPortfolios, result];
+						//this.refreshPortfolios();
 					}
 				});
 		}

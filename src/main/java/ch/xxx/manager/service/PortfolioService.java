@@ -70,7 +70,7 @@ public class PortfolioService {
 	public Mono<PortfolioDto> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository
 				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate()))
-				.flatMap(myEntity -> this.calculatePortfolio(myEntity.getId()))
+				.flatMap(myEntity -> this.calculatePortfolio(dto.getId()))
 				.flatMap(entity -> this.convert(entity));
 	}
 
@@ -162,7 +162,7 @@ public class PortfolioService {
 				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
 						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
 		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
-				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio));
+				.flatMap(portfolio -> this.portfolioRepository.save(portfolio));
 //		return Mono.just(Boolean.TRUE);
 	}
 
