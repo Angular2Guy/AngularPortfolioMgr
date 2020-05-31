@@ -26,7 +26,7 @@ public class PortfolioEntity {
 	private String name;
 	private LocalDate createdAt;
 	private BigDecimal month1;
-	private BigDecimal months6;
+	private BigDecimal month6;
 	private BigDecimal year1;
 	private BigDecimal year2;
 	private BigDecimal year5;
@@ -62,11 +62,11 @@ public class PortfolioEntity {
 	public void setMonth1(BigDecimal month1) {
 		this.month1 = month1;
 	}
-	public BigDecimal getMonths6() {
-		return months6;
+	public BigDecimal getMonth6() {
+		return month6;
 	}
-	public void setMonths6(BigDecimal months6) {
-		this.months6 = months6;
+	public void setMonth6(BigDecimal month6) {
+		this.month6 = month6;
 	}
 	public BigDecimal getYear1() {
 		return year1;

@@ -18,7 +18,7 @@ export interface Portfolio {
 	name: string;
 	createdAt: string;
 	month1: number;
-	months6: number;
+	month6: number;
 	year1: number;
 	year2: number;
 	year5: number;

@@ -13,9 +13,7 @@
 package ch.xxx.manager.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class PortfolioDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime createdAt;
 	private BigDecimal month1;
-	private BigDecimal months6;
+	private BigDecimal month6;
 	private BigDecimal year1;
 	private BigDecimal year2;
 	private BigDecimal year5;
@@ -40,14 +38,14 @@ public class PortfolioDto {
 	}
 	
 	public PortfolioDto(Long id, Long userId, String name, LocalDateTime createdAt, BigDecimal month1,
-			BigDecimal months6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10) {
+			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.name = name;
 		this.createdAt = createdAt;
 		this.month1 = month1;
-		this.months6 = months6;
+		this.month6 = month6;
 		this.year1 = year1;
 		this.year2 = year2;
 		this.year5 = year5;
@@ -89,12 +87,12 @@ public class PortfolioDto {
 		this.month1 = month1;
 	}
 
-	public BigDecimal getMonths6() {
-		return months6;
+	public BigDecimal getMonth6() {
+		return month6;
 	}
 
-	public void setMonths6(BigDecimal months6) {
-		this.months6 = months6;
+	public void setMonth6(BigDecimal month6) {
+		this.month6 = month6;
 	}
 
 	public BigDecimal getYear1() {

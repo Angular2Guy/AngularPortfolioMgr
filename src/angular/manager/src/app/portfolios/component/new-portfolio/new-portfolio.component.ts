@@ -46,7 +46,7 @@ export class NewPortfolioComponent implements OnInit {
 	const createdAt = this.portfolioForm.get('createdAt').value as Date;
 	createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
 	const portfolio: Portfolio = {id: null,createdAt: createdAt.toISOString(),
-		 month1: null, months6: null, name: this.portfolioForm.get('portfolioName').value, 
+		 month1: null, month6: null, name: this.portfolioForm.get('portfolioName').value, 
 		symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
 	this.dialogRef.close(portfolio);		
   }

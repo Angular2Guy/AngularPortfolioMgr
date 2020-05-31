@@ -133,7 +133,7 @@ public class PortfolioService {
 
 	private Mono<PortfolioDto> convert(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName(),
-				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonths6(), entity.getYear1(),
+				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonth6(), entity.getYear1(),
 				entity.getYear2(), entity.getYear5(), entity.getYear10());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
 				.switchIfEmpty(Mono.just(new PortfolioToSymbolEntity()))
@@ -142,7 +142,7 @@ public class PortfolioService {
 
 	private Flux<PortfolioDto> convertFlux(PortfolioEntity entity) {
 		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getUserId(), entity.getName(),
-				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonths6(), entity.getYear1(),
+				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonth6(), entity.getYear1(),
 				entity.getYear2(), entity.getYear5(), entity.getYear10());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
 				.switchIfEmpty(Flux.just(new PortfolioToSymbolEntity()))
@@ -168,7 +168,7 @@ public class PortfolioService {
 		// Now all the portfolioQuotes are needed for the calculation!!!
 		List<DailyQuoteEntity> portfolioQuotes = portfolioQuotesRef.block();
 		entity.setMonth1(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(1, ChronoUnit.MONTHS)));
-		entity.setMonths6(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(6, ChronoUnit.MONTHS)));
+		entity.setMonth6(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(6, ChronoUnit.MONTHS)));
 		entity.setYear1(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(1, ChronoUnit.YEARS)));
 		entity.setYear2(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(2, ChronoUnit.YEARS)));
 		entity.setYear5(this.calcPortfolioValueAtDate(portfolioQuotes, LocalDate.now().minus(5, ChronoUnit.YEARS)));
