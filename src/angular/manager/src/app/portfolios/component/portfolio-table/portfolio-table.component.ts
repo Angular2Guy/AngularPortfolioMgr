@@ -35,7 +35,7 @@ export class PortfolioTableComponent implements OnInit {
 
   @Input()
   set localPortfolios(localPortfolios: Portfolio[]) {
-	this.portfolios.data = localPortfolios;  
+	this.portfolios.connect().next(localPortfolios);  	
   }
 
   get localPortfolios(): Portfolio[] {

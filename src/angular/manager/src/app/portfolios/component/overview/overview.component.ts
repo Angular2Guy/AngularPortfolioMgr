@@ -43,10 +43,7 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit() {
 	this.windowHeight = window.innerHeight - 84;
-	this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
-			myPortfolios.forEach(port => port.symbols = !port.symbols ?  [] : port.symbols);
-			this.portfolios = myPortfolios;
-		});
+	this.refreshPortfolios();
   }
 
   @HostListener( 'window:resize', ['$event'] )
@@ -71,6 +68,13 @@ export class OverviewComponent implements OnInit {
 	this.router.navigate(['/portfolios/portfolio', portfolio.id]);
   }
 
+  private refreshPortfolios() {
+	this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
+		myPortfolios.forEach(port => port.symbols = !port.symbols ?  [] : port.symbols);
+		this.portfolios = myPortfolios;
+	});
+  }
+
   addSymbol(portfolio: Portfolio) {
 	const portfolioData: PortfolioData = { portfolio: portfolio };
 	const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData});
@@ -80,9 +84,7 @@ export class OverviewComponent implements OnInit {
 			this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight, symbol.changedAt)
 				.subscribe(result => {
 					if(result) {
-						portfolio.symbols.push(symbol);
-						const filteredPortfolios = this.portfolios.filter(port => port !== portfolio);
-						this.portfolios = [...filteredPortfolios, portfolio];
+						this.refreshPortfolios();
 					}
 				});
 		}

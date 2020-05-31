@@ -59,19 +59,19 @@ public class PortfolioController {
 	}
 
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
+	public Mono<PortfolioDto> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
 		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 	}
 
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
-	public Mono<Boolean> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
+	public Mono<PortfolioDto> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
 		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 	}
 
 	@DeleteMapping("/{id}/symbol/{symbolId}")
-	public Mono<Boolean> deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
+	public Mono<PortfolioDto> deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
 			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
 		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
 	}

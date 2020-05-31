@@ -67,26 +67,29 @@ public class PortfolioService {
 				.flatMap(myEntity -> this.convertFlux(myEntity).singleOrEmpty());
 	}
 
-	public Mono<Boolean> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
+	public Mono<PortfolioDto> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository
 				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate()))
-				.flatMap(myEntity -> this.calculatePortfolio(myEntity.getId()));
+				.flatMap(myEntity -> this.calculatePortfolio(myEntity.getId()))
+				.flatMap(entity -> this.convert(entity));
 	}
 
-	public Mono<Boolean> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
+	public Mono<PortfolioDto> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId)
 				.flatMap(myEntity -> Flux.just(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.flatMap(newEntity -> Flux.just(this.portfolioToSymbolRepository.save(newEntity))).count()
-				.flatMap(num -> this.calculatePortfolio(dto.getId()));
+				.flatMap(num -> this.calculatePortfolio(dto.getId()))
+				.flatMap(entity -> this.convert(entity));
 	}
 
-	public Mono<Boolean> removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
+	public Mono<PortfolioDto> removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
 				.flatMap(entity -> Flux.just(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
-				.count().flatMap(num -> this.calculatePortfolio(portfolioId));
+				.count().flatMap(num -> this.calculatePortfolio(portfolioId))
+				.flatMap(entity -> this.convert(entity));
 	}
 
 	private PortfolioToSymbolEntity updatePtsEntity(PortfolioToSymbolEntity entity, Optional<Long> weightOpt,
@@ -149,7 +152,7 @@ public class PortfolioService {
 				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto)).distinct();
 	}
 
-	public Mono<Boolean> calculatePortfolio(Long portfolioId) {
+	public Mono<PortfolioEntity> calculatePortfolio(Long portfolioId) {
 		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono
 				.zip(this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
 						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),
@@ -159,7 +162,7 @@ public class PortfolioService {
 				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
 						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
 		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
-				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio.getId() != null));
+				.flatMap(portfolio -> this.portfolioRepository.save(portfolio)).flatMap(portfolio -> Mono.just(portfolio));
 //		return Mono.just(Boolean.TRUE);
 	}
 
