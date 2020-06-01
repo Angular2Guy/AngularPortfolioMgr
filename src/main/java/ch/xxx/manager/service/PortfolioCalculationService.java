@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,6 +45,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Transactional(propagation = Propagation.MANDATORY)
 public class PortfolioCalculationService {
+	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final static String PORTFOLIO_MARKER = "$#@";
 	private final static int SYMBOL_LENGTH = 15;
 	@Autowired
@@ -53,7 +56,7 @@ public class PortfolioCalculationService {
 	private SymbolRepository symbolRepository;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
-	
+
 	public Mono<PortfolioEntity> calculatePortfolio(Long portfolioId) {
 		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono
 				.zip(this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
@@ -63,9 +66,9 @@ public class PortfolioCalculationService {
 				.flatMap(data -> Mono.just(new Tuple<>(data.getT1(), data.getT2())))
 				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
 						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
-		return this.portfolioRepository.findById(portfolioId).flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
+		return this.portfolioRepository.findById(portfolioId)
+				.flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
 				.flatMap(portfolio -> this.portfolioRepository.save(portfolio));
-//		return Mono.just(Boolean.TRUE);
 	}
 
 	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity,
@@ -110,13 +113,21 @@ public class PortfolioCalculationService {
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
 
 		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream()
-				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream()
-				.flatMap(entry -> Stream.of(entry.getValue().stream()
-						.reduce(new Tuple3<Long, LocalDate, BigDecimal>(entry.getValue().get(0).getA(),
-								entry.getValue().get(0).getB(), BigDecimal.ZERO),
-								(t1, t2) -> new Tuple3<Long, LocalDate, BigDecimal>(t1.getA(), t1.getB(),
-										t1.getC().add(t2.getC())))))
-				.collect(Collectors.toList()).stream()
+				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream().flatMap(entry -> {
+					LOG.info("Size: " + entry.getValue().size());
+					entry.getValue().forEach(myTuple3 -> {
+						LOG.info("---");
+						LOG.info(myTuple3.getC().toPlainString());
+						LOG.info(myTuple3.getB().toString());
+						LOG.info(myTuple3.getA().toString());
+						LOG.info("---");
+					});
+					return Stream.of(entry.getValue().stream()
+							.reduce(new Tuple3<Long, LocalDate, BigDecimal>(entry.getValue().get(0).getA(),
+									entry.getValue().get(0).getB(), BigDecimal.ZERO),
+									(t1, t2) -> new Tuple3<Long, LocalDate, BigDecimal>(t1.getA(), t1.getB(),
+											t1.getC().add(t2.getC()))));
+				}).collect(Collectors.toList()).stream()
 				.flatMap(localTuple -> Stream.of(this.createQuote(localTuple, tuple3.getB())))
 				.collect(Collectors.toList());
 		return portfolioQuotes;

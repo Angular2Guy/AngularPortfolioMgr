@@ -25,7 +25,6 @@ import ch.xxx.manager.dto.SymbolDto;
 import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.entity.SymbolEntity;
-import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -35,16 +34,12 @@ import reactor.core.publisher.Mono;
 @Service
 @Transactional
 public class PortfolioService {
-	private final static String PORTFOLIO_MARKER = "$#@";
-	private final static int SYMBOL_LENGTH = 15;
 	@Autowired
 	private PortfolioRepository portfolioRepository;
 	@Autowired
 	private PortfolioToSymbolRepository portfolioToSymbolRepository;
 	@Autowired
 	private SymbolRepository symbolRepository;
-	@Autowired
-	private DailyQuoteRepository dailyQuoteRepository;
 	@Autowired
 	private PortfolioCalculationService portfolioCalculationService;
 
@@ -62,27 +57,27 @@ public class PortfolioService {
 	}
 
 	public Mono<PortfolioDto> addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
-		return this.portfolioToSymbolRepository
-				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate()))
+		return Mono.just(this.portfolioToSymbolRepository
+				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).block())
 				.flatMap(myEntity -> this.portfolioCalculationService.calculatePortfolio(dto.getId()))
 				.flatMap(entity -> this.convert(entity));
 	}
 
 	public Mono<PortfolioDto> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
-		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId)
+		return Mono.just(this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId)
 				.flatMap(myEntity -> Flux.just(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
-				.flatMap(newEntity -> Flux.just(this.portfolioToSymbolRepository.save(newEntity))).count()
+				.flatMap(newEntity -> Flux.just(this.portfolioToSymbolRepository.save(newEntity))).count().block())
 				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(dto.getId()))
 				.flatMap(entity -> this.convert(entity));
 	}
 
 	public Mono<PortfolioDto> removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
-		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
+		return Mono.just(this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
 				.flatMap(entity -> Flux.just(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
-						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
-				.count().flatMap(num -> this.portfolioCalculationService.calculatePortfolio(portfolioId))
+						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate()))))).count().block())
+				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(portfolioId))
 				.flatMap(entity -> this.convert(entity));
 	}
 
