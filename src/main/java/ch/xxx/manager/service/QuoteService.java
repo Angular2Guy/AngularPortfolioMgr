@@ -16,6 +16,7 @@ import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.dto.QuoteDto;
 import ch.xxx.manager.entity.DailyQuoteEntity;
@@ -25,6 +26,7 @@ import ch.xxx.manager.repository.IntraDayQuoteRepository;
 import reactor.core.publisher.Flux;
 
 @Service
+@Transactional
 public class QuoteService {
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
