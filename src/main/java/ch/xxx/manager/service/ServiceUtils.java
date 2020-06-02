@@ -12,7 +12,11 @@
  */
 package ch.xxx.manager.service;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ServiceUtils {
 	public static String generateRandomString(long length) {
@@ -22,5 +26,10 @@ public class ServiceUtils {
 		return random.ints(leftLimit, rightLimit + 1).filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
 				.limit(length).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
 				.toString();
+	}
+
+	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 }

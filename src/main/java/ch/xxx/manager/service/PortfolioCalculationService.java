@@ -15,6 +15,7 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -96,7 +97,8 @@ public class PortfolioCalculationService {
 		Optional<SymbolEntity> symbolEntityOpt = tuple3.getB().values().stream()
 				.filter(symbolEntity -> symbolEntity.getSymbol().contains(PORTFOLIO_MARKER)).findFirst();
 		Optional<List<Tuple3<Long, LocalDate, BigDecimal>>> reduceOpt = tuple3.getA().entrySet().stream()
-				.filter(value -> symbolEntityOpt.isEmpty() || !symbolEntityOpt.get().getId().equals(value.getKey()))
+				.filter(value -> symbolEntityOpt.isEmpty()
+						|| !symbolEntityOpt.get().getId().equals(value.getValue().getSymbolId()))
 				.flatMap(value -> Stream.of(new Tuple<Long, PortfolioToSymbolEntity>(value.getKey(), value.getValue())))
 				.flatMap(tuple -> Stream.of(new Tuple<Long, Collection<DailyQuoteEntity>>(tuple.getB().getWeight(),
 						tuple3.getC().get(tuple.getA()))))
@@ -107,21 +109,38 @@ public class PortfolioCalculationService {
 										quote.getClose().multiply(BigDecimal.valueOf(quotesTuple.getA())))))
 								.collect(Collectors.toList())))
 				.reduce((oldList, newList) -> {
-					oldList.addAll(newList);
-					return oldList;
+//					LOG.info("oldList: " + oldList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
+//							.flatMap(myId -> Stream.of(" " + myId)).collect(Collectors.toList()));
+//					LOG.info("newList: " + newList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
+//							.flatMap(myId -> Stream.of(" " + myId)).collect(Collectors.toList()));
+//					LOG.info("oldList: " + oldList.stream().collect(Collectors.groupingBy(myTuple3 -> myTuple3.getB()))
+//							.entrySet().stream().flatMap(entry -> Stream.of("" + entry.getKey() + " "
+//									+ entry.getValue().size() + " " + entry.getValue().get(0).getA()))
+//							.collect(Collectors.toList()));
+//					LOG.info("newList: " + newList.stream().collect(Collectors.groupingBy(myTuple3 -> myTuple3.getB()))
+//							.entrySet().stream().flatMap(entry -> Stream.of("" + entry.getKey() + " "
+//									+ entry.getValue().size() + " " + entry.getValue().get(0).getA()))
+//							.collect(Collectors.toList()));
+					List<Tuple3<Long, LocalDate, BigDecimal>> resultList = oldList.stream()
+							.filter(ServiceUtils.distinctByKey(myTuple3 -> "" + myTuple3.getA() + myTuple3.getB()))
+							.collect(Collectors.toList());
+					resultList.addAll(newList.stream()
+							.filter(ServiceUtils.distinctByKey(myTuple3 -> "" + myTuple3.getA() + myTuple3.getB()))
+							.collect(Collectors.toList()));
+					return resultList;
 				});
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
 
 		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream()
 				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream().flatMap(entry -> {
-					LOG.info("Size: " + entry.getValue().size());
-					entry.getValue().forEach(myTuple3 -> {
-						LOG.info("---");
-						LOG.info(myTuple3.getC().toPlainString());
-						LOG.info(myTuple3.getB().toString());
-						LOG.info(myTuple3.getA().toString());
-						LOG.info("---");
-					});
+//					LOG.info("Size: " + entry.getValue().size());
+//					entry.getValue().forEach(myTuple3 -> {
+//						LOG.info("---");
+//						LOG.info(myTuple3.getC().toPlainString());
+//						LOG.info(myTuple3.getB().toString());
+//						LOG.info(myTuple3.getA().toString());
+//						LOG.info("---");
+//					});
 					return Stream.of(entry.getValue().stream()
 							.reduce(new Tuple3<Long, LocalDate, BigDecimal>(entry.getValue().get(0).getA(),
 									entry.getValue().get(0).getB(), BigDecimal.ZERO),
