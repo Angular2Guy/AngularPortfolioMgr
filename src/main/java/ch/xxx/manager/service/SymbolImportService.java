@@ -29,6 +29,7 @@ import ch.xxx.manager.connector.NasdaqConnector;
 import ch.xxx.manager.connector.XetraConnector;
 import ch.xxx.manager.dto.HkSymbolImportDto;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -116,7 +117,7 @@ public class SymbolImportService {
 		String cutSymbol = dto.getSymbol().trim().length() > 4
 				? dto.getSymbol().trim().substring(dto.getSymbol().length() - 4)
 				: dto.getSymbol().trim();
-		return Flux.just(new SymbolEntity(null, String.format("%s.HKG", cutSymbol), dto.getName()));
+		return Flux.just(new SymbolEntity(null, String.format("%s.HKG", cutSymbol), dto.getName(), SymbolCurrency.HKD));
 	}
 
 	private boolean filter(HkSymbolImportDto dto) {
@@ -143,7 +144,7 @@ public class SymbolImportService {
 		String symbol = String.format("%s.DEX",
 				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		SymbolEntity entity = new SymbolEntity(null, symbol,
-				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100));
+				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100), SymbolCurrency.EUR);
 		return Mono.just(entity);
 	}
 
@@ -151,7 +152,7 @@ public class SymbolImportService {
 		String[] strParts = symbolLine.split("\\|");
 		SymbolEntity entity = new SymbolEntity(null,
 				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15),
-				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100));
+				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100), SymbolCurrency.USD);
 		return Mono.just(entity);
 	}
 }

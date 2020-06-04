@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ch.xxx.manager.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.dto.IntraDayWrapperImportDto;
+import ch.xxx.manager.entity.SymbolEntity;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -48,6 +50,19 @@ public class AlphavatageConnector {
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
 				.uri(new URI(String.format("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s", symbol, fullSeriesStr, this.apiKey)))				                            
 				.retrieve().bodyToMono(DailyWrapperImportDto.class);
+		} catch (URISyntaxException e) {
+			LOGGER.error("getTimeseriesHistory failed.",e);
+		}
+		return Mono.empty();
+	}
+	
+	public Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
+		try {
+			final String from_currency = SymbolEntity.SymbolCurrency.EUR.toString();
+			String fullSeriesStr = fullSeries ? "&outputsize=full" : ""; 
+			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
+				.uri(new URI(String.format("https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s", from_currency, to_currency, fullSeriesStr, this.apiKey)))				                            
+				.retrieve().bodyToMono(DailyFxWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.",e);
 		}

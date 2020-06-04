@@ -17,19 +17,24 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("symbol")
 public class SymbolEntity {
+	public enum SymbolCurrency { EUR, HKD, USD }
+	
 	@Id
 	private Long id;
 	private String symbol;
 	private String name;
+	private String curr;
+	
 	
 	public SymbolEntity() {		
 	}
 	
-	public SymbolEntity(Long id, String symbol, String name) {
+	public SymbolEntity(Long id, String symbol, String name, SymbolCurrency currency) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
+		this.curr = currency.toString();
 	}
 	
 	public Long getId() {
@@ -49,5 +54,13 @@ public class SymbolEntity {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCurr() {
+		return curr;
+	}
+
+	public void setCurr(String currency) {
+		this.curr = currency;
 	}
 }

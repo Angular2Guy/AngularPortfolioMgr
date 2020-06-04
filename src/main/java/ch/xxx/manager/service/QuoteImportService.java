@@ -114,6 +114,11 @@ public class QuoteImportService {
 			flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 	
+	public Mono<Long> importFxDailyQuoteHistory(String to_currency) {
+		LOGGER.info("importFxDailyQuoteHistory() called");
+		return null;
+	}
+	
 	private Mono<List<IntraDayQuoteEntity>> convert(SymbolEntity symbolEntity, IntraDayWrapperImportDto wrapper) {
 		List<IntraDayQuoteEntity> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue())).collect(Collectors.toList());
