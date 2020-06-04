@@ -62,4 +62,9 @@ public class QuoteController {
 	public Mono<Long> importIntraDayQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteImportService.importIntraDayQuotes(symbol);
 	}
+	
+	@GetMapping("/import/daily/currency/{to_curr}")
+	public Mono<Long> importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
+		return this.quoteImportService.importFxDailyQuoteHistory(to_curr);
+	}
 }
