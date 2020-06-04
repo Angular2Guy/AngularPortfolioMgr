@@ -5,10 +5,10 @@ jdk:
 
 services:
   - docker
-  
+
 notifications:
   email:
-	recipients:
+    recipients:
       - angular2guy@gmx.ch
     on_success: always
     on_failure: always
