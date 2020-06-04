@@ -30,11 +30,13 @@ public class DailyQuoteEntity {
 	private Long volume;
 	private LocalDate localDay;
 	private Long symbolId;
-	
-	public DailyQuoteEntity() {		
+	private Long currencyId;
+
+	public DailyQuoteEntity() {
 	}
-	
-	public DailyQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume, LocalDate localDay, Long symbolId) {
+
+	public DailyQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
+			Long volume, LocalDate localDay, Long symbolId, Long currencyId) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
@@ -45,8 +47,9 @@ public class DailyQuoteEntity {
 		this.volume = volume;
 		this.localDay = localDay;
 		this.symbolId = symbolId;
+		this.currencyId = currencyId;
 	}
-	
+
 	public Long getSymbolId() {
 		return symbolId;
 	}
@@ -58,6 +61,7 @@ public class DailyQuoteEntity {
 	public Long getId() {
 		return id;
 	}
+
 	public LocalDate getLocalDay() {
 		return localDay;
 	}
@@ -69,33 +73,43 @@ public class DailyQuoteEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public BigDecimal getOpen() {
 		return open;
 	}
+
 	public void setOpen(BigDecimal open) {
 		this.open = open;
 	}
+
 	public BigDecimal getHigh() {
 		return high;
 	}
+
 	public void setHigh(BigDecimal high) {
 		this.high = high;
 	}
+
 	public BigDecimal getLow() {
 		return low;
 	}
+
 	public void setLow(BigDecimal low) {
 		this.low = low;
 	}
+
 	public BigDecimal getClose() {
 		return close;
 	}
+
 	public void setClose(BigDecimal close) {
 		this.close = close;
 	}
+
 	public Long getVolume() {
 		return volume;
 	}
+
 	public void setVolume(Long volume) {
 		this.volume = volume;
 	}
@@ -106,5 +120,13 @@ public class DailyQuoteEntity {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+
+	public Long getCurrencyId() {
+		return currencyId;
+	}
+
+	public void setCurrencyId(Long currencyId) {
+		this.currencyId = currencyId;
 	}
 }

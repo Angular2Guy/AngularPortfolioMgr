@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -103,21 +104,23 @@ public class QuoteImportService {
 
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called");
+		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
-						.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
+						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called");
+		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
 						.flatMap(entities -> entities.isEmpty()
 								? this.alphavatageController.getTimeseriesDailyHistory(symbol, true)
-										.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
+										.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 								: this.alphavatageController.getTimeseriesDailyHistory(symbol, false)
-										.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
+										.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 										.map(dtos -> dtos.stream()
 												.filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()
 														.compareTo(myDto.getLocalDay()))
@@ -131,17 +134,21 @@ public class QuoteImportService {
 				.flatMap(wrapper -> this.currencyRepository.saveAll(this.convert(wrapper)).count());
 	}
 
+	private Map<LocalDate, Collection<CurrencyEntity>> createCurrencyMap() {
+		return this.currencyRepository.findAll().collectMultimap(grouped -> grouped.getLocalDay(), grouped -> grouped)
+				.block();
+	}
+
 	private List<CurrencyEntity> convert(DailyFxWrapperImportDto wrapperDto) {
-		return wrapperDto.getDailyQuotes().entrySet().stream()
-				.flatMap(entry -> Stream.of(this.convert(entry, SymbolCurrency.valueOf(wrapperDto.getMetadata().getFromSymbol()), 
+		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
+				entry -> Stream.of(this.convert(entry, SymbolCurrency.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						SymbolCurrency.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-						.collect(Collectors.toList());
+				.collect(Collectors.toList());
 	}
 
 	private CurrencyEntity convert(Entry<String, DailyFxQuoteImportDto> entry, SymbolCurrency from_curr,
 			SymbolCurrency to_curr) {
-		return new CurrencyEntity(
-				LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+		return new CurrencyEntity(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
 				from_curr.toString(), to_curr.toString(), new BigDecimal(entry.getValue().getOpen()),
 				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),
 				new BigDecimal(entry.getValue().getClose()));
@@ -167,18 +174,23 @@ public class QuoteImportService {
 		return this.intraDayQuoteRepository.saveAll(entities);
 	}
 
-	private Mono<List<DailyQuoteEntity>> convert(SymbolEntity symbolEntity, DailyWrapperImportDto wrapper) {
+	private Mono<List<DailyQuoteEntity>> convert(SymbolEntity symbolEntity, DailyWrapperImportDto wrapper,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
 		List<DailyQuoteEntity> quotes = wrapper.getDailyQuotes().entrySet().stream()
-				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue()))
+				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
 				.collect(Collectors.toList());
 		return Mono.just(quotes);
 	}
 
-	private DailyQuoteEntity convert(SymbolEntity symbolEntity, String dateStr, DailyQuoteImportDto dto) {
+	private DailyQuoteEntity convert(SymbolEntity symbolEntity, String dateStr, DailyQuoteImportDto dto,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
+		Optional<Long> currencyIdOpt = currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE))
+				.stream().filter(entity -> entity.getTo_curr() != null && entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr()))
+				.flatMap(entity -> Stream.of(entity.getId())).findFirst();
 		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
-				symbolEntity.getId());
+				symbolEntity.getId(), currencyIdOpt.orElse(null));
 		return entity;
 	}
 
