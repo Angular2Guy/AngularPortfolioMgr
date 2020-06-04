@@ -141,7 +141,7 @@ public class QuoteImportService {
 	private CurrencyEntity convert(Entry<String, DailyFxQuoteImportDto> entry, SymbolCurrency from_curr,
 			SymbolCurrency to_curr) {
 		return new CurrencyEntity(
-				LocalDateTime.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate(),
+				LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
 				from_curr.toString(), to_curr.toString(), new BigDecimal(entry.getValue().getOpen()),
 				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),
 				new BigDecimal(entry.getValue().getClose()));

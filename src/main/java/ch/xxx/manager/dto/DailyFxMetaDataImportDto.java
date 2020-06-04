@@ -13,6 +13,7 @@
 package ch.xxx.manager.dto;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,7 +28,7 @@ public class DailyFxMetaDataImportDto {
 	@JsonProperty("4. Output Size")
 	private String outputSize;
 	@JsonProperty("5. Last Refreshed")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDate lastRefreshed;
 	@JsonProperty("6. Time Zone")
 	private String timeZone;
