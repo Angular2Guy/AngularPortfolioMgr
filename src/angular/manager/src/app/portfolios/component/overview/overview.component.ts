@@ -22,6 +22,7 @@ import { SymbolImportService } from '../../service/symbol-import.service';
 import { forkJoin } from 'rxjs';
 import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
 import { Symbol } from '../../model/symbol';
+import { QuoteImportService } from '../../service/quote-import.service';
 
 @Component({
   selector: 'app-overview',
@@ -38,7 +39,8 @@ export class OverviewComponent implements OnInit {
   constructor(private tokenService: TokenService,
 		private router: Router,
 		private portfolioService: PortfolioService,
-		private symbolImportService: SymbolImportService,		
+		private symbolImportService: SymbolImportService,
+		private quoteImportService: QuoteImportService,	
 		private dialog: MatDialog) { }
 
   ngOnInit() {
@@ -98,9 +100,11 @@ export class OverviewComponent implements OnInit {
 	forkJoin(
 		this.symbolImportService.getSymbolImportUs(),
 		this.symbolImportService.getSymbolImportHk(),
-		this.symbolImportService.getSymbolImportDe())
-		.subscribe(([resultUs, resultHk, resultDe]) => { 
-			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}`);
+		this.symbolImportService.getSymbolImportDe(),
+		this.quoteImportService.importFxDailyQuotes('USD'),
+		this.quoteImportService.importFxDailyQuotes('HKD'))
+		.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => { 
+			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
 			this.importingSymbols = false;
 		});
   }
