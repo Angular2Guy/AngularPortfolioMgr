@@ -131,8 +131,9 @@ public class QuoteImportService {
 	public Mono<Long> importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called");
 		return this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
-				.flatMap(currencyMap ->	this.alphavatageController.getFxTimeseriesDailyHistory(to_currency, true)
-				.flatMap(wrapper -> this.currencyRepository.saveAll(this.convert(wrapper, currencyMap)).count()));
+				.flatMap(currencyMap -> this.alphavatageController.getFxTimeseriesDailyHistory(to_currency, true)
+						.flatMap(wrapper -> this.currencyRepository.saveAll(this.convert(wrapper, currencyMap))
+								.count()));
 	}
 
 	private Map<LocalDate, Collection<CurrencyEntity>> createCurrencyMap() {
@@ -140,13 +141,15 @@ public class QuoteImportService {
 				.block();
 	}
 
-	private List<CurrencyEntity> convert(DailyFxWrapperImportDto wrapperDto, Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
+	private List<CurrencyEntity> convert(DailyFxWrapperImportDto wrapperDto,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
 		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, SymbolCurrency.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						SymbolCurrency.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null 
-					|| currencyMap.get(entity.getLocalDay()).stream()
-						.noneMatch(mapEntity -> SymbolCurrency.valueOf(entity.getTo_curr()).equals(SymbolCurrency.valueOf(mapEntity.getTo_curr()))))
+				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null
+						|| currencyMap.get(entity.getLocalDay()).stream()
+								.noneMatch(mapEntity -> SymbolCurrency.valueOf(entity.getTo_curr())
+										.equals(SymbolCurrency.valueOf(mapEntity.getTo_curr()))))
 				.collect(Collectors.toList());
 	}
 
@@ -188,9 +191,13 @@ public class QuoteImportService {
 
 	private DailyQuoteEntity convert(SymbolEntity symbolEntity, String dateStr, DailyQuoteImportDto dto,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
-		Optional<Long> currencyIdOpt = currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE))
-				.stream().filter(entity -> entity.getTo_curr() != null && entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr()))
-				.flatMap(entity -> Stream.of(entity.getId())).findFirst();
+		Optional<Long> currencyIdOpt = currencyMap
+				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
+						? Optional.empty()
+						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
+								.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
+										&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
+								.flatMap(entity -> Stream.of(entity.getId())).findFirst();
 		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),

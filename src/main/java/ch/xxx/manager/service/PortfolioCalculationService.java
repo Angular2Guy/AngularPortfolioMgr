@@ -111,7 +111,7 @@ public class PortfolioCalculationService {
 						quotesTuple -> Stream.of(quotesTuple.getB().stream()
 								.flatMap(quote -> Stream.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(),
 										quote.getLocalDay(),
-										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(), this.findCurrencyByDateAndSymbol(tuple4.getD(), quote.getLocalDay(), symbolEntityOpt.get())))))										
+										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(), this.findCurrencyByDateAndSymbol(tuple4.getD(), quote.getLocalDay(), symbolEntityOpt)))))										
 								.collect(Collectors.toList())))
 				.reduce((oldList, newList) -> {
 //					LOG.info("oldList: " + oldList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
@@ -164,12 +164,12 @@ public class PortfolioCalculationService {
 	}
 	
 	private Optional<CurrencyEntity> findCurrencyByDateAndSymbol(Map<LocalDate, Collection<CurrencyEntity>> currencyMap,
-			LocalDate localDate, SymbolEntity symbolEntity) {
+			LocalDate localDate, Optional<SymbolEntity> symbolEntityOpt) {
 		Optional<CurrencyEntity> entityOpt = currencyMap
-				.get(localDate) == null
+				.get(localDate) == null || symbolEntityOpt.isEmpty()
 						? Optional.empty()
 						: currencyMap.get(localDate).stream().filter(entity -> SymbolCurrency
-								.valueOf(entity.getTo_curr()).equals(SymbolCurrency.valueOf(symbolEntity.getCurr())))
+								.valueOf(entity.getTo_curr()).equals(SymbolCurrency.valueOf(symbolEntityOpt.get().getCurr())))
 								.findFirst();
 		return entityOpt;
 	}
