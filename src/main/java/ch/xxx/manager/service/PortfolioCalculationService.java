@@ -13,6 +13,7 @@
 package ch.xxx.manager.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -111,7 +112,9 @@ public class PortfolioCalculationService {
 						quotesTuple -> Stream.of(quotesTuple.getB().stream()
 								.flatMap(quote -> Stream.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(),
 										quote.getLocalDay(),
-										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(), this.findCurrencyByDateAndSymbol(tuple4.getD(), quote.getLocalDay(), symbolEntityOpt)))))										
+										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(),
+												this.findCurrencyByDateAndQuote(quote, tuple4.getD(),
+														quote.getLocalDay(), tuple4.getB())))))
 								.collect(Collectors.toList())))
 				.reduce((oldList, newList) -> {
 //					LOG.info("oldList: " + oldList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
@@ -159,18 +162,22 @@ public class PortfolioCalculationService {
 
 	private BigDecimal calculatePortfolioQuote(BigDecimal close, Long weight, Optional<CurrencyEntity> currencyOpt) {
 		BigDecimal currencyValue = currencyOpt.isEmpty() ? BigDecimal.ONE : currencyOpt.get().getClose();
-		BigDecimal symbolWeight = weight == null || weight.longValue() < 1 ? BigDecimal.ONE : BigDecimal.valueOf(weight);
-		return close.multiply(symbolWeight).divide(currencyValue);
+		BigDecimal symbolWeight = weight == null || weight.longValue() < 1 ? BigDecimal.ONE
+				: BigDecimal.valueOf(weight);
+		return close.multiply(symbolWeight).divide(currencyValue, 4, RoundingMode.HALF_UP);
 	}
-	
-	private Optional<CurrencyEntity> findCurrencyByDateAndSymbol(Map<LocalDate, Collection<CurrencyEntity>> currencyMap,
-			LocalDate localDate, Optional<SymbolEntity> symbolEntityOpt) {
-		Optional<CurrencyEntity> entityOpt = currencyMap
-				.get(localDate) == null || symbolEntityOpt.isEmpty()
+
+	private Optional<CurrencyEntity> findCurrencyByDateAndQuote(DailyQuoteEntity quote,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap, LocalDate localDate,
+			Map<Long, SymbolEntity> symbolMap) {
+		Optional<CurrencyEntity> entityOpt = currencyMap.get(localDate) == null
+				|| symbolMap.get(quote.getSymbolId()) == null
 						? Optional.empty()
-						: currencyMap.get(localDate).stream().filter(entity -> SymbolCurrency
-								.valueOf(entity.getTo_curr()).equals(SymbolCurrency.valueOf(symbolEntityOpt.get().getCurr())))
+						: currencyMap.get(localDate).stream()
+								.filter(entity -> SymbolCurrency.valueOf(entity.getTo_curr())
+										.equals(SymbolCurrency.valueOf(symbolMap.get(quote.getSymbolId()).getCurr())))
 								.findFirst();
+//		entityOpt.ifPresent(entity -> LOG.info("Date: {}", entity.getLocalDay().toString()));
 		return entityOpt;
 	}
 
