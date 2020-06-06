@@ -15,7 +15,6 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -31,11 +30,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.entity.CurrencyEntity;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.jwt.Tuple;
+import ch.xxx.manager.repository.CurrencyRepository;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
@@ -57,14 +59,17 @@ public class PortfolioCalculationService {
 	private SymbolRepository symbolRepository;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
+	@Autowired
+	private CurrencyRepository currencyRepository;
 
 	public Mono<PortfolioEntity> calculatePortfolio(Long portfolioId) {
-		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono
-				.zip(this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
+		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono.zip(
+				this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
 						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),
-						this.symbolRepository.findByPortfolioId(portfolioId)
-								.collectMap(localEntity -> localEntity.getId(), localEntity -> localEntity))
-				.flatMap(data -> Mono.just(new Tuple<>(data.getT1(), data.getT2())))
+				this.symbolRepository.findByPortfolioId(portfolioId).collectMap(localEntity -> localEntity.getId(),
+						localEntity -> localEntity),
+				this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity))
+				.flatMap(data -> Mono.just(new Tuple3<>(data.getT1(), data.getT2(), data.getT3())))
 				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
 						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
 		return this.portfolioRepository.findById(portfolioId)
@@ -93,20 +98,20 @@ public class PortfolioCalculationService {
 	}
 
 	private List<DailyQuoteEntity> updatePortfolioSymbol(
-			Tuple3<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>> tuple3) {
-		Optional<SymbolEntity> symbolEntityOpt = tuple3.getB().values().stream()
+			Tuple4<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>, Map<LocalDate, Collection<CurrencyEntity>>> tuple4) {
+		Optional<SymbolEntity> symbolEntityOpt = tuple4.getB().values().stream()
 				.filter(symbolEntity -> symbolEntity.getSymbol().contains(PORTFOLIO_MARKER)).findFirst();
-		Optional<List<Tuple3<Long, LocalDate, BigDecimal>>> reduceOpt = tuple3.getA().entrySet().stream()
+		Optional<List<Tuple3<Long, LocalDate, BigDecimal>>> reduceOpt = tuple4.getA().entrySet().stream()
 				.filter(value -> symbolEntityOpt.isEmpty()
 						|| !symbolEntityOpt.get().getId().equals(value.getValue().getSymbolId()))
 				.flatMap(value -> Stream.of(new Tuple<Long, PortfolioToSymbolEntity>(value.getKey(), value.getValue())))
 				.flatMap(tuple -> Stream.of(new Tuple<Long, Collection<DailyQuoteEntity>>(tuple.getB().getWeight(),
-						tuple3.getC().get(tuple.getA()))))
+						tuple4.getC().get(tuple.getA()))))
 				.flatMap(
 						quotesTuple -> Stream.of(quotesTuple.getB().stream()
 								.flatMap(quote -> Stream.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(),
 										quote.getLocalDay(),
-										quote.getClose().multiply(BigDecimal.valueOf(quotesTuple.getA())))))
+										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(), this.findCurrencyByDateAndSymbol(tuple4.getD(), quote.getLocalDay(), symbolEntityOpt.get())))))										
 								.collect(Collectors.toList())))
 				.reduce((oldList, newList) -> {
 //					LOG.info("oldList: " + oldList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
@@ -147,9 +152,26 @@ public class PortfolioCalculationService {
 									(t1, t2) -> new Tuple3<Long, LocalDate, BigDecimal>(t1.getA(), t1.getB(),
 											t1.getC().add(t2.getC()))));
 				}).collect(Collectors.toList()).stream()
-				.flatMap(localTuple -> Stream.of(this.createQuote(localTuple, tuple3.getB())))
+				.flatMap(localTuple -> Stream.of(this.createQuote(localTuple, tuple4.getB())))
 				.collect(Collectors.toList());
 		return portfolioQuotes;
+	}
+
+	private BigDecimal calculatePortfolioQuote(BigDecimal close, Long weight, Optional<CurrencyEntity> currencyOpt) {
+		BigDecimal currencyValue = currencyOpt.isEmpty() ? BigDecimal.ONE : currencyOpt.get().getClose();
+		BigDecimal symbolWeight = weight == null || weight.longValue() < 1 ? BigDecimal.ONE : BigDecimal.valueOf(weight);
+		return close.multiply(symbolWeight).multiply(currencyValue);
+	}
+	
+	private Optional<CurrencyEntity> findCurrencyByDateAndSymbol(Map<LocalDate, Collection<CurrencyEntity>> currencyMap,
+			LocalDate localDate, SymbolEntity symbolEntity) {
+		Optional<CurrencyEntity> entityOpt = currencyMap
+				.get(localDate) == null
+						? Optional.empty()
+						: currencyMap.get(localDate).stream().filter(entity -> SymbolCurrency
+								.valueOf(entity.getTo_curr()).equals(SymbolCurrency.valueOf(symbolEntity.getCurr())))
+								.findFirst();
+		return entityOpt;
 	}
 
 	private DailyQuoteEntity createQuote(Tuple3<Long, LocalDate, BigDecimal> tuple3,
@@ -165,8 +187,8 @@ public class PortfolioCalculationService {
 		return entity;
 	}
 
-	private Mono<Tuple3<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>>> createMultiMap(
-			Tuple<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>> tuple) {
+	private Mono<Tuple4<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>, Map<LocalDate, Collection<CurrencyEntity>>>> createMultiMap(
+			Tuple3<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<LocalDate, Collection<CurrencyEntity>>> tuple) {
 		Map<Long, Collection<DailyQuoteEntity>> quotesMap = Flux
 				.fromIterable(tuple.getB().keySet()).parallel().flatMap(symId -> this.dailyQuoteRepository
 						.findBySymbolId(symId).collectMultimap(quote -> symId, quote -> quote))
@@ -175,7 +197,7 @@ public class PortfolioCalculationService {
 					return oldMap;
 				}).block();
 		return Mono.just(
-				new Tuple3<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>>(
-						tuple.getA(), tuple.getB(), quotesMap));
+				new Tuple4<Map<Long, PortfolioToSymbolEntity>, Map<Long, SymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>, Map<LocalDate, Collection<CurrencyEntity>>>(
+						tuple.getA(), tuple.getB(), quotesMap, tuple.getC()));
 	}
 }
