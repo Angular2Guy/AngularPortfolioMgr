@@ -160,7 +160,7 @@ public class PortfolioCalculationService {
 	private BigDecimal calculatePortfolioQuote(BigDecimal close, Long weight, Optional<CurrencyEntity> currencyOpt) {
 		BigDecimal currencyValue = currencyOpt.isEmpty() ? BigDecimal.ONE : currencyOpt.get().getClose();
 		BigDecimal symbolWeight = weight == null || weight.longValue() < 1 ? BigDecimal.ONE : BigDecimal.valueOf(weight);
-		return close.multiply(symbolWeight).multiply(currencyValue);
+		return close.multiply(symbolWeight).divide(currencyValue);
 	}
 	
 	private Optional<CurrencyEntity> findCurrencyByDateAndSymbol(Map<LocalDate, Collection<CurrencyEntity>> currencyMap,

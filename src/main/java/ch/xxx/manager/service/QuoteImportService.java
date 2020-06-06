@@ -148,7 +148,7 @@ public class QuoteImportService {
 						SymbolCurrency.valueOf(wrapperDto.getMetadata().getToSymbol()))))
 				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null
 						|| currencyMap.get(entity.getLocalDay()).stream()
-								.noneMatch(mapEntity -> SymbolCurrency.valueOf(entity.getTo_curr())
+								.anyMatch(mapEntity -> SymbolCurrency.valueOf(entity.getTo_curr())
 										.equals(SymbolCurrency.valueOf(mapEntity.getTo_curr()))))
 				.collect(Collectors.toList());
 	}
