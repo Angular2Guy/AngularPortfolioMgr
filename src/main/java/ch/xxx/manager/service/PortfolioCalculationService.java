@@ -106,16 +106,18 @@ public class PortfolioCalculationService {
 				.filter(value -> symbolEntityOpt.isEmpty()
 						|| !symbolEntityOpt.get().getId().equals(value.getValue().getSymbolId()))
 				.flatMap(value -> Stream.of(new Tuple<Long, PortfolioToSymbolEntity>(value.getKey(), value.getValue())))
-				.flatMap(tuple -> Stream.of(new Tuple<Long, Collection<DailyQuoteEntity>>(tuple.getB().getWeight(),
-						tuple4.getC().get(tuple.getA()))))
-				.flatMap(
-						quotesTuple -> Stream.of(quotesTuple.getB().stream()
-								.flatMap(quote -> Stream.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(),
-										quote.getLocalDay(),
-										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA(),
+				.flatMap(tuple -> Stream.of(new Tuple<PortfolioToSymbolEntity, Collection<DailyQuoteEntity>>(
+						tuple.getB(), tuple4.getC().get(tuple.getA()))))
+				.flatMap(quotesTuple -> Stream.of(quotesTuple.getB().stream()
+						.filter(quote -> quote.getLocalDay().compareTo(quotesTuple.getA().getChangedAt()) > -1
+								&& (quotesTuple.getA().getRemovedAt() == null
+										|| quote.getLocalDay().isBefore(quotesTuple.getA().getRemovedAt())))
+						.flatMap(quote -> Stream
+								.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(), quote.getLocalDay(),
+										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA().getWeight(),
 												this.findCurrencyByDateAndQuote(quote, tuple4.getD(),
 														quote.getLocalDay(), tuple4.getB())))))
-								.collect(Collectors.toList())))
+						.collect(Collectors.toList())))
 				.reduce((oldList, newList) -> {
 //					LOG.info("oldList: " + oldList.stream().flatMap(myTuple3 -> Stream.of(myTuple3.getA())).distinct()
 //							.flatMap(myId -> Stream.of(" " + myId)).collect(Collectors.toList()));

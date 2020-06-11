@@ -36,7 +36,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.xxx.manager.init.MyConnectionFactoryInitializer;
 import io.r2dbc.proxy.ProxyConnectionFactory;
-import io.r2dbc.proxy.support.QueryExecutionInfoFormatter;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -70,8 +69,8 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
 
 			return ProxyConnectionFactory.builder(connectionFactory)
-					.onAfterQuery(
-							queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
+//					.onAfterQuery(
+//							queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
 					.build();
 		}
 	}
