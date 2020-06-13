@@ -63,4 +63,10 @@ public class PortfolioToSymbolEntity {
 	public void setSymbolId(Long symbolId) {
 		this.symbolId = symbolId;
 	}
+	@Override
+	public String toString() {
+		return "PortfolioToSymbolEntity [id=" + id + ", portfolioId=" + portfolioId + ", symbolId=" + symbolId
+				+ ", weight=" + weight + ", changedAt=" + changedAt + ", removedAt=" + removedAt + "]";
+	}
+	
 }

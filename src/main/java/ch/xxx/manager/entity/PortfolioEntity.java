@@ -92,4 +92,11 @@ public class PortfolioEntity {
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
 	}
+	@Override
+	public String toString() {
+		return "PortfolioEntity [id=" + id + ", userId=" + userId + ", name=" + name + ", createdAt=" + createdAt
+				+ ", month1=" + month1 + ", month6=" + month6 + ", year1=" + year1 + ", year2=" + year2 + ", year5="
+				+ year5 + ", year10=" + year10 + "]";
+	}
+	
 }

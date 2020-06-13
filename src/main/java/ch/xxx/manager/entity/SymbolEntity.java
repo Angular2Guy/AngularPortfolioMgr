@@ -63,4 +63,10 @@ public class SymbolEntity {
 	public void setCurr(String currency) {
 		this.curr = currency;
 	}
+
+	@Override
+	public String toString() {
+		return "SymbolEntity [id=" + id + ", symbol=" + symbol + ", name=" + name + ", curr=" + curr + "]";
+	}
+	
 }

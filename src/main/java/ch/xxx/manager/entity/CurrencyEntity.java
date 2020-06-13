@@ -108,4 +108,10 @@ public class CurrencyEntity {
 	public void setLocalDay(LocalDate localDay) {
 		this.localDay = localDay;
 	}
+
+	@Override
+	public String toString() {
+		return "CurrencyEntity [id=" + id + ", localDay=" + localDay + ", from_curr=" + from_curr + ", to_curr="
+				+ to_curr + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + "]";
+	}
 }

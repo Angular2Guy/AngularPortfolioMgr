@@ -129,4 +129,12 @@ public class DailyQuoteEntity {
 	public void setCurrencyId(Long currencyId) {
 		this.currencyId = currencyId;
 	}
+
+	@Override
+	public String toString() {
+		return "DailyQuoteEntity [id=" + id + ", symbol=" + symbol + ", open=" + open + ", high=" + high + ", low="
+				+ low + ", close=" + close + ", volume=" + volume + ", localDay=" + localDay + ", symbolId=" + symbolId
+				+ ", currencyId=" + currencyId + "]";
+	}
+	
 }
