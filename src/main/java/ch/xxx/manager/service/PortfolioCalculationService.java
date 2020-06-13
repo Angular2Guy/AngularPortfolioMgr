@@ -40,6 +40,7 @@ import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.jwt.Tuple;
 import ch.xxx.manager.repository.CurrencyRepository;
 import ch.xxx.manager.repository.DailyQuoteRepository;
+import ch.xxx.manager.repository.PortfolioAndSymbolRepository;
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -62,8 +63,11 @@ public class PortfolioCalculationService {
 	private DailyQuoteRepository dailyQuoteRepository;
 	@Autowired
 	private CurrencyRepository currencyRepository;
+	@Autowired
+	private PortfolioAndSymbolRepository portfolioAndSymbolRepository;
 
 	public Mono<PortfolioEntity> calculatePortfolio(Long portfolioId) {
+		this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPorfolioId(portfolioId).subscribe(entity -> LOG.info(entity.toString()));
 		Mono<List<DailyQuoteEntity>> portfolioQuotes = Mono.zip(
 				this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
 						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),

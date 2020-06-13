@@ -2,6 +2,9 @@ package ch.xxx.manager.entity;
 
 import java.time.LocalDate;
 
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table
 public class PortfolioAndSymbolEntity {
 	private Long id;
 	private Long userId;
