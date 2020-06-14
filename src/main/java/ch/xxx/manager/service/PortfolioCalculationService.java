@@ -137,7 +137,7 @@ public class PortfolioCalculationService {
 					return resultList;
 				});
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
-		String randomString = ServiceUtils.generateRandomString(SYMBOL_LENGTH - PORTFOLIO_MARKER.length());
+		String randomString = ServiceUtils.generateRandomString(SYMBOL_LENGTH - PORTFOLIO_MARKER.length()) + PORTFOLIO_MARKER;
 		
 		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream()
 				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream().flatMap(entry -> {
@@ -153,6 +153,7 @@ public class PortfolioCalculationService {
 				}).collect(Collectors.toList()).stream()
 				.flatMap(localTuple -> Stream.of(this.createQuote(localTuple, tuple3.getA(), randomString)))
 				.collect(Collectors.toList());
+//		portfolioQuotes.forEach(myEntity -> LOG.info("Symbol: {}", myEntity.getSymbol()));
 		return portfolioQuotes;
 	}
 
