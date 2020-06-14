@@ -144,7 +144,7 @@ public class PortfolioCalculationParallelService {
 					return resultList;
 				});
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
-		String randomString = ServiceUtils.generateRandomString(SYMBOL_LENGTH - PORTFOLIO_MARKER.length()) + PORTFOLIO_MARKER;
+		String randomString = ServiceUtils.generateRandomPortfolioSymbol();
 
 		List<DailyQuoteEntity> portfolioQuotes = portfolioTuples.stream()
 				.collect(Collectors.groupingBy(tuple -> tuple.getB())).entrySet().stream().flatMap(entry -> {
@@ -191,7 +191,7 @@ public class PortfolioCalculationParallelService {
 	private DailyQuoteEntity createQuote(Tuple3<Long, LocalDate, BigDecimal> tuple3,
 			Map<Long, SymbolEntity> symbolsMap, String symbolStr) {
 		Optional<SymbolEntity> symbolEntityOpt = symbolsMap.values().stream()
-				.filter(symbolEntity -> symbolEntity.getSymbol().contains(PORTFOLIO_MARKER)).findFirst();
+				.filter(symbolEntity -> symbolEntity.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).findFirst();
 		DailyQuoteEntity entity = new DailyQuoteEntity();
 		entity.setClose(tuple3.getC());
 		entity.setLocalDay(tuple3.getB());

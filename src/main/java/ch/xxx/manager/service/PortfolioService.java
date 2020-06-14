@@ -25,6 +25,7 @@ import ch.xxx.manager.dto.SymbolDto;
 import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -138,8 +139,22 @@ public class PortfolioService {
 				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonth6(), entity.getYear1(),
 				entity.getYear2(), entity.getYear5(), entity.getYear10());
 		return this.portfolioToSymbolRepository.findByPortfolioId(dto.getId())
-				.switchIfEmpty(Flux.just(new PortfolioToSymbolEntity()))
+				.switchIfEmpty(this.createPortfolioPtSAndSymbol(entity))
 				.flatMapSequential(p2SymbolEntity -> this.convert(p2SymbolEntity, dto)).distinct();
 	}
-	
+
+	private Flux<PortfolioToSymbolEntity> createPortfolioPtSAndSymbol(PortfolioEntity portfolioEntity) {
+		SymbolEntity symbolEntity = new SymbolEntity(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(), SymbolCurrency.EUR);
+		return this.symbolRepository.save(symbolEntity).flatMap(mySymbolEntity -> 
+			this.portfolioToSymbolRepository.save(this.createPtSEntity(portfolioEntity, mySymbolEntity.getId()))).flux();
+	}
+
+	private PortfolioToSymbolEntity createPtSEntity(PortfolioEntity portfolioEntity, Long symbolId) {
+		PortfolioToSymbolEntity ptSEntity = new PortfolioToSymbolEntity();
+		ptSEntity.setChangedAt(portfolioEntity.getCreatedAt());
+		ptSEntity.setPortfolioId(portfolioEntity.getId());
+		ptSEntity.setWeight(1L);
+		ptSEntity.setSymbolId(symbolId);
+		return ptSEntity;
+	}
 }
