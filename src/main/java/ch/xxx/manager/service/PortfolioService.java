@@ -41,6 +41,7 @@ public class PortfolioService {
 	@Autowired
 	private SymbolRepository symbolRepository;
 	@Autowired
+//	private PortfolioCalculationParallelService portfolioCalculationService;
 	private PortfolioCalculationService portfolioCalculationService;
 
 	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {

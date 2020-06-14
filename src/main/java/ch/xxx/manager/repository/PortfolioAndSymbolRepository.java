@@ -24,7 +24,7 @@ public class PortfolioAndSymbolRepository {
 	@Autowired
 	private DatabaseClient client;
 
-	public Flux<PortfolioAndSymbolEntity> findPortfolioCalcEntitiesByPorfolioId(Long portfolioId) {
+	public Flux<PortfolioAndSymbolEntity> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId) {
 		return client
 				.execute("select s.symbol as symbol, s.name as symbol_name, s.curr as curr, s.id as symbol_id, "
 						+ "pts.changed_at as changed_at, pts.removed_at as removed_at, pts.weight as weight, "
