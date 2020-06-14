@@ -100,7 +100,7 @@ public class PortfolioCalculationService {
 				.filter(symbolEntity -> symbolEntity.getSymbol().contains(PORTFOLIO_MARKER)).findFirst();
 		Optional<List<Tuple3<Long, LocalDate, BigDecimal>>> reduceOpt = tuple3.getA().entrySet().stream()
 				.filter(value -> pAndSymEntityOpt.isEmpty()
-						|| !pAndSymEntityOpt.get().getId().equals(value.getValue().getSymbolId()))
+						|| !pAndSymEntityOpt.get().getSymbolId().equals(value.getValue().getSymbolId()))
 				.flatMap(
 						value -> Stream.of(new Tuple<Long, PortfolioAndSymbolEntity>(value.getKey(), value.getValue())))
 				.flatMap(tuple -> Stream.of(new Tuple<PortfolioAndSymbolEntity, Collection<DailyQuoteEntity>>(
@@ -168,7 +168,14 @@ public class PortfolioCalculationService {
 		BigDecimal currencyValue = currencyOpt.isEmpty() ? BigDecimal.ONE : currencyOpt.get().getClose();
 		BigDecimal symbolWeight = weight == null || weight.longValue() < 1 ? BigDecimal.ONE
 				: BigDecimal.valueOf(weight);
-		return close.multiply(symbolWeight).divide(currencyValue, 4, RoundingMode.HALF_UP);
+		BigDecimal result = close.multiply(symbolWeight).divide(currencyValue, 4, RoundingMode.HALF_UP);
+//		LOG.info("---");
+//		LOG.info(close.toString());
+//		LOG.info(currencyValue.toString());
+//		LOG.info(symbolWeight.toString());
+//		LOG.info(result.toString());
+//		LOG.info("---");
+		return result;
 	}
 
 	private Optional<CurrencyEntity> findCurrencyByDateAndQuote(DailyQuoteEntity quote,
