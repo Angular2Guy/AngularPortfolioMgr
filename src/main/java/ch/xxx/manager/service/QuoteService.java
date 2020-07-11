@@ -13,6 +13,7 @@
 package ch.xxx.manager.service;
 
 import java.time.LocalDate;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,15 +35,19 @@ public class QuoteService {
 	private IntraDayQuoteRepository intraDayQuoteRepository;
 	
 	public Flux<QuoteDto> getDailyQuotes(String symbol) {
-		return this.dailyQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
+		return this.dailyQuoteRepository.findBySymbol(this.decodeSymbol(symbol)).flatMapSequential(quote -> convert(quote));
 	}
 	
 	public Flux<QuoteDto> getDailyQuotes(String symbol, LocalDate start, LocalDate end) {
-		return this.dailyQuoteRepository.findBySymbolAndDayBetween(symbol, start, end).flatMapSequential(quote -> convert(quote));
+		return this.dailyQuoteRepository.findBySymbolAndDayBetween(this.decodeSymbol(symbol), start, end).flatMapSequential(quote -> convert(quote));
 	}
 	
 	public Flux<QuoteDto> getIntraDayQuotes(String symbol) {
-		return this.intraDayQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
+		return this.intraDayQuoteRepository.findBySymbol(this.decodeSymbol(symbol)).flatMapSequential(quote -> convert(quote));
+	}
+	
+	private String decodeSymbol(String symbol) {		
+		return symbol.indexOf(ServiceUtils.PORTFOLIO_MARKER) > -1 ?  new String(Base64.getDecoder().decode(symbol)) : symbol;
 	}
 	
 	private Flux<QuoteDto> convert(IntraDayQuoteEntity entity) {
