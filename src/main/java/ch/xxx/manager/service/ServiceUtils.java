@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class ServiceUtils {
-	public final static String PORTFOLIO_MARKER = "$#@";
+	public final static String PORTFOLIO_MARKER = "äüè";
 	private final static int SYMBOL_LENGTH = 15;
 	
 	public static String generateRandomPortfolioSymbol() {

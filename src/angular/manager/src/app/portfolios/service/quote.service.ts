@@ -17,24 +17,19 @@ import { Quote } from '../model/quote';
 
 @Injectable()
 export class QuoteService {
-  static readonly PORTFOLIO_MARKER = "$#@";	
-
   constructor(private http: HttpClient) { }
 
   getAllDailyQuotes(symbol: string): Observable<Quote[]> {
-	const mySymbol = symbol.includes(QuoteService.PORTFOLIO_MARKER) ? btoa(symbol) : symbol;
-	return this.http.get<Quote[]>(`/rest/quote/daily/all/symbol/${mySymbol}`);
+	return this.http.get<Quote[]>(`/rest/quote/daily/all/symbol/${symbol}`);
   }
 
   getIntraDayQuotes(symbol: string): Observable<Quote[]> {
-	const mySymbol = symbol.includes(QuoteService.PORTFOLIO_MARKER) ? btoa(symbol) : symbol;
-	return this.http.get<Quote[]>(`/rest/quote/intraday/symbol/${mySymbol}`);
+	return this.http.get<Quote[]>(`/rest/quote/intraday/symbol/${symbol}`);
   }
 
   getDailyQuotesFromStartToEnd(symbol: string, start: Date, end: Date): Observable<Quote[]> {
 	const startStr = start.toISOString().split('T')[0];
 	const endStr = end.toISOString().split('T')[0];
-	const mySymbol = symbol.includes(QuoteService.PORTFOLIO_MARKER) ? btoa(symbol) : symbol;
-	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${mySymbol}/start/${startStr}/end/${endStr}`);
+	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
   }
 }
