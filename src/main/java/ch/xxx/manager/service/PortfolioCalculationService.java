@@ -82,7 +82,7 @@ public class PortfolioCalculationService {
 					.filter(entry -> entry.getKey().equals(pAndSymEntityOpt.get().getSymbolId())).findFirst();
 			quotesToDelete = entryOpt.isEmpty() ? quotesToDelete : entryOpt.get().getValue();
 		}
-		return this.dailyQuoteRepository.deleteAll(quotesToDelete).flatMap(myValue -> this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
+		return this.dailyQuoteRepository.deleteAll(quotesToDelete).then(this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
 						.collectList());
 	}
 
@@ -230,7 +230,6 @@ public class PortfolioCalculationService {
 
 		Map<Long, Collection<DailyQuoteEntity>> quotesMap = Flux
 				.fromIterable(tuple.getA().values().stream()
-						.filter(myEntity -> !myEntity.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 						.flatMap(pAndSEntity -> Stream.of(pAndSEntity.getSymbolId())).collect(Collectors.toList()))
 				.parallel().flatMap(symId -> this.dailyQuoteRepository.findBySymbolId(symId)
 						.collectMultimap(quote -> symId, quote -> quote))
