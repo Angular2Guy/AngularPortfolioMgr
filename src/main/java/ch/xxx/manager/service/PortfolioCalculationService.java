@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,11 +66,27 @@ public class PortfolioCalculationService {
 						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),
 				this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity))
 				.flatMap(data -> Mono.just(new Tuple<>(data.getT1(), data.getT2())))
-				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.dailyQuoteRepository
-						.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
+				.flatMap(tuple -> createMultiMap(tuple)).flatMap(myTuple -> this.updatePortfolioQuotes(myTuple));
 		return this.portfolioRepository.findById(portfolioId)
 				.flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
 				.flatMap(portfolio -> this.portfolioRepository.save(portfolio));
+	}
+
+	private Mono<List<DailyQuoteEntity>> updatePortfolioQuotes(
+			Tuple3<Map<Long, PortfolioAndSymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>, Map<LocalDate, Collection<CurrencyEntity>>> myTuple) {
+		Optional<PortfolioAndSymbolEntity> pAndSymEntityOpt = myTuple.getA().values().stream()
+				.filter(symbolEntity -> symbolEntity.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).findFirst();
+		Collection<DailyQuoteEntity> quotesToDelete = List.of();
+		if (pAndSymEntityOpt.isPresent()) {
+			Optional<Entry<Long, Collection<DailyQuoteEntity>>> entryOpt = myTuple.getB().entrySet().stream()
+					.filter(entry -> entry.getKey().equals(pAndSymEntityOpt.get().getSymbolId())).findFirst();
+			quotesToDelete = entryOpt.isEmpty() ? quotesToDelete : entryOpt.get().getValue();
+		}
+		return Flux
+				.fromStream(quotesToDelete.stream().flatMap(
+						dailyQuotrEntity -> Stream.of(this.dailyQuoteRepository.deleteById(dailyQuotrEntity.getId()))))
+				.last(Mono.empty()).flatMap(myValue -> this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
+						.collectList());
 	}
 
 	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity,
@@ -126,13 +143,15 @@ public class PortfolioCalculationService {
 //						LOG.info("newList: " + newList.stream().collect(Collectors.groupingBy(myTuple3 -> myTuple3.getB()))
 //								.entrySet().stream().flatMap(entry -> Stream.of("" + entry.getKey() + " "
 //										+ entry.getValue().size() + " " + entry.getValue().get(0).getA()))
-//								.collect(Collectors.toList()));
-					List<Tuple3<Long, LocalDate, BigDecimal>> resultList = oldList.stream()
+//								.collect(Collectors.toList()));					
+					oldList = oldList.stream()
+							.filter(tuple3Old -> newList.stream()
+									.anyMatch(tuple3New -> tuple3New.getB().isEqual(tuple3Old.getB())))
+							.collect(Collectors.toList());
+					List<Tuple3<Long, LocalDate, BigDecimal>> resultList = Stream
+							.concat(oldList.stream(), newList.stream())
 							.filter(ServiceUtils.distinctByKey(myTuple3 -> "" + myTuple3.getA() + myTuple3.getB()))
 							.collect(Collectors.toList());
-					resultList.addAll(newList.stream()
-							.filter(ServiceUtils.distinctByKey(myTuple3 -> "" + myTuple3.getA() + myTuple3.getB()))
-							.collect(Collectors.toList()));
 					return resultList;
 				});
 		List<Tuple3<Long, LocalDate, BigDecimal>> portfolioTuples = reduceOpt.orElse(List.of());
