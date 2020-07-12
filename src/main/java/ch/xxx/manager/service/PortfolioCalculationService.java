@@ -82,10 +82,7 @@ public class PortfolioCalculationService {
 					.filter(entry -> entry.getKey().equals(pAndSymEntityOpt.get().getSymbolId())).findFirst();
 			quotesToDelete = entryOpt.isEmpty() ? quotesToDelete : entryOpt.get().getValue();
 		}
-		return Flux
-				.fromStream(quotesToDelete.stream().flatMap(
-						dailyQuotrEntity -> Stream.of(this.dailyQuoteRepository.deleteById(dailyQuotrEntity.getId()))))
-				.last(Mono.empty()).flatMap(myValue -> this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
+		return this.dailyQuoteRepository.deleteAll(quotesToDelete).flatMap(myValue -> this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
 						.collectList());
 	}
 
