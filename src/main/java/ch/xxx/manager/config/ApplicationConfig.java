@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager;
+import org.springframework.data.r2dbc.connectionfactory.TransactionAwareConnectionFactoryProxy;
 import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePopulator;
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
@@ -62,13 +63,13 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		if (this.activeProfile.contains("prod")) {
-			return this.connectionFactory();
+			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(this.connectionFactory());
+			return transactionAwareConnectionFactoryProxy;
 		} else {
 			ConnectionFactory connectionFactory = ConnectionFactories
-					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
-			
-
-			return ProxyConnectionFactory.builder(connectionFactory)
+					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");			
+			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(connectionFactory);
+			return ProxyConnectionFactory.builder(transactionAwareConnectionFactoryProxy)
 //					.onAfterQuery(
 //							queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
 					.build();
