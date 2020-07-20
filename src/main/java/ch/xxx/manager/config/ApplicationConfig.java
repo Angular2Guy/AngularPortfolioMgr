@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import ch.xxx.manager.init.MyConnectionFactoryInitializer;
 import io.r2dbc.proxy.ProxyConnectionFactory;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
@@ -67,6 +66,7 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 		} else {
 			ConnectionFactory connectionFactory = ConnectionFactories
 					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");
+			
 
 			return ProxyConnectionFactory.builder(connectionFactory)
 //					.onAfterQuery(
@@ -77,8 +77,7 @@ class ApplicationConfig extends AbstractR2dbcConfiguration {
 
 	@Bean
 	public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
-
-		MyConnectionFactoryInitializer initializer = new MyConnectionFactoryInitializer();
+		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
 		initializer.setConnectionFactory(connectionFactory);
 		if (!this.activeProfile.contains("prod")) {
 			CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
