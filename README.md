@@ -15,5 +15,6 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The Gradle build is done. 
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. 
 * The setup of the Angular fronted is done. 
+* The portfolio calculation is done.
 
 The features coming now will be further features on the existing architecture. 
