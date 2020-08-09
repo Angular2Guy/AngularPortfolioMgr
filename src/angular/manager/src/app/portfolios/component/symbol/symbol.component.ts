@@ -16,6 +16,7 @@ import { QuoteService } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
 import { MyChartData, MyChartValue } from '../../model/my-chart-data';
 import { DOCUMENT, formatDate } from '@angular/common';
+import { ServiceUtils } from '../../model/service-utils';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
@@ -40,8 +41,8 @@ interface SymbolData {
 	styleUrls: ['./symbol.component.scss']
 })
 export class SymbolComponent implements OnInit {	
-	private dayInMs = 24 * 60 * 60 * 1000;
-	private hourInMs = 1 * 60 * 60 * 1000;
+	private readonly dayInMs = 24 * 60 * 60 * 1000;
+	private readonly hourInMs = 1 * 60 * 60 * 1000;
 	quotePeriods: QuotePeriod[] = [];
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
@@ -49,6 +50,7 @@ export class SymbolComponent implements OnInit {
 	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, open: null, start: null } as SymbolData;
 	@Output()
 	loadingData = new EventEmitter<boolean>();
+	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
 
 	multi: MyChartData[] = [{ name: 'none', series: [] }];	
 	legend = false;
@@ -78,9 +80,17 @@ export class SymbolComponent implements OnInit {
 		this.selQuotePeriod = this.quotePeriods[0];
 	}	
 
+	replacePortfolioSymbol(symbolStr: string): string {
+		return ServiceUtils.isPortfolioSymbol(symbolStr) ? 'SymbolId' : symbolStr;
+	}
+
 	quotePeriodChanged() {
 		this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
 		console.log(this.selQuotePeriod);
+	}
+
+	isPortfolioSymbol(mySymbol: Symbol): boolean {
+		return !mySymbol || !mySymbol.symbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
 	}
 
 	private updateSymbolData() {
@@ -159,6 +169,7 @@ export class SymbolComponent implements OnInit {
 	@Input()
 	set symbol(mySymbol: Symbol) {
 		if (mySymbol) {
+			this.selQuotePeriod = ServiceUtils.isPortfolioSymbol(mySymbol.symbol) && this.selQuotePeriod === this.quotePeriods[0] ? this.quotePeriods[1] : this.selQuotePeriod;
 			this.localSymbol = mySymbol;
 			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
 		}
