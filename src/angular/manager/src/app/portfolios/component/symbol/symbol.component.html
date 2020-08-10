@@ -22,7 +22,10 @@
 	  </mat-radio-button>
 	</mat-radio-group>
 </div>
-<div #chartContainer class="chart-container">
+<div *ngIf="!symbol" class="chart-container center-div">
+	<div i18>Please select an instrument</div>
+</div>
+<div *ngIf="symbol" #chartContainer class="chart-container">
 	<ngx-charts-line-chart	
 	  [legend]="legend"
 	  [showXAxisLabel]="showXAxisLabel"
