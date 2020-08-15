@@ -33,6 +33,9 @@ interface SymbolData {
 	low: number;
 	close: number;
 	avgVolume: number;
+	avgClose: number;
+	medianClose: number;
+	volatilityClose: number;
 }
 
 @Component({
@@ -47,7 +50,8 @@ export class SymbolComponent implements OnInit {
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
 	quotes: Quote[] = [];
-	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, open: null, start: null } as SymbolData;
+	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, 
+		open: null, start: null, avgClose: null, medianClose: null, volatilityClose: null } as SymbolData;
 	@Output()
 	loadingData = new EventEmitter<boolean>();
 	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
@@ -105,7 +109,24 @@ export class SymbolComponent implements OnInit {
 		this.symbolData.low = localQuotes && localQuotes.length > 0 ? Math.min(...localQuotes.map(quote => quote.low)) : null;
 		this.symbolData.avgVolume = localQuotes && localQuotes.length > 0 ?
 			(localQuotes.map(quote => quote.volume).reduce((result, volume) => result + volume, 0) / localQuotes.length) : null;
+		this.symbolData.avgClose = localQuotes && localQuotes.length > 0 ?
+			(localQuotes.map(quote => quote.close).reduce((result, close) => result + close, 0) / localQuotes.length) : null;
+		this.symbolData.medianClose = localQuotes && localQuotes.length > 0 ? (localQuotes.map(quote => quote.close).sort((a,b) => a-b)[Math.round(localQuotes.length / 2)]) : null;
+		this.symbolData.volatilityClose = this.calcVolatility(localQuotes); 
 		this.updateChartData();
+	}
+
+	private calcVolatility(localQuotes: Quote[]): number {
+		if(!localQuotes && localQuotes.length > 1) {
+			return null;
+		}
+		const variances = [];
+		for(let i = 1; i < localQuotes.length;i++) {
+			const myVariance = Math.log(localQuotes[i].close) - Math.log(localQuotes[i-1].close);
+			variances.push(myVariance);
+		}
+		const realizedVariance = variances.map(localVar => localVar*localVar).reduce((acc, value) => acc + value, 0);
+		return Math.sqrt(realizedVariance);
 	}
 
 	private updateChartData(): void {
