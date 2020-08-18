@@ -40,12 +40,14 @@ import ch.xxx.manager.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.dto.DailyQuoteImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.dto.HkDailyQuoteImportDto;
+import ch.xxx.manager.dto.IntraDayMetaDataImportDto;
 import ch.xxx.manager.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.entity.CurrencyEntity;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.IntraDayQuoteEntity;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
 import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.repository.CurrencyRepository;
 import ch.xxx.manager.repository.DailyQuoteRepository;
@@ -77,17 +79,23 @@ public class QuoteImportService {
 	}
 
 	public Mono<Long> importIntraDayQuotes(String symbol) {
+		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
+		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
+		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
+
 		LOGGER.info("importIntraDayQuotes() called");
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-				.flatMap(symbolEntity -> this.alphavatageConnector.getTimeseriesIntraDay(symbol)
-						.flatMap(wrapper -> this.convert(symbolEntity, wrapper))
-						.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
-						.doAfterTerminate(() -> this.intraDayQuoteRepository.findBySymbolId(symbolEntity.getId())
-								.groupBy(intraDayQuote -> intraDayQuote.getLocalDateTime().toLocalDate())
-								.flatMap(group -> group.collectList())
-								.map(groupList -> this.createIntraDayQuoteMap(groupList))
-								.map(quotesMap -> this.deleteIntraDayQuotes(this.filterNewestDay(quotesMap)))
-								.subscribe()));
+				.flatMap(symbolEntity -> (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getSource())
+						? this.alphavatageConnector.getTimeseriesIntraDay(symbol)
+						: Mono.just(intraDayWrapperImportDto)).flatMap(wrapper -> this.convert(symbolEntity, wrapper))
+								.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
+								.doAfterTerminate(() -> this.intraDayQuoteRepository
+										.findBySymbolId(symbolEntity.getId())
+										.groupBy(intraDayQuote -> intraDayQuote.getLocalDateTime().toLocalDate())
+										.flatMap(group -> group.collectList())
+										.map(groupList -> this.createIntraDayQuoteMap(groupList))
+										.map(quotesMap -> this.deleteIntraDayQuotes(this.filterNewestDay(quotesMap)))
+										.subscribe()));
 	}
 
 	private List<IntraDayQuoteEntity> filterNewestDay(Map<LocalDate, List<IntraDayQuoteEntity>> quotesMap) {
@@ -110,41 +118,72 @@ public class QuoteImportService {
 		LOGGER.info("importQuoteHistory() called");
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
 //		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.alphavatageConnector.getTimeseriesDailyHistory(symbol, true)
-//						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
+//				.flatMap(symbolEntity -> this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of())
 //						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
+
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-				.flatMap(symbolEntity -> this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of())
+				.flatMap(symbolEntity -> this.customImport(symbol, currencyMap, symbolEntity, List.of())
 						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
+	}
+
+	private Mono<? extends List<DailyQuoteEntity>> customImport(String symbol,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap, SymbolEntity symbolEntity,
+			List<DailyQuoteEntity> entities) {
+		if (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getSource())) {
+			return this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of());
+		} else if (QuoteSource.YAHOO.toString().equals(symbolEntity.getSource())) {
+			return this.yahooImport(symbol, currencyMap, symbolEntity, List.of());
+		}
+		return Mono.just(List.of());
 	}
 
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called");
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
+//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
+//				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
+//						.flatMap(entities -> alphavantageImport(symbol, currencyMap, symbolEntity, entities))
+//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
+
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
-						.flatMap(entities -> alphavantageImport(symbol, currencyMap, symbolEntity, entities))
+						.flatMap(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities))
 						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
 	}
 
 	private Mono<? extends List<DailyQuoteEntity>> yahooImport(String symbol,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> entities) {
-		return entities.isEmpty() ? this.yahooConnector.getTimeseriesDailyHistory(symbol).flatMap(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)) : null;
+		return entities.isEmpty()
+				? this.yahooConnector.getTimeseriesDailyHistory(symbol)
+						.flatMap(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
+				: this.yahooConnector.getTimeseriesDailyHistory(symbol)
+						.flatMap(
+								importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
+						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()
+								.compareTo(myDto.getLocalDay())).collect(Collectors.toList()));
 	}
-	
+
 	private Mono<List<DailyQuoteEntity>> convert(SymbolEntity symbolEntity, List<HkDailyQuoteImportDto> importDtos,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
 		List<DailyQuoteEntity> quotes = importDtos.stream()
-				.map(importDto -> this.convert(symbolEntity, importDto, currencyMap))
-				.collect(Collectors.toList());
+				.map(importDto -> this.convert(symbolEntity, importDto, currencyMap)).collect(Collectors.toList());
 		return Mono.just(quotes);
 	}
-	
-	private DailyQuoteEntity convert(SymbolEntity symbolEntity, HkDailyQuoteImportDto importDto, Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
-		return null;
+
+	private DailyQuoteEntity convert(SymbolEntity symbolEntity, HkDailyQuoteImportDto importDto,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
+		Optional<Long> currencyIdOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
+				: currencyMap.get(importDto.getDate()).stream()
+						.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
+								&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
+						.flatMap(entity -> Stream.of(entity.getId())).findFirst();
+		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), importDto.getOpen(),
+				importDto.getHigh(), importDto.getLow(), importDto.getAdjClose(), importDto.getVolume().longValue(),
+				importDto.getDate(), symbolEntity.getId(), currencyIdOpt.orElse(null));
+		return entity;
 	}
-	
+
 	private Mono<? extends List<DailyQuoteEntity>> alphavantageImport(String symbol,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> entities) {
@@ -152,11 +191,10 @@ public class QuoteImportService {
 				? this.alphavatageConnector.getTimeseriesDailyHistory(symbol, true)
 						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 				: this.alphavatageConnector.getTimeseriesDailyHistory(symbol, false)
-						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-						.map(dtos -> dtos.stream()
-								.filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()
-										.compareTo(myDto.getLocalDay()))
-								.collect(Collectors.toList()));
+						.flatMap(
+								wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
+						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()
+								.compareTo(myDto.getLocalDay())).collect(Collectors.toList()));
 	}
 
 	public Mono<Long> importFxDailyQuoteHistory(String to_currency) {
