@@ -12,15 +12,24 @@
  */
 package ch.xxx.manager.connector;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import ch.xxx.manager.dto.HkDailyQuoteImportDto;
 import reactor.core.publisher.Mono;
@@ -28,8 +37,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class YahooConnector {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
+	private CsvMapper csvMapper = new CsvMapper();
 
-	public Mono<HkDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
+	public Mono<List<HkDailyQuoteImportDto>> getTimeseriesDailyHistory(String symbol) {
 		try {
 			LocalDateTime toTime = LocalDateTime.now();
 			LocalDateTime fromTime = toTime.minusYears(10);
@@ -39,10 +49,21 @@ public class YahooConnector {
 							"https://query1.finance.yahoo.com/v7/finance/download/%s.HK?period1=%d&period2=%d&interval=1d&events=history",
 							symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 							toTime.toEpochSecond(OffsetDateTime.now().getOffset()))))
-					.retrieve().bodyToMono(HkDailyQuoteImportDto.class);
+					.retrieve().toEntity(String.class).flatMap(response -> this.convert(response.getBody()));
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.", e);
 		}
 		return Mono.empty();
+	}
+
+	private Mono<List<HkDailyQuoteImportDto>> convert(String linesStr) {
+		try {
+			MappingIterator<HkDailyQuoteImportDto> mappingIterator = csvMapper.readerFor(HkDailyQuoteImportDto.class)
+					.with(CsvSchema.emptySchema().withHeader()).readValues(linesStr);
+			return Mono.just(mappingIterator.readAll());
+		} catch (IOException e) {
+			LOGGER.error("Csv import failed.", e);
+		}
+		return Mono.just(List.of());
 	}
 }

@@ -22,7 +22,6 @@ import ch.xxx.manager.connector.HkexConnector;
 import ch.xxx.manager.connector.NasdaqConnector;
 import ch.xxx.manager.connector.XetraConnector;
 import ch.xxx.manager.dto.SymbolDto;
-import ch.xxx.manager.repository.SymbolRepository;
 import ch.xxx.manager.service.SymbolImportService;
 import ch.xxx.manager.service.SymbolService;
 import reactor.core.publisher.Flux;
