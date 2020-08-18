@@ -1,6 +1,6 @@
 create sequence mainseq start with 1000 increment by 100;
 create table appuser (id bigint identity primary key, username varchar(50), birthdate timestamp, updated_at timestamp, password varchar(255), email_address varchar(100), user_role varchar(20), locked boolean, enabled boolean, uuid varchar(50));
-create table symbol (id bigint identity primary key, symbol varchar(15) unique, name varchar(100), curr varchar(10));
+create table symbol (id bigint identity primary key, symbol varchar(15) unique, name varchar(100), curr varchar(10), source varchar(15));
 create table currency (id bigint identity primary key, local_day timestamp, from_curr varchar(10), to_curr varchar(10), open numeric(12,4), high numeric(12,4), low numeric(12,4), close numeric(12,4));
 create table daily_quote (id bigint identity primary key,symbol varchar(15), open numeric(12,4), high numeric(12,4), low numeric(12,4), close numeric(12,4), volume bigint, local_day date, symbol_id bigint, currency_id bigint, foreign key (symbol_id) references symbol(id), foreign key (currency_id) references currency(id));
 create table intra_day_quote (id bigint identity primary key, symbol varchar(15), open numeric(12,4), high numeric(12,4), low numeric(12,4), close numeric(12,4), volume bigint, local_date_time timestamp, symbol_id bigint, foreign key (symbol_id) references symbol(id));

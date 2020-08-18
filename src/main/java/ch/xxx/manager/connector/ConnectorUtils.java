@@ -14,7 +14,8 @@ package ch.xxx.manager.connector;
 
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 
-public class ConnectorUtils {
+public class ConnectorUtils {	
+	
 	public static ExchangeStrategies createLargeResponseStrategy() {
 		return ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs()

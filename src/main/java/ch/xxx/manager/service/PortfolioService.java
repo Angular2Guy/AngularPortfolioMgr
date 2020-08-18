@@ -25,7 +25,9 @@ import ch.xxx.manager.dto.SymbolDto;
 import ch.xxx.manager.entity.PortfolioEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
 import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
+
 import ch.xxx.manager.repository.PortfolioRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -144,7 +146,7 @@ public class PortfolioService {
 	}
 
 	private Flux<PortfolioToSymbolEntity> createPortfolioPtSAndSymbol(PortfolioEntity portfolioEntity) {
-		SymbolEntity symbolEntity = new SymbolEntity(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(), SymbolCurrency.EUR);
+		SymbolEntity symbolEntity = new SymbolEntity(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(), SymbolCurrency.EUR, QuoteSource.PORTFOLIO);
 		return this.symbolRepository.save(symbolEntity).flatMap(mySymbolEntity -> 
 			this.portfolioToSymbolRepository.save(this.createPtSEntity(portfolioEntity, mySymbolEntity.getId()))).flux();
 	}

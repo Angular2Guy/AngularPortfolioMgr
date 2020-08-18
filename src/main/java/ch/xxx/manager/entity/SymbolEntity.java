@@ -18,23 +18,26 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("symbol")
 public class SymbolEntity {
 	public enum SymbolCurrency { EUR, HKD, USD }
+	public enum QuoteSource { ALPHAVANTAGE, YAHOO, PORTFOLIO }
 	
 	@Id
 	private Long id;
 	private String symbol;
 	private String name;
 	private String curr;
+	private String source;
 	
 	
 	public SymbolEntity() {		
 	}
 	
-	public SymbolEntity(Long id, String symbol, String name, SymbolCurrency currency) {
+	public SymbolEntity(Long id, String symbol, String name, SymbolCurrency currency, QuoteSource quoteSource) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
 		this.curr = currency.toString();
+		this.source = quoteSource.toString();
 	}
 	
 	public Long getId() {
@@ -55,18 +58,16 @@ public class SymbolEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 	public String getCurr() {
 		return curr;
 	}
-
 	public void setCurr(String currency) {
 		this.curr = currency;
 	}
-
-	@Override
-	public String toString() {
-		return "SymbolEntity [id=" + id + ", symbol=" + symbol + ", name=" + name + ", curr=" + curr + "]";
+	public String getSource() {
+		return source;
 	}
-	
+	public void setSource(String source) {
+		this.source = source;
+	}
 }
