@@ -34,7 +34,7 @@ public class HkDailyQuoteImportDto {
 	@JsonProperty("Adj Close")
 	private BigDecimal adjClose;
 	@JsonProperty("Volume")
-	private BigDecimal volume;
+	private Long volume;
 	
 	public LocalDate getDate() {
 		return date;
@@ -72,11 +72,16 @@ public class HkDailyQuoteImportDto {
 	public void setAdjClose(BigDecimal adjClose) {
 		this.adjClose = adjClose;
 	}
-	public BigDecimal getVolume() {
+	public Long getVolume() {
 		return volume;
 	}
-	public void setVolume(BigDecimal volume) {
+	public void setVolume(Long volume) {
 		this.volume = volume;
+	}
+	@Override
+	public String toString() {
+		return "HkDailyQuoteImportDto [date=" + date + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
+				+ close + ", adjClose=" + adjClose + ", volume=" + volume + "]";
 	}
 	
 }

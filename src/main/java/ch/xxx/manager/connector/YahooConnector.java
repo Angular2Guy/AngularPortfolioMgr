@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.xxx.manager.dto.HkDailyQuoteImportDto;
 import reactor.core.publisher.Mono;
@@ -35,6 +38,11 @@ import reactor.core.publisher.Mono;
 public class YahooConnector {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private CsvMapper csvMapper = new CsvMapper();
+	
+	@PostConstruct
+	public void init() {
+		this.csvMapper.registerModule(new JavaTimeModule());
+	}
 
 	public Mono<List<HkDailyQuoteImportDto>> getTimeseriesDailyHistory(String symbol) {
 		try {

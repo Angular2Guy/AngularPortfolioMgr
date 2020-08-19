@@ -167,6 +167,7 @@ public class QuoteImportService {
 	private Mono<List<DailyQuoteEntity>> convert(SymbolEntity symbolEntity, List<HkDailyQuoteImportDto> importDtos,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
 		List<DailyQuoteEntity> quotes = importDtos.stream()
+				.filter(myImportDto -> myImportDto.getAdjClose() != null && myImportDto.getVolume() != null)
 				.map(importDto -> this.convert(symbolEntity, importDto, currencyMap)).collect(Collectors.toList());
 		return Mono.just(quotes);
 	}
@@ -178,9 +179,11 @@ public class QuoteImportService {
 						.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
 								&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
 						.flatMap(entity -> Stream.of(entity.getId())).findFirst();
+		LOGGER.info(importDto.toString());
 		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), importDto.getOpen(),
-				importDto.getHigh(), importDto.getLow(), importDto.getAdjClose(), importDto.getVolume().longValue(),
-				importDto.getDate(), symbolEntity.getId(), currencyIdOpt.orElse(null));
+				importDto.getHigh(), importDto.getLow(), importDto.getAdjClose(),
+				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
+				symbolEntity.getId(), currencyIdOpt.orElse(null));
 		return entity;
 	}
 
