@@ -119,6 +119,7 @@ public class PortfolioCalculationService {
 						tuple.getB(), tuple3.getB().get(tuple.getB().getSymbolId()))))
 				.flatMap(quotesTuple -> Stream.of(quotesTuple.getB().stream()
 						.filter(ServiceUtils.distinctByKey(myQuote -> "" + myQuote.getLocalDay()))
+						.filter(myQuote -> tuple3.getC().containsKey(myQuote.getLocalDay()))
 						.filter(quote -> quote.getLocalDay().compareTo(quotesTuple.getA().getChangedAt()) > -1
 								&& (quotesTuple.getA().getRemovedAt() == null
 										|| quote.getLocalDay().isBefore(quotesTuple.getA().getRemovedAt())))

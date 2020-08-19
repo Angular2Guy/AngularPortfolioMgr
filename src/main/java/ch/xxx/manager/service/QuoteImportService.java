@@ -179,7 +179,7 @@ public class QuoteImportService {
 						.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
 								&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
 						.flatMap(entity -> Stream.of(entity.getId())).findFirst();
-		LOGGER.info(importDto.toString());
+//		LOGGER.info(importDto.toString());
 		DailyQuoteEntity entity = new DailyQuoteEntity(null, symbolEntity.getSymbol(), importDto.getOpen(),
 				importDto.getHigh(), importDto.getLow(), importDto.getAdjClose(),
 				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
@@ -215,6 +215,7 @@ public class QuoteImportService {
 
 	private List<CurrencyEntity> convert(DailyFxWrapperImportDto wrapperDto,
 			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
+//		LOGGER.info(wrapperDto.getDailyQuotes().get(LocalDate.of(2014, 12, 29)).getClose());
 		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, SymbolCurrency.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						SymbolCurrency.valueOf(wrapperDto.getMetadata().getToSymbol()))))
