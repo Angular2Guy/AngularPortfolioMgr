@@ -22,7 +22,7 @@
 	  aria-labelledby="my-radio-group-label"
 	  class="my-radio-group" (change)="quotePeriodChanged()"
 	  [(ngModel)]="selQuotePeriod">
-	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod" [disabled]="myQuotePeriod.quotePeriodKey === quotePeriodKeyDay && isPortfolioSymbol(symbol)">
+	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod" [disabled]="!isIntraDayDataAvailiable(symbol) && myQuotePeriod.quotePeriodKey === quotePeriodKeyDay">
 	    {{myQuotePeriod.periodText}}
 	  </mat-radio-button>
 	</mat-radio-group>

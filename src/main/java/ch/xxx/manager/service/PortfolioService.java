@@ -113,7 +113,7 @@ public class PortfolioService {
 	private Mono<PortfolioDto> updatePortfolioDto(PortfolioToSymbolEntity entity, SymbolEntity symbolEntity,
 			PortfolioDto dto) {
 		SymbolDto symbolDto = new SymbolDto(symbolEntity.getId(), symbolEntity.getSymbol(), symbolEntity.getName(),
-				entity.getChangedAt(), entity.getRemovedAt());
+				entity.getChangedAt(), entity.getRemovedAt(), symbolEntity.getSource());
 		symbolDto.setWeight(entity.getWeight());
 		dto.getSymbols().add(symbolDto);
 		return Mono.just(dto);

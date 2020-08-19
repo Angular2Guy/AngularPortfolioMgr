@@ -17,4 +17,5 @@ export interface Symbol {
 	weight?: number;
 	changedAt: string;
 	removedAt?: string;
+	source: string;
 }

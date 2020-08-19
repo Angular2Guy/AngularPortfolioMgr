@@ -18,11 +18,14 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
+
 public class SymbolDto {
 	private Long id;
 	private String symbol;
 	private String name;
 	private Long weight;
+	private String source;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime changedAt;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
@@ -32,11 +35,12 @@ public class SymbolDto {
 		
 	}
 	
-	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt) {
+	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
+		this.source = source;
 		this.changedAt = changedAt == null ? null : LocalDateTime.of(changedAt, LocalTime.now());
 		this.removedAt = removedAt == null ? null : LocalDateTime.of(removedAt, LocalTime.now());
 	}
@@ -82,6 +86,14 @@ public class SymbolDto {
 
 	public void setWeight(Long weight) {
 		this.weight = weight;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 	
 }

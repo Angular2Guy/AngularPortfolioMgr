@@ -93,8 +93,9 @@ export class SymbolComponent implements OnInit {
 		console.log(this.selQuotePeriod);
 	}
 
-	isPortfolioSymbol(mySymbol: Symbol): boolean {
-		return !mySymbol || !mySymbol.symbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
+	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
+		console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
+		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
 	}
 
 	private updateSymbolData() {
@@ -118,7 +119,7 @@ export class SymbolComponent implements OnInit {
 
 	private calcVolatility(localQuotes: Quote[]): number {
 		if(!localQuotes && localQuotes.length > 1) {
-			return null;
+			return 0;
 		}
 		const variances = [];
 		for(let i = 1; i < localQuotes.length;i++) {
@@ -190,7 +191,7 @@ export class SymbolComponent implements OnInit {
 	@Input()
 	set symbol(mySymbol: Symbol) {
 		if (mySymbol) {
-			this.selQuotePeriod = ServiceUtils.isPortfolioSymbol(mySymbol.symbol) && this.selQuotePeriod === this.quotePeriods[0] ? this.quotePeriods[1] : this.selQuotePeriod;
+			this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol) && this.selQuotePeriod === this.quotePeriods[0] ? this.quotePeriods[1] : this.selQuotePeriod;
 			this.localSymbol = mySymbol;
 			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
 		}

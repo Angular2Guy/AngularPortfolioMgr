@@ -10,10 +10,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+import { Symbol } from './symbol';
+
+enum QuoteSource { ALPHAVANTAGE = 'ALPHAVANTAGE', YAHOO = 'YAHOO', PORTFOLIO = 'PORTFOLIO' }
+
 export class ServiceUtils {
 	public static readonly PORTFOLIO_MARKER = "äüè";
+	public static readonly QuoteSource = QuoteSource;
 	
 	public static isPortfolioSymbol(symbolStr: string): boolean {
 		return symbolStr.includes(ServiceUtils.PORTFOLIO_MARKER);
+	}
+	
+	public static isIntraDayDataAvailiable(symbol: Symbol): boolean {
+		return symbol && symbol.source && symbol.source === QuoteSource.ALPHAVANTAGE;
 	}
 }
