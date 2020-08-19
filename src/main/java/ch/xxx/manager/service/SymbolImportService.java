@@ -118,7 +118,7 @@ public class SymbolImportService {
 		String cutSymbol = dto.getSymbol().trim().length() > 4
 				? dto.getSymbol().trim().substring(dto.getSymbol().length() - 4)
 				: dto.getSymbol().trim();
-		return Flux.just(new SymbolEntity(null, String.format("%s", cutSymbol), dto.getName(), SymbolCurrency.HKD, QuoteSource.YAHOO));
+		return Flux.just(new SymbolEntity(null, String.format("%s.HK", cutSymbol), dto.getName(), SymbolCurrency.HKD, QuoteSource.YAHOO));
 	}
 
 	private boolean filter(HkSymbolImportDto dto) {

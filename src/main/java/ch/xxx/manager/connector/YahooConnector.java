@@ -51,7 +51,7 @@ public class YahooConnector {
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
 					.get()
 					.uri(new URI(String.format(
-							"https://query1.finance.yahoo.com/v7/finance/download/%s.HK?period1=%d&period2=%d&interval=1d&events=history",
+							"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
 							symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 							toTime.toEpochSecond(OffsetDateTime.now().getOffset()))))
 					.retrieve().toEntity(String.class).flatMap(response -> this.convert(response.getBody()));
