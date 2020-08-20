@@ -18,10 +18,12 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -108,6 +110,7 @@ public class PortfolioCalculationService {
 
 	private List<DailyQuoteEntity> updatePortfolioSymbol(
 			Tuple3<Map<Long, PortfolioAndSymbolEntity>, Map<Long, Collection<DailyQuoteEntity>>, Map<LocalDate, Collection<CurrencyEntity>>> tuple3) {
+		final Set<LocalDate> blockedDates = new HashSet<>();
 		Optional<PortfolioAndSymbolEntity> pAndSymEntityOpt = tuple3.getA().values().stream()
 				.filter(symbolEntity -> symbolEntity.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).findFirst();
 		Optional<List<Tuple3<Long, LocalDate, BigDecimal>>> reduceOpt = tuple3.getA().entrySet().stream()
@@ -119,10 +122,17 @@ public class PortfolioCalculationService {
 						tuple.getB(), tuple3.getB().get(tuple.getB().getSymbolId()))))
 				.flatMap(quotesTuple -> Stream.of(quotesTuple.getB().stream()
 						.filter(ServiceUtils.distinctByKey(myQuote -> "" + myQuote.getLocalDay()))
-						.filter(myQuote -> tuple3.getC().containsKey(myQuote.getLocalDay()))
 						.filter(quote -> quote.getLocalDay().compareTo(quotesTuple.getA().getChangedAt()) > -1
 								&& (quotesTuple.getA().getRemovedAt() == null
 										|| quote.getLocalDay().isBefore(quotesTuple.getA().getRemovedAt())))
+						.filter(myQuote -> { 
+							if(myQuote.getClose() == null || quotesTuple.getA().getWeight() == null || this.findCurrencyByDateAndQuote(myQuote, tuple3.getC(),
+									myQuote.getLocalDay(), tuple3.getA()).isEmpty() ) {
+								blockedDates.add(myQuote.getLocalDay());
+							}
+							return true;
+						})
+						.filter(myQuote -> blockedDates.contains(myQuote.getLocalDay()))
 						.flatMap(quote -> Stream
 								.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(), quote.getLocalDay(),
 										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA().getWeight(),
