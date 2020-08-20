@@ -118,7 +118,7 @@ export class SymbolComponent implements OnInit {
 	}
 
 	private calcVolatility(localQuotes: Quote[]): number {
-		if(!localQuotes && localQuotes.length > 1) {
+		if(!localQuotes || localQuotes.length < 1) {
 			return 0;
 		}
 		const variances = [];
@@ -150,7 +150,7 @@ export class SymbolComponent implements OnInit {
 		if (selPeriod === QuotePeriodKey.Day) {
 			this.loadingData.emit(true);
 			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
-				.subscribe(myQuotes => {
+				.subscribe(myQuotes => {										
 					this.quotes = myQuotes;
 					this.updateSymbolData();
 					this.loadingData.emit(false);
