@@ -13,7 +13,9 @@
 package ch.xxx.manager.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +37,7 @@ import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @Transactional
@@ -48,6 +51,8 @@ public class SymbolImportService {
 	private SymbolRepository repository;
 	@Autowired
 	private XetraConnector xetraConnector;
+	@Autowired
+	private QuoteImportService quoteImportService;
 	private List<SymbolEntity> allSymbolEntities = new ArrayList<>();
 
 	@PostConstruct
@@ -101,10 +106,18 @@ public class SymbolImportService {
 			symbolStrs = Flux.just(ComparisonIndexes.SP500.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol(),
 					ComparisonIndexes.MSCI_CHINA.getSymbol());
 		}
+		final Set<String> symbolStrsToImport = new HashSet<>();
 		return symbolStrs
 				.filter(symbolStr -> Stream.of(ComparisonIndexes.values()).map(ComparisonIndexes::getSymbol)
 						.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
-				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).count().doAfterTerminate(() -> this.init());
+				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
+					symbolStrsToImport.add(entity.getSymbol());
+					return entity;
+				}).count().doAfterTerminate(() -> {
+					this.init();
+					symbolStrsToImport.forEach(mySymbolStr -> this.quoteImportService
+							.importUpdateDailyQuotes(mySymbolStr).subscribeOn(Schedulers.elastic()));
+				});
 	}
 
 	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol) {
