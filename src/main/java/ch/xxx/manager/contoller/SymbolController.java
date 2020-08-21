@@ -22,6 +22,7 @@ import ch.xxx.manager.connector.HkexConnector;
 import ch.xxx.manager.connector.NasdaqConnector;
 import ch.xxx.manager.connector.XetraConnector;
 import ch.xxx.manager.dto.SymbolDto;
+import ch.xxx.manager.service.ComparisonIndexes;
 import ch.xxx.manager.service.SymbolImportService;
 import ch.xxx.manager.service.SymbolService;
 import reactor.core.publisher.Flux;
@@ -54,6 +55,12 @@ public class SymbolController {
 	@GetMapping("/importde/all")
 	public Mono<Long> importDeSymbols() {
 		return this.importService.importDeSymbols(this.xetraConnector.importXetraSymbols());
+	}
+
+	@GetMapping("/importindex/all")
+	public Mono<Long> importIndexSymbols() {
+		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndexes.EUROSTOXX50.getSymbol(),
+				ComparisonIndexes.MSCI_CHINA.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol()));
 	}
 
 	@GetMapping("/all")

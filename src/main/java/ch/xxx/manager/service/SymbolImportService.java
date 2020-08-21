@@ -62,6 +62,7 @@ public class SymbolImportService {
 		this.importUsSymbols(null).subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
 		this.importHkSymbols(null).subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
 		this.importDeSymbols(null).subscribe(count -> LOGGER.info("Import of {} de symbols finished.", count));
+		this.importReferenceIndexes(null).subscribe(count -> LOGGER.info("Import of {} index symbols finished.", count));
 	}
 
 	public Mono<Long> importUsSymbols(Flux<String> nasdaq) {
