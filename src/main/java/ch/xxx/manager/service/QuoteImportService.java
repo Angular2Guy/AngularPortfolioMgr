@@ -117,10 +117,6 @@ public class QuoteImportService {
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called");
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
-//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of())
-//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
-
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.customImport(symbol, currencyMap, symbolEntity, List.of())
 						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
@@ -140,11 +136,6 @@ public class QuoteImportService {
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called");
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
-//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
-//						.flatMap(entities -> alphavantageImport(symbol, currencyMap, symbolEntity, entities))
-//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
-
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
 						.flatMap(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities))

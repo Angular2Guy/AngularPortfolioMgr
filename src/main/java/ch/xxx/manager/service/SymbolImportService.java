@@ -14,6 +14,7 @@ package ch.xxx.manager.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -48,11 +49,11 @@ public class SymbolImportService {
 	@Autowired
 	private XetraConnector xetraConnector;
 	private List<SymbolEntity> allSymbolEntities = new ArrayList<>();
-	
+
 	@PostConstruct
-	public void init() {		
+	public void init() {
 		this.repository.findAll().collectList().subscribe(symbolEnities -> {
-			this.allSymbolEntities = symbolEnities;	
+			this.allSymbolEntities = symbolEnities;
 		});
 	}
 
@@ -64,33 +65,28 @@ public class SymbolImportService {
 	}
 
 	public Mono<Long> importUsSymbols(Flux<String> nasdaq) {
-		if(nasdaq != null) {
+		if (nasdaq != null) {
 			return nasdaq.filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-					.flatMap(entity -> this.replaceEntity(entity)).count()
-					.doAfterTerminate(() -> this.init());
+					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
 		}
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity)).count()
-				.doAfterTerminate(() -> this.init());
+				.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importHkSymbols(Flux<HkSymbolImportDto> hkex) {
-		if(hkex != null) {
+		if (hkex != null) {
 			return hkex.filter(this::filter).flatMap(myDto -> this.convert(myDto))
-					.flatMap(entity -> this.replaceEntity(entity)).count()
-					.doAfterTerminate(() -> this.init());
+					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
 		}
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.replaceEntity(entity)).count()
-				.doAfterTerminate(() -> this.init());
+				.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importDeSymbols(Flux<String> xetra) {
-		if(xetra != null) {
-			return xetra.filter(this::filter).filter(this::filterXetra)
-					.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
-					.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count()
-					.doAfterTerminate(() -> this.init());
+		if (xetra != null) {
+			return xetra.filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
+					.groupBy(SymbolEntity::getSymbol).flatMap(group -> group.reduce((a, b) -> a))
+					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
 		}
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
@@ -98,12 +94,32 @@ public class SymbolImportService {
 				.doAfterTerminate(() -> this.init());
 	}
 
+	public Mono<Long> importReferenceIndexes(Flux<String> symbolStrs) {
+		if (symbolStrs == null) {
+			symbolStrs = Flux.just(ComparisonIndexes.SP500.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol(),
+					ComparisonIndexes.MSCI_CHINA.getSymbol());
+		}
+		symbolStrs
+				.filter(symbolStr -> Stream.of(ComparisonIndexes.values()).map(ComparisonIndexes::getSymbol)
+						.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
+				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol));
+		return Mono.empty();
+	}
+
+	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol) {
+		ComparisonIndexes compIndex = Stream.of(ComparisonIndexes.values())
+				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()
+				.orElseThrow(() -> new RuntimeException("Unknown indexSymbol: " + indexSymbol));
+		SymbolEntity symbolEntity = new SymbolEntity(null, compIndex.getSymbol(), compIndex.getName(),
+				compIndex.getCurrency(), compIndex.getSource());
+		return this.replaceEntity(symbolEntity);
+	}
+
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
 		return Flux.fromIterable(this.allSymbolEntities)
 				.filter(filterEntity -> filterEntity.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
-						.switchIfEmpty(Mono.just(entity))
-						.flatMap(localEntity -> this.updateEntity(localEntity, entity))
-						.flatMap(myEntity -> this.repository.save(myEntity)).single();
+				.switchIfEmpty(Mono.just(entity)).flatMap(localEntity -> this.updateEntity(localEntity, entity))
+				.flatMap(myEntity -> this.repository.save(myEntity)).single();
 	}
 
 	private Mono<SymbolEntity> updateEntity(SymbolEntity dbEntity, SymbolEntity importEntity) {
@@ -118,7 +134,8 @@ public class SymbolImportService {
 		String cutSymbol = dto.getSymbol().trim().length() > 4
 				? dto.getSymbol().trim().substring(dto.getSymbol().length() - 4)
 				: dto.getSymbol().trim();
-		return Flux.just(new SymbolEntity(null, String.format("%s.HK", cutSymbol), dto.getName(), SymbolCurrency.HKD, QuoteSource.YAHOO));
+		return Flux.just(new SymbolEntity(null, String.format("%s.HK", cutSymbol), dto.getName(), SymbolCurrency.HKD,
+				QuoteSource.YAHOO));
 	}
 
 	private boolean filter(HkSymbolImportDto dto) {
@@ -145,7 +162,8 @@ public class SymbolImportService {
 		String symbol = String.format("%s.DEX",
 				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		SymbolEntity entity = new SymbolEntity(null, symbol,
-				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100), SymbolCurrency.EUR, QuoteSource.ALPHAVANTAGE);
+				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100), SymbolCurrency.EUR,
+				QuoteSource.ALPHAVANTAGE);
 		return Mono.just(entity);
 	}
 
@@ -153,7 +171,8 @@ public class SymbolImportService {
 		String[] strParts = symbolLine.split("\\|");
 		SymbolEntity entity = new SymbolEntity(null,
 				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15),
-				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100), SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE);
+				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100), SymbolCurrency.USD,
+				QuoteSource.ALPHAVANTAGE);
 		return Mono.just(entity);
 	}
 }
