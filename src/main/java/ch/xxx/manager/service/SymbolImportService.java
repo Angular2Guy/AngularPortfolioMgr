@@ -62,7 +62,8 @@ public class SymbolImportService {
 		this.importUsSymbols(null).subscribe(count -> LOGGER.info("Import of {} us symbols finished.", count));
 		this.importHkSymbols(null).subscribe(count -> LOGGER.info("Import of {} hk symbols finished.", count));
 		this.importDeSymbols(null).subscribe(count -> LOGGER.info("Import of {} de symbols finished.", count));
-		this.importReferenceIndexes(null).subscribe(count -> LOGGER.info("Import of {} index symbols finished.", count));
+		this.importReferenceIndexes(null)
+				.subscribe(count -> LOGGER.info("Import of {} index symbols finished.", count));
 	}
 
 	public Mono<Long> importUsSymbols(Flux<String> nasdaq) {
@@ -100,11 +101,10 @@ public class SymbolImportService {
 			symbolStrs = Flux.just(ComparisonIndexes.SP500.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol(),
 					ComparisonIndexes.MSCI_CHINA.getSymbol());
 		}
-		symbolStrs
+		return symbolStrs
 				.filter(symbolStr -> Stream.of(ComparisonIndexes.values()).map(ComparisonIndexes::getSymbol)
 						.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
-				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol));
-		return Mono.empty();
+				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).count().doAfterTerminate(() -> this.init());
 	}
 
 	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol) {
