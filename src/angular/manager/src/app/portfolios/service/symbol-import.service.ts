@@ -30,4 +30,8 @@ export class SymbolImportService {
   getSymbolImportDe(): Observable<number> {
 	return this.http.get<number>('/rest/symbol/importde/all');
   }
+  
+  getIndexSymbols(): Observable<number> {
+	return this.http.get<number>('/rest/symbol/importindex/all');
+  }
 }

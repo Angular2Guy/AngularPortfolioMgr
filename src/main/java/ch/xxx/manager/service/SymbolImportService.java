@@ -15,6 +15,7 @@ package ch.xxx.manager.service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -59,6 +60,7 @@ public class SymbolImportService {
 	public void init() {
 		this.repository.findAll().collectList().subscribe(symbolEnities -> {
 			this.allSymbolEntities = symbolEnities;
+			LOGGER.info("{} symbols updated.", symbolEnities.size());
 		});
 	}
 
@@ -72,65 +74,72 @@ public class SymbolImportService {
 	}
 
 	public Mono<Long> importUsSymbols(Flux<String> nasdaq) {
+		LOGGER.info("importUsSymbols() called.");
 		if (nasdaq != null) {
 			return nasdaq.filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
+					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count().doAfterTerminate(() -> this.init());
 		}
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
+				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count().doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importHkSymbols(Flux<HkSymbolImportDto> hkex) {
+		LOGGER.info("importHkSymbols() called.");
 		if (hkex != null) {
 			return hkex.filter(this::filter).flatMap(myDto -> this.convert(myDto))
-					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
+					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count().doAfterTerminate(() -> this.init());
 		}
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
+				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count().doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importDeSymbols(Flux<String> xetra) {
+		LOGGER.info("importDeSymbols() called.");
 		if (xetra != null) {
 			return xetra.filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
 					.groupBy(SymbolEntity::getSymbol).flatMap(group -> group.reduce((a, b) -> a))
-					.flatMap(entity -> this.replaceEntity(entity)).count().doAfterTerminate(() -> this.init());
+					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count().doAfterTerminate(() -> this.init());
 		}
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
-				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity)).count()
+				.flatMap(group -> group.reduce((a, b) -> a)).flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
 				.doAfterTerminate(() -> this.init());
 	}
 
 	public Mono<Long> importReferenceIndexes(Flux<String> symbolStrs) {
+		LOGGER.info("importReferenceIndexes() called.");
 		if (symbolStrs == null) {
 			symbolStrs = Flux.just(ComparisonIndexes.SP500.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol(),
 					ComparisonIndexes.MSCI_CHINA.getSymbol());
 		}
+		final Flux<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
-		return symbolStrs
+		final List<SymbolEntity> availiableSymbolEntities = new ArrayList<>();
+		return this.repository.findAll().collectList().flux()
+				.flatMap(symbolEntities -> { availiableSymbolEntities.addAll(symbolEntities); return localSymbolStrs; })
 				.filter(symbolStr -> Stream.of(ComparisonIndexes.values()).map(ComparisonIndexes::getSymbol)
 						.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
-				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
-					symbolStrsToImport.add(entity.getSymbol());
+				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol, availiableSymbolEntities)).map(entity -> {
+					symbolStrsToImport.add(entity.getSymbol());					
 					return entity;
 				}).count().doAfterTerminate(() -> {
 					this.init();
 					symbolStrsToImport.forEach(mySymbolStr -> this.quoteImportService
-							.importUpdateDailyQuotes(mySymbolStr).subscribeOn(Schedulers.elastic()));
+							.importUpdateDailyQuotes(mySymbolStr).subscribeOn(Schedulers.elastic()).subscribe());
 				});
 	}
 
-	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol) {
+	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol, List<SymbolEntity> availiableSymbolEntities) {
 		ComparisonIndexes compIndex = Stream.of(ComparisonIndexes.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()
 				.orElseThrow(() -> new RuntimeException("Unknown indexSymbol: " + indexSymbol));
 		SymbolEntity symbolEntity = new SymbolEntity(null, compIndex.getSymbol(), compIndex.getName(),
 				compIndex.getCurrency(), compIndex.getSource());
-		return this.replaceEntity(symbolEntity);
+		return this.replaceEntity(symbolEntity, Optional.of(availiableSymbolEntities));
 	}
 
-	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity) {
-		return Flux.fromIterable(this.allSymbolEntities)
+	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity, Optional<List<SymbolEntity>> availiableSymbolEntitiesOpt) {
+		return Flux.fromIterable(availiableSymbolEntitiesOpt.isEmpty() ? this.allSymbolEntities : availiableSymbolEntitiesOpt.get())
 				.filter(filterEntity -> filterEntity.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
 				.switchIfEmpty(Mono.just(entity)).flatMap(localEntity -> this.updateEntity(localEntity, entity))
 				.flatMap(myEntity -> this.repository.save(myEntity)).single();

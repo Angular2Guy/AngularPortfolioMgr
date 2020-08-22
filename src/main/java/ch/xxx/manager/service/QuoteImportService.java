@@ -83,7 +83,7 @@ public class QuoteImportService {
 		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
 		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
 
-		LOGGER.info("importIntraDayQuotes() called");
+		LOGGER.info("importIntraDayQuotes() called for symbol: {}", symbol);
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getSource())
 						? this.alphavatageConnector.getTimeseriesIntraDay(symbol)
@@ -115,7 +115,7 @@ public class QuoteImportService {
 	}
 
 	public Mono<Long> importDailyQuoteHistory(String symbol) {
-		LOGGER.info("importQuoteHistory() called");
+		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.customImport(symbol, currencyMap, symbolEntity, List.of())
@@ -134,7 +134,7 @@ public class QuoteImportService {
 	}
 
 	public Mono<Long> importUpdateDailyQuotes(String symbol) {
-		LOGGER.info("importNewDailyQuotes() called");
+		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<CurrencyEntity>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
 				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
@@ -192,7 +192,7 @@ public class QuoteImportService {
 	}
 
 	public Mono<Long> importFxDailyQuoteHistory(String to_currency) {
-		LOGGER.info("importFxDailyQuoteHistory() called");
+		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
 		return this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
 				.flatMap(currencyMap -> this.alphavatageConnector.getFxTimeseriesDailyHistory(to_currency, true)
 						.flatMap(wrapper -> this.currencyRepository.saveAll(this.convert(wrapper, currencyMap))

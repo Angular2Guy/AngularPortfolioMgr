@@ -59,7 +59,7 @@ public class SymbolController {
 
 	@GetMapping("/importindex/all")
 	public Mono<Long> importIndexSymbols() {
-		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndexes.EUROSTOXX50.getSymbol(),
+		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndexes.SP500.getSymbol(),
 				ComparisonIndexes.MSCI_CHINA.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol()));
 	}
 

@@ -100,11 +100,12 @@ export class OverviewComponent implements OnInit {
 	forkJoin(
 		this.symbolImportService.getSymbolImportUs(),
 		this.symbolImportService.getSymbolImportHk(),
-		this.symbolImportService.getSymbolImportDe(),
+		this.symbolImportService.getSymbolImportDe(),		
 		this.quoteImportService.importFxDailyQuotes('USD'),
 		this.quoteImportService.importFxDailyQuotes('HKD'))
 		.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => { 
 			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
+			this.symbolImportService.getIndexSymbols().subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`));
 			this.importingSymbols = false;
 		});
   }
