@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -54,12 +55,13 @@ public class SymbolImportService {
 	private XetraConnector xetraConnector;
 	@Autowired
 	private QuoteImportService quoteImportService;
-	private List<SymbolEntity> allSymbolEntities = new ArrayList<>();
+	private AtomicReference<List<SymbolEntity>> allSymbolEntities = new AtomicReference<List<SymbolEntity>>(
+			new ArrayList<>());
 
 	@PostConstruct
 	public void init() {
 		this.repository.findAll().collectList().subscribe(symbolEnities -> {
-			this.allSymbolEntities = symbolEnities;
+			this.allSymbolEntities.set(symbolEnities);
 			LOGGER.info("{} symbols updated.", symbolEnities.size());
 		});
 	}
@@ -149,7 +151,7 @@ public class SymbolImportService {
 	private Mono<SymbolEntity> replaceEntity(SymbolEntity entity,
 			Optional<List<SymbolEntity>> availiableSymbolEntitiesOpt) {
 		return Flux
-				.fromIterable(availiableSymbolEntitiesOpt.isEmpty() ? this.allSymbolEntities
+				.fromIterable(availiableSymbolEntitiesOpt.isEmpty() ? this.allSymbolEntities.get()
 						: availiableSymbolEntitiesOpt.get())
 				.filter(filterEntity -> filterEntity.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
 				.switchIfEmpty(Mono.just(entity)).flatMap(localEntity -> this.updateEntity(localEntity, entity))
