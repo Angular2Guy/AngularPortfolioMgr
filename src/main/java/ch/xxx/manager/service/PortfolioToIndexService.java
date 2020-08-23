@@ -12,6 +12,30 @@
  */
 package ch.xxx.manager.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ch.xxx.manager.repository.DailyQuoteRepository;
+import ch.xxx.manager.repository.PortfolioToSymbolRepository;
+import ch.xxx.manager.repository.SymbolRepository;
+import reactor.core.publisher.Flux;
+
+@Service
 public class PortfolioToIndexService {
-	
+	@Autowired
+	private PortfolioToSymbolRepository portfolioToSymbolRepository;
+	@Autowired
+	private SymbolRepository symbolRepository;
+	@Autowired
+	private DailyQuoteRepository dailyQuoteRepository;
+
+	public Flux<Long> calculateIndexComparison(Long portfolioId) {
+		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
+				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
+//		this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).filter(portfolioToSymbolEntity -> portfolioToSymbolEntity.get)
+		return Flux.empty();
+	}
 }

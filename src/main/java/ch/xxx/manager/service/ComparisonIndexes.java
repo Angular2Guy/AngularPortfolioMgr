@@ -1,6 +1,3 @@
-package ch.xxx.manager.service;
-
-import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
 /**
  *    Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +10,10 @@ import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+package ch.xxx.manager.service;
 import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
+
+import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
 
 public enum ComparisonIndexes {
 	SP500("IVV", "S&P 500 ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE),

@@ -20,12 +20,31 @@ import java.util.function.Predicate;
 
 public class ServiceUtils {
 	public final static String PORTFOLIO_MARKER = "äüè";
+
+	public enum RefMarker {
+		US_REF_MARKER("öüà"), EUROPE_REF_MARKER("üäé"), CHINA_REF_MARKER("àöü");
+
+		private String marker;
+
+		private RefMarker(String marker) {
+			this.marker = marker;
+		}
+
+		public String getMarker() {
+			return this.marker;
+		}
+	};
+
 	private final static int SYMBOL_LENGTH = 15;
-	
+
+	public static String generateRandomRefMarkerSymbol(RefMarker refMarker) {
+		return generateRandomString(SYMBOL_LENGTH - refMarker.getMarker().length()) + refMarker.getMarker();
+	}
+
 	public static String generateRandomPortfolioSymbol() {
 		return generateRandomString(SYMBOL_LENGTH - PORTFOLIO_MARKER.length()) + PORTFOLIO_MARKER;
 	}
-	
+
 	public static String generateRandomString(long length) {
 		int leftLimit = 48; // numeral '0'
 		int rightLimit = 122; // letter 'z'
