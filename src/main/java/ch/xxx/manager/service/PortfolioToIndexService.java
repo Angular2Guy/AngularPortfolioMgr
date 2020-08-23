@@ -38,17 +38,21 @@ public class PortfolioToIndexService {
 	public Mono<List<Long>> calculateIndexComparison(Long portfolioId) {
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
 				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
-		return this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
-				.flatMap(ptsEntities -> this.symbolRepository
-						.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).collect(Collectors
-								.toList()))
-						.filter(symbolEntity -> refMarkerStrs.stream()
-								.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
-						.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbol(symbolEntity.getSymbol())
-								.collectList().flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities,
-										symbolEntity, dailyQuoteEntities))
-								.flux())
-						.collectList());
+		return this.portfolioToSymbolRepository
+				.findByPortfolioId(
+						portfolioId)
+				.collectList().flatMap(
+						ptsEntities -> this.symbolRepository
+								.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
+										.collect(Collectors.toList()))
+								.filter(symbolEntity -> refMarkerStrs.stream().anyMatch(
+										refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
+								.flatMap(symbolEntity -> this.dailyQuoteRepository
+										.findBySymbol(symbolEntity.getSymbol()).collectList()
+										.flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities, symbolEntity,
+												dailyQuoteEntities))
+										.flux())
+								.collectList());
 	}
 
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
