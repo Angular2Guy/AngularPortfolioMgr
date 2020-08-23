@@ -24,6 +24,7 @@ import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -35,7 +36,7 @@ public class PortfolioToIndexService {
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
 
-	public Mono<List<Long>> calculateIndexComparison(Long portfolioId) {
+	public Flux<Long> calculateIndexComparison(Long portfolioId) {
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
 				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
 		return this.portfolioToSymbolRepository
@@ -52,7 +53,7 @@ public class PortfolioToIndexService {
 										.flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities, symbolEntity,
 												dailyQuoteEntities))
 										.flux())
-								.collectList());
+								.collectList()).flatMapMany(Flux::fromIterable);
 	}
 
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
