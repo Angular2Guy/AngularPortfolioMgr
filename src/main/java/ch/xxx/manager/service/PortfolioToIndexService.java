@@ -18,10 +18,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.entity.DailyQuoteEntity;
+import ch.xxx.manager.entity.PortfolioToSymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class PortfolioToIndexService {
@@ -32,10 +35,24 @@ public class PortfolioToIndexService {
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
 
-	public Flux<Long> calculateIndexComparison(Long portfolioId) {
+	public Mono<List<Long>> calculateIndexComparison(Long portfolioId) {
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
 				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
-//		this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).filter(portfolioToSymbolEntity -> portfolioToSymbolEntity.get)
-		return Flux.empty();
+		return this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
+				.flatMap(ptsEntities -> this.symbolRepository
+						.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).collect(Collectors
+								.toList()))
+						.filter(symbolEntity -> refMarkerStrs.stream()
+								.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
+						.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbol(symbolEntity.getSymbol())
+								.collectList().flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities,
+										symbolEntity, dailyQuoteEntities))
+								.flux())
+						.collectList());
+	}
+
+	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
+			List<DailyQuoteEntity> dailyQuoteEntities) {
+		return Mono.empty();
 	}
 }
