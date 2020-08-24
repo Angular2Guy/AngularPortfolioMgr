@@ -84,8 +84,8 @@ public class PortfolioCalculationService {
 					.filter(entry -> entry.getKey().equals(pAndSymEntityOpt.get().getSymbolId())).findFirst();
 			quotesToDelete = entryOpt.isEmpty() ? quotesToDelete : entryOpt.get().getValue();
 		}
-		return this.dailyQuoteRepository.deleteAll(quotesToDelete).then(this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple))
-						.collectList());
+		return this.dailyQuoteRepository.deleteAll(quotesToDelete)
+				.then(this.dailyQuoteRepository.saveAll(this.updatePortfolioSymbol(myTuple)).collectList());
 	}
 
 	private Mono<PortfolioEntity> updatePortfolio(PortfolioEntity entity,
@@ -125,14 +125,14 @@ public class PortfolioCalculationService {
 						.filter(quote -> quote.getLocalDay().compareTo(quotesTuple.getA().getChangedAt()) > -1
 								&& (quotesTuple.getA().getRemovedAt() == null
 										|| quote.getLocalDay().isBefore(quotesTuple.getA().getRemovedAt())))
-						.filter(myQuote -> { 
-							if(myQuote.getClose() == null || quotesTuple.getA().getWeight() == null || this.findCurrencyByDateAndQuote(myQuote, tuple3.getC(),
-									myQuote.getLocalDay(), tuple3.getA()).isEmpty() ) {
+						.filter(myQuote -> {
+							if (myQuote.getClose() == null || quotesTuple.getA().getWeight() == null
+									|| this.findCurrencyByDateAndQuote(myQuote, tuple3.getC(), myQuote.getLocalDay(),
+											tuple3.getA()).isEmpty()) {
 								blockedDates.add(myQuote.getLocalDay());
 							}
 							return true;
-						})
-						.filter(myQuote -> blockedDates.contains(myQuote.getLocalDay()))
+						}).filter(myQuote -> blockedDates.contains(myQuote.getLocalDay()))
 						.flatMap(quote -> Stream
 								.of(new Tuple3<Long, LocalDate, BigDecimal>(quote.getSymbolId(), quote.getLocalDay(),
 										this.calculatePortfolioQuote(quote.getClose(), quotesTuple.getA().getWeight(),

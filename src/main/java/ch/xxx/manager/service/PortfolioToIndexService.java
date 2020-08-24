@@ -58,11 +58,16 @@ public class PortfolioToIndexService {
 
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> dailyQuoteEntities) {
-		List<Tuple3<PortfolioToSymbolEntity,SymbolEntity,DailyQuoteEntity>> portfolioChanges = this.calculatePortfolioChanges(ptsEntities, symbolEntity, dailyQuoteEntities);
+		List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges = this
+				.calculateSortedPortfolioChanges(ptsEntities, symbolEntity, dailyQuoteEntities);
+		Mono<Map<LocalDate,DailyQuoteEntity>> euroStoxxQuotes = this.dailyQuoteRepository.findBySymbol(ComparisonIndexes.EUROSTOXX50.getSymbol()).collectMap(DailyQuoteEntity::getLocalDay);
+		Mono<Map<LocalDate,DailyQuoteEntity>> chinaQuotes = this.dailyQuoteRepository.findBySymbol(ComparisonIndexes.MSCI_CHINA.getSymbol()).collectMap(DailyQuoteEntity::getLocalDay);
+		Mono<Map<LocalDate,DailyQuoteEntity>> sp500Quotes = this.dailyQuoteRepository.findBySymbol(ComparisonIndexes.SP500.getSymbol()).collectMap(DailyQuoteEntity::getLocalDay);
+		
 		return Mono.empty();
 	}
 	
-	private List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> calculatePortfolioChanges(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
+	private List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> calculateSortedPortfolioChanges(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> dailyQuoteEntities) {
 		Map<LocalDate, PortfolioToSymbolEntity> myPtsEntities = ptsEntities.stream()
 				.filter(ptsEntity -> ptsEntity.getPortfolioId().equals(symbolEntity.getId()))
