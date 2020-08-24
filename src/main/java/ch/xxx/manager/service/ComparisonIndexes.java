@@ -11,25 +11,27 @@
    limitations under the License.
  */
 package ch.xxx.manager.service;
-import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
-
 import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
+import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
+import ch.xxx.manager.service.ServiceUtils.RefMarker;
 
 public enum ComparisonIndexes {
-	SP500("IVV", "S&P 500 ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE),
-	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", SymbolCurrency.EUR, QuoteSource.ALPHAVANTAGE),
-	MSCI_CHINA("ICGA.DE", "Msci China ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE);
+	SP500("IVV", "S&P 500 ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE, RefMarker.US_REF_MARKER),
+	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", SymbolCurrency.EUR, QuoteSource.ALPHAVANTAGE, RefMarker.EUROPE_REF_MARKER),
+	MSCI_CHINA("ICGA.DE", "Msci China ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE, RefMarker.CHINA_REF_MARKER);
 
 	private String symbol;
 	private String name;
 	private SymbolCurrency currency;
 	private QuoteSource source;
+	private RefMarker refMarker;
 
-	private ComparisonIndexes(String symbol, String name, SymbolCurrency currency, QuoteSource source) {
+	private ComparisonIndexes(String symbol, String name, SymbolCurrency currency, QuoteSource source, RefMarker refMarker) {
 		this.symbol = symbol;
 		this.name = name;
 		this.currency = currency;
 		this.source = source;
+		this.refMarker = refMarker;
 	}
 
 	public String getSymbol() {
@@ -46,6 +48,10 @@ public enum ComparisonIndexes {
 
 	public QuoteSource getSource() {
 		return source;
+	}
+
+	public RefMarker getRefMarker() {
+		return refMarker;
 	}
 
 };
