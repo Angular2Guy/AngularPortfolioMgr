@@ -27,6 +27,7 @@ import ch.xxx.manager.entity.SymbolEntity;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
+import ch.xxx.manager.service.ServiceUtils.RefMarker;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,15 +40,16 @@ public class PortfolioToIndexService {
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
 
-	public Flux<Long> calculateIndexComparison(Long portfolioId) {
+	public Flux<Long> calculateIndexComparison(Long portfolioId) {		
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
 				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
+		
 		return this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
 				.flatMap(ptsEntities -> this.symbolRepository
 						.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
 								.collect(Collectors.toList()))
 						.filter(symbolEntity -> refMarkerStrs.stream()
-								.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
+								.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))						
 						.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbol(symbolEntity.getSymbol())
 								.collectList().flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities,
 										symbolEntity, dailyQuoteEntities))
@@ -56,6 +58,25 @@ public class PortfolioToIndexService {
 				.flatMapMany(Flux::fromIterable);
 	}
 
+	private Mono<Long> upsertIndexComparisonSymbols(Long portfolioId) {
+		final List<RefMarker> refMarkers = List.of(ServiceUtils.RefMarker.values());				
+		this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
+		.flatMap(ptsEntities -> this.symbolRepository
+				.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
+						.collect(Collectors.toList()))
+				.filter(symbolEntity -> refMarkers.stream()
+						.anyMatch(refMarker -> symbolEntity.getSymbol().contains(refMarker.getMarker())))
+				.collectList()
+				.flatMap(symbolEntities -> this.addIndexComaprisonSymbol(refMarkers.stream().filter(refMarker -> 
+				symbolEntities.stream().noneMatch(symbolEntity -> 
+				symbolEntity.getSymbol().contains(refMarker.getMarker()))).collect(Collectors.toList()))));
+		return Mono.empty();
+	}
+
+	private Mono<Long> addIndexComaprisonSymbol(List<RefMarker> refMarkers) {
+		return Mono.empty();
+	}
+	
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> dailyQuoteEntities) {
 		List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges = this
