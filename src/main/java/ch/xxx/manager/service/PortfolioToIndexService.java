@@ -12,8 +12,11 @@
  */
 package ch.xxx.manager.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,25 +42,41 @@ public class PortfolioToIndexService {
 	public Flux<Long> calculateIndexComparison(Long portfolioId) {
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
 				.map(refMarker -> refMarker.getMarker()).collect(Collectors.toList());
-		return this.portfolioToSymbolRepository
-				.findByPortfolioId(
-						portfolioId)
-				.collectList().flatMap(
-						ptsEntities -> this.symbolRepository
-								.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
-										.collect(Collectors.toList()))
-								.filter(symbolEntity -> refMarkerStrs.stream().anyMatch(
-										refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
-								.flatMap(symbolEntity -> this.dailyQuoteRepository
-										.findBySymbol(symbolEntity.getSymbol()).collectList()
-										.flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities, symbolEntity,
-												dailyQuoteEntities))
-										.flux())
-								.collectList()).flatMapMany(Flux::fromIterable);
+		return this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
+				.flatMap(ptsEntities -> this.symbolRepository
+						.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
+								.collect(Collectors.toList()))
+						.filter(symbolEntity -> refMarkerStrs.stream()
+								.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
+						.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbol(symbolEntity.getSymbol())
+								.collectList().flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities,
+										symbolEntity, dailyQuoteEntities))
+								.flux())
+						.collectList())
+				.flatMapMany(Flux::fromIterable);
 	}
 
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> dailyQuoteEntities) {
+		List<Tuple3<PortfolioToSymbolEntity,SymbolEntity,DailyQuoteEntity>> portfolioChanges = this.calculatePortfolioChanges(ptsEntities, symbolEntity, dailyQuoteEntities);
 		return Mono.empty();
+	}
+	
+	private List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> calculatePortfolioChanges(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
+			List<DailyQuoteEntity> dailyQuoteEntities) {
+		Map<LocalDate, PortfolioToSymbolEntity> myPtsEntities = ptsEntities.stream()
+				.filter(ptsEntity -> ptsEntity.getPortfolioId().equals(symbolEntity.getId()))
+				.collect(Collectors.toMap(ptsEntity -> ptsEntity.getChangedAt() != null ? ptsEntity.getChangedAt()
+						: ptsEntity.getRemovedAt(), ptsEntity -> ptsEntity));
+		Map<LocalDate, DailyQuoteEntity> myDailyQuoteEntities = dailyQuoteEntities.stream()
+				.filter(dailyQuoteEntity -> myPtsEntities.containsKey(dailyQuoteEntity.getLocalDay()))
+				.collect(Collectors.toMap(dailyQuoteEntity -> dailyQuoteEntity.getLocalDay(),
+						dailyQuoteEntity -> dailyQuoteEntity));
+		List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> portfolioChanges = myPtsEntities.keySet()
+				.stream().sorted()
+				.flatMap(myDate -> Stream.of(new Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>(
+						myPtsEntities.get(myDate), symbolEntity, myDailyQuoteEntities.get(myDate))))
+				.collect(Collectors.toList());
+		return portfolioChanges;
 	}
 }
