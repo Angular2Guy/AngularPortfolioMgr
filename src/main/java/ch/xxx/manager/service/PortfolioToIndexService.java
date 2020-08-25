@@ -12,8 +12,10 @@
  */
 package ch.xxx.manager.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,9 +26,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.entity.CurrencyEntity;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
 import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
+import ch.xxx.manager.jwt.Tuple;
+import ch.xxx.manager.repository.CurrencyRepository;
 import ch.xxx.manager.repository.DailyQuoteRepository;
 import ch.xxx.manager.repository.PortfolioToSymbolRepository;
 import ch.xxx.manager.repository.SymbolRepository;
@@ -43,6 +49,8 @@ public class PortfolioToIndexService {
 	private SymbolRepository symbolRepository;
 	@Autowired
 	private DailyQuoteRepository dailyQuoteRepository;
+	@Autowired
+	private CurrencyRepository currencyRepository;
 
 	public Flux<Long> calculateIndexComparison(Long portfolioId) {
 		final List<String> refMarkerStrs = List.of(ServiceUtils.RefMarker.values()).stream()
@@ -50,29 +58,25 @@ public class PortfolioToIndexService {
 		final List<RefMarker> refMarkers = List.of(ServiceUtils.RefMarker.values());
 		return this.addIndexComparisonSymbols(portfolioId, refMarkers).flux().flatMap(result -> {
 			LOGGER.info("ComparisonIndexes added: {}", result);
-			return this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
-					.flatMap(ptsEntities -> this.symbolRepository
-							.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
-									.collect(Collectors.toList()))
-							.filter(symbolEntity -> refMarkerStrs.stream()
-									.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
-							.flatMap(
-									symbolEntity -> this.dailyQuoteRepository.findBySymbol(symbolEntity.getSymbol())
-											.collectList().flatMap(dailyQuoteEntities -> this
-													.calculateIndexes(ptsEntities, symbolEntity, dailyQuoteEntities))
+			return this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
+					.flatMap(currencyMap -> this.portfolioToSymbolRepository.findByPortfolioId(portfolioId)
+							.collectList()
+							.flatMap(ptsEntities -> this.symbolRepository
+									.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId())
+											.distinct().collect(Collectors.toList()))
+									.filter(symbolEntity -> refMarkerStrs.stream()
+											.anyMatch(refMarkerStr -> symbolEntity.getSymbol().contains(refMarkerStr)))
+									.flatMap(symbolEntity -> this.dailyQuoteRepository
+											.findBySymbol(symbolEntity.getSymbol()).collectList()
+											.flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities,
+													symbolEntity, dailyQuoteEntities, currencyMap))
 											.flux())
-							.collectList());
+									.collectList()));
 		}).flatMap(results -> Flux.just(results.stream().count()));
 	}
 
-	private Mono<Long> upsertIndexComparisonSymbols(Long portfolioId, List<RefMarker> refMarkers) {
-		this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
-				.flatMap(ptsEntities -> this.symbolRepository
-						.findAllById(ptsEntities.stream().map(ptsEntity -> ptsEntity.getSymbolId()).distinct()
-								.collect(Collectors.toList()))
-						.filter(symbolEntity -> refMarkers.stream()
-								.anyMatch(refMarker -> symbolEntity.getSymbol().contains(refMarker.getMarker())))
-						.collectList().flatMap(symbolEntities -> Mono.just(symbolEntities)));
+	private Mono<DailyQuoteEntity> upsertIndexComparisonDate(Tuple<LocalDate, BigDecimal> tuple) {
+		
 		return Mono.empty();
 	}
 
@@ -100,7 +104,7 @@ public class PortfolioToIndexService {
 	}
 
 	private Mono<Long> calculateIndexes(List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
-			List<DailyQuoteEntity> dailyQuoteEntities) {
+			List<DailyQuoteEntity> dailyQuoteEntities, Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
 		final Map<LocalDate, DailyQuoteEntity> indexQuoteMap = dailyQuoteEntities.stream()
 				.collect(Collectors.toMap(DailyQuoteEntity::getLocalDay, entity -> entity));
 		final List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges = this
@@ -118,17 +122,47 @@ public class PortfolioToIndexService {
 		} else {
 			throw new RuntimeException(String.format("Not a comparison index symbol: %s", symbolEntity.getSymbol()));
 		}
-		return comparisonIndexQuotes
-				.flatMap(quoteMap -> this.recalculateComparisonIndex(quoteMap, indexQuoteMap, sortedPortfolioChanges));
+		return comparisonIndexQuotes.flatMap(quoteMap -> this.recalculateComparisonIndex(quoteMap, indexQuoteMap,
+				sortedPortfolioChanges, currencyMap));
 	}
 
 	private Mono<Long> recalculateComparisonIndex(Map<LocalDate, DailyQuoteEntity> comparisonIndexQuoteMap,
 			Map<LocalDate, DailyQuoteEntity> currentIndexQuoteMap,
-			List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges) {
-		final List<LocalDate> comparisonIndexDates = comparisonIndexQuoteMap.keySet().stream().sorted()
-				.collect(Collectors.toList());
-		
+			List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap) {
+		final List<LocalDate> comparisonIndexDates = comparisonIndexQuoteMap.keySet().stream()
+				.filter(myLocalDate -> -1 > myLocalDate.compareTo(sortedPortfolioChanges.get(0).getA().getChangedAt()))
+				.sorted().collect(Collectors.toList());
+		final Map<LocalDate, DailyQuoteEntity> currentIndexQuotesLeftMap = new HashMap<>(currentIndexQuoteMap);
+		final BigDecimal[] portfolioValue = List.of(BigDecimal.ZERO).toArray(new BigDecimal[1]);
+		comparisonIndexDates.stream().flatMap(myDate -> {
+			portfolioValue[0] = portfolioValue[0]
+					.add(this.updatePortfolioValue(myDate, currencyMap, sortedPortfolioChanges));
+			return Stream.of(this.upsertIndexComparisonDate(new Tuple<LocalDate, BigDecimal>(myDate, portfolioValue[0])));
+		});
 		return Mono.empty();
+	}
+
+	private BigDecimal updatePortfolioValue(LocalDate currentDate,
+			Map<LocalDate, Collection<CurrencyEntity>> currencyMap,
+			List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> portfolioChanges) {
+		BigDecimal difference = portfolioChanges.stream()
+				.filter(tuple3 -> currentDate.equals(tuple3.getA().getChangedAt())
+						|| currentDate.equals(tuple3.getA().getRemovedAt()))
+				.reduce(BigDecimal.ZERO, (value, tuple3) -> {
+					BigDecimal newValue = BigDecimal.ZERO;
+					if (SymbolCurrency.EUR.toString().equals(tuple3.getB().getCurr())) {
+						newValue = BigDecimal.valueOf(tuple3.getA().getWeight()).multiply(tuple3.getC().getClose());
+					} else if (currencyMap.containsKey(currentDate) && currencyMap.get(currentDate).stream().anyMatch(
+							currencyEntity -> tuple3.getB().getCurr().equals(currencyEntity.getFrom_curr()))) {
+						BigDecimal currencyValue = currencyMap.get(currentDate).stream()
+								.filter(currencyEntity -> tuple3.getB().getCurr().equals(currencyEntity.getFrom_curr()))
+								.map(currencyEntity -> currencyEntity.getClose()).findFirst().orElseThrow();
+						newValue = BigDecimal.valueOf(tuple3.getA().getWeight()).multiply(tuple3.getC().getClose().multiply(currencyValue));
+					}
+					return value.add(newValue);
+				}, BigDecimal::add);
+		return difference;
 	}
 
 	private List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> calculateSortedPortfolioChanges(
