@@ -117,8 +117,8 @@ public class SymbolImportService {
 	public Mono<Long> importReferenceIndexes(Flux<String> symbolStrs) {
 		LOGGER.info("importReferenceIndexes() called.");
 		if (symbolStrs == null) {
-			symbolStrs = Flux.just(ComparisonIndexes.SP500.getSymbol(), ComparisonIndexes.EUROSTOXX50.getSymbol(),
-					ComparisonIndexes.MSCI_CHINA.getSymbol());
+			symbolStrs = Flux.just(ComparisonIndex.SP500.getSymbol(), ComparisonIndex.EUROSTOXX50.getSymbol(),
+					ComparisonIndex.MSCI_CHINA.getSymbol());
 		}
 		final Flux<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
@@ -126,7 +126,7 @@ public class SymbolImportService {
 		return this.repository.findAll().collectList().flux().flatMap(symbolEntities -> {
 			availiableSymbolEntities.addAll(symbolEntities);
 			return localSymbolStrs;
-		}).filter(symbolStr -> Stream.of(ComparisonIndexes.values()).map(ComparisonIndexes::getSymbol)
+		}).filter(symbolStr -> Stream.of(ComparisonIndex.values()).map(ComparisonIndex::getSymbol)
 				.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
 				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol, availiableSymbolEntities)).map(entity -> {
 					symbolStrsToImport.add(entity.getSymbol());
@@ -140,7 +140,7 @@ public class SymbolImportService {
 	}
 
 	private Mono<SymbolEntity> upsertSymbolEntity(String indexSymbol, List<SymbolEntity> availiableSymbolEntities) {
-		ComparisonIndexes compIndex = Stream.of(ComparisonIndexes.values())
+		ComparisonIndex compIndex = Stream.of(ComparisonIndex.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()
 				.orElseThrow(() -> new RuntimeException("Unknown indexSymbol: " + indexSymbol));
 		SymbolEntity symbolEntity = new SymbolEntity(null, compIndex.getSymbol(), compIndex.getName(),

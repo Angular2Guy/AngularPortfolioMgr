@@ -14,7 +14,7 @@ package ch.xxx.manager.service;
 import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
 import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
 
-public enum ComparisonIndexes {
+public enum ComparisonIndex {
 	SP500("IVV", "S&P 500 ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE),
 	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", SymbolCurrency.EUR, QuoteSource.ALPHAVANTAGE),
 	MSCI_CHINA("ICGA.DE", "Msci China ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE);
@@ -24,7 +24,7 @@ public enum ComparisonIndexes {
 	private SymbolCurrency currency;
 	private QuoteSource source;
 
-	private ComparisonIndexes(String symbol, String name, SymbolCurrency currency, QuoteSource source) {
+	private ComparisonIndex(String symbol, String name, SymbolCurrency currency, QuoteSource source) {
 		this.symbol = symbol;
 		this.name = name;
 		this.currency = currency;
