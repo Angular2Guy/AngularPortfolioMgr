@@ -46,6 +46,8 @@ interface SymbolData {
 export class SymbolComponent implements OnInit {	
 	private readonly dayInMs = 24 * 60 * 60 * 1000;
 	private readonly hourInMs = 1 * 60 * 60 * 1000;
+	@Input()
+	portfolioId: number;
 	quotePeriods: QuotePeriod[] = [];
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;

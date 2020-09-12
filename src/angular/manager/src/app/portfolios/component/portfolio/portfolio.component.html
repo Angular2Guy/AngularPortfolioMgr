@@ -21,6 +21,6 @@
 		</mat-action-list>	
 	</mat-sidenav>
 	<mat-sidenav-content opened mode="side">
-		<app-symbol [symbol]="selSymbol" (loadingData)="updateReloadData($event)"></app-symbol>
+		<app-symbol [portfolioId]="portfolioId" [symbol]="selSymbol" (loadingData)="updateReloadData($event)"></app-symbol>
 	</mat-sidenav-content>
 </mat-sidenav-container>

@@ -30,6 +30,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   windowHeight = 0;
   portfolioName = '';
   selSymbol: Symbol = null;
+  portfolioId: number = null;
   private routeParamSubscription: Subscription;
 
   constructor(private route: ActivatedRoute, private tokenService: TokenService, 
@@ -38,7 +39,9 @@ export class PortfolioComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 	this.windowHeight = window.innerHeight - 84;
-	this.routeParamSubscription = this.route.paramMap.pipe(tap(() => this.reloadData = true),
+	this.routeParamSubscription = this.route.paramMap.pipe(
+		tap(() => this.reloadData = true),
+		tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
 		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
 		tap(() => this.reloadData = false))		
 		.subscribe(myPortfolio => {

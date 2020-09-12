@@ -18,8 +18,6 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
-
 public class SymbolDto {
 	private Long id;
 	private String symbol;
