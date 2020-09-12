@@ -15,6 +15,7 @@ package ch.xxx.manager.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.dto.QuoteDto;
 import ch.xxx.manager.entity.CurrencyEntity;
 import ch.xxx.manager.entity.DailyQuoteEntity;
 import ch.xxx.manager.entity.PortfolioToSymbolEntity;
@@ -51,7 +53,7 @@ public class PortfolioToIndexService {
 	@Autowired
 	private CurrencyRepository currencyRepository;
 
-	public Flux<DailyQuoteEntity> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
+	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
 		LOGGER.info("CalculateComparison Index: {} for PortfolioId: {}", comparisonIndex.getName(), portfolioId);
 		return this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
 				.flatMap(currencyMap -> this.portfolioToSymbolRepository.findByPortfolioId(portfolioId).collectList()
@@ -64,7 +66,16 @@ public class PortfolioToIndexService {
 												dailyQuoteEntities, currencyMap, comparisonIndex))
 										.flux())
 								.collectList()))
-				.flux().flatMap(results -> Flux.fromIterable(results));
+				.flatMapMany(Flux::fromIterable).flatMap(entity -> this.mapToDto(entity));
+	}
+
+	private Flux<QuoteDto> mapToDto(DailyQuoteEntity entity) {
+		QuoteDto dto = new QuoteDto();
+		dto.setClose(entity.getClose());
+		dto.setSymbol(entity.getSymbol());
+		dto.setTimestamp(LocalDateTime.from(entity.getLocalDay()));
+		dto.setVolume(entity.getVolume());
+		return Flux.fromIterable(List.of(dto));
 	}
 
 	private Mono<DailyQuoteEntity> upsertIndexComparisonDate(Tuple3<LocalDate, BigDecimal[], BigDecimal> tuple,

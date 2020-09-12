@@ -14,6 +14,7 @@ package ch.xxx.manager.contoller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.dto.QuoteDto;
+import ch.xxx.manager.service.ComparisonIndex;
+import ch.xxx.manager.service.PortfolioToIndexService;
 import ch.xxx.manager.service.QuoteImportService;
 import ch.xxx.manager.service.QuoteService;
 import reactor.core.publisher.Flux;
@@ -34,10 +37,18 @@ public class QuoteController {
 	private QuoteService quoteService;
 	@Autowired
 	private QuoteImportService quoteImportService;
+	@Autowired
+	private PortfolioToIndexService portfolioToIndexService;
 	
 	@GetMapping("/daily/all/symbol/{symbol}")
 	public Flux<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getDailyQuotes(symbol);
+	}
+	
+	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}")
+	public Flux<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId, @PathVariable("indexSymbol") String indexSymbol) {
+		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream().filter(value -> value.getSource().equals(indexSymbol)).findFirst().orElseThrow();
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
 	}
 	
 	@GetMapping("/intraday/symbol/{symbol}")
