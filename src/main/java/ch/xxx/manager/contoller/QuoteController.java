@@ -66,6 +66,17 @@ public class QuoteController {
 		return this.quoteService.getDailyQuotes(symbol, start, end);
 	}
 
+	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
+	public Flux<QuoteDto> getAllDailyComparisonIndexQuotesFromStartToEnd(@PathVariable("portfolioId") Long portfolioId,
+			@PathVariable("indexSymbol") String indexSymbol, @PathVariable("start") String isodateStart,
+			@PathVariable("end") String isodateEnd) {
+		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
+				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
+		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
+	}
+
 	@GetMapping("/import/daily/symbol/{symbol}")
 	public Mono<Long> importDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteImportService.importDailyQuoteHistory(symbol);

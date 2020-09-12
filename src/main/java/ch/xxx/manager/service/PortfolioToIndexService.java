@@ -69,6 +69,13 @@ public class PortfolioToIndexService {
 				.flatMapMany(Flux::fromIterable).flatMap(entity -> this.mapToDto(entity));
 	}
 
+	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
+			LocalDate to) {
+		return this.calculateIndexComparison(portfolioId, comparisonIndex)
+				.filter(quoteDto -> -1 < quoteDto.getTimestamp().compareTo(LocalDateTime.from(from))
+						&& 1 > quoteDto.getTimestamp().compareTo(LocalDateTime.from(to)));
+	}
+
 	private Flux<QuoteDto> mapToDto(DailyQuoteEntity entity) {
 		QuoteDto dto = new QuoteDto();
 		dto.setClose(entity.getClose());
