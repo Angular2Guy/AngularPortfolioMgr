@@ -39,41 +39,43 @@ public class QuoteController {
 	private QuoteImportService quoteImportService;
 	@Autowired
 	private PortfolioToIndexService portfolioToIndexService;
-	
+
 	@GetMapping("/daily/all/symbol/{symbol}")
 	public Flux<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getDailyQuotes(symbol);
 	}
-	
+
 	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}")
-	public Flux<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId, @PathVariable("indexSymbol") String indexSymbol) {
-		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream().filter(value -> value.getSource().equals(indexSymbol)).findFirst().orElseThrow();
+	public Flux<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId,
+			@PathVariable("indexSymbol") String indexSymbol) {
+		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
+				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
 		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
 	}
-	
+
 	@GetMapping("/intraday/symbol/{symbol}")
 	public Flux<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteService.getIntraDayQuotes(symbol);
 	}
-	
+
 	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
-	public Flux<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol, 
+	public Flux<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol,
 			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
 		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
 		return this.quoteService.getDailyQuotes(symbol, start, end);
 	}
-	
+
 	@GetMapping("/import/daily/symbol/{symbol}")
 	public Mono<Long> importDailyQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteImportService.importDailyQuoteHistory(symbol);
 	}
-	
+
 	@GetMapping("/import/intraday/symbol/{symbol}")
 	public Mono<Long> importIntraDayQuotes(@PathVariable("symbol") String symbol) {
 		return this.quoteImportService.importIntraDayQuotes(symbol);
 	}
-	
+
 	@GetMapping("/import/daily/currency/{to_curr}")
 	public Mono<Long> importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
 		return this.quoteImportService.importFxDailyQuoteHistory(to_curr);
