@@ -15,6 +15,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Quote } from '../model/quote';
 
+export enum ComparisonIndex {
+	SP500 = 'IVV',
+	EUROSTOXX50 = 'SXRT.DE',
+	MSCI_CHINA = 'ICGA.DE'
+}
+
 @Injectable()
 export class QuoteService {
   constructor(private http: HttpClient) { }
@@ -32,4 +38,14 @@ export class QuoteService {
 	const endStr = end.toISOString().split('T')[0];
 	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
   }
+
+  getDailyQuotesForComparisonIndexFromStartToEnd(portfolioId: number, comparisonIndex: ComparisonIndex, start: Date, end: Date) {
+	const startStr = start.toISOString().split('T')[0];
+	const endStr = end.toISOString().split('T')[0];
+	return this.http.get<Quote[]>(`/rest/quote/daily/portfolio/${portfolioId}/index/${comparisonIndex}/start/${startStr}/end/${endStr}`);
+  }
+
+  getDailyQuotesForComparisonIndex(portfolioId: number, comparisonIndex: ComparisonIndex) {
+	return this.http.get<Quote[]>(`/rest/quote/daily/all/portfolio/${portfolioId}/index/${comparisonIndex}`);
+  }  
 }

@@ -66,7 +66,7 @@ public class QuoteController {
 		return this.quoteService.getDailyQuotes(symbol, start, end);
 	}
 
-	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
+	@GetMapping("/daily/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
 	public Flux<QuoteDto> getAllDailyComparisonIndexQuotesFromStartToEnd(@PathVariable("portfolioId") Long portfolioId,
 			@PathVariable("indexSymbol") String indexSymbol, @PathVariable("start") String isodateStart,
 			@PathVariable("end") String isodateEnd) {
