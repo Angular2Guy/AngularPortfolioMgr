@@ -12,11 +12,12 @@
  */
 import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Symbol } from '../../model/symbol';
-import { QuoteService } from '../../service/quote.service';
+import { QuoteService, ComparisonIndex } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
 import { MyChartData, MyChartValue } from '../../model/my-chart-data';
 import { DOCUMENT, formatDate } from '@angular/common';
 import { ServiceUtils } from '../../model/service-utils';
+import { forkJoin } from 'rxjs';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
@@ -52,6 +53,10 @@ export class SymbolComponent implements OnInit {
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
 	quotes: Quote[] = [];
+	quotesSP500: Quote[] = [];
+	quotesES50: Quote[] = [];
+	quotesMsciCH: Quote[] = [];
+	quotesLoading = true;
 	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, 
 		open: null, start: null, avgClose: null, medianClose: null, volatilityClose: null } as SymbolData;
 	@Output()
@@ -151,22 +156,41 @@ export class SymbolComponent implements OnInit {
 		if (!this.symbol) { return; }
 		if (selPeriod === QuotePeriodKey.Day) {
 			this.loadingData.emit(true);
+			this.quotesLoading = true;
 			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
 				.subscribe(myQuotes => {										
 					this.quotes = myQuotes;
 					this.updateSymbolData();
 					this.loadingData.emit(false);
+					this.quotesLoading = false;
 				});
 		} else {
 			this.loadingData.emit(true);
+			this.quotesLoading = true;
 			const startDate = this.createStartDate(selPeriod);
 			const endDate = new Date();
 			this.quoteService.getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.updateSymbolData();
-					this.loadingData.emit(false);
-				});
+					if(false && ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
+						console.log('add comparison index quotes.')
+						forkJoin(
+							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.EUROSTOXX50, startDate, endDate),
+							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.MSCI_CHINA, startDate, endDate),
+							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.SP500, startDate, endDate),
+						).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
+							this.quotesES50 = myQuotesES50;
+							this.quotesMsciCH = myQuotesMsciCh;
+							this.quotesSP500 = myQuotesSP500;
+							this.loadingData.emit(false);
+							this.quotesLoading = false;
+						});
+					} else {
+						this.loadingData.emit(false);
+						this.quotesLoading = false;
+					}
+				});			
 		}
 	}
 

@@ -39,13 +39,13 @@ export class QuoteService {
 	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
   }
 
-  getDailyQuotesForComparisonIndexFromStartToEnd(portfolioId: number, comparisonIndex: ComparisonIndex, start: Date, end: Date) {
+  getDailyQuotesForComparisonIndexFromStartToEnd(portfolioId: number, comparisonIndex: ComparisonIndex, start: Date, end: Date): Observable<Quote[]> {
 	const startStr = start.toISOString().split('T')[0];
 	const endStr = end.toISOString().split('T')[0];
 	return this.http.get<Quote[]>(`/rest/quote/daily/portfolio/${portfolioId}/index/${comparisonIndex}/start/${startStr}/end/${endStr}`);
   }
 
-  getDailyQuotesForComparisonIndex(portfolioId: number, comparisonIndex: ComparisonIndex) {
+  getDailyQuotesForComparisonIndex(portfolioId: number, comparisonIndex: ComparisonIndex): Observable<Quote[]> {
 	return this.http.get<Quote[]>(`/rest/quote/daily/all/portfolio/${portfolioId}/index/${comparisonIndex}`);
   }  
 }
