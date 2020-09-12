@@ -62,6 +62,7 @@ export class SymbolComponent implements OnInit {
 	@Output()
 	loadingData = new EventEmitter<boolean>();
 	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
+	readonly ComparisonIndex = ComparisonIndex; 
 
 	multi: MyChartData[] = [{ name: 'none', series: [] }];	
 	legend = false;
@@ -103,6 +104,10 @@ export class SymbolComponent implements OnInit {
 	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
 		console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
 		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
+	}
+	
+	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
+		
 	}
 
 	private updateSymbolData() {

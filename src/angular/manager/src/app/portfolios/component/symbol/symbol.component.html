@@ -22,10 +22,18 @@
 	  aria-labelledby="my-radio-group-label"
 	  class="my-radio-group" (change)="quotePeriodChanged()"
 	  [(ngModel)]="selQuotePeriod">
-	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod" [disabled]="!isIntraDayDataAvailiable(symbol) && myQuotePeriod.quotePeriodKey === quotePeriodKeyDay">
+	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of quotePeriods" [value]="myQuotePeriod" [disabled]="!quotesLoading && !isIntraDayDataAvailiable(symbol) && myQuotePeriod.quotePeriodKey === quotePeriodKeyDay">
 	    {{myQuotePeriod.periodText}}
 	  </mat-radio-button>
 	</mat-radio-group>
+</div>
+<div class="text-container" *ngIf="false">
+	<label id="my-checkbox-group-label" i18n>Pick your comparison index:</label>
+	<span>
+		<mat-checkbox [disabled]="!quotesLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)" i18n>EuroStoxx 50</mat-checkbox>
+		<mat-checkbox [disabled]="!quotesLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)" i18n>Msci China</mat-checkbox>
+		<mat-checkbox [disabled]="!quotesLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)" i18n>S&P 500</mat-checkbox>
+	</span>
 </div>
 <div *ngIf="!symbol" class="chart-container center-div">
 	<div i18>Please select an instrument</div>
