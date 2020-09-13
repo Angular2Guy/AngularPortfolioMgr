@@ -72,15 +72,16 @@ public class PortfolioToIndexService {
 	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
 			LocalDate to) {
 		return this.calculateIndexComparison(portfolioId, comparisonIndex)
-				.filter(quoteDto -> -1 < quoteDto.getTimestamp().compareTo(LocalDateTime.from(from))
-						&& 1 > quoteDto.getTimestamp().compareTo(LocalDateTime.from(to)));
+				.filter(quoteDto -> -1 < quoteDto.getTimestamp().compareTo(from.atStartOfDay())
+						&& 1 > quoteDto.getTimestamp().compareTo(LocalDateTime.from(to.atTime(23, 59))));
 	}
 
 	private Flux<QuoteDto> mapToDto(DailyQuoteEntity entity) {
+		LOGGER.info(entity.getLocalDay().toString());
 		QuoteDto dto = new QuoteDto();
 		dto.setClose(entity.getClose());
 		dto.setSymbol(entity.getSymbol());
-		dto.setTimestamp(LocalDateTime.from(entity.getLocalDay()));
+		dto.setTimestamp(entity.getLocalDay().atStartOfDay());
 		dto.setVolume(entity.getVolume());
 		return Flux.fromIterable(List.of(dto));
 	}
