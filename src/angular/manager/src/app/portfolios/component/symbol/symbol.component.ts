@@ -107,7 +107,7 @@ export class SymbolComponent implements OnInit {
 	}
 	
 	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
-		
+		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
 	}
 
 	private updateSymbolData() {
@@ -178,7 +178,7 @@ export class SymbolComponent implements OnInit {
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.updateSymbolData();
-					if(false && ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
+					if(ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
 						console.log('add comparison index quotes.')
 						forkJoin(
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.EUROSTOXX50, startDate, endDate),

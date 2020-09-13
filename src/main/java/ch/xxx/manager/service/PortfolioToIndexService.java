@@ -97,8 +97,10 @@ public class PortfolioToIndexService {
 		SymbolCurrency symbolCurrency = List.of(ComparisonIndex.values()).stream()
 				.filter(compIndex -> compIndex.getSymbol().equals(comparisonQuoteOpt.get().getSymbol())).findFirst()
 				.map(compIndex -> compIndex.getCurrency()).orElseThrow();
-		Optional<CurrencyEntity> currencyQuoteOpt = currencyMap.get(tuple.getA()).stream()
-				.filter(currencyEntity -> symbolCurrency.toString().equals(currencyEntity.getFrom_curr())).findFirst();
+		Optional<CurrencyEntity> currencyQuoteOpt = currencyMap.get(tuple.getA()) == null ? Optional.empty()
+				: currencyMap.get(tuple.getA()).stream()
+						.filter(currencyEntity -> symbolCurrency.toString().equals(currencyEntity.getFrom_curr()))
+						.findFirst();
 		if (!symbolCurrency.equals(SymbolCurrency.EUR) && currencyQuoteOpt.isEmpty()) {
 			return Mono.empty();
 		}
@@ -174,7 +176,7 @@ public class PortfolioToIndexService {
 			List<PortfolioToSymbolEntity> ptsEntities, SymbolEntity symbolEntity,
 			List<DailyQuoteEntity> dailyQuoteEntities) {
 		Map<LocalDate, PortfolioToSymbolEntity> myPtsEntities = ptsEntities.stream()
-				.filter(ptsEntity -> ptsEntity.getPortfolioId().equals(symbolEntity.getId()))
+				.filter(ptsEntity -> ptsEntity.getSymbolId().equals(symbolEntity.getId()))
 				.collect(Collectors.toMap(ptsEntity -> ptsEntity.getChangedAt() != null ? ptsEntity.getChangedAt()
 						: ptsEntity.getRemovedAt(), ptsEntity -> ptsEntity));
 		Map<LocalDate, DailyQuoteEntity> myDailyQuoteEntities = dailyQuoteEntities.stream()

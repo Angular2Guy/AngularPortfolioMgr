@@ -27,7 +27,7 @@
 	  </mat-radio-button>
 	</mat-radio-group>
 </div>
-<div class="text-container" *ngIf="false">
+<div class="text-container">
 	<label id="my-checkbox-group-label" i18n>Pick your comparison index:</label>
 	<span>
 		<mat-checkbox [disabled]="!quotesLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)" i18n>EuroStoxx 50</mat-checkbox>
