@@ -101,9 +101,13 @@ export class SymbolComponent implements OnInit {
 		console.log(this.selQuotePeriod);
 	}
 
-	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
-		console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
+	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {		
+		//console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
 		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
+	}
+	
+	isPortfolioSymbol(mySymbol: Symbol): boolean {
+		return !mySymbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
 	}
 	
 	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {		
