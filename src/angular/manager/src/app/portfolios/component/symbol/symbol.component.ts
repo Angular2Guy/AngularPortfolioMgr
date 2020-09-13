@@ -106,7 +106,7 @@ export class SymbolComponent implements OnInit {
 		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
 	}
 	
-	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
+	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {		
 		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
 	}
 
