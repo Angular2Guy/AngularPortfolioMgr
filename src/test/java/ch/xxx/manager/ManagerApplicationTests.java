@@ -13,12 +13,15 @@
 package ch.xxx.manager;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@EnableAutoConfiguration
 class ManagerApplicationTests {
 
-	@Test
+//	@Test
 	void contextLoads() {
 	}
 

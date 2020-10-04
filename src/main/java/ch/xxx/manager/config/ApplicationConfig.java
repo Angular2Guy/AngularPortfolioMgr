@@ -45,7 +45,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableScheduling
 @EnableTransactionManagement
-class ApplicationConfig extends AbstractR2dbcConfiguration {
+public class ApplicationConfig extends AbstractR2dbcConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
 	@Value("${spring.profiles.active:}")
