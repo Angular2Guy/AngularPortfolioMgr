@@ -66,12 +66,18 @@ public class PortfolioToIndexService {
 										.flatMap(dailyQuoteEntities -> this.calculateIndexes(ptsEntities, symbolEntity,
 												dailyQuoteEntities, currencyMap, comparisonIndex).collectList()))
 								.collectList()))
-				.flatMapMany(Flux::fromIterable).flatMap(Flux::fromIterable).flatMap(entity -> this.mapToDto(entity));
+				.flatMapMany(Flux::fromIterable).flatMap(Flux::fromIterable).collectList().flatMap(entities -> {
+					LOGGER.info("List filer called. Size: {}", entities.size());
+					return Mono.just(entities.stream().filter(entity -> entity.getLocalDay() != null)
+							.filter(ServiceUtils.distinctByKey(entity -> entity.getLocalDay().toString()))
+							.collect(Collectors.toList()));
+				}).flux().flatMap(Flux::fromIterable).flatMap(entity -> this.mapToDto(entity));
 	}
 
 	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
 			LocalDate to) {
 		return this.calculateIndexComparison(portfolioId, comparisonIndex)
+				.filter(quoteDto -> quoteDto.getClose() != null && 0 < quoteDto.getClose().compareTo(BigDecimal.ZERO))
 				.filter(quoteDto -> -1 < quoteDto.getTimestamp().compareTo(from.atStartOfDay())
 						&& 1 > quoteDto.getTimestamp().compareTo(LocalDateTime.from(to.atTime(23, 59))));
 	}
