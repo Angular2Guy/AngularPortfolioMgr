@@ -16,12 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ContextConfiguration;
+
+import ch.xxx.manager.config.ApplicationConfig;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
+@ContextConfiguration(classes =  ApplicationConfig.class)
 class ManagerApplicationTests {
 
-//	@Test
+	@Test
 	void contextLoads() {
 	}
 
