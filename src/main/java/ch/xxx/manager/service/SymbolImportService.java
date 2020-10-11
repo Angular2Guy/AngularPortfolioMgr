@@ -69,7 +69,7 @@ public class SymbolImportService {
 		AtomicInteger atomicCount = new AtomicInteger(-1);
 		this.repository.findAll().collectList().subscribe(symbolEnities -> {
 			this.allSymbolEntities.set(symbolEnities);
-			atomicCount.getAndSet(symbolEnities.size());
+			atomicCount.set(symbolEnities.size());
 			LOGGER.info("{} symbols updated.", symbolEnities.size());
 		});
 		return Mono.just(atomicCount.get());

@@ -83,7 +83,7 @@ public class PortfolioToIndexService {
 	}
 
 	private Flux<QuoteDto> mapToDto(DailyQuoteEntity entity) {
-		LOGGER.info(entity.getLocalDay().toString());
+		LOGGER.info(entity.toString());
 		QuoteDto dto = new QuoteDto();
 		dto.setClose(entity.getClose());
 		dto.setSymbol(entity.getSymbol());
@@ -93,12 +93,14 @@ public class PortfolioToIndexService {
 	}
 
 	private Flux<DailyQuoteEntity> upsertIndexComparisonDate(Tuple3<LocalDate, BigDecimal[], BigDecimal> tuple,
-			Map<String, DailyQuoteEntity> comparisonIndexQuoteMap, Map<String, DailyQuoteEntity> currentSymbolQuoteMap,
+			Map<LocalDate, DailyQuoteEntity> comparisonIndexQuoteMap, Map<String, DailyQuoteEntity> currentSymbolQuoteMap,
 			Map<String, Collection<CurrencyEntity>> currencyMap) {
 		Optional<DailyQuoteEntity> currentQuoteOpt = Optional
-				.ofNullable(currentSymbolQuoteMap.get(tuple.getA().toString()));
+				.ofNullable(currentSymbolQuoteMap.get(tuple.getA().toString()))
+				.filter(symbolQuote -> symbolQuote.getClose() != null && symbolQuote.getCurrencyId() != null);
 		Optional<DailyQuoteEntity> comparisonQuoteOpt = Optional
-				.ofNullable(comparisonIndexQuoteMap.get(tuple.getA().toString()));
+				.ofNullable(comparisonIndexQuoteMap.get(tuple.getA()))
+				.filter(indexQuote -> indexQuote.getClose() != null && indexQuote.getCurrencyId() != null);
 		if (comparisonQuoteOpt.isEmpty()) {
 			return Flux.empty();
 		}
@@ -107,7 +109,7 @@ public class PortfolioToIndexService {
 				.map(compIndex -> compIndex.getCurrency()).orElseThrow();
 		Optional<CurrencyEntity> currencyQuoteOpt = currencyMap.get(tuple.getA().toString()) == null ? Optional.empty()
 				: currencyMap.get(tuple.getA().toString()).stream()
-						.filter(currencyEntity -> symbolCurrency.toString().equals(currencyEntity.getFrom_curr()))
+						.filter(currencyEntity -> symbolCurrency.toString().equals(currencyEntity.getTo_curr()))
 						.findFirst();
 		if (!symbolCurrency.equals(SymbolCurrency.EUR) && currencyQuoteOpt.isEmpty()) {
 			return Flux.empty();
@@ -134,18 +136,18 @@ public class PortfolioToIndexService {
 				.collect(Collectors.toMap(entity -> entity.getLocalDay().toString(), entity -> entity));
 		final List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges = this
 				.calculateSortedPortfolioChanges(ptsEntities, symbolEntity, dailyQuoteEntities);
-		Mono<Map<String, DailyQuoteEntity>> comparisonIndexQuotes = this.dailyQuoteRepository
-				.findBySymbol(comparisonIndex.getSymbol()).collectMap(entity -> entity.getLocalDay().toString());
+		Mono<Map<LocalDate, DailyQuoteEntity>> comparisonIndexQuotes = this.dailyQuoteRepository
+				.findBySymbol(comparisonIndex.getSymbol()).collectMap(entity -> entity.getLocalDay());
 		return comparisonIndexQuotes.flatMapMany(quoteMap -> this.recalculateComparisonIndex(quoteMap, symbolQuoteMap,
 				sortedPortfolioChanges, currencyMap));
 	}
 
-	private Flux<DailyQuoteEntity> recalculateComparisonIndex(Map<String, DailyQuoteEntity> comparisonIndexQuoteMap,
+	private Flux<DailyQuoteEntity> recalculateComparisonIndex(Map<LocalDate, DailyQuoteEntity> comparisonIndexQuoteMap,
 			Map<String, DailyQuoteEntity> currentSymbolQuoteMap,
 			List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges,
 			Map<String, Collection<CurrencyEntity>> currencyMap) {
 		final List<LocalDate> comparisonIndexDates = comparisonIndexQuoteMap.keySet().stream()
-				.flatMap(str -> Stream.of(LocalDate.parse(str))).sorted().collect(Collectors.toList());
+				.sorted().collect(Collectors.toList());
 		final BigDecimal[] portfolioShares = List.of(BigDecimal.ZERO).toArray(new BigDecimal[1]);
 		Flux<DailyQuoteEntity> result = Flux.mergeSequential(comparisonIndexDates.stream().flatMap(myDate -> {
 			LOGGER.info("Date: {}", myDate.toString());
