@@ -17,14 +17,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,13 +58,21 @@ public class SymbolImportService {
 	private QuoteImportService quoteImportService;
 	private AtomicReference<List<SymbolEntity>> allSymbolEntities = new AtomicReference<List<SymbolEntity>>(
 			new ArrayList<>());
-
-	@PostConstruct
-	public void init() {
+	
+	@EventListener
+    public Mono<Integer> onApplicationEvent(ApplicationReadyEvent event) {
+        LOGGER.info("Refresh Symbols");
+        return this.refreshSymbolEntities();
+    }
+	
+	private Mono<Integer> refreshSymbolEntities() {
+		AtomicInteger atomicCount = new AtomicInteger(-1);
 		this.repository.findAll().collectList().subscribe(symbolEnities -> {
 			this.allSymbolEntities.set(symbolEnities);
+			atomicCount.getAndSet(symbolEnities.size());
 			LOGGER.info("{} symbols updated.", symbolEnities.size());
 		});
+		return Mono.just(atomicCount.get());
 	}
 
 	@Scheduled(cron = "0 0 1 * * ?")
@@ -80,11 +89,11 @@ public class SymbolImportService {
 		if (nasdaq != null) {
 			return nasdaq.filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-					.doAfterTerminate(() -> this.init());
+					.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 		}
 		return this.nasdaqConnector.importSymbols().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-				.doAfterTerminate(() -> this.init());
+				.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 	}
 
 	public Mono<Long> importHkSymbols(Flux<HkSymbolImportDto> hkex) {
@@ -92,11 +101,11 @@ public class SymbolImportService {
 		if (hkex != null) {
 			return hkex.filter(this::filter).flatMap(myDto -> this.convert(myDto))
 					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-					.doAfterTerminate(() -> this.init());
+					.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 		}
 		return this.hkexConnector.importSymbols().filter(this::filter).flatMap(myDto -> this.convert(myDto))
 				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-				.doAfterTerminate(() -> this.init());
+				.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 	}
 
 	public Mono<Long> importDeSymbols(Flux<String> xetra) {
@@ -105,13 +114,13 @@ public class SymbolImportService {
 			return xetra.filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
 					.groupBy(SymbolEntity::getSymbol).flatMap(group -> group.reduce((a, b) -> a))
 					.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-					.doAfterTerminate(() -> this.init());
+					.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 		}
 		return this.xetraConnector.importXetraSymbols().filter(this::filter).filter(this::filterXetra)
 				.flatMap(line -> this.convertXetra(line)).groupBy(SymbolEntity::getSymbol)
 				.flatMap(group -> group.reduce((a, b) -> a))
 				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count()
-				.doAfterTerminate(() -> this.init());
+				.doAfterTerminate(() -> this.refreshSymbolEntities().subscribe());
 	}
 
 	public Mono<Long> importReferenceIndexes(Flux<String> symbolStrs) {
@@ -132,7 +141,7 @@ public class SymbolImportService {
 					symbolStrsToImport.add(entity.getSymbol());
 					return entity;
 				}).count().doAfterTerminate(() -> {
-					this.init();
+					this.refreshSymbolEntities().subscribe();
 					symbolStrsToImport.forEach(mySymbolStr -> this.quoteImportService
 							.importUpdateDailyQuotes(mySymbolStr).subscribeOn(Schedulers.elastic())
 							.subscribe(value -> LOGGER.info("Indexquotes import done for: {}", mySymbolStr)));

@@ -47,7 +47,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableTransactionManagement
 public class ApplicationConfig extends AbstractR2dbcConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
-
+	
 	@Value("${spring.profiles.active:}")
 	private String activeProfile;
 	
@@ -99,4 +99,5 @@ public class ApplicationConfig extends AbstractR2dbcConfiguration {
 	public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
 		return new R2dbcTransactionManager(connectionFactory);
 	}
+	
 }
