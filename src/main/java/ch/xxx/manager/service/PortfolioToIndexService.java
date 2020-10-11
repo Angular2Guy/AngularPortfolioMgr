@@ -93,13 +93,12 @@ public class PortfolioToIndexService {
 	}
 
 	private Flux<DailyQuoteEntity> upsertIndexComparisonDate(Tuple3<LocalDate, BigDecimal[], BigDecimal> tuple,
-			Map<LocalDate, DailyQuoteEntity> comparisonIndexQuoteMap, Map<String, DailyQuoteEntity> currentSymbolQuoteMap,
-			Map<String, Collection<CurrencyEntity>> currencyMap) {
+			Map<LocalDate, DailyQuoteEntity> comparisonIndexQuoteMap,
+			Map<String, DailyQuoteEntity> currentSymbolQuoteMap, Map<String, Collection<CurrencyEntity>> currencyMap) {
 		Optional<DailyQuoteEntity> currentQuoteOpt = Optional
 				.ofNullable(currentSymbolQuoteMap.get(tuple.getA().toString()))
 				.filter(symbolQuote -> symbolQuote.getClose() != null && symbolQuote.getCurrencyId() != null);
-		Optional<DailyQuoteEntity> comparisonQuoteOpt = Optional
-				.ofNullable(comparisonIndexQuoteMap.get(tuple.getA()))
+		Optional<DailyQuoteEntity> comparisonQuoteOpt = Optional.ofNullable(comparisonIndexQuoteMap.get(tuple.getA()))
 				.filter(indexQuote -> indexQuote.getClose() != null && indexQuote.getCurrencyId() != null);
 		if (comparisonQuoteOpt.isEmpty()) {
 			return Flux.empty();
@@ -115,8 +114,9 @@ public class PortfolioToIndexService {
 			return Flux.empty();
 		}
 		BigDecimal comparisonQuoteEur = comparisonQuoteOpt.get().getClose().multiply(currencyQuoteOpt.get().getClose());
-		BigDecimal newPortfolioShares = tuple.getB()[0]
-				.add(tuple.getC().divide(comparisonQuoteEur, 10, RoundingMode.HALF_UP));
+		BigDecimal newPortfolioShares = tuple.getB()[0].add(tuple.getC().compareTo(BigDecimal.valueOf(0.0001)) > 0
+				? comparisonQuoteEur.divide(tuple.getC(), 10, RoundingMode.HALF_UP)
+				: BigDecimal.ZERO);
 		tuple.getB()[0] = newPortfolioShares;
 		DailyQuoteEntity newDailyQuoteEntity = currentQuoteOpt.orElse(new DailyQuoteEntity());
 		newDailyQuoteEntity.setCurrencyId(currencyQuoteOpt.get().getId());
@@ -146,8 +146,8 @@ public class PortfolioToIndexService {
 			Map<String, DailyQuoteEntity> currentSymbolQuoteMap,
 			List<Tuple3<PortfolioToSymbolEntity, SymbolEntity, DailyQuoteEntity>> sortedPortfolioChanges,
 			Map<String, Collection<CurrencyEntity>> currencyMap) {
-		final List<LocalDate> comparisonIndexDates = comparisonIndexQuoteMap.keySet().stream()
-				.sorted().collect(Collectors.toList());
+		final List<LocalDate> comparisonIndexDates = comparisonIndexQuoteMap.keySet().stream().sorted()
+				.collect(Collectors.toList());
 		final BigDecimal[] portfolioShares = List.of(BigDecimal.ZERO).toArray(new BigDecimal[1]);
 		Flux<DailyQuoteEntity> result = Flux.mergeSequential(comparisonIndexDates.stream().flatMap(myDate -> {
 			LOGGER.info("Date: {}", myDate.toString());
@@ -175,7 +175,7 @@ public class PortfolioToIndexService {
 						newValue = BigDecimal.valueOf(tuple3.getA().getWeight()).multiply(tuple3.getC().getClose());
 					} else if (currencyMap.containsKey(currentDate.toString())
 							&& currencyMap.get(currentDate.toString()).stream().anyMatch(
-									currencyEntity -> tuple3.getB().getCurr().equals(currencyEntity.getFrom_curr()))) {
+									currencyEntity -> tuple3.getB().getCurr().equals(currencyEntity.getTo_curr()))) {
 						BigDecimal currencyValue = currencyMap.get(currentDate.toString()).stream()
 								.filter(currencyEntity -> tuple3.getB().getCurr().equals(currencyEntity.getTo_curr()))
 								.map(currencyEntity -> currencyEntity.getClose()).findFirst().orElseThrow();
