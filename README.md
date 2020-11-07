@@ -1,4 +1,4 @@
-# AngularPortfolioMgr (retiered)
+# AngularPortfolioMgr (retired)
 
 
 ![Build Status](https://travis-ci.org/Angular2Guy/AngularPortfolioMgr.svg?branch=master)
