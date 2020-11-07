@@ -1,4 +1,4 @@
-# AngularPortfolioMgr
+# AngularPortfolioMgr (retiered)
 
 
 ![Build Status](https://travis-ci.org/Angular2Guy/AngularPortfolioMgr.svg?branch=master)
@@ -16,5 +16,15 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. 
 * The setup of the Angular fronted is done. 
 * The portfolio calculation is done.
+* The project is retired
 
-The features coming now will be further features on the existing architecture. 
+# Experiences gained from the project
+The project is now retired and has provided a valueable experience. I tried to use reactive programming with R2DBC and a normalized data model. The technology works and is Ok. The developers of R2DBC have done a good job.
+
+I have implemented the PortfolioCalculationService to get the combined value of a portfolio. The calculation needs values of several tables and combines them to the collective value. The code I ended up with is not easy to read and not what I would consider maintainable. Then I tried to implement the comparison of portfolios to standard indexes in the PortfolioToIndexService. It is not done and will not be done with R2DBC. For me the code is hard to read and hard to debug. 
+
+If there a people out there that disagree with my experience please send me a pull request or show me a fork on how to do a better implementation. 
+
+As a conclusion I would say that I have not found a solution to use a normalized data model and reactive programming in a maintainable manner. I will use for normalized data models Jpa in the future and accept that its model is less efficient. 
+
+A final thougth: Unsuccessful experiments provide important knowledge too. Either the result is lets use something like Jpa or an alternative approach to use R2DBC can evolve.
