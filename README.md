@@ -28,3 +28,6 @@ If there a people out there that disagree with my experience please send me a pu
 As a conclusion I would say that I have not found a solution to use a normalized data model and reactive programming in a maintainable manner. I will use for normalized data models Jpa in the future and accept that its model is less efficient. 
 
 A final thougth: Unsuccessful experiments provide important knowledge too. Either the result is lets use something like Jpa or an alternative approach to use R2DBC can evolve.
+
+# Future plans
+In some point in the future the backend will be replaced with a Jpa implementation. The current backend will remain availiable in the branch R2DBC-Implementation
