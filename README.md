@@ -5,7 +5,7 @@
 
 Author: Sven Loesekann
 
-Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Webflux, Spring Data R2DBC, Gradle, Docker
+Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Webflux, Spring Data R2DBC, Gradle, Docker, H2, Postgresql
 
 ## What is the goal?
 The goal is to provide an Angular based Web App with a reactive backend server that uses Webflux and Spring R2DBC technology. The build tool is Gradle.
