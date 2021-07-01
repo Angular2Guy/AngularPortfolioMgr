@@ -66,15 +66,15 @@ $ ./prepare-docker.sh --from-release --artemis-version {release-version}
 The output of the previous command is shown below.
 
 ```
-$ ./prepare-docker.sh --from-release --artemis-version 2.16.0
+$ ./prepare-docker.sh --from-release --artemis-version 2.17.0
 
-Downloading apache-artemis-2.16.0-bin.tar.gz from https://downloads.apache.org/activemq/activemq-artemis/2.16.0/...
+Downloading apache-artemis-2.17.0-bin.tar.gz from https://downloads.apache.org/activemq/activemq-artemis/2.17.0/...
 ################################################################################################################################################################################################################################ 100,0%
-Expanding _TMP_/artemis/2.16.0/apache-artemis-2.16.0-bin.tar.gz...
-Removing _TMP_/artemis/2.16.0/apache-artemis-2.16.0-bin.tar.gz...
-Using Artemis dist: _TMP_/artemis/2.16.0
-Docker file support files at : _TMP_/artemis/2.16.0/docker
-_TMP_/artemis/2.16.0/docker
+Expanding _TMP_/artemis/2.17.0/apache-artemis-2.17.0-bin.tar.gz...
+Removing _TMP_/artemis/2.17.0/apache-artemis-2.17.0-bin.tar.gz...
+Using Artemis dist: _TMP_/artemis/2.17.0
+Docker file support files at : _TMP_/artemis/2.17.0/docker
+_TMP_/artemis/2.17.0/docker
 ├── Dockerfile-adoptopenjdk-11
 ├── Dockerfile-centos
 ├── Dockerfile-debian
@@ -84,10 +84,10 @@ _TMP_/artemis/2.16.0/docker
 
 Well done! Now you can continue with the Docker image build.
 Building the Docker Image:
-  Go to _TMP_/artemis/2.16.0 where you prepared the binary with Docker files.
+  Go to _TMP_/artemis/2.17.0 where you prepared the binary with Docker files.
 
-  # Go to _TMP_/artemis/2.16.0
-  $ cd _TMP_/artemis/2.16.0
+  # Go to _TMP_/artemis/2.17.0
+  $ cd _TMP_/artemis/2.17.0
 
   # For Debian
   $ docker build -f ./docker/Dockerfile-debian -t artemis-debian .

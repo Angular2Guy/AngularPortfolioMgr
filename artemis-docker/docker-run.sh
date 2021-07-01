@@ -41,15 +41,14 @@ echo CREATE_ARGUMENTS=${CREATE_ARGUMENTS}
 
 if ! [ -f ./etc/broker.xml ]; then
     /opt/activemq-artemis/bin/artemis create ${CREATE_ARGUMENTS} .
+  	if [ "$(ls -A /default-config)" ]; then 
+		cp /default-config/* $BROKER_CONFIG_PATH 
+		echo "default-config copied"
+	else 
+		echo "no default-config provided"
+	fi  
 else
     echo "broker already created, ignoring creation"
-fi
-
-if [ "$(ls -A /default-config)" ]; then 
-	cp /default-config/* $BROKER_CONFIG_PATH 
-	echo "default-config copied"
-else 
-	echo "no default-config provided"
 fi
 
 exec ./bin/artemis "$@"
