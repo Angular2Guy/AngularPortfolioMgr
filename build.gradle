@@ -109,3 +109,13 @@ task testAngular {
 		}
 	}
 }
+
+task buildDockerImage {
+	if(project.hasProperty('buildDockerImage')) {	
+		bootBuildImage {
+			imageName = 'angular2guy/angularandspringwithmaps:latest'
+			environment = ["BPL_JVM_HEAD_ROOM" : "10","SPRING_PROFILES_ACTIVE" : "prod"]
+			publish = false
+		}
+	}
+}
