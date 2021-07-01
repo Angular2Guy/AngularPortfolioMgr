@@ -48,14 +48,21 @@ jobs:
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
     - name: Setup Java JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
-        java-version: 11
+        distribution: 'adopt'
+        java-version: 16
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
+    - if: matrix.language != 'java' 
+      name: Autobuild
       uses: github/codeql-action/autobuild@v1
+
+    - if: matrix.language == 'java' 
+      name: Build Java
+      run: |
+        gradle build -PwithAngular=true 
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
