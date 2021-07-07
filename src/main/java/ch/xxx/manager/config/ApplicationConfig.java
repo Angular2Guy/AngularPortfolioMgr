@@ -29,7 +29,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @EnableScheduling
-@EnableTransactionManagement
 public class ApplicationConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 	
