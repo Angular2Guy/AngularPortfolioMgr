@@ -13,128 +13,111 @@
 package ch.xxx.manager.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("daily_quote")
-public class DailyQuoteEntity {
+
+@Entity
+public class IntraDayQuote {
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-	private String symbol;
+	private String symbolKey;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
 	private BigDecimal close;
 	private Long volume;
-	private LocalDate localDay;
-	private Long symbolId;
-	private Long currencyId;
+	private LocalDateTime localDateTime;
+	private Symbol symbol;
 
-	public DailyQuoteEntity() {
+	public IntraDayQuote() {		
 	}
-
-	public DailyQuoteEntity(Long id, String symbol, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
-			Long volume, LocalDate localDay, Long symbolId, Long currencyId) {
+	
+	public IntraDayQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low,
+			BigDecimal close, Long volume, LocalDateTime localDateTime, Symbol symbol) {
 		super();
 		this.id = id;
-		this.symbol = symbol;
+		this.symbolKey = symbolKey;
 		this.open = open;
 		this.high = high;
 		this.low = low;
 		this.close = close;
 		this.volume = volume;
-		this.localDay = localDay;
-		this.symbolId = symbolId;
-		this.currencyId = currencyId;
+		this.localDateTime = localDateTime;
+		this.symbol = symbol;
+	}
+	
+	public LocalDateTime getLocalDateTime() {
+		return localDateTime;
 	}
 
-	public Long getSymbolId() {
-		return symbolId;
-	}
-
-	public void setSymbolId(Long symbolId) {
-		this.symbolId = symbolId;
+	public void setLocalDateTime(LocalDateTime localDateTime) {
+		this.localDateTime = localDateTime;
 	}
 
 	public Long getId() {
 		return id;
 	}
-
-	public LocalDate getLocalDay() {
-		return localDay;
-	}
-
-	public void setLocalDay(LocalDate localDay) {
-		this.localDay = localDay;
-	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	public BigDecimal getOpen() {
 		return open;
 	}
-
 	public void setOpen(BigDecimal open) {
 		this.open = open;
 	}
-
 	public BigDecimal getHigh() {
 		return high;
 	}
-
 	public void setHigh(BigDecimal high) {
 		this.high = high;
 	}
-
 	public BigDecimal getLow() {
 		return low;
 	}
-
 	public void setLow(BigDecimal low) {
 		this.low = low;
 	}
-
 	public BigDecimal getClose() {
 		return close;
 	}
-
 	public void setClose(BigDecimal close) {
 		this.close = close;
 	}
-
 	public Long getVolume() {
 		return volume;
 	}
-
 	public void setVolume(Long volume) {
 		this.volume = volume;
 	}
 
-	public String getSymbol() {
+	public String getSymbolKey() {
+		return symbolKey;
+	}
+
+	public void setSymbolKey(String symbolKey) {
+		this.symbolKey = symbolKey;
+	}
+
+	public Symbol getSymbol() {
 		return symbol;
 	}
 
-	public void setSymbol(String symbol) {
+	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
-	}
-
-	public Long getCurrencyId() {
-		return currencyId;
-	}
-
-	public void setCurrencyId(Long currencyId) {
-		this.currencyId = currencyId;
 	}
 
 	@Override
 	public String toString() {
-		return "DailyQuoteEntity [id=" + id + ", symbol=" + symbol + ", open=" + open + ", high=" + high + ", low="
-				+ low + ", close=" + close + ", volume=" + volume + ", localDay=" + localDay + ", symbolId=" + symbolId
-				+ ", currencyId=" + currencyId + "]";
+		return "IntraDayQuote [id=" + id + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
+				+ low + ", close=" + close + ", volume=" + volume + ", localDateTime=" + localDateTime + ", symbol="
+				+ symbol + "]";
 	}
-	
+
 }

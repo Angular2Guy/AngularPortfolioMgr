@@ -13,18 +13,18 @@
 package ch.xxx.manager.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import ch.xxx.manager.entity.IntraDayQuoteEntity;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.entity.IntraDayQuote;
 
-public interface IntraDayQuoteRepository extends R2dbcRepository<IntraDayQuoteEntity, Long> {
-	@Query("select * from intra_day_quote where symbol = :symbol order by local_date_time asc")
-	Flux<IntraDayQuoteEntity> findBySymbol(String symbol);
-	@Query("select * from intra_day_quote where symbol_id = :symbolId order by local_date_time asc")
-	Flux<IntraDayQuoteEntity> findBySymbolId(Long symbolId);
-	@Query("select * from intra_day_quote where symbol = :symbol and local_date_time between :start and :end order by local_date_time asc")
-	Flux<IntraDayQuoteEntity> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
+public interface IntraDayQuoteRepository extends JpaRepository<IntraDayQuote, Long> {
+	@Query("select * from intra_day_quote where symbol.symbol = :symbol order by local_date_time asc")
+	List<IntraDayQuote> findBySymbol(String symbol);
+	@Query("select * from intra_day_quote where symbol.id = :symbolId order by local_date_time asc")
+	List<IntraDayQuote> findBySymbolId(Long symbolId);
+	@Query("select * from intra_day_quote where symbol.symbol = :symbol and local_date_time between :start and :end order by local_date_time asc")
+	List<IntraDayQuote> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
 }

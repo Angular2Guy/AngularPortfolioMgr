@@ -13,22 +13,23 @@
 package ch.xxx.manager.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.DailyQuoteEntity;
+import ch.xxx.manager.entity.DailyQuote;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface DailyQuoteRepository extends R2dbcRepository<DailyQuoteEntity, Long> {
-	@Query("select * from daily_quote where symbol = :symbol order by local_day asc")
-	Flux<DailyQuoteEntity> findBySymbol(String symbol);
+public interface DailyQuoteRepository extends JpaRepository<DailyQuote, Long> {
+	@Query("select * from daily_quote where symbol.symbol = :symbol order by local_day asc")
+	List<DailyQuote> findBySymbol(String symbol);
 	
-	@Query("select * from daily_quote where symbol_id = :symbolId order by local_day asc")
-	Flux<DailyQuoteEntity> findBySymbolId(Long symbolId);
+	@Query("select * from daily_quote where symbol.symbol.id = :symbolId order by local_day asc")
+	Flux<DailyQuote> findBySymbolId(Long symbolId);
 	
-	@Query("select * from daily_quote where symbol = :symbol and local_day between :start and :end order by local_day asc")
-	Flux<DailyQuoteEntity> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
+	@Query("select * from daily_quote where symbol.symbol = :symbol and local_day between :start and :end order by local_day asc")
+	Flux<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

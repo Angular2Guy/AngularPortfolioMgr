@@ -12,15 +12,17 @@
  */
 package ch.xxx.manager.repository;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.CurrencyEntity;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.entity.Currency;
+import ch.xxx.manager.utils.CurrencyKey;
 
 @Repository
-public interface CurrencyRepository extends R2dbcRepository<CurrencyEntity, Long> {
+public interface CurrencyRepository extends JpaRepository<Currency, Long> {
 	@Query("select * from currency where to_curr = :toCurr")
-	Flux<CurrencyEntity> findByToCurr(String toCurr);	
+	Optional<Currency> findByToCurr(CurrencyKey toCurr);	
 }

@@ -15,15 +15,19 @@ package ch.xxx.manager.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("appuser")
-public class AppUserEntity {
+
+@Entity
+public class AppUser {
 	@Id	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-	private String username;
-	private LocalDate birthdate;
+	private String userName;
+	private LocalDate birthDate;
 	private LocalDateTime updatedAt = LocalDateTime.now();	
 	private String password;
 	private String emailAddress;
@@ -32,12 +36,12 @@ public class AppUserEntity {
 	private boolean enabled;
 	private String uuid;
 	
-	public AppUserEntity(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
+	public AppUser(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
 			boolean locked, boolean enabled, String uuid) {
 		super();
 		this.id = id;
-		this.username = userName;
-		this.birthdate = birthdate;
+		this.userName = userName;
+		this.birthDate = birthdate;
 		this.password = password;
 		this.emailAddress = emailAddress;
 		this.userRole = userRole;
@@ -46,7 +50,7 @@ public class AppUserEntity {
 		this.uuid = uuid;
 	}
 
-	public AppUserEntity() {		
+	public AppUser() {		
 	}
 	
 	public String getEmailAddress() {
@@ -62,12 +66,6 @@ public class AppUserEntity {
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public LocalDate getBirthdate() {
-		return birthdate;
-	}
-	public void setBirthdate(LocalDate birthdate) {
-		this.birthdate = birthdate;
 	}
 
 	public LocalDateTime getUpdatedAt() {
@@ -110,20 +108,35 @@ public class AppUserEntity {
 		this.enabled = enabled;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getUuid() {
 		return uuid;
 	}
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public LocalDate getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	@Override
+	public String toString() {
+		return "AppUser [id=" + id + ", userName=" + userName + ", birthDate=" + birthDate + ", updatedAt=" + updatedAt
+				+ ", password=" + password + ", emailAddress=" + emailAddress + ", userRole=" + userRole + ", locked="
+				+ locked + ", enabled=" + enabled + ", uuid=" + uuid + "]";
 	}
 	
 }

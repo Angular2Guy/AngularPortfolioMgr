@@ -12,31 +12,37 @@
  */
 package ch.xxx.manager.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("symbol")
-public class SymbolEntity {
-	public enum SymbolCurrency { EUR, HKD, USD }
+import ch.xxx.manager.utils.CurrencyKey;
+
+
+
+@Entity
+public class Symbol {
 	public enum QuoteSource { ALPHAVANTAGE, YAHOO, PORTFOLIO }
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private String symbol;
 	private String name;
-	private String curr;
+	private CurrencyKey currencyKey;
 	private String source;
 	
 	
-	public SymbolEntity() {		
+	public Symbol() {		
 	}
 	
-	public SymbolEntity(Long id, String symbol, String name, SymbolCurrency currency, QuoteSource quoteSource) {
+	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
-		this.curr = currency.toString();
+		this.currencyKey = currencyKey;
 		this.source = quoteSource.toString();
 	}
 	
@@ -58,16 +64,24 @@ public class SymbolEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getCurr() {
-		return curr;
-	}
-	public void setCurr(String currency) {
-		this.curr = currency;
-	}
 	public String getSource() {
 		return source;
 	}
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
+	}
+
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
+	}
+
+	@Override
+	public String toString() {
+		return "Symbol [id=" + id + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
+				+ ", source=" + source + "]";
 	}
 }

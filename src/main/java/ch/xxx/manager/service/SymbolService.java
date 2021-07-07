@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.dto.SymbolDto;
-import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.entity.Symbol;
 import ch.xxx.manager.repository.SymbolRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,26 +28,26 @@ public class SymbolService {
 	@Autowired
 	private SymbolRepository repository;
 
-	public Flux<SymbolDto> getAllSymbols() {
-		return this.repository.findAll().flatMap(entity -> this.convert(entity));
-	}
+//	public Flux<SymbolDto> getAllSymbols() {
+//		return this.repository.findAll().flatMap(entity -> this.convert(entity));
+//	}
 
-	public Flux<SymbolDto> getSymbolBySymbol(String symbol) {
-		if (symbol != null && symbol.trim().length() > 2) {
-			return this.repository.findBySymbol("%" + symbol.trim().toLowerCase() + "%").flatMap(entity -> this.convert(entity));
-		}
-		return Flux.empty();
-	}
-
-	public Flux<SymbolDto> getSymbolByName(String name) {
-		if (name != null && name.trim().length() > 2) {
-			return this.repository.findByName("%" + name.trim().toLowerCase() + "%")
-					.flatMap(entity -> this.convert(entity));
-		}
-		return Flux.empty();
-	}
-
-	private Mono<SymbolDto> convert(SymbolEntity entity) {
-		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getSource()));
-	}
+//	public Flux<SymbolDto> getSymbolBySymbol(String symbol) {
+//		if (symbol != null && symbol.trim().length() > 2) {
+//			return this.repository.findBySymbol("%" + symbol.trim().toLowerCase() + "%").flatMap(entity -> this.convert(entity));
+//		}
+//		return Flux.empty();
+//	}
+//
+//	public Flux<SymbolDto> getSymbolByName(String name) {
+//		if (name != null && name.trim().length() > 2) {
+//			return this.repository.findByName("%" + name.trim().toLowerCase() + "%")
+//					.flatMap(entity -> this.convert(entity));
+//		}
+//		return Flux.empty();
+//	}
+//
+//	private Mono<SymbolDto> convert(Symbol entity) {
+//		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getSource()));
+//	}
 }

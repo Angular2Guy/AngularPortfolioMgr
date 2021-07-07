@@ -12,19 +12,20 @@
  */
 package ch.xxx.manager.repository;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.PortfolioToSymbolEntity;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.entity.PortfolioToSymbol;
 
 @Repository
-public interface PortfolioToSymbolRepository extends R2dbcRepository<PortfolioToSymbolEntity, Long> {
-	@Query("select * from portfolio_to_symbol where portfolio_id = :portfolioId")
-	Flux<PortfolioToSymbolEntity> findByPortfolioId(Long portfolioId);
-	@Query("select * from portfolio_to_symbol where symbol_id = :symbolId")
-	Flux<PortfolioToSymbolEntity> findBySymbolId(Long symbolId);
-	@Query("select * from portfolio_to_symbol where symbol_id = :symbolId and portfolio_id = :portfolioId")
-	Flux<PortfolioToSymbolEntity> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
+public interface PortfolioToSymbolRepository extends JpaRepository<PortfolioToSymbol, Long> {
+	@Query("select * from portfolio_to_symbol where portfolio.id = :portfolioId")
+	List<PortfolioToSymbol> findByPortfolioId(Long portfolioId);
+	@Query("select * from portfolio_to_symbol where symbol.id = :symbolId")
+	List<PortfolioToSymbol> findBySymbolId(Long symbolId);
+	@Query("select * from portfolio_to_symbol where symbol.id = :symbolId and portfolio.id = :portfolioId")
+	List<PortfolioToSymbol> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
 }

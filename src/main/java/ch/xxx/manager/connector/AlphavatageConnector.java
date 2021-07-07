@@ -1,5 +1,5 @@
 /**
- *    Copyright 2019 Sven Loesekann
+     Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ch.xxx.manager.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.dto.DailyWrapperImportDto;
 import ch.xxx.manager.dto.IntraDayWrapperImportDto;
-import ch.xxx.manager.entity.SymbolEntity;
+import ch.xxx.manager.utils.CurrencyKey;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -58,7 +58,7 @@ public class AlphavatageConnector {
 	
 	public Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
 		try {
-			final String from_currency = SymbolEntity.SymbolCurrency.EUR.toString();
+			final String from_currency = CurrencyKey.EUR.toString();
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : ""; 
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
 				.uri(new URI(String.format("https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s", from_currency, to_currency, fullSeriesStr, this.apiKey)))				                            

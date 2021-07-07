@@ -11,23 +11,23 @@
    limitations under the License.
  */
 package ch.xxx.manager.service;
-import ch.xxx.manager.entity.SymbolEntity.QuoteSource;
-import ch.xxx.manager.entity.SymbolEntity.SymbolCurrency;
+import ch.xxx.manager.entity.Symbol.QuoteSource;
+import ch.xxx.manager.utils.CurrencyKey;
 
 public enum ComparisonIndex {
-	SP500("IVV", "S&P 500 ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE),
-	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", SymbolCurrency.EUR, QuoteSource.ALPHAVANTAGE),
-	MSCI_CHINA("ICGA.DE", "Msci China ETF", SymbolCurrency.USD, QuoteSource.ALPHAVANTAGE);
+	SP500("IVV", "S&P 500 ETF", CurrencyKey.USD, QuoteSource.ALPHAVANTAGE),
+	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", CurrencyKey.EUR, QuoteSource.ALPHAVANTAGE),
+	MSCI_CHINA("ICGA.DE", "Msci China ETF", CurrencyKey.USD, QuoteSource.ALPHAVANTAGE);
 
 	private String symbol;
 	private String name;
-	private SymbolCurrency currency;
+	private CurrencyKey currencyKey;
 	private QuoteSource source;
 
-	private ComparisonIndex(String symbol, String name, SymbolCurrency currency, QuoteSource source) {
+	private ComparisonIndex(String symbol, String name, CurrencyKey currency, QuoteSource source) {
 		this.symbol = symbol;
 		this.name = name;
-		this.currency = currency;
+		this.currencyKey = currency;
 		this.source = source;
 	}
 
@@ -39,8 +39,8 @@ public enum ComparisonIndex {
 		return name;
 	}
 
-	public SymbolCurrency getCurrency() {
-		return currency;
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
 	}
 
 	public QuoteSource getSource() {

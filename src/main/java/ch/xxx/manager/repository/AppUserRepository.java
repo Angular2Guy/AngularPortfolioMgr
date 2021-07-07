@@ -12,15 +12,16 @@
  */
 package ch.xxx.manager.repository;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import java.util.Optional;
 
-import ch.xxx.manager.entity.AppUserEntity;
-import reactor.core.publisher.Mono;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface AppUserRepository extends R2dbcRepository<AppUserEntity, Long> {
+import ch.xxx.manager.entity.AppUser;
+
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 		@Query("select * from appuser where username = :username")
-		Mono<AppUserEntity> findByUsername(String username);
+		Optional<AppUser> findByUsername(String username);
 		@Query("select * from appuser where uuid = :uuid")
-		Mono<AppUserEntity> findByUuid(String uuid);
+		Optional<AppUser> findByUuid(String uuid);
 }

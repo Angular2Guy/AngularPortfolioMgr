@@ -15,12 +15,16 @@ package ch.xxx.manager.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("portfolio")
-public class PortfolioEntity {
+
+@Entity
+public class Portfolio {
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private Long userId;
 	private String name;
@@ -92,6 +96,7 @@ public class PortfolioEntity {
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
 	}
+	
 	@Override
 	public String toString() {
 		return "PortfolioEntity [id=" + id + ", userId=" + userId + ", name=" + name + ", createdAt=" + createdAt

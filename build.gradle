@@ -26,14 +26,13 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'	
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'io.r2dbc:r2dbc-proxy'
-	implementation 'io.netty:netty-codec-http'
-	implementation 'org.tuckey:urlrewritefilter:4.0.4'	
+	implementation 'org.liquibase:liquibase-core'
 	implementation 'io.springfox:springfox-swagger2:2.9.2'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 	implementation 'commons-net:commons-net:3.6'	
@@ -43,18 +42,15 @@ dependencies {
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '0.19.0'
 			
 	if(project.hasProperty('withAngular')) {
-		runtimeOnly 'io.r2dbc:r2dbc-postgresql'
 		runtimeOnly 'org.postgresql:postgresql'
 		testImplementation 'com.h2database:h2'
-		testImplementation 'io.r2dbc:r2dbc-h2'
 	} else {
 		runtimeOnly 'com.h2database:h2'
-		runtimeOnly 'io.r2dbc:r2dbc-h2'
 	}
 }
 
@@ -113,7 +109,7 @@ task testAngular {
 task buildDockerImage {
 	if(project.hasProperty('buildDockerImage')) {	
 		bootBuildImage {
-			imageName = 'angular2guy/angularandspringwithmaps:latest'
+			imageName = 'angular2guy/angularportfoliomgr:latest'
 			environment = ["BPL_JVM_HEAD_ROOM" : "10","SPRING_PROFILES_ACTIVE" : "prod"]
 			publish = false
 		}

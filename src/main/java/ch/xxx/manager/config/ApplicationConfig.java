@@ -17,35 +17,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
-import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager;
-import org.springframework.data.r2dbc.connectionfactory.TransactionAwareConnectionFactoryProxy;
-import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePopulator;
-import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
-import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
-import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.r2dbc.proxy.ProxyConnectionFactory;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactory;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableR2dbcRepositories
 @EnableSwagger2
 @EnableScheduling
 @EnableTransactionManagement
-public class ApplicationConfig extends AbstractR2dbcConfiguration {
+public class ApplicationConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 	
 	@Value("${spring.profiles.active:}")
@@ -59,45 +44,45 @@ public class ApplicationConfig extends AbstractR2dbcConfiguration {
 		return objectMapper;
 	}
 	
-	@Override
-	@Bean
-	public ConnectionFactory connectionFactory() {
-		if (this.activeProfile.contains("prod")) {
-			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(this.connectionFactory());
-			return transactionAwareConnectionFactoryProxy;
-		} else {
-			ConnectionFactory connectionFactory = ConnectionFactories
-					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");			
-			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(connectionFactory);
-			return ProxyConnectionFactory.builder(transactionAwareConnectionFactoryProxy)
-//					.onAfterQuery(
-//							queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
-					.build();
-		}
-	}
-
-	@Bean
-	public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
-		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
-		initializer.setConnectionFactory(connectionFactory);
-		if (!this.activeProfile.contains("prod")) {
-			CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
-			populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/schema.sql")));
-			populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/data.sql")));
-			initializer.setDatabasePopulator(populator);
-		}
-
-		return initializer;
-	}	
-	
-	@Bean
-	public ServerCodecConfigurer serverCodecConfigurer() {
-		return new DefaultServerCodecConfigurer();
-	}
-
-	@Bean
-	public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
-		return new R2dbcTransactionManager(connectionFactory);
-	}
+//	@Override
+//	@Bean
+//	public ConnectionFactory connectionFactory() {
+//		if (this.activeProfile.contains("prod")) {
+//			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(this.connectionFactory());
+//			return transactionAwareConnectionFactoryProxy;
+//		} else {
+//			ConnectionFactory connectionFactory = ConnectionFactories
+//					.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;");			
+//			TransactionAwareConnectionFactoryProxy transactionAwareConnectionFactoryProxy = new TransactionAwareConnectionFactoryProxy(connectionFactory);
+//			return ProxyConnectionFactory.builder(transactionAwareConnectionFactoryProxy)
+////					.onAfterQuery(
+////							queryExecInfo -> LOGGER.info(QueryExecutionInfoFormatter.showAll().format(queryExecInfo)))
+//					.build();
+//		}
+//	}
+//
+//	@Bean
+//	public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
+//		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
+//		initializer.setConnectionFactory(connectionFactory);
+//		if (!this.activeProfile.contains("prod")) {
+//			CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
+//			populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/schema.sql")));
+//			populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("/local/data.sql")));
+//			initializer.setDatabasePopulator(populator);
+//		}
+//
+//		return initializer;
+//	}	
+//	
+//	@Bean
+//	public ServerCodecConfigurer serverCodecConfigurer() {
+//		return new DefaultServerCodecConfigurer();
+//	}
+//
+//	@Bean
+//	public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+//		return new R2dbcTransactionManager(connectionFactory);
+//	}
 	
 }

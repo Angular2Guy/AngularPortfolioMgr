@@ -15,30 +15,36 @@ package ch.xxx.manager.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("currency")
-public class CurrencyEntity {
+import ch.xxx.manager.utils.CurrencyKey;
+
+
+@Entity
+public class Currency {
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private LocalDate localDay;
-	private String from_curr;
-	private String to_curr;
+	private CurrencyKey fromCurrKey;
+	private CurrencyKey toCurrKey;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
 	private BigDecimal close;
 	
-	public CurrencyEntity() {
+	public Currency() {
 	}
 	
-	public CurrencyEntity(LocalDate localDay, String from_curr, String to_curr, BigDecimal open, BigDecimal high, BigDecimal low,
+	public Currency(LocalDate localDay, CurrencyKey fromCurrKey, CurrencyKey toCurrKey, BigDecimal open, BigDecimal high, BigDecimal low,
 			BigDecimal close) {
 		super();
 		this.localDay = localDay;
-		this.from_curr = from_curr;
-		this.to_curr = to_curr;
+		this.fromCurrKey = fromCurrKey;
+		this.toCurrKey = toCurrKey;
 		this.open = open;
 		this.high = high;
 		this.low = low;
@@ -51,22 +57,6 @@ public class CurrencyEntity {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getFrom_curr() {
-		return from_curr;
-	}
-
-	public void setFrom_curr(String from_curr) {
-		this.from_curr = from_curr;
-	}
-
-	public String getTo_curr() {
-		return to_curr;
-	}
-
-	public void setTo_curr(String to_curr) {
-		this.to_curr = to_curr;
 	}
 
 	public BigDecimal getOpen() {
@@ -109,9 +99,27 @@ public class CurrencyEntity {
 		this.localDay = localDay;
 	}
 
+
+	public CurrencyKey getFromCurrKey() {
+		return fromCurrKey;
+	}
+
+	public void setFromCurrKey(CurrencyKey fromCurrKey) {
+		this.fromCurrKey = fromCurrKey;
+	}
+
+	public CurrencyKey getToCurrKey() {
+		return toCurrKey;
+	}
+
+	public void setToCurrKey(CurrencyKey toCurrKey) {
+		this.toCurrKey = toCurrKey;
+	}
+
 	@Override
 	public String toString() {
-		return "CurrencyEntity [id=" + id + ", localDay=" + localDay + ", from_curr=" + from_curr + ", to_curr="
-				+ to_curr + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + "]";
+		return "Currency [id=" + id + ", localDay=" + localDay + ", fromCurrKey=" + fromCurrKey + ", toCurrKey="
+				+ toCurrKey + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + "]";
 	}
+
 }

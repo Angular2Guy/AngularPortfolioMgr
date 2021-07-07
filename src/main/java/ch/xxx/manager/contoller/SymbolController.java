@@ -42,39 +42,39 @@ public class SymbolController {
 	@Autowired
 	private XetraConnector xetraConnector;
 
-	@GetMapping("/importus/all")
-	public Mono<Long> importUsSymbols() {
-		return this.importService.importUsSymbols(this.nasdaqConnector.importSymbols());
-	}
-
-	@GetMapping("/importhk/all")
-	public Mono<Long> importHkSymbols() {
-		return this.importService.importHkSymbols(this.hkexConnector.importSymbols());
-	}
-
-	@GetMapping("/importde/all")
-	public Mono<Long> importDeSymbols() {
-		return this.importService.importDeSymbols(this.xetraConnector.importXetraSymbols());
-	}
-
-	@GetMapping("/importindex/all")
-	public Mono<Long> importIndexSymbols() {
-		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndex.SP500.getSymbol(),
-				ComparisonIndex.MSCI_CHINA.getSymbol(), ComparisonIndex.EUROSTOXX50.getSymbol()));
-	}
-
-	@GetMapping("/all")
-	public Flux<SymbolDto> getAllSymbols() {
-		return this.service.getAllSymbols();
-	}
-
-	@GetMapping("/symbol/{symbol}")
-	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
-		return this.service.getSymbolBySymbol(symbol);
-	}
-
-	@GetMapping("/name/{name}")
-	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
-		return this.service.getSymbolByName(name);
-	}
+//	@GetMapping("/importus/all")
+//	public Mono<Long> importUsSymbols() {
+//		return this.importService.importUsSymbols(this.nasdaqConnector.importSymbols());
+//	}
+//
+//	@GetMapping("/importhk/all")
+//	public Mono<Long> importHkSymbols() {
+//		return this.importService.importHkSymbols(this.hkexConnector.importSymbols());
+//	}
+//
+//	@GetMapping("/importde/all")
+//	public Mono<Long> importDeSymbols() {
+//		return this.importService.importDeSymbols(this.xetraConnector.importXetraSymbols());
+//	}
+//
+//	@GetMapping("/importindex/all")
+//	public Mono<Long> importIndexSymbols() {
+//		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndex.SP500.getSymbol(),
+//				ComparisonIndex.MSCI_CHINA.getSymbol(), ComparisonIndex.EUROSTOXX50.getSymbol()));
+//	}
+//
+//	@GetMapping("/all")
+//	public Flux<SymbolDto> getAllSymbols() {
+//		return this.service.getAllSymbols();
+//	}
+//
+//	@GetMapping("/symbol/{symbol}")
+//	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
+//		return this.service.getSymbolBySymbol(symbol);
+//	}
+//
+//	@GetMapping("/name/{name}")
+//	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
+//		return this.service.getSymbolByName(name);
+//	}
 }

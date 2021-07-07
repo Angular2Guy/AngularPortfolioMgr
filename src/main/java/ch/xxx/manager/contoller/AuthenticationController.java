@@ -53,35 +53,35 @@ public class AuthenticationController {
 	@Autowired
 	private AppUserService appUserService;
 	
-	@PostMapping("/authorize")
-	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
-		String tokenRoles = JwtUtils.getTokenRoles(header, jwtTokenProvider);
-		if (tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
-			return Mono.just(new AuthCheckDto(authcheck.getPath(), true));
-		} else {
-			return Mono.just(new AuthCheckDto(authcheck.getPath(), false));
-		}
-	}
-	
-	@PostMapping("/signin")
-	public Mono<Boolean> postUserSignin(@RequestBody AppUserDto myUser) {
-		return this.appUserService.signin(myUser);
-	}
-	
-	@GetMapping("/confirm/{uuid}")
-	public Mono<Boolean> getConfirmUuid(@PathVariable String uuid) {
-		return this.appUserService.confirmUuid(uuid);
-	}
-
-	@PostMapping("/login")
-	public Mono<AppUserDto> postUserLogin(@RequestBody AppUserDto myUser) {
-		return this.appUserService.login(myUser);
-	}
-	
-	@GetMapping("/refreshToken")
-	public Mono<RefreshTokenDto> getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
-		return this.appUserService.refreshToken(bearerStr);
-	}
+//	@PostMapping("/authorize")
+//	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
+//		String tokenRoles = JwtUtils.getTokenRoles(header, jwtTokenProvider);
+//		if (tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
+//			return Mono.just(new AuthCheckDto(authcheck.getPath(), true));
+//		} else {
+//			return Mono.just(new AuthCheckDto(authcheck.getPath(), false));
+//		}
+//	}
+//	
+//	@PostMapping("/signin")
+//	public Mono<Boolean> postUserSignin(@RequestBody AppUserDto myUser) {
+//		return this.appUserService.signin(myUser);
+//	}
+//	
+//	@GetMapping("/confirm/{uuid}")
+//	public Mono<Boolean> getConfirmUuid(@PathVariable String uuid) {
+//		return this.appUserService.confirmUuid(uuid);
+//	}
+//
+//	@PostMapping("/login")
+//	public Mono<AppUserDto> postUserLogin(@RequestBody AppUserDto myUser) {
+//		return this.appUserService.login(myUser);
+//	}
+//	
+//	@GetMapping("/refreshToken")
+//	public Mono<RefreshTokenDto> getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
+//		return this.appUserService.refreshToken(bearerStr);
+//	}
 	
 //	@GetMapping("/id/{id}")
 //	public Mono<AppUserDto> getUser(@PathVariable Long id) {

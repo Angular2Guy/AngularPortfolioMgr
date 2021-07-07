@@ -14,15 +14,19 @@ package ch.xxx.manager.entity;
 
 import java.time.LocalDate;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Table("portfolio_to_symbol")
-public class PortfolioToSymbolEntity {
+
+@Entity
+public class PortfolioToSymbol {
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-	private Long portfolioId;
-	private Long symbolId;
+	private Portfolio portfolio;
+	private Symbol symbol;
 	private Long weight;
 	private LocalDate changedAt;
 	private LocalDate removedAt;
@@ -51,22 +55,22 @@ public class PortfolioToSymbolEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getPortfolioId() {
-		return portfolioId;
+	public Portfolio getPortfolio() {
+		return portfolio;
 	}
-	public void setPortfolioId(Long portfolioId) {
-		this.portfolioId = portfolioId;
+	public void setPortfolio(Portfolio portfolio) {
+		this.portfolio = portfolio;
 	}
-	public Long getSymbolId() {
-		return symbolId;
+	public Symbol getSymbol() {
+		return symbol;
 	}
-	public void setSymbolId(Long symbolId) {
-		this.symbolId = symbolId;
-	}
-	@Override
-	public String toString() {
-		return "PortfolioToSymbolEntity [id=" + id + ", portfolioId=" + portfolioId + ", symbolId=" + symbolId
-				+ ", weight=" + weight + ", changedAt=" + changedAt + ", removedAt=" + removedAt + "]";
+	public void setSymbol(Symbol symbol) {
+		this.symbol = symbol;
 	}
 	
+	@Override
+	public String toString() {
+		return "PortfolioToSymbol [id=" + id + ", portfolio=" + portfolio + ", symbol=" + symbol + ", weight=" + weight
+				+ ", changedAt=" + changedAt + ", removedAt=" + removedAt + "]";
+	}
 }

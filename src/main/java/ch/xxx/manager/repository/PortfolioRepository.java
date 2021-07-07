@@ -12,15 +12,16 @@
  */
 package ch.xxx.manager.repository;
 
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.entity.PortfolioEntity;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.entity.Portfolio;
 
 @Repository
-public interface PortfolioRepository extends R2dbcRepository<PortfolioEntity, Long> {
-	@Query("select * from portfolio where user_id = :userId")
-	Flux<PortfolioEntity> findByUserId(Long userId);
+public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
+	@Query("select * from portfolio where userId = :userId")
+	List<Portfolio> findByUserId(Long userId);
 }

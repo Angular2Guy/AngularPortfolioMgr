@@ -10,14 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.entity;
+package ch.xxx.manager.entity.dto;
 
 import java.time.LocalDate;
 
-import org.springframework.data.relational.core.mapping.Table;
+import ch.xxx.manager.utils.CurrencyKey;
 
-@Table
-public class PortfolioAndSymbolEntity {
+public class PortfolioAndSymbolDto {
 	private Long id;
 	private Long userId;
 	private String portfolioName;
@@ -28,7 +27,26 @@ public class PortfolioAndSymbolEntity {
 	private Long symbolId;
 	private String symbol;
 	private String symbolName;
-	private String curr;
+	private CurrencyKey currencyKey;
+
+	public PortfolioAndSymbolDto() {}
+	
+	public PortfolioAndSymbolDto(Long id, Long userId, String portfolioName, LocalDate createdAt, Long weight,
+			LocalDate changedAt, LocalDate removedAt, Long symbolId, String symbol, String symbolName,
+			CurrencyKey currencyKey) {
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.portfolioName = portfolioName;
+		this.createdAt = createdAt;
+		this.weight = weight;
+		this.changedAt = changedAt;
+		this.removedAt = removedAt;
+		this.symbolId = symbolId;
+		this.symbol = symbol;
+		this.symbolName = symbolName;
+		this.currencyKey = currencyKey;
+	}
 	
 	public Long getId() {
 		return id;
@@ -90,18 +108,19 @@ public class PortfolioAndSymbolEntity {
 	public void setSymbolName(String symbolName) {
 		this.symbolName = symbolName;
 	}
-	public String getCurr() {
-		return curr;
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
 	}
-	public void setCurr(String curr) {
-		this.curr = curr;
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
 	}
 	
 	@Override
 	public String toString() {
-		return "PortfolioAndSymbolEntity [id=" + id + ", userId=" + userId + ", portfolioName=" + portfolioName
+		return "PortfolioAndSymbol [id=" + id + ", userId=" + userId + ", portfolioName=" + portfolioName
 				+ ", createdAt=" + createdAt + ", weight=" + weight + ", changedAt=" + changedAt + ", removedAt="
-				+ removedAt + ", symbolId=" + symbolId + ", symbol=" + symbol + ", symbolName=" + symbolName + ", curr="
-				+ curr + "]";
+				+ removedAt + ", symbolId=" + symbolId + ", symbol=" + symbol + ", symbolName=" + symbolName
+				+ ", currencyKey=" + currencyKey + "]";
 	}
+	
 }
