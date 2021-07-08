@@ -23,6 +23,6 @@ import ch.xxx.manager.utils.CurrencyKey;
 
 @Repository
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
-	@Query("select * from currency where to_curr = :toCurr")
+	@Query("select c from Currency c where c.toCurrKey = :toCurr")
 	Optional<Currency> findByToCurr(CurrencyKey toCurr);	
 }

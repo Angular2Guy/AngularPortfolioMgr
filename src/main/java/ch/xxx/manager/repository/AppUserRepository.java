@@ -20,8 +20,8 @@ import org.springframework.data.jpa.repository.Query;
 import ch.xxx.manager.entity.AppUser;
 
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-		@Query("select * from appuser where username = :username")
+		@Query("select au from AppUser au where au.userName = :username")
 		Optional<AppUser> findByUsername(String username);
-		@Query("select * from appuser where uuid = :uuid")
+		@Query("select au from AppUser au where au.uuid = :uuid")
 		Optional<AppUser> findByUuid(String uuid);
 }

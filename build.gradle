@@ -22,7 +22,6 @@ sourceCompatibility = '16'
 
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {

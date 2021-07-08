@@ -1,5 +1,5 @@
-/**
- *    Copyright 2019 Sven Loesekann
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -9,19 +9,15 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
-package ch.xxx.manager.repository;
+ -->
+<databaseChangeLog  
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"  
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"> 
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
-import ch.xxx.manager.entity.Portfolio;
-
-@Repository
-public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
-	@Query("select p from Portfolio p where p.appUser.id = :userId")
-	List<Portfolio> findByUserId(Long userId);
-}
+	<include file="changes/db.changelog-1.xml" relativeToChangelogFile="true"/>
+	
+	<include file="db.changelog-loaddata.xml" relativeToChangelogFile="true"/>
+	
+</databaseChangeLog>

@@ -22,12 +22,12 @@ import ch.xxx.manager.entity.Symbol;
 
 @Repository
 public interface SymbolRepository extends JpaRepository<Symbol, Long> {	
-	@Query("select * from symbol s where lower(s.symbol) like :symbol")
+	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
 	List<Symbol> findBySymbol(String symbol);
-	@Query("select * from symbol s where lower(s.symbol) = :symbol")
+	@Query("select s from Symbol s where lower(s.symbol) = :symbol")
 	List<Symbol> findBySymbolSingle(String symbol);
-	@Query("select * from symbol s where lower(s.name) like :name")
+	@Query("select s from Symbol s where lower(s.name) like :name")
 	List<Symbol> findByName(String name);
-	@Query("select * from symbol s, portfolio_to_symbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
+	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
 	List<Symbol> findByPortfolioId(Long portfolioId);
 }

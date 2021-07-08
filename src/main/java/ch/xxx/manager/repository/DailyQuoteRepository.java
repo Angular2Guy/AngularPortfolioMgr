@@ -20,16 +20,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.entity.DailyQuote;
-import reactor.core.publisher.Flux;
 
 @Repository
 public interface DailyQuoteRepository extends JpaRepository<DailyQuote, Long> {
-	@Query("select * from daily_quote where symbol.symbol = :symbol order by local_day asc")
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol order by dq.localDay asc")
 	List<DailyQuote> findBySymbol(String symbol);
 	
-	@Query("select * from daily_quote where symbol.symbol.id = :symbolId order by local_day asc")
-	Flux<DailyQuote> findBySymbolId(Long symbolId);
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id = :symbolId order by dq.localDay asc")
+	List<DailyQuote> findBySymbolId(Long symbolId);
 	
-	@Query("select * from daily_quote where symbol.symbol = :symbol and local_day between :start and :end order by local_day asc")
-	Flux<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol and dq.localDay between :start and :end order by dq.localDay asc")
+	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

@@ -14,11 +14,15 @@ package ch.xxx.manager.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 
 
 @Entity
@@ -26,7 +30,8 @@ public class Portfolio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-	private Long userId;
+	@ManyToOne
+	private AppUser appUser;
 	private String name;
 	private LocalDate createdAt;
 	private BigDecimal month1;
@@ -35,24 +40,22 @@ public class Portfolio {
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;
+	@OneToMany(mappedBy = "portfolio")
+	private Set<PortfolioToSymbol> portfolioToSymbols;
+	
+	@PrePersist
+	void init() {
+		this.createdAt = LocalDate.now();
+	}
 
 	public LocalDate getCreatedAt() {
 		return createdAt;
-	}
-	public void setCreatedAt(LocalDate createdAt) {
-		this.createdAt = createdAt;
 	}
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public Long getUserId() {
-		return userId;
-	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 	public String getName() {
 		return name;
@@ -96,12 +99,28 @@ public class Portfolio {
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
 	}
-	
+
+	public AppUser getAppUser() {
+		return appUser;
+	}
+
+	public void setAppUser(AppUser appUser) {
+		this.appUser = appUser;
+	}
+
+	public Set<PortfolioToSymbol> getPortfolioToSymbols() {
+		return portfolioToSymbols;
+	}
+
+	public void setPortfolioToSymbols(Set<PortfolioToSymbol> portfolioToSymbols) {
+		this.portfolioToSymbols = portfolioToSymbols;
+	}
+
 	@Override
 	public String toString() {
-		return "PortfolioEntity [id=" + id + ", userId=" + userId + ", name=" + name + ", createdAt=" + createdAt
+		return "Portfolio [id=" + id + ", appUser=" + appUser + ", name=" + name + ", createdAt=" + createdAt
 				+ ", month1=" + month1 + ", month6=" + month6 + ", year1=" + year1 + ", year2=" + year2 + ", year5="
-				+ year5 + ", year10=" + year10 + "]";
+				+ year5 + ", year10=" + year10 + ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}
 	
 }

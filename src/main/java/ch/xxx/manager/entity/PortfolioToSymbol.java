@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 
 @Entity
@@ -25,7 +26,9 @@ public class PortfolioToSymbol {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
+	@ManyToOne
 	private Portfolio portfolio;
+	@ManyToOne
 	private Symbol symbol;
 	private Long weight;
 	private LocalDate changedAt;

@@ -22,10 +22,10 @@ import ch.xxx.manager.entity.PortfolioToSymbol;
 
 @Repository
 public interface PortfolioToSymbolRepository extends JpaRepository<PortfolioToSymbol, Long> {
-	@Query("select * from portfolio_to_symbol where portfolio.id = :portfolioId")
+	@Query("select pts from PortfolioToSymbol pts where pts.portfolio.id = :portfolioId")
 	List<PortfolioToSymbol> findByPortfolioId(Long portfolioId);
-	@Query("select * from portfolio_to_symbol where symbol.id = :symbolId")
+	@Query("select pts from PortfolioToSymbol pts where pts.symbol.id = :symbolId")
 	List<PortfolioToSymbol> findBySymbolId(Long symbolId);
-	@Query("select * from portfolio_to_symbol where symbol.id = :symbolId and portfolio.id = :portfolioId")
+	@Query("select pts from PortfolioToSymbol pts where pts.symbol.id = :symbolId and pts.portfolio.id = :portfolioId")
 	List<PortfolioToSymbol> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
 }

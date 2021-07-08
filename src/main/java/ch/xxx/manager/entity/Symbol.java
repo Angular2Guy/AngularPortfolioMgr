@@ -12,63 +12,78 @@
  */
 package ch.xxx.manager.entity;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import ch.xxx.manager.utils.CurrencyKey;
 
-
-
 @Entity
 public class Symbol {
-	public enum QuoteSource { ALPHAVANTAGE, YAHOO, PORTFOLIO }
-	
+	public enum QuoteSource {
+		ALPHAVANTAGE, YAHOO, PORTFOLIO
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private String symbol;
 	private String name;
+	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
-	private String source;
-	
-	
-	public Symbol() {		
+	@Enumerated(EnumType.STRING)
+	private QuoteSource quoteSource;
+	@OneToMany(mappedBy = "symbol")
+	private Set<DailyQuote> dailyQuotes;
+	@OneToMany(mappedBy = "symbol")
+	private Set<IntraDayQuote> intraDayQuotes;
+	@OneToMany(mappedBy = "symbol")
+	private Set<PortfolioToSymbol> portfolioToSymbols;
+
+	public Symbol() {
 	}
-	
-	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource) {
+
+	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource,
+			Set<DailyQuote> dailyQuotes, Set<IntraDayQuote> intraDayQuotes, Set<PortfolioToSymbol> portfolioToSymbols) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
 		this.currencyKey = currencyKey;
-		this.source = quoteSource.toString();
+		this.quoteSource = quoteSource;
+		this.dailyQuotes = dailyQuotes;
+		this.intraDayQuotes = intraDayQuotes;
+		this.portfolioToSymbols = portfolioToSymbols;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getSymbol() {
 		return symbol;
 	}
+
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
-	}
-	public String getSource() {
-		return source;
-	}
-	public void setSource(String source) {
-		this.source = source;
 	}
 
 	public CurrencyKey getCurrencyKey() {
@@ -79,9 +94,43 @@ public class Symbol {
 		this.currencyKey = currencyKey;
 	}
 
+	public Set<DailyQuote> getDailyQuotes() {
+		return dailyQuotes;
+	}
+
+	public void setDailyQuotes(Set<DailyQuote> dailyQuotes) {
+		this.dailyQuotes = dailyQuotes;
+	}
+
+	public Set<IntraDayQuote> getIntraDayQuotes() {
+		return intraDayQuotes;
+	}
+
+	public void setIntraDayQuotes(Set<IntraDayQuote> intraDayQuotes) {
+		this.intraDayQuotes = intraDayQuotes;
+	}
+
+	public Set<PortfolioToSymbol> getPortfolioToSymbols() {
+		return portfolioToSymbols;
+	}
+
+	public void setPortfolioToSymbols(Set<PortfolioToSymbol> portfolioToSymbols) {
+		this.portfolioToSymbols = portfolioToSymbols;
+	}
+
+	public QuoteSource getQuoteSource() {
+		return quoteSource;
+	}
+
+	public void setQuoteSource(QuoteSource quoteSource) {
+		this.quoteSource = quoteSource;
+	}
+
 	@Override
 	public String toString() {
 		return "Symbol [id=" + id + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
-				+ ", source=" + source + "]";
+				+ ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes=" + intraDayQuotes
+				+ ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}
+
 }

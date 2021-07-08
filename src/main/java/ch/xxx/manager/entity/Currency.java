@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +31,9 @@ public class Currency {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private LocalDate localDay;
+	@Enumerated(EnumType.STRING)
 	private CurrencyKey fromCurrKey;
+	@Enumerated(EnumType.STRING)
 	private CurrencyKey toCurrKey;
 	private BigDecimal open;
 	private BigDecimal high;

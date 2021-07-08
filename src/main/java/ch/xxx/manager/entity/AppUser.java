@@ -14,11 +14,15 @@ package ch.xxx.manager.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 
 @Entity
@@ -28,16 +32,19 @@ public class AppUser {
 	private Long id;
 	private String userName;
 	private LocalDate birthDate;
-	private LocalDateTime updatedAt = LocalDateTime.now();	
+	private LocalDateTime updatedAt;	
 	private String password;
 	private String emailAddress;
 	private String userRole;
 	private boolean locked;
 	private boolean enabled;
 	private String uuid;
+	@OneToMany(mappedBy = "appUser")
+	private Set<Portfolio> portfolios;
+	
 	
 	public AppUser(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
-			boolean locked, boolean enabled, String uuid) {
+			boolean locked, boolean enabled, String uuid, Set<Portfolio> portfolios) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -48,9 +55,15 @@ public class AppUser {
 		this.locked = locked;
 		this.enabled = enabled;
 		this.uuid = uuid;
+		this.portfolios = portfolios;
 	}
 
-	public AppUser() {		
+	public AppUser() {}
+
+	@PrePersist
+	@PreUpdate
+	void init() {
+		this.updatedAt = LocalDateTime.now();
 	}
 	
 	public String getEmailAddress() {
@@ -70,10 +83,6 @@ public class AppUser {
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
 	}
 
 	public String getPassword() {
@@ -132,11 +141,19 @@ public class AppUser {
 		this.birthDate = birthDate;
 	}
 
+	public Set<Portfolio> getPortfolios() {
+		return portfolios;
+	}
+
+	public void setPortfolios(Set<Portfolio> portfolios) {
+		this.portfolios = portfolios;
+	}
+
 	@Override
 	public String toString() {
 		return "AppUser [id=" + id + ", userName=" + userName + ", birthDate=" + birthDate + ", updatedAt=" + updatedAt
 				+ ", password=" + password + ", emailAddress=" + emailAddress + ", userRole=" + userRole + ", locked="
-				+ locked + ", enabled=" + enabled + ", uuid=" + uuid + "]";
+				+ locked + ", enabled=" + enabled + ", uuid=" + uuid + ", portfolios=" + portfolios + "]";
 	}
 	
 }
