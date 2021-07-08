@@ -10,23 +10,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager;
+package ch.xxx.manager.adapter.repository;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
+import java.util.Optional;
 
-import ch.xxx.manager.adapter.config.ApplicationConfig;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration
-@ContextConfiguration(classes =  ApplicationConfig.class)
-class ManagerApplicationTests {
+import ch.xxx.manager.domain.model.entity.AppUser;
 
-	@Test
-	void contextLoads() {
-	}
-
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
+		@Query("select au from AppUser au where au.userName = :username")
+		Optional<AppUser> findByUsername(String username);
+		@Query("select au from AppUser au where au.uuid = :uuid")
+		Optional<AppUser> findByUuid(String uuid);
 }

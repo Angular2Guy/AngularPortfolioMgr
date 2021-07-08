@@ -10,23 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager;
+package ch.xxx.manager.adapter.connector;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 
-import ch.xxx.manager.adapter.config.ApplicationConfig;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration
-@ContextConfiguration(classes =  ApplicationConfig.class)
-class ManagerApplicationTests {
-
-	@Test
-	void contextLoads() {
+public class ConnectorUtils {	
+	
+	public static ExchangeStrategies createLargeResponseStrategy() {
+		return ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs()
+                        .maxInMemorySize(10 * 1024 * 1024))
+                .build();
 	}
-
 }

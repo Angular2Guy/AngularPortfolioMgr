@@ -10,23 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager;
+package ch.xxx.manager.domain.exception;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
+import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.adapter.config.ApplicationConfig;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration
-@ContextConfiguration(classes =  ApplicationConfig.class)
-class ManagerApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
+@Component
+public class MyErrorAttributes extends DefaultErrorAttributes {
 
 }

@@ -10,23 +10,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager;
+package ch.xxx.manager.domain.model.dto;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
+public class RefreshTokenDto {
+	private String refreshToken;
 
-import ch.xxx.manager.adapter.config.ApplicationConfig;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration
-@ContextConfiguration(classes =  ApplicationConfig.class)
-class ManagerApplicationTests {
-
-	@Test
-	void contextLoads() {
+	public RefreshTokenDto(String refreshToken) {
+		super();
+		this.refreshToken = refreshToken;
 	}
 
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+	
 }

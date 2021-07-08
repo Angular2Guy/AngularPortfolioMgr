@@ -10,23 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager;
+package ch.xxx.manager.domain.exception;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
+public class ResourceNotFoundException extends RuntimeException {
 
-import ch.xxx.manager.adapter.config.ApplicationConfig;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration
-@ContextConfiguration(classes =  ApplicationConfig.class)
-class ManagerApplicationTests {
-
-	@Test
-	void contextLoads() {
+	private static final long serialVersionUID = -4246075150244552193L;
+	
+	public ResourceNotFoundException(String message) {
+		super(message);
 	}
 
 }
