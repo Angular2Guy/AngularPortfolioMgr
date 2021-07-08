@@ -19,8 +19,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.connector.AlphavatageConnector;
-import ch.xxx.manager.adapter.connector.YahooConnector;
+import ch.xxx.manager.adapter.client.AlphavatageConnector;
+import ch.xxx.manager.adapter.client.YahooConnector;
 import ch.xxx.manager.adapter.repository.CurrencyRepository;
 import ch.xxx.manager.adapter.repository.DailyQuoteRepository;
 import ch.xxx.manager.adapter.repository.IntraDayQuoteRepository;

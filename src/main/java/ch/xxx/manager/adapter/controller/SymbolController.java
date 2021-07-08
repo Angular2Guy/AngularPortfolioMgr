@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.adapter.connector.HkexConnector;
-import ch.xxx.manager.adapter.connector.NasdaqConnector;
-import ch.xxx.manager.adapter.connector.XetraConnector;
+import ch.xxx.manager.adapter.client.HkexConnector;
+import ch.xxx.manager.adapter.client.NasdaqConnector;
+import ch.xxx.manager.adapter.client.XetraConnector;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
 

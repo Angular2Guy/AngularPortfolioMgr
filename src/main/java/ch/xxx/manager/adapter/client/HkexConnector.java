@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.connector;
+package ch.xxx.manager.adapter.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;

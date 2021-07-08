@@ -26,9 +26,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.connector.HkexConnector;
-import ch.xxx.manager.adapter.connector.NasdaqConnector;
-import ch.xxx.manager.adapter.connector.XetraConnector;
+import ch.xxx.manager.adapter.client.HkexConnector;
+import ch.xxx.manager.adapter.client.NasdaqConnector;
+import ch.xxx.manager.adapter.client.XetraConnector;
 import ch.xxx.manager.adapter.repository.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import reactor.core.publisher.Mono;
