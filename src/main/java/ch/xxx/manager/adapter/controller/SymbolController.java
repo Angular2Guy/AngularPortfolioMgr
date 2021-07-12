@@ -12,15 +12,24 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.adapter.client.HkexConnector;
 import ch.xxx.manager.adapter.client.NasdaqConnector;
 import ch.xxx.manager.adapter.client.XetraConnector;
+import ch.xxx.manager.domain.model.dto.SymbolDto;
+import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/symbol")
@@ -29,46 +38,42 @@ public class SymbolController {
 	private SymbolImportService importService;
 	@Autowired
 	private SymbolService service;
-	@Autowired
-	private NasdaqConnector nasdaqConnector;
-	@Autowired
-	private HkexConnector hkexConnector;
-	@Autowired
-	private XetraConnector xetraConnector;
 
-//	@GetMapping("/importus/all")
-//	public Mono<Long> importUsSymbols() {
-//		return this.importService.importUsSymbols(this.nasdaqConnector.importSymbols());
-//	}
-//
-//	@GetMapping("/importhk/all")
-//	public Mono<Long> importHkSymbols() {
-//		return this.importService.importHkSymbols(this.hkexConnector.importSymbols());
-//	}
-//
-//	@GetMapping("/importde/all")
-//	public Mono<Long> importDeSymbols() {
-//		return this.importService.importDeSymbols(this.xetraConnector.importXetraSymbols());
-//	}
-//
-//	@GetMapping("/importindex/all")
-//	public Mono<Long> importIndexSymbols() {
-//		return this.importService.importReferenceIndexes(Flux.just(ComparisonIndex.SP500.getSymbol(),
-//				ComparisonIndex.MSCI_CHINA.getSymbol(), ComparisonIndex.EUROSTOXX50.getSymbol()));
-//	}
-//
-//	@GetMapping("/all")
-//	public Flux<SymbolDto> getAllSymbols() {
-//		return this.service.getAllSymbols();
-//	}
-//
-//	@GetMapping("/symbol/{symbol}")
-//	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
+	@GetMapping("/importus/all")
+	public ResponseEntity<String> importUsSymbols() {
+		return ResponseEntity.ok(this.importService.importUsSymbols());
+	}
+
+	@GetMapping("/importhk/all")
+	public ResponseEntity<String> importHkSymbols() {
+		return ResponseEntity.ok(this.importService.importHkSymbols());
+	}
+
+	@GetMapping("/importde/all")
+	public ResponseEntity<String> importDeSymbols() {
+		return ResponseEntity.ok(this.importService.importDeSymbols());
+	}
+
+	@GetMapping("/importindex/all")
+	public ResponseEntity<Long> importIndexSymbols() {
+		return ResponseEntity.ok(this.importService.importReferenceIndexes(List.of()));
+	}
+
+	@GetMapping("/all")
+	public Flux<SymbolDto> getAllSymbols() {
+		//return this.service.getAllSymbols();
+		return null;
+	}
+
+	@GetMapping("/symbol/{symbol}")
+	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
 //		return this.service.getSymbolBySymbol(symbol);
-//	}
-//
-//	@GetMapping("/name/{name}")
-//	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
+		return null;
+	}
+
+	@GetMapping("/name/{name}")
+	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
 //		return this.service.getSymbolByName(name);
-//	}
+		return null;
+	}
 }

@@ -25,57 +25,57 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ch.xxx.manager.usecase.service.XetraClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class XetraConnector {
+public class XetraConnector implements XetraClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XetraConnector.class);
 	private static final String XETRA_URL = "https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente";
-	
-	public Flux<String> importXetraSymbols() {
+
+	public Mono<List<String>> importXetraSymbols() {
 		try {
-			return this.getSymbolCsv(WebClient.create().get()
-			.uri(new URI(XETRA_URL))
-			.retrieve().toEntity(String.class).flatMap(htmlPage -> Mono.just(this.findCsvUrl(htmlPage.getBody()))));
+			return this.getSymbolCsv(WebClient.create().get().uri(new URI(XETRA_URL)).retrieve().toEntity(String.class)
+					.flatMap(htmlPage -> Mono.just(this.findCsvUrl(htmlPage.getBody()))));
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(String.format("Page not found: %s", XETRA_URL), e);
 		}
 	}
-	
-	private Flux<String> getSymbolCsv(Mono<String> urlStr) {
-		return urlStr.flux().flatMap(url -> {
+
+	private Mono<List<String>> getSymbolCsv(Mono<String> urlStr) {
+		return urlStr.flatMap(url -> {
 			try {
 				return this.loadSymbolsCsv(url);
 			} catch (URISyntaxException e) {
-				throw new RuntimeException("allTradableInstruments.csv not loaded.", e);
+				throw new RuntimeException(e);
 			}
 		});
 	}
 
-	private Flux<String> loadSymbolsCsv(String url) throws URISyntaxException {
-		return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
-				.uri(new URI(url)).retrieve().toEntityList(String.class).flux()
-				.flatMap(line -> Flux.fromIterable(line.getBody()));
+	private Mono<List<String>> loadSymbolsCsv(String url) throws URISyntaxException {
+		return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
+				.get().uri(new URI(url)).retrieve().toEntityList(String.class)
+				.flatMap(line -> Mono.justOrEmpty(line == null || !line.hasBody() ? null : line.getBody()));
 	}
-	
+
 	private String findCsvUrl(String htmlPage) {
 		// find 'href="..."' in html page
 		Pattern pattern = Pattern.compile("(href=\\\"(.*?)\\\")");
 		Matcher matcher = pattern.matcher(htmlPage);
 		List<String> hrefs = new ArrayList<String>();
-		while(matcher.find()) {
+		while (matcher.find()) {
 			hrefs.add(matcher.group(1));
 		}
-		//create csv url for the xetra stocks
+		// create csv url for the xetra stocks
 		Optional<String> csvUrlOpt = hrefs.stream().filter(href -> href.contains("allTradableInstruments.csv"))
 				.map(href -> this.createCsvUrl(href)).findFirst();
-		if(csvUrlOpt.isEmpty()) {
+		if (csvUrlOpt.isEmpty()) {
 			throw new RuntimeException("allTradableInstruments.csv not found.");
 		}
 		return csvUrlOpt.get();
 	}
-	
+
 	private String createCsvUrl(String href) {
 		String url = "https://www.xetra.com" + href.replaceAll("href=\"", "").replaceAll("\"", "");
 		return url;

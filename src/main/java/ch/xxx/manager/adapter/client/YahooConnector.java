@@ -32,10 +32,11 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
+import ch.xxx.manager.usecase.service.YahooClient;
 import reactor.core.publisher.Mono;
 
 @Component
-public class YahooConnector {
+public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private CsvMapper csvMapper = new CsvMapper();
 	

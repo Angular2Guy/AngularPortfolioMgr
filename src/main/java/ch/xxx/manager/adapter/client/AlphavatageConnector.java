@@ -25,10 +25,11 @@ import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.usecase.service.AlphavatageClient;
 import reactor.core.publisher.Mono;
 
 @Component
-public class AlphavatageConnector {
+public class AlphavatageConnector implements AlphavatageClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlphavatageConnector.class);
 	@Value("${api.key:xxx}")
 	private String apiKey;

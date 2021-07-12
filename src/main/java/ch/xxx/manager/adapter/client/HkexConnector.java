@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,20 +22,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
-import reactor.core.publisher.Flux;
+import ch.xxx.manager.usecase.service.HkexClient;
+import reactor.core.publisher.Mono;
 
 @Component
-public class HkexConnector {
+public class HkexConnector implements HkexClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HkexConnector.class);
 	
-	public Flux<HkSymbolImportDto> importSymbols() {
+	public Mono<List<HkSymbolImportDto>> importSymbols() {
 		try {
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
 				.uri(new URI("https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json"))
-				.retrieve().bodyToFlux(HkSymbolImportDto.class);
+				.retrieve().bodyToFlux(HkSymbolImportDto.class).collectList();
 		} catch (URISyntaxException e) {
 			LOGGER.error("Import hk symbols failed.",e);
 		}
-		return Flux.empty();
+		return Mono.empty();
 	}
 }

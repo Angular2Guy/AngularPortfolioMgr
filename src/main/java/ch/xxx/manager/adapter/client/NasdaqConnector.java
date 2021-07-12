@@ -29,16 +29,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.usecase.service.NasdaqClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
-public class NasdaqConnector {
+public class NasdaqConnector implements NasdaqClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NasdaqConnector.class);
 	private static final String HOST = "ftp.nasdaqtrader.com";
 	private static final String DIR = "/symboldirectory/";
 	private static final List<String> IMPORT_FILES = Arrays.asList("nasdaqlisted.txt", "otherlisted.txt");
 
-	public Flux<String> importSymbols() {
+	public Mono<List<String>> importSymbols() {
 		FTPClient ftp = new FTPClient();
 		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 		try {
@@ -58,7 +60,7 @@ public class NasdaqConnector {
 		} catch (IOException e) {			
 			throw new RuntimeException(e);
 		}
-		return Flux.concat(this.importSymbols(IMPORT_FILES.get(0), ftp), this.importSymbols(IMPORT_FILES.get(1), ftp))
+		return Flux.concat(this.importSymbols(IMPORT_FILES.get(0), ftp), this.importSymbols(IMPORT_FILES.get(1), ftp)).collectList()
 				.doAfterTerminate(() -> {
 					try {
 						ftp.logout();

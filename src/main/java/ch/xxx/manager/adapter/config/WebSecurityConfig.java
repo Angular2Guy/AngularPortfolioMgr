@@ -24,7 +24,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.xxx.manager.adapter.filter.JwtTokenFilterConfigurer;
 import ch.xxx.manager.usecase.service.JwtTokenService;
 
 @Configuration
