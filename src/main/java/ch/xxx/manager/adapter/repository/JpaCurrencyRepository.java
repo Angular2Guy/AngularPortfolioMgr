@@ -17,11 +17,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import ch.xxx.manager.domain.model.entity.AppUser;
+import ch.xxx.manager.domain.model.entity.Currency;
+import ch.xxx.manager.domain.utils.CurrencyKey;
 
-public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-		@Query("select au from AppUser au where au.userName = :username")
-		Optional<AppUser> findByUsername(String username);
-		@Query("select au from AppUser au where au.uuid = :uuid")
-		Optional<AppUser> findByUuid(String uuid);
+public interface JpaCurrencyRepository extends JpaRepository<Currency, Long> {
+	@Query("select c from Currency c where c.toCurrKey = :toCurr")
+	Optional<Currency> findByToCurr(CurrencyKey toCurr);	
 }

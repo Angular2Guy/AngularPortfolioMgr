@@ -10,19 +10,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.utils;
+package ch.xxx.manager.domain.utils;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
 
-import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.JwtTokenService;
+import ch.xxx.manager.usecase.utils.TokenSubjectRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 

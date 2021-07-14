@@ -34,8 +34,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
-import ch.xxx.manager.usecase.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;

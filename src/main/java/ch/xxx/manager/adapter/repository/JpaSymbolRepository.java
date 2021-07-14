@@ -16,12 +16,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 
-@Repository
-public interface SymbolRepository extends JpaRepository<Symbol, Long> {	
+public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {	
 	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
 	List<Symbol> findBySymbol(String symbol);
 	@Query("select s from Symbol s where lower(s.symbol) = :symbol")

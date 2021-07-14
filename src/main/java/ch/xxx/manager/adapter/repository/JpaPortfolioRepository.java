@@ -16,13 +16,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto;
 
-@Repository
-public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
+public interface JpaPortfolioRepository extends JpaRepository<Portfolio, Long> {
 	@Query("select p from Portfolio p where p.appUser.id = :userId")
 	List<Portfolio> findByUserId(Long userId);
 	@Query("select new ch.xxx.manager.entity.dto.PortfolioAndSymbolDto(p.id, au.id, p.name, p.createdAt, pts.weight, pts.changedAt, "

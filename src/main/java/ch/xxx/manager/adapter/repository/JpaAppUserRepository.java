@@ -16,13 +16,12 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.domain.model.entity.Currency;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.model.entity.AppUser;
 
-@Repository
-public interface CurrencyRepository extends JpaRepository<Currency, Long> {
-	@Query("select c from Currency c where c.toCurrKey = :toCurr")
-	Optional<Currency> findByToCurr(CurrencyKey toCurr);	
+public interface JpaAppUserRepository extends JpaRepository<AppUser, Long> {
+		@Query("select au from AppUser au where au.userName = :username")
+		Optional<AppUser> findByUsername(String username);
+		@Query("select au from AppUser au where au.uuid = :uuid")
+		Optional<AppUser> findByUuid(String uuid);
 }

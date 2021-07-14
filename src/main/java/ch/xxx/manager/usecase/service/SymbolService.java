@@ -15,14 +15,14 @@ package ch.xxx.manager.usecase.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.SymbolRepository;
+import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
 
 @Service
 @Transactional
 public class SymbolService {
-	private final SymbolRepository repository;
+	private final JpaSymbolRepository repository;
 	
-	public SymbolService(SymbolRepository repository) {
+	public SymbolService(JpaSymbolRepository repository) {
 		this.repository = repository;
 	}
 

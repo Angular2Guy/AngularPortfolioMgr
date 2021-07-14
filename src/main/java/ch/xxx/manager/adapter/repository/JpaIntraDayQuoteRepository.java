@@ -20,7 +20,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import ch.xxx.manager.domain.model.entity.IntraDayQuote;
 
-public interface IntraDayQuoteRepository extends JpaRepository<IntraDayQuote, Long> {
+public interface JpaIntraDayQuoteRepository extends JpaRepository<IntraDayQuote, Long> {
 	@Query("select idq from IntraDayQuote idq where idq.symbol.symbol = :symbol order by idq.localDateTime asc")
 	List<IntraDayQuote> findBySymbol(String symbol);
 	@Query("select idq from IntraDayQuote idq where idq.symbol.id = :symbolId order by idq.localDateTime asc")

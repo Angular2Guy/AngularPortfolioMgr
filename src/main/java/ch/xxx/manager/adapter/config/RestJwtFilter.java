@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.JwtTokenService;
-import ch.xxx.manager.usecase.utils.JwtUtils;
 import ch.xxx.manager.usecase.utils.TokenSubjectRole;
 
 @Component

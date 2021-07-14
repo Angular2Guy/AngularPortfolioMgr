@@ -12,20 +12,21 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.model.entity.DailyQuote;
 
-@Repository
-public interface PortfolioToSymbolRepository extends JpaRepository<PortfolioToSymbol, Long> {
-	@Query("select pts from PortfolioToSymbol pts where pts.portfolio.id = :portfolioId")
-	List<PortfolioToSymbol> findByPortfolioId(Long portfolioId);
-	@Query("select pts from PortfolioToSymbol pts where pts.symbol.id = :symbolId")
-	List<PortfolioToSymbol> findBySymbolId(Long symbolId);
-	@Query("select pts from PortfolioToSymbol pts where pts.symbol.id = :symbolId and pts.portfolio.id = :portfolioId")
-	List<PortfolioToSymbol> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
+public interface JpaDailyQuoteRepository extends JpaRepository<DailyQuote, Long> {
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol order by dq.localDay asc")
+	List<DailyQuote> findBySymbol(String symbol);
+	
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id = :symbolId order by dq.localDay asc")
+	List<DailyQuote> findBySymbolId(Long symbolId);
+	
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol and dq.localDay between :start and :end order by dq.localDay asc")
+	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

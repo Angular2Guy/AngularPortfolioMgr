@@ -30,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.adapter.client.AlphavatageConnector;
 import ch.xxx.manager.adapter.client.YahooConnector;
-import ch.xxx.manager.adapter.repository.CurrencyRepository;
-import ch.xxx.manager.adapter.repository.DailyQuoteRepository;
-import ch.xxx.manager.adapter.repository.IntraDayQuoteRepository;
-import ch.xxx.manager.adapter.repository.SymbolRepository;
+import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
+import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.adapter.repository.JpaIntraDayQuoteRepository;
+import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
 import ch.xxx.manager.domain.model.dto.DailyFxQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
@@ -55,14 +55,14 @@ public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	private final AlphavatageConnector alphavatageConnector;
 	private final YahooConnector yahooConnector;
-	private final DailyQuoteRepository dailyQuoteRepository;
-	private final IntraDayQuoteRepository intraDayQuoteRepository;
-	private final SymbolRepository symbolRepository;
-	private final CurrencyRepository currencyRepository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
+	private final JpaIntraDayQuoteRepository intraDayQuoteRepository;
+	private final JpaSymbolRepository symbolRepository;
+	private final JpaCurrencyRepository currencyRepository;
 
 	public QuoteImportService(AlphavatageConnector alphavatageConnector, YahooConnector yahooConnector,
-			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
-			SymbolRepository symbolRepository, CurrencyRepository currencyRepository) {
+			JpaDailyQuoteRepository dailyQuoteRepository, JpaIntraDayQuoteRepository intraDayQuoteRepository,
+			JpaSymbolRepository symbolRepository, JpaCurrencyRepository currencyRepository) {
 		this.alphavatageConnector = alphavatageConnector;
 		this.yahooConnector = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;

@@ -23,8 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.AppUserRepository;
+import ch.xxx.manager.adapter.repository.JpaAppUserRepository;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
+import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import reactor.core.publisher.Mono;
 
 @Transactional

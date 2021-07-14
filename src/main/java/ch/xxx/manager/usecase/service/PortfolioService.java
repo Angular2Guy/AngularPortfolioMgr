@@ -15,19 +15,19 @@ package ch.xxx.manager.usecase.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.PortfolioRepository;
-import ch.xxx.manager.adapter.repository.PortfolioToSymbolRepository;
-import ch.xxx.manager.adapter.repository.SymbolRepository;
+import ch.xxx.manager.adapter.repository.JpaPortfolioRepository;
+import ch.xxx.manager.adapter.repository.JpaPortfolioToSymbolRepository;
+import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
 
 @Service
 @Transactional
 public class PortfolioService {
-	private final PortfolioRepository portfolioRepository;
-	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final SymbolRepository symbolRepository;
+	private final JpaPortfolioRepository portfolioRepository;
+	private final JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final JpaSymbolRepository symbolRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
 
-	public PortfolioService(PortfolioRepository portfolioRepository, PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository, PortfolioCalculationService portfolioCalculationService) {
+	public PortfolioService(JpaPortfolioRepository portfolioRepository, JpaPortfolioToSymbolRepository portfolioToSymbolRepository, JpaSymbolRepository symbolRepository, PortfolioCalculationService portfolioCalculationService) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
