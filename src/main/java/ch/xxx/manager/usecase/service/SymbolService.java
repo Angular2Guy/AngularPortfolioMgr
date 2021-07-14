@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +20,11 @@ import ch.xxx.manager.adapter.repository.SymbolRepository;
 @Service
 @Transactional
 public class SymbolService {
-	@Autowired
-	private SymbolRepository repository;
+	private final SymbolRepository repository;
+	
+	public SymbolService(SymbolRepository repository) {
+		this.repository = repository;
+	}
 
 //	public Flux<SymbolDto> getAllSymbols() {
 //		return this.repository.findAll().flatMap(entity -> this.convert(entity));

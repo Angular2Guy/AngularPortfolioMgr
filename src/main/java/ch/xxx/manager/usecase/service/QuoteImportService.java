@@ -12,10 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
@@ -23,15 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +39,6 @@ import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
-import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
@@ -61,18 +53,23 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
-	@Autowired
-	private AlphavatageConnector alphavatageConnector;
-	@Autowired
-	private YahooConnector yahooConnector;
-	@Autowired
-	private DailyQuoteRepository dailyQuoteRepository;
-	@Autowired
-	private IntraDayQuoteRepository intraDayQuoteRepository;
-	@Autowired
-	private SymbolRepository symbolRepository;
-	@Autowired
-	private CurrencyRepository currencyRepository;
+	private final AlphavatageConnector alphavatageConnector;
+	private final YahooConnector yahooConnector;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final IntraDayQuoteRepository intraDayQuoteRepository;
+	private final SymbolRepository symbolRepository;
+	private final CurrencyRepository currencyRepository;
+
+	public QuoteImportService(AlphavatageConnector alphavatageConnector, YahooConnector yahooConnector,
+			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
+			SymbolRepository symbolRepository, CurrencyRepository currencyRepository) {
+		this.alphavatageConnector = alphavatageConnector;
+		this.yahooConnector = yahooConnector;
+		this.dailyQuoteRepository = dailyQuoteRepository;
+		this.intraDayQuoteRepository = intraDayQuoteRepository;
+		this.symbolRepository = symbolRepository;
+		this.currencyRepository = currencyRepository;
+	}
 
 	public Mono<Long> importIntraDayQuotes(String symbol) {
 //		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
@@ -121,8 +118,7 @@ public class QuoteImportService {
 	}
 
 	private Mono<? extends List<DailyQuote>> customImport(String symbol,
-			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity,
-			List<DailyQuote> entities) {
+			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity, List<DailyQuote> entities) {
 		if (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getQuoteSource())) {
 			return this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of());
 		} else if (QuoteSource.YAHOO.toString().equals(symbolEntity.getQuoteSource())) {
@@ -149,10 +145,9 @@ public class QuoteImportService {
 //						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count())).;
 		return null;
 	}
-	
+
 	private Mono<? extends List<DailyQuote>> yahooImport(String symbol,
-			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity,
-			List<DailyQuote> entities) {
+			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
 				? this.yahooConnector.getTimeseriesDailyHistory(symbol)
 						.flatMap(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
@@ -188,8 +183,7 @@ public class QuoteImportService {
 	}
 
 	private Mono<? extends List<DailyQuote>> alphavantageImport(String symbol,
-			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity,
-			List<DailyQuote> entities) {
+			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
 				? this.alphavatageConnector.getTimeseriesDailyHistory(symbol, true)
 						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
@@ -229,8 +223,7 @@ public class QuoteImportService {
 		return null;
 	}
 
-	private Currency convert(Entry<String, DailyFxQuoteImportDto> entry, CurrencyKey from_curr,
-			CurrencyKey to_curr) {
+	private Currency convert(Entry<String, DailyFxQuoteImportDto> entry, CurrencyKey from_curr, CurrencyKey to_curr) {
 //		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
 //				from_curr.toString(), to_curr.toString(), new BigDecimal(entry.getValue().getOpen()),
 //				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),

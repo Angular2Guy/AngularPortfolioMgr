@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +21,13 @@ import ch.xxx.manager.adapter.repository.IntraDayQuoteRepository;
 @Service
 @Transactional
 public class QuoteService {
-	@Autowired
-	private DailyQuoteRepository dailyQuoteRepository;
-	@Autowired
-	private IntraDayQuoteRepository intraDayQuoteRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final IntraDayQuoteRepository intraDayQuoteRepository;
+	
+	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository) {
+		this.dailyQuoteRepository = dailyQuoteRepository;
+		this.intraDayQuoteRepository = intraDayQuoteRepository;
+	}
 	
 //	public Flux<QuoteDto> getDailyQuotes(String symbol) {
 //		return this.dailyQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));

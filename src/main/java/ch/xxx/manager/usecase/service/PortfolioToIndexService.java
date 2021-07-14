@@ -25,14 +25,17 @@ import ch.xxx.manager.adapter.repository.SymbolRepository;
 @Service
 public class PortfolioToIndexService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
-	@Autowired
-	private PortfolioToSymbolRepository portfolioToSymbolRepository;
-	@Autowired
-	private SymbolRepository symbolRepository;
-	@Autowired
-	private DailyQuoteRepository dailyQuoteRepository;
-	@Autowired
-	private CurrencyRepository currencyRepository;
+	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final SymbolRepository symbolRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final CurrencyRepository currencyRepository;
+	
+	public PortfolioToIndexService(PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository, DailyQuoteRepository dailyQuoteRepository, CurrencyRepository currencyRepository) {
+		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
+		this.symbolRepository = symbolRepository;
+		this.dailyQuoteRepository = dailyQuoteRepository;
+		this.currencyRepository = currencyRepository;
+	}
 
 //	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
 //		LOGGER.info("CalculateComparison Index: {} for PortfolioId: {}", comparisonIndex.getName(), portfolioId);

@@ -34,7 +34,6 @@ import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.utils.CurrencyKey;
-import reactor.core.publisher.Flux;
 
 @Service
 @Transactional
@@ -45,7 +44,7 @@ public class SymbolImportService {
 	private final SymbolRepository repository;
 	private final XetraClient xetraClient;
 	private final QuoteImportService quoteImportService;
-	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<List<Symbol>>(
+	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(
 			new ArrayList<>());
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,

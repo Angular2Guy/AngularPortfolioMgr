@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +22,18 @@ import ch.xxx.manager.adapter.repository.SymbolRepository;
 @Service
 @Transactional
 public class PortfolioService {
-	@Autowired
-	private PortfolioRepository portfolioRepository;
-	@Autowired
-	private PortfolioToSymbolRepository portfolioToSymbolRepository;
-	@Autowired
-	private SymbolRepository symbolRepository;
-	@Autowired
-//	private PortfolioCalculationParallelService portfolioCalculationService;
-	private PortfolioCalculationService portfolioCalculationService;
+	private final PortfolioRepository portfolioRepository;
+	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final SymbolRepository symbolRepository;
+	private final PortfolioCalculationService portfolioCalculationService;
 
+	public PortfolioService(PortfolioRepository portfolioRepository, PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository, PortfolioCalculationService portfolioCalculationService) {
+		this.portfolioRepository = portfolioRepository;
+		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
+		this.symbolRepository = symbolRepository;
+		this.portfolioCalculationService = portfolioCalculationService;
+	}
+	
 //	public Flux<PortfolioDto> getPortfoliosByUserId(Long userId) {
 //		return this.portfolioRepository.findByUserId(userId).flatMapSequential(entity -> this.convertFlux(entity));
 //	}
