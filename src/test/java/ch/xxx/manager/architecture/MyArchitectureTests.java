@@ -89,8 +89,10 @@ public class MyArchitectureTests {
 
 	@Test
 	public void ruleGeneralCodingRulesLoggers() {
+		JavaClasses classesToCheck = this.importedClasses
+				.that(JavaClass.Predicates.resideOutsideOfPackages("..domain.utils.."));
 		ArchRuleDefinition.fields().that().haveRawType(Logger.class).should().bePrivate().andShould().beStatic()
-				.andShould().beFinal().because("we agreed on this convention").check(this.importedClasses);
+				.andShould().beFinal().because("we agreed on this convention").check(classesToCheck);
 	}
 
 	@Test
