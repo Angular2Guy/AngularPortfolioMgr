@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -32,20 +31,24 @@ import reactor.core.publisher.Mono;
 @Service
 public class AppUserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserService.class);
-	@Autowired
-	private AppUserRepository repository;
+	private final AppUserRepository repository;
+	private final JavaMailSender javaMailSender;
+	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenService jwtTokenProvider;
+
 	@Value("${spring.mail.username}")
 	private String mailuser;
 	@Value("${spring.mail.password}")
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
-	@Autowired
-	private JavaMailSender javaMailSender;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	@Autowired
-	private JwtTokenService jwtTokenProvider;
+	
+	public AppUserService(AppUserRepository repository, JavaMailSender javaMailSender, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider) {
+		this.repository = repository;
+		this.javaMailSender = javaMailSender;
+		this.passwordEncoder = passwordEncoder;
+		this.jwtTokenProvider = jwtTokenProvider;
+	}
 	
 	public Mono<RefreshTokenDto> refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);

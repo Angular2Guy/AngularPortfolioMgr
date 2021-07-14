@@ -25,8 +25,11 @@ import ch.xxx.manager.usecase.service.PortfolioService;
 public class PortfolioController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioController.class);
 	
-	@Autowired
-	private PortfolioService portfolioService;
+	private final PortfolioService portfolioService;
+	
+	public PortfolioController(PortfolioService portfolioService) {
+		this.portfolioService = portfolioService;
+	}
 
 //	@GetMapping("/userid/{userId}")
 //	public Flux<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {

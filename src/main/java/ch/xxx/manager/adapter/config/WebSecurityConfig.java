@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.adapter.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +29,11 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {	
-
-	@Autowired
-	private JwtTokenService jwtTokenProvider;
+	private final JwtTokenService jwtTokenProvider;
+	
+	public WebSecurityConfig(JwtTokenService jwtTokenProvider) {
+		this.jwtTokenProvider = jwtTokenProvider;
+	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {

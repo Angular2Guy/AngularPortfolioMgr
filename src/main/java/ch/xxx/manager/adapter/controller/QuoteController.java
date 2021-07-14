@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.adapter.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,12 +22,15 @@ import ch.xxx.manager.usecase.service.QuoteService;
 @RestController
 @RequestMapping("rest/quote")
 public class QuoteController {
-	@Autowired
-	private QuoteService quoteService;
-	@Autowired
-	private QuoteImportService quoteImportService;
-	@Autowired
-	private PortfolioToIndexService portfolioToIndexService;
+	private final QuoteService quoteService;
+	private final QuoteImportService quoteImportService;
+	private final PortfolioToIndexService portfolioToIndexService;
+	
+	public QuoteController(QuoteService quoteService, QuoteImportService quoteImportService, PortfolioToIndexService portfolioToIndexService) {
+		this.quoteService = quoteService;
+		this.quoteImportService = quoteImportService;
+		this.portfolioToIndexService = portfolioToIndexService;
+	}
 
 //	@GetMapping("/daily/all/symbol/{symbol}")
 //	public Flux<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {

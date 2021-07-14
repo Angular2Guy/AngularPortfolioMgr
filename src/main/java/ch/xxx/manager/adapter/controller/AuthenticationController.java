@@ -27,16 +27,21 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 @RequestMapping("/rest/auth")
 public class AuthenticationController {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
-	@Autowired
-	private JwtTokenService jwtTokenProvider;
+	
+	private final JwtTokenService jwtTokenProvider;
+	private final AppUserService appUserService;
+
 	@Value("${spring.mail.username}")
 	private String mailuser;
 	@Value("${spring.mail.password}")
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
-	@Autowired
-	private AppUserService appUserService;
+	
+	public AuthenticationController(JwtTokenService jwtTokenProvider, AppUserService appUserService) {
+		this.appUserService = appUserService;
+		this.jwtTokenProvider = jwtTokenProvider;
+	}
 	
 //	@PostMapping("/authorize")
 //	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {

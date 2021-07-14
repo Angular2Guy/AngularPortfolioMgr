@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.utils.Role;
@@ -39,8 +38,11 @@ import ch.xxx.manager.usecase.utils.TokenSubjectRole;
 public class RestJwtFilter implements Filter {
 	private static final Logger LOG = LoggerFactory.getLogger(RestJwtFilter.class);
 	
-	@Autowired
-	private JwtTokenService jwtTokenService;
+	private final JwtTokenService jwtTokenService;
+	
+	public RestJwtFilter(JwtTokenService jwtTokenService) {
+		this.jwtTokenService = jwtTokenService;
+	}
 	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

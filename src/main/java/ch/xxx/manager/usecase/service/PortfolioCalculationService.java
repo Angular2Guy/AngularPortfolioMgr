@@ -14,22 +14,31 @@ package ch.xxx.manager.usecase.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import ch.xxx.manager.adapter.repository.CurrencyRepository;
+import ch.xxx.manager.adapter.repository.DailyQuoteRepository;
+import ch.xxx.manager.adapter.repository.PortfolioRepository;
+import ch.xxx.manager.adapter.repository.PortfolioToSymbolRepository;
 
 @Service
 @Transactional(propagation = Propagation.MANDATORY)
 public class PortfolioCalculationService {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
-//	@Autowired
-//	private PortfolioRepository portfolioRepository;
-//	@Autowired
-//	private DailyQuoteRepository dailyQuoteRepository;
-//	@Autowired
-//	private CurrencyRepository currencyRepository;
-//	@Autowired
-//	private PortfolioAndSymbolRepository portfolioAndSymbolRepository;
+	private final PortfolioRepository portfolioRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final CurrencyRepository currencyRepository;
+	private final PortfolioToSymbolRepository portfolioAndSymbolRepository;
+	
+	public PortfolioCalculationService(PortfolioRepository portfolioRepository, DailyQuoteRepository dailyQuoteRepository, CurrencyRepository currencyRepository, PortfolioToSymbolRepository portfolioAndSymbolRepository) {
+		this.portfolioRepository = portfolioRepository;
+		this.dailyQuoteRepository = dailyQuoteRepository;
+		this.currencyRepository = currencyRepository;
+		this.portfolioAndSymbolRepository = portfolioAndSymbolRepository;
+	}
 //
 //	public Mono<Portfolio> calculatePortfolio(Long portfolioId) {
 //		this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId)

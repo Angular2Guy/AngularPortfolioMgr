@@ -14,30 +14,27 @@ package ch.xxx.manager.adapter.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.adapter.client.HkexConnector;
-import ch.xxx.manager.adapter.client.NasdaqConnector;
-import ch.xxx.manager.adapter.client.XetraConnector;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
-import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/symbol")
 public class SymbolController {
-	@Autowired
-	private SymbolImportService importService;
-	@Autowired
-	private SymbolService service;
+	private final SymbolImportService importService;
+	private final SymbolService service;
+	
+	public SymbolController(SymbolImportService importService, SymbolService service) {
+		this.importService = importService;
+		this.service = service;
+	}
 
 	@GetMapping("/importus/all")
 	public ResponseEntity<String> importUsSymbols() {
