@@ -40,12 +40,12 @@ import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 //import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
-@AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class })
+@AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })
 public class MyArchitectureTests {
 	private static final ArchRule NO_CLASSES_SHOULD_USE_FIELD_INJECTION = createNoFieldInjectionRule();
 
-	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");
-
+	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");    
+	
 	@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..").adapter("rest", "..adapter.controller..")
