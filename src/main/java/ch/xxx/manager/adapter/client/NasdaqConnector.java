@@ -27,8 +27,10 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.utils.MyLogPrintWriter;
 import ch.xxx.manager.usecase.service.NasdaqClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,7 +44,7 @@ public class NasdaqConnector implements NasdaqClient {
 
 	public Mono<List<String>> importSymbols() {
 		FTPClient ftp = new FTPClient();
-		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(new MyLogPrintWriter(LOGGER, Level.INFO))));
 		try {
 			ftp.setStrictReplyParsing(false);
 			ftp.connect(HOST);			
