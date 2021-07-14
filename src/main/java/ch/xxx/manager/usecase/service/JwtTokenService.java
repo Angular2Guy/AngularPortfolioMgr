@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -59,6 +60,10 @@ public class JwtTokenService {
 		this.jwtTokenKey = Keys.hmacShaKeyFor(secretKey.getBytes());
 	}
 
+	public TokenSubjectRole getTokenUserRoles(Map<String,String> headers) {
+		return JwtUtils.getTokenUserRoles(headers, this.jwtTokenKey);
+	}
+	
 	public String createToken(String username, List<Role> roles, Optional<Date> issuedAtOpt) {
 		Claims claims = Jwts.claims();
 		claims.setSubject(username);
@@ -76,7 +81,7 @@ public class JwtTokenService {
 
 	public String refreshToken(String token) {
 		validateToken(token);
-		Optional<Jws<Claims>> claimsOpt = this.getClaims(Optional.of(token));
+		Optional<Jws<Claims>> claimsOpt = JwtUtils.getClaims(Optional.of(token), this.jwtTokenKey);
 		if(claimsOpt.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token claims");
 		}
@@ -87,13 +92,6 @@ public class JwtTokenService {
 		return newToken;
 	}
 	
-	public Optional<Jws<Claims>> getClaims(Optional<String> token) {
-		if (!token.isPresent()) {
-			return Optional.empty();
-		}
-		return Optional.of(Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token.get()));
-	}
-
 	public Authentication getAuthentication(String token) {		
 		if(this.getAuthorities(token).stream().filter(role -> role.equals(Role.GUEST)).count() > 0) {
 			return new UsernamePasswordAuthenticationToken(this.getUsername(token), null);

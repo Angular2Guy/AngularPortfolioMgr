@@ -53,18 +53,18 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
-	private final AlphavatageConnector alphavatageConnector;
-	private final YahooConnector yahooConnector;
+	private final AlphavatageClient alphavatageClient;
+	private final YahooClient yahooClient;
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final SymbolRepository symbolRepository;
 	private final CurrencyRepository currencyRepository;
 
-	public QuoteImportService(AlphavatageConnector alphavatageConnector, YahooConnector yahooConnector,
+	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
 			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
 			SymbolRepository symbolRepository, CurrencyRepository currencyRepository) {
-		this.alphavatageConnector = alphavatageConnector;
-		this.yahooConnector = yahooConnector;
+		this.alphavatageClient = alphavatageConnector;
+		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.intraDayQuoteRepository = intraDayQuoteRepository;
 		this.symbolRepository = symbolRepository;
@@ -149,9 +149,9 @@ public class QuoteImportService {
 	private Mono<? extends List<DailyQuote>> yahooImport(String symbol,
 			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
-				? this.yahooConnector.getTimeseriesDailyHistory(symbol)
+				? this.yahooClient.getTimeseriesDailyHistory(symbol)
 						.flatMap(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
-				: this.yahooConnector.getTimeseriesDailyHistory(symbol)
+				: this.yahooClient.getTimeseriesDailyHistory(symbol)
 						.flatMap(
 								importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
 						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()
@@ -185,9 +185,9 @@ public class QuoteImportService {
 	private Mono<? extends List<DailyQuote>> alphavantageImport(String symbol,
 			Map<LocalDate, Collection<Currency>> currencyMap, Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
-				? this.alphavatageConnector.getTimeseriesDailyHistory(symbol, true)
+				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true)
 						.flatMap(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-				: this.alphavatageConnector.getTimeseriesDailyHistory(symbol, false)
+				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false)
 						.flatMap(
 								wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.map(dtos -> dtos.stream().filter(myDto -> 1 > entities.get(entities.size() - 1).getLocalDay()

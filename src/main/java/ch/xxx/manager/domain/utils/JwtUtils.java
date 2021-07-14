@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.domain.utils;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -20,10 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
 
-import ch.xxx.manager.usecase.service.JwtTokenService;
-import ch.xxx.manager.usecase.utils.TokenSubjectRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 
 public class JwtUtils {
 	public static final String AUTHORIZATION = HttpHeaders.AUTHORIZATION.toLowerCase();
@@ -44,9 +44,16 @@ public class JwtUtils {
 		return authStr;
 	}
 
-	public static String getTokenRoles(Map<String,String> headers, JwtTokenService jwtTokenProvider) {
+	public static Optional<Jws<Claims>> getClaims(Optional<String> token, Key jwtTokenKey) {
+		if (!token.isPresent()) {
+			return Optional.empty();
+		}
+		return Optional.of(Jwts.parserBuilder().setSigningKey(jwtTokenKey).build().parseClaimsJws(token.get()));
+	}
+	
+	public static String getTokenRoles(Map<String,String> headers, Key jwtTokenKey) {
 		Optional<String> tokenStr = extractToken(headers);
-		Optional<Jws<Claims>> claims = jwtTokenProvider.getClaims(tokenStr);
+		Optional<Jws<Claims>> claims = JwtUtils.getClaims(tokenStr, jwtTokenKey);
 		if (claims.isPresent() && new Date().before(claims.get().getBody().getExpiration())) {
 			return claims.get().getBody().get(TOKENAUTHKEY).toString();
 		}
@@ -54,9 +61,9 @@ public class JwtUtils {
 	}
 
 	public static TokenSubjectRole getTokenUserRoles(Map<String,String> headers,
-			JwtTokenService jwtTokenProvider) {
+			Key jwtTokenKey) {
 		Optional<String> tokenStr = extractToken(headers);
-		Optional<Jws<Claims>> claims = jwtTokenProvider.getClaims(tokenStr);
+		Optional<Jws<Claims>> claims = JwtUtils.getClaims(tokenStr, jwtTokenKey);
 		if (claims.isPresent() && new Date().before(claims.get().getBody().getExpiration())) {
 			return new TokenSubjectRole(claims.get().getBody().getSubject(),
 					claims.get().getBody().get(TOKENAUTHKEY).toString());
@@ -64,10 +71,10 @@ public class JwtUtils {
 		return new TokenSubjectRole(null, null);
 	}
 
-	public static boolean checkToken(HttpServletRequest request, JwtTokenService jwtTokenProvider) {
+	public static boolean checkToken(HttpServletRequest request, Key jwtTokenKey) {
 		Optional<String> tokenStr = JwtUtils
 				.extractToken(Optional.ofNullable(request.getHeader(JwtUtils.AUTHORIZATION)));
-		Optional<Jws<Claims>> claims = jwtTokenProvider.getClaims(tokenStr);
+		Optional<Jws<Claims>> claims = JwtUtils.getClaims(tokenStr, jwtTokenKey);
 		if (claims.isPresent() && new Date().before(claims.get().getBody().getExpiration())
 				&& claims.get().getBody().get(TOKENAUTHKEY).toString().contains(Role.USERS.name())
 				&& !claims.get().getBody().get(TOKENAUTHKEY).toString().contains(Role.GUEST.name())) {

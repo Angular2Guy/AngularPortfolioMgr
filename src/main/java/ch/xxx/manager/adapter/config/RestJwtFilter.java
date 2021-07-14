@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import ch.xxx.manager.usecase.service.JwtTokenService;
-import ch.xxx.manager.usecase.utils.TokenSubjectRole;
 
 @Component
 public class RestJwtFilter implements Filter {
@@ -49,7 +49,7 @@ public class RestJwtFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		if (httpReq.getRequestURI().contains("/rest") && !httpReq.getRequestURI().contains("/rest/auth")) {			
-			TokenSubjectRole tokenTuple = JwtUtils.getTokenUserRoles(createHeaderMap(request), jwtTokenService);
+			TokenSubjectRole tokenTuple = this.jwtTokenService.getTokenUserRoles(createHeaderMap(request));
 			if (tokenTuple.role() == null || !tokenTuple.role().contains(Role.USERS.name())) {
 				HttpServletResponse httpRes = (HttpServletResponse) response;
 				httpRes.setStatus(401);
