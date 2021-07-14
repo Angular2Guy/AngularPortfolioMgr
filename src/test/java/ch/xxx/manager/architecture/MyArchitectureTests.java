@@ -17,10 +17,13 @@ package ch.xxx.manager.architecture;
 
 import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
 
+import javax.annotation.PostConstruct;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -38,19 +41,20 @@ import com.tngtech.archunit.library.Architectures;
 import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 //import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })
 public class MyArchitectureTests {
 	private static final ArchRule NO_CLASSES_SHOULD_USE_FIELD_INJECTION = createNoFieldInjectionRule();
 
-	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");    
-	
+	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");
+
 	@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..").adapter("rest", "..adapter.controller..")
-			.adapter("cron", "..adapter.cron..")
-			.adapter("repo", "..adapter.repository..")
+			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..")
 			.adapter("client", "..adapter.client..").adapter("config", "..adapter.config..").withOptionalLayers(true);
 
 	@ArchTest
@@ -79,13 +83,13 @@ public class MyArchitectureTests {
 		exceptionType.check(this.importedClasses);
 	}
 
-//	@Test
-//	public void ruleCronJobMethodsAnnotations() {
-//		ArchRule exceptionType = ArchRuleDefinition.methods().that().arePublic().and().areDeclaredInClassesThat()
-//				.resideInAPackage("..adapter.cron.ScheduledTask").should().beAnnotatedWith(PostConstruct.class)
-//				.orShould().beAnnotatedWith(Scheduled.class).andShould().beAnnotatedWith(SchedulerLock.class);
-//		exceptionType.check(this.importedClasses);
-//	}
+	@Test
+	public void ruleCronJobMethodsAnnotations() {
+		ArchRule exceptionType = ArchRuleDefinition.methods().that().arePublic().and().areDeclaredInClassesThat()
+				.resideInAPackage("..adapter.cron..").should().beAnnotatedWith(Scheduled.class).andShould()
+				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class);
+		exceptionType.check(this.importedClasses);
+	}
 
 	@Test
 	public void ruleGeneralCodingRulesLoggers() {

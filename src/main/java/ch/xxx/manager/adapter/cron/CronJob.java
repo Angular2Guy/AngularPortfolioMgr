@@ -1,5 +1,7 @@
 package ch.xxx.manager.adapter.cron;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +13,7 @@ import ch.xxx.manager.usecase.service.NasdaqClient;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.XetraClient;
 import ch.xxx.manager.usecase.service.YahooClient;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class CronJob {
@@ -32,7 +35,13 @@ public class CronJob {
 		this.symbolImportService = symbolImportService;
 	}
 
+	@PostConstruct
+	public void init() {
+		LOGGER.info("init called");
+	}
+	
 	@Scheduled(cron = "0 0 1 * * ?")
+	@SchedulerLock(name = "CronJob_scheduledImporter", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporter() {
 		this.alphavatageClient.getFxTimeseriesDailyHistory(null, true)
 				.subscribe(dto -> LOGGER.info("Import of {} currency quotes finished.", dto.getDailyQuotes().size()));
