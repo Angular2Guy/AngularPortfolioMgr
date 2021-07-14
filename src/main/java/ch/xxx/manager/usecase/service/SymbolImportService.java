@@ -29,10 +29,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
@@ -41,13 +41,13 @@ public class SymbolImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
 	private final NasdaqClient nasdaqClient;
 	private final HkexClient hkexClient;
-	private final JpaSymbolRepository repository;
+	private final SymbolRepository repository;
 	private final XetraClient xetraClient;
 	private final QuoteImportService quoteImportService;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(
 			new ArrayList<>());
 
-	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, JpaSymbolRepository repository,
+	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
 			XetraClient xetraClient, QuoteImportService quoteImportService) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;

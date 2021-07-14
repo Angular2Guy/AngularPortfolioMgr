@@ -15,16 +15,16 @@ package ch.xxx.manager.usecase.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
-import ch.xxx.manager.adapter.repository.JpaIntraDayQuoteRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
 
 @Service
 @Transactional
 public class QuoteService {
-	private final JpaDailyQuoteRepository dailyQuoteRepository;
-	private final JpaIntraDayQuoteRepository intraDayQuoteRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	
-	public QuoteService(JpaDailyQuoteRepository dailyQuoteRepository, JpaIntraDayQuoteRepository intraDayQuoteRepository) {
+	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.intraDayQuoteRepository = intraDayQuoteRepository;
 	}

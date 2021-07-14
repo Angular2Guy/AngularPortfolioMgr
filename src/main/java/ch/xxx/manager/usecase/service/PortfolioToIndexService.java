@@ -14,23 +14,24 @@ package ch.xxx.manager.usecase.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
-import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
-import ch.xxx.manager.adapter.repository.JpaPortfolioToSymbolRepository;
-import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
+import ch.xxx.manager.domain.model.entity.CurrencyRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 
 @Service
 public class PortfolioToIndexService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
-	private final JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final JpaSymbolRepository symbolRepository;
-	private final JpaDailyQuoteRepository dailyQuoteRepository;
-	private final JpaCurrencyRepository currencyRepository;
-	
-	public PortfolioToIndexService(JpaPortfolioToSymbolRepository portfolioToSymbolRepository, JpaSymbolRepository symbolRepository, JpaDailyQuoteRepository dailyQuoteRepository, JpaCurrencyRepository currencyRepository) {
+	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final SymbolRepository symbolRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final CurrencyRepository currencyRepository;
+
+	public PortfolioToIndexService(PortfolioToSymbolRepository portfolioToSymbolRepository,
+			SymbolRepository symbolRepository, DailyQuoteRepository dailyQuoteRepository,
+			CurrencyRepository currencyRepository) {
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;

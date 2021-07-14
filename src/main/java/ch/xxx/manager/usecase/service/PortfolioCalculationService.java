@@ -14,26 +14,27 @@ package ch.xxx.manager.usecase.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
-import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
-import ch.xxx.manager.adapter.repository.JpaPortfolioRepository;
-import ch.xxx.manager.adapter.repository.JpaPortfolioToSymbolRepository;
+import ch.xxx.manager.domain.model.entity.CurrencyRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.PortfolioRepository;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 
 @Service
 @Transactional(propagation = Propagation.MANDATORY)
 public class PortfolioCalculationService {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
-	private final JpaPortfolioRepository portfolioRepository;
-	private final JpaDailyQuoteRepository dailyQuoteRepository;
-	private final JpaCurrencyRepository currencyRepository;
-	private final JpaPortfolioToSymbolRepository portfolioAndSymbolRepository;
-	
-	public PortfolioCalculationService(JpaPortfolioRepository portfolioRepository, JpaDailyQuoteRepository dailyQuoteRepository, JpaCurrencyRepository currencyRepository, JpaPortfolioToSymbolRepository portfolioAndSymbolRepository) {
+	private final PortfolioRepository portfolioRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final CurrencyRepository currencyRepository;
+	private final PortfolioToSymbolRepository portfolioAndSymbolRepository;
+
+	public PortfolioCalculationService(PortfolioRepository portfolioRepository,
+			DailyQuoteRepository dailyQuoteRepository, CurrencyRepository currencyRepository,
+			PortfolioToSymbolRepository portfolioAndSymbolRepository) {
 		this.portfolioRepository = portfolioRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyRepository = currencyRepository;

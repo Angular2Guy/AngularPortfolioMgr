@@ -35,5 +35,14 @@ public class SymbolRepositoryBean implements SymbolRepository {
 		return this.jpaSymbolRepository.findByPortfolioId(portfolioId);
 	}
 	
+	@Override
+	public List<Symbol> findAll() {
+		return this.jpaSymbolRepository.findAll();
+	}
+
+	@Override
+	public Symbol save(Symbol symbol) {
+		return this.jpaSymbolRepository.save(symbol);
+	}
 	
 }

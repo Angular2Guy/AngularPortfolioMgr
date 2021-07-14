@@ -7,4 +7,6 @@ public interface SymbolRepository {
 	List<Symbol> findBySymbolSingle(String symbol);
 	List<Symbol> findByName(String name);
 	List<Symbol> findByPortfolioId(Long portfolioId);
+	List<Symbol> findAll();
+	Symbol save(Symbol symbol);
 }

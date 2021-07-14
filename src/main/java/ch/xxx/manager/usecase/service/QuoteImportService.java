@@ -30,10 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.adapter.client.AlphavatageConnector;
 import ch.xxx.manager.adapter.client.YahooConnector;
-import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
-import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
-import ch.xxx.manager.adapter.repository.JpaIntraDayQuoteRepository;
-import ch.xxx.manager.adapter.repository.JpaSymbolRepository;
 import ch.xxx.manager.domain.model.dto.DailyFxQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
@@ -41,10 +37,14 @@ import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
+import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.IntraDayQuote;
+import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,14 +55,14 @@ public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	private final AlphavatageConnector alphavatageConnector;
 	private final YahooConnector yahooConnector;
-	private final JpaDailyQuoteRepository dailyQuoteRepository;
-	private final JpaIntraDayQuoteRepository intraDayQuoteRepository;
-	private final JpaSymbolRepository symbolRepository;
-	private final JpaCurrencyRepository currencyRepository;
+	private final DailyQuoteRepository dailyQuoteRepository;
+	private final IntraDayQuoteRepository intraDayQuoteRepository;
+	private final SymbolRepository symbolRepository;
+	private final CurrencyRepository currencyRepository;
 
 	public QuoteImportService(AlphavatageConnector alphavatageConnector, YahooConnector yahooConnector,
-			JpaDailyQuoteRepository dailyQuoteRepository, JpaIntraDayQuoteRepository intraDayQuoteRepository,
-			JpaSymbolRepository symbolRepository, JpaCurrencyRepository currencyRepository) {
+			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
+			SymbolRepository symbolRepository, CurrencyRepository currencyRepository) {
 		this.alphavatageConnector = alphavatageConnector;
 		this.yahooConnector = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
