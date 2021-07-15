@@ -10,12 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.domain.exception;
+package ch.xxx.manager.usecase.mapping;
 
-import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 
-@Component
-public class MyErrorAttributes extends DefaultErrorAttributes {
+import ch.xxx.manager.domain.model.dto.SymbolDto;
+import ch.xxx.manager.domain.model.entity.Symbol;
 
+@Component
+public class SymbolMapper {
+	public SymbolDto convert(Symbol entity) {
+		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getQuoteSource().toString());
+	}
 }

@@ -12,40 +12,45 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.usecase.mapping.SymbolMapper;
 
 @Service
 @Transactional
 public class SymbolService {
 	private final SymbolRepository repository;
-	
-	public SymbolService(SymbolRepository repository) {
+	private final SymbolMapper symbolMapper;
+
+	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper) {
 		this.repository = repository;
+		this.symbolMapper = symbolMapper;
 	}
 
-//	public Flux<SymbolDto> getAllSymbols() {
-//		return this.repository.findAll().flatMap(entity -> this.convert(entity));
-//	}
+	public List<SymbolDto> getAllSymbols() {
+		return this.repository.findAll().stream().flatMap(symbol -> Stream.of(this.symbolMapper.convert(symbol)))
+				.collect(Collectors.toList());
+	}
 
-//	public Flux<SymbolDto> getSymbolBySymbol(String symbol) {
-//		if (symbol != null && symbol.trim().length() > 2) {
-//			return this.repository.findBySymbol("%" + symbol.trim().toLowerCase() + "%").flatMap(entity -> this.convert(entity));
-//		}
-//		return Flux.empty();
-//	}
-//
-//	public Flux<SymbolDto> getSymbolByName(String name) {
-//		if (name != null && name.trim().length() > 2) {
-//			return this.repository.findByName("%" + name.trim().toLowerCase() + "%")
-//					.flatMap(entity -> this.convert(entity));
-//		}
-//		return Flux.empty();
-//	}
-//
-//	private Mono<SymbolDto> convert(Symbol entity) {
-//		return Mono.just(new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getSource()));
-//	}
+	public List<SymbolDto> getSymbolBySymbol(String symbol) {
+		return Optional.ofNullable(symbol).filter(mySymbol -> mySymbol.trim().length() > 2)
+				.map(mySymbol -> this.repository.findBySymbol("%" + mySymbol.trim().toLowerCase() + "%").stream()
+						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
+				.orElse(List.of());
+	}
+
+	public List<SymbolDto> getSymbolByName(String name) {
+		return Optional.ofNullable(name).filter(myName -> name.trim().length() > 2)
+				.map(myName -> this.repository.findByName("%" + myName.trim().toLowerCase() + "%").stream()
+						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
+				.orElse(List.of());
+	}
 }

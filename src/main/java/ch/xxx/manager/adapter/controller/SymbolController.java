@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
-import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("rest/symbol")
@@ -57,20 +56,17 @@ public class SymbolController {
 	}
 
 	@GetMapping("/all")
-	public Flux<SymbolDto> getAllSymbols() {
-		//return this.service.getAllSymbols();
-		return null;
+	public List<SymbolDto> getAllSymbols() {
+		return this.service.getAllSymbols();
 	}
 
 	@GetMapping("/symbol/{symbol}")
-	public Flux<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
-//		return this.service.getSymbolBySymbol(symbol);
-		return null;
+	public List<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
+		return this.service.getSymbolBySymbol(symbol);
 	}
 
 	@GetMapping("/name/{name}")
-	public Flux<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
-//		return this.service.getSymbolByName(name);
-		return null;
+	public List<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
+		return this.service.getSymbolByName(name);
 	}
 }

@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.qos.logback.core.joran.conditional.ThenOrElseActionBase;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
@@ -39,7 +37,6 @@ import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
-import reactor.core.publisher.Mono;
 
 @Transactional
 @Service
