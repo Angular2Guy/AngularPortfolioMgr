@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -36,6 +37,19 @@ public class AppUserRepositoryBean implements AppUserRepository {
 	public Optional<AppUser> findByUuid(String uuid) {
 		return this.jpaAppUserRepository.findByUuid(uuid);
 	}
-	
-	
+
+	@Override
+	public List<AppUser> findAll() {
+		return this.jpaAppUserRepository.findAll();
+	}
+
+	@Override
+	public Optional<AppUser> findById(Long id) {
+		return this.jpaAppUserRepository.findById(id);				
+	}
+
+	@Override
+	public AppUser save(AppUser appUser) {
+		return this.jpaAppUserRepository.save(appUser);
+	}
 }

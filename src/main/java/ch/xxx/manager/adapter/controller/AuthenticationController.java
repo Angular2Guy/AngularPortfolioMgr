@@ -13,13 +13,20 @@
 package ch.xxx.manager.adapter.controller;
 
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.JwtTokenService;
 
@@ -73,18 +80,18 @@ public class AuthenticationController {
 //		return this.appUserService.refreshToken(bearerStr);
 //	}
 	
-//	@GetMapping("/id/{id}")
-//	public Mono<AppUserDto> getUser(@PathVariable Long id) {
-//		return this.appUserService.load(id);
-//	}
-//	
-//	@GetMapping("/all")
-//	public Flux<AppUserDto> getUsers() {
-//		return this.appUserService.loadAll();
-//	}
-//	
-//	@PutMapping()
-//	public Mono<AppUserEntity> putUser(@RequestBody AppUserDto appUserDto) {
-//		return this.appUserService.save(appUserDto);
-//	}
+	@GetMapping("/id/{id}")
+	public AppUserDto getUser(@PathVariable Long id) {
+		return this.appUserService.load(id);
+	}
+	
+	@GetMapping("/all")
+	public List<AppUserDto> getUsers() {
+		return this.appUserService.loadAll();
+	}
+	
+	@PutMapping()
+	public AppUserDto putUser(@RequestBody AppUserDto appUserDto) {
+		return this.appUserService.save(appUserDto);
+	}
 }

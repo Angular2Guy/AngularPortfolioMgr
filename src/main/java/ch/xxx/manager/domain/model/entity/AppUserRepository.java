@@ -12,9 +12,13 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AppUserRepository {
 	Optional<AppUser> findByUsername(String username);
 	Optional<AppUser> findByUuid(String uuid);
+	List<AppUser> findAll();
+	Optional<AppUser> findById(Long id);
+	AppUser save(AppUser appUser);
 }

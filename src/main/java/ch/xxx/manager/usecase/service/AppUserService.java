@@ -12,7 +12,10 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +26,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
-import reactor.core.publisher.Mono;
+import ch.xxx.manager.usecase.mapping.AppUserMapper;
 
 @Transactional
 @Service
 public class AppUserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserService.class);
 	private final AppUserRepository repository;
+	private final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenService jwtTokenProvider;
@@ -42,28 +47,31 @@ public class AppUserService {
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
-	
-	public AppUserService(AppUserRepository repository, JavaMailSender javaMailSender, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider) {
+
+	public AppUserService(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
+			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtTokenProvider = jwtTokenProvider;
+		this.appUserMapper = appUserMapper;
 	}
-	
-	public Mono<RefreshTokenDto> refreshToken(String bearerToken) {
+
+	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);
-		if(tokenOpt.isEmpty()) {
+		if (tokenOpt.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token");
 		}
 		String newToken = this.jwtTokenProvider.refreshToken(tokenOpt.get());
 		LOGGER.info("Jwt Token refreshed.");
-		return Mono.just(new RefreshTokenDto(newToken));
+		return new RefreshTokenDto(newToken);
 	}
 
-//	public Mono<AppUserEntity> save(AppUserDto appUser) {
-//		return this.repository.save(this.convert(appUser));
-//	}
-//
+	public AppUserDto save(AppUserDto appUser) {
+		return this.appUserMapper.convert(Optional.of(
+				this.repository.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))));
+	}
+
 //	public Mono<Boolean> signin(AppUserDto appUserDto) {
 //		if (appUserDto.getId() != null) {
 //			return Mono.just(Boolean.FALSE);
@@ -137,24 +145,13 @@ public class AppUserService {
 //		LOGGER.info("Confirm Mail send to: " + entity.getEmailAddress());
 //	}
 //
-//	public Mono<AppUserDto> load(Long id) {
-//		return this.repository.findById(id).flatMap(entity -> Mono.just(convert(entity)));
-//	}
-//
-//	public Flux<AppUserDto> loadAll() {
-//		return this.repository.findAll().flatMap(entity -> Flux.just(convert(entity)));
-//	}
-//
-//	private AppUserDto convert(AppUserEntity entity) {
-//		AppUserDto dto = new AppUserDto(entity.getId(), entity.getUsername(), entity.getBirthdate(),
-//				entity.getPassword(), entity.getEmailAddress(), entity.getUserRole(), entity.isLocked(),
-//				entity.isEnabled(), entity.getUuid());
-//		return dto;
-//	}
-//
-//	private AppUserEntity convert(AppUserDto dto) {
-//		AppUserEntity entity = new AppUserEntity(dto.getId(), dto.getUsername(), dto.getBirthdate(), dto.getPassword(),
-//				dto.getEmailAddress(), dto.getUserRole(), dto.isLocked(), dto.isEnabled(), dto.getUuid());
-//		return entity;
-//	}
+	public AppUserDto load(Long id) {
+		return this.appUserMapper.convert(this.repository.findById(id));
+	}
+
+	public List<AppUserDto> loadAll() {
+		return this.repository.findAll().stream()
+				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity))))
+				.collect(Collectors.toList());
+	}
 }
