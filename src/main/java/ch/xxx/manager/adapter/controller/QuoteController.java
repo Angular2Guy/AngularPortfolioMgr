@@ -12,12 +12,19 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteService;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/quote")
@@ -32,11 +39,11 @@ public class QuoteController {
 		this.portfolioToIndexService = portfolioToIndexService;
 	}
 
-//	@GetMapping("/daily/all/symbol/{symbol}")
-//	public Flux<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {
-//		return this.quoteService.getDailyQuotes(symbol);
-//	}
-//
+	@GetMapping("/daily/all/symbol/{symbol}")
+	public List<QuoteDto> getAllDailyQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteService.getDailyQuotes(symbol);
+	}
+
 //	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}")
 //	public Flux<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId,
 //			@PathVariable("indexSymbol") String indexSymbol) {
@@ -44,12 +51,12 @@ public class QuoteController {
 //				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
 //		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
 //	}
-//
-//	@GetMapping("/intraday/symbol/{symbol}")
-//	public Flux<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
-//		return this.quoteService.getIntraDayQuotes(symbol);
-//	}
-//
+
+	@GetMapping("/intraday/symbol/{symbol}")
+	public List<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteService.getIntraDayQuotes(symbol);
+	}
+
 //	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
 //	public Flux<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol,
 //			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {
@@ -68,19 +75,19 @@ public class QuoteController {
 //		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
 //		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
 //	}
-//
+
 //	@GetMapping("/import/daily/symbol/{symbol}")
-//	public Mono<Long> importDailyQuotes(@PathVariable("symbol") String symbol) {
+//	public Long importDailyQuotes(@PathVariable("symbol") String symbol) {
 //		return this.quoteImportService.importDailyQuoteHistory(symbol);
 //	}
 //
 //	@GetMapping("/import/intraday/symbol/{symbol}")
-//	public Mono<Long> importIntraDayQuotes(@PathVariable("symbol") String symbol) {
+//	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol) {
 //		return this.quoteImportService.importIntraDayQuotes(symbol);
 //	}
 //
 //	@GetMapping("/import/daily/currency/{to_curr}")
-//	public Mono<Long> importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
+//	public Long importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
 //		return this.quoteImportService.importFxDailyQuoteHistory(to_curr);
 //	}
 }

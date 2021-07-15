@@ -12,40 +12,45 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
+import ch.xxx.manager.usecase.mapping.QuoteMapper;
 
 @Service
 @Transactional
 public class QuoteService {
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
-	
-	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository) {
+	private final QuoteMapper quoteMapper;
+
+	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
+			QuoteMapper quoteMapper) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.intraDayQuoteRepository = intraDayQuoteRepository;
+		this.quoteMapper = quoteMapper;
 	}
-	
-//	public Flux<QuoteDto> getDailyQuotes(String symbol) {
-//		return this.dailyQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
-//	}
-//	
-//	public Flux<QuoteDto> getDailyQuotes(String symbol, LocalDate start, LocalDate end) {
-//		return this.dailyQuoteRepository.findBySymbolAndDayBetween(symbol, start, end).flatMapSequential(quote -> convert(quote));
-//	}
-//	
-//	public Flux<QuoteDto> getIntraDayQuotes(String symbol) {
-//		return this.intraDayQuoteRepository.findBySymbol(symbol).flatMapSequential(quote -> convert(quote));
-//	}
-//	
-//	private Flux<QuoteDto> convert(IntraDayQuote entity) {
-//		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getLocalDateTime(), entity.getSymbol()));
-//	}
-//	
-//	private Flux<QuoteDto> convert(DailyQuote entity) {
-//		return Flux.just(new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(), entity.getLocalDay().atStartOfDay(), entity.getSymbol()));
-//	}
+
+	public List<QuoteDto> getDailyQuotes(String symbol) {
+		return this.dailyQuoteRepository.findBySymbol(symbol).stream()
+				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
+	}
+
+	public List<QuoteDto> getDailyQuotes(String symbol, LocalDate start, LocalDate end) {
+		return this.dailyQuoteRepository.findBySymbolAndDayBetween(symbol, start, end).stream()
+				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
+	}
+
+	public List<QuoteDto> getIntraDayQuotes(String symbol) {
+		return this.intraDayQuoteRepository.findBySymbol(symbol).stream()
+				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
+	}
 }
