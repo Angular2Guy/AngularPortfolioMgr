@@ -31,7 +31,7 @@ import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.utils.JwtUtils;
@@ -44,7 +44,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-@Component
+@Service
 public class JwtTokenService {
 
 	@Value("${security.jwt.token.secret-key}")

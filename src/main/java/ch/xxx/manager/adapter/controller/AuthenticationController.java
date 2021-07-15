@@ -14,28 +14,33 @@ package ch.xxx.manager.adapter.controller;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
-import ch.xxx.manager.domain.model.entity.AppUser;
+import ch.xxx.manager.domain.model.dto.AuthCheckDto;
+import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
+import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.AppUserService;
-import ch.xxx.manager.usecase.service.JwtTokenService;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/rest/auth")
 public class AuthenticationController {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
 	
-	private final JwtTokenService jwtTokenProvider;
 	private final AppUserService appUserService;
 
 	@Value("${spring.mail.username}")
@@ -45,40 +50,39 @@ public class AuthenticationController {
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
 	
-	public AuthenticationController(JwtTokenService jwtTokenProvider, AppUserService appUserService) {
+	public AuthenticationController(AppUserService appUserService) {
 		this.appUserService = appUserService;
-		this.jwtTokenProvider = jwtTokenProvider;
 	}
 	
-//	@PostMapping("/authorize")
-//	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
-//		String tokenRoles = JwtUtils.getTokenRoles(header, jwtTokenProvider);
-//		if (tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
-//			return Mono.just(new AuthCheckDto(authcheck.getPath(), true));
-//		} else {
-//			return Mono.just(new AuthCheckDto(authcheck.getPath(), false));
-//		}
-//	}
-//	
-//	@PostMapping("/signin")
-//	public Mono<Boolean> postUserSignin(@RequestBody AppUserDto myUser) {
-//		return this.appUserService.signin(myUser);
-//	}
-//	
-//	@GetMapping("/confirm/{uuid}")
-//	public Mono<Boolean> getConfirmUuid(@PathVariable String uuid) {
-//		return this.appUserService.confirmUuid(uuid);
-//	}
-//
-//	@PostMapping("/login")
-//	public Mono<AppUserDto> postUserLogin(@RequestBody AppUserDto myUser) {
-//		return this.appUserService.login(myUser);
-//	}
-//	
-//	@GetMapping("/refreshToken")
-//	public Mono<RefreshTokenDto> getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
-//		return this.appUserService.refreshToken(bearerStr);
-//	}
+	@PostMapping("/authorize")
+	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
+		String tokenRoles = this.appUserService.getTokenRoles(header).role();
+		if (tokenRoles != null && tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
+			return Mono.just(new AuthCheckDto(authcheck.getPath(), true));
+		} else {
+			return Mono.just(new AuthCheckDto(authcheck.getPath(), false));
+		}
+	}
+	
+	@PostMapping("/signin")
+	public Boolean postUserSignin(@RequestBody AppUserDto myUser) {
+		return this.appUserService.signin(myUser);
+	}
+	
+	@GetMapping("/confirm/{uuid}")
+	public Boolean getConfirmUuid(@PathVariable String uuid) {
+		return this.appUserService.confirmUuid(uuid);
+	}
+
+	@PostMapping("/login")
+	public AppUserDto postUserLogin(@RequestBody AppUserDto myUser) {
+		return this.appUserService.login(myUser);
+	}
+	
+	@GetMapping("/refreshToken")
+	public RefreshTokenDto getRefreshToken(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
+		return this.appUserService.refreshToken(bearerStr);
+	}
 	
 	@GetMapping("/id/{id}")
 	public AppUserDto getUser(@PathVariable Long id) {
