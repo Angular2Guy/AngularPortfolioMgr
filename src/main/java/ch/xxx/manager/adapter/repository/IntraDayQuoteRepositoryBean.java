@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -44,7 +45,12 @@ public class IntraDayQuoteRepositoryBean implements IntraDayQuoteRepository{
 		return this.jpaIntraDayQuoteRepository.findBySymbolAndLocaldatetimeBetween(symbol, start, end);
 	}
 	
-	public void deleteAll(List<IntraDayQuote> intraDayQuotes) {
+	public void deleteAll(Collection<IntraDayQuote> intraDayQuotes) {
 		this.jpaIntraDayQuoteRepository.deleteAll(intraDayQuotes);
+	}
+
+	@Override
+	public List<IntraDayQuote> saveAll(Collection<IntraDayQuote> intraDayQuotes) {
+		return this.jpaIntraDayQuoteRepository.saveAll(intraDayQuotes);
 	}
 }

@@ -12,17 +12,23 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.persistence.EntityManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +42,7 @@ import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
+import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
@@ -46,7 +53,6 @@ import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.mapping.QuoteMapper;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -171,18 +177,18 @@ public class QuoteImportService {
 
 	private DailyQuote convert(Symbol symbolEntity, HkDailyQuoteImportDto importDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		Optional<Long> currencyIdOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
-//				: currencyMap.get(importDto.getDate()).stream()
-//						.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
-//								&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
-//						.flatMap(entity -> Stream.of(entity.getId())).findFirst();
-////		LOGGER.info(importDto.toString());
-//		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(),
-//				importDto.getHigh(), importDto.getLow(), importDto.getAdjClose(),
-//				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
-//				symbolEntity.getId(), currencyIdOpt.orElse(null));
-//		return entity;
-		return null;
+		Optional<CurrencyKey> currencyOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
+				: currencyMap.get(importDto.getDate()).stream()
+						.filter(entity -> Optional.ofNullable(entity)
+								.filter(myEntity -> myEntity.getFromCurrKey().equals(symbolEntity.getCurrencyKey()))
+								.isPresent())
+						.flatMap(entity -> Stream.of(entity.getFromCurrKey())).findFirst();
+//		LOGGER.info(importDto.toString());
+		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(), importDto.getHigh(),
+				importDto.getLow(), importDto.getAdjClose(),
+				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
+				symbolEntity, currencyOpt.orElse(null));
+		return entity;
 	}
 
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
@@ -242,18 +248,16 @@ public class QuoteImportService {
 	}
 
 	private IntraDayQuote convert(Symbol symbolEntity, String dateStr, IntraDayQuoteImportDto dto) {
-//		IntraDayQuote entity = new IntraDayQuote(null, symbolEntity.getSymbol(),
-//				new BigDecimal(dto.getOpen()), new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()),
-//				new BigDecimal(dto.getClose()), Long.parseLong(dto.getVolume()),
-//				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity.getId());
-//		return entity;
-		return null;
+		IntraDayQuote entity = new IntraDayQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
+				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
+				Long.parseLong(dto.getVolume()),
+				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity);
+		return entity;
 	}
 
-	private Flux<IntraDayQuote> saveAllIntraDayQuotes(Collection<IntraDayQuote> entities) {
+	private List<IntraDayQuote> saveAllIntraDayQuotes(Collection<IntraDayQuote> entities) {
 		LOGGER.info("importIntraDayQuotes() {} to import", entities.size());
-//		return this.intraDayQuoteRepository.saveAll(entities);
-		return null;
+		return this.intraDayQuoteRepository.saveAll(entities);
 	}
 
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
