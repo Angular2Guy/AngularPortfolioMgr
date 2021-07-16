@@ -135,21 +135,16 @@ public class QuoteImportService {
 
 	public Long importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
-		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
-//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
-//						.flatMap(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities))
-//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
-		return null;
+		return this.importUpdateDailyQuotes(Set.of(symbol));
 	}
 
 	public Long importUpdateDailyQuotes(Set<String> symbols) {
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
-//		return symbols.stream().flatMap(symbol -> this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()).collectList()
-//						.flatMap(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities))
-//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count())).;
-		return null;
+		return symbols.stream().flatMap(symbol -> Stream.of(this.symbolRepository
+				.findBySymbolSingle(symbol.toLowerCase()).stream()
+				.flatMap(symbolEntity -> Stream.of(this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))
+						.map(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities)))
+				.map(values -> this.saveAllDailyQuotes(values)).count())).reduce(0L, (a, b) -> a + b);
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
@@ -212,9 +207,8 @@ public class QuoteImportService {
 	}
 
 	private Map<LocalDate, Collection<Currency>> createCurrencyMap() {
-//		return this.currencyRepository.findAll().collectMultimap(grouped -> grouped.getLocalDay(), grouped -> grouped)
-//				.block();
-		return null;
+		return Flux.fromIterable(this.currencyRepository.findAll())
+				.collectMultimap(grouped -> grouped.getLocalDay(), grouped -> grouped).block();
 	}
 
 	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
