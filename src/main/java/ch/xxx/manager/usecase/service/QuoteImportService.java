@@ -118,23 +118,22 @@ public class QuoteImportService {
 	public Long importDailyQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
-//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> this.customImport(symbol, currencyMap, symbolEntity, List.of())
-//						.flatMapMany(value -> this.saveAllDailyQuotes(value)).count());
-		return null;
+		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
+				.flatMap(symbolEntity -> Stream.of(this.customImport(symbol, currencyMap, symbolEntity, List.of()))
+						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
+				.count();
 	}
 
 	private List<DailyQuote> customImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities) {
-		if (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getQuoteSource())) {
-			return this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of());
-		} else if (QuoteSource.YAHOO.toString().equals(symbolEntity.getQuoteSource())) {
-			return this.yahooImport(symbol, currencyMap, symbolEntity, List.of());
-		}
-		return List.of();
+		return switch (symbolEntity.getQuoteSource()) {
+		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of());
+		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, List.of());
+		default -> List.of();
+		};
 	}
 
-	public Mono<Long> importUpdateDailyQuotes(String symbol) {
+	public Long importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
 //		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
@@ -204,10 +203,12 @@ public class QuoteImportService {
 
 	public Integer importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
-		return Flux.fromIterable(this.currencyRepository.findAll()).collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
+		return Flux.fromIterable(this.currencyRepository.findAll())
+				.collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
 				.flatMap(currencyMap -> this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
-						.flatMap(wrapper -> Mono.just(this.currencyRepository.saveAll(this.convert(wrapper, currencyMap))
-								.size()))).block();
+						.flatMap(wrapper -> Mono
+								.just(this.currencyRepository.saveAll(this.convert(wrapper, currencyMap)).size())))
+				.block();
 	}
 
 	private Map<LocalDate, Collection<Currency>> createCurrencyMap() {
@@ -222,18 +223,15 @@ public class QuoteImportService {
 		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null
-						|| currencyMap.get(entity.getLocalDay()).stream()
-								.anyMatch(mapEntity -> entity.getToCurrKey()
-										.equals(mapEntity.getToCurrKey())))
+				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null || currencyMap.get(entity.getLocalDay())
+						.stream().anyMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
 				.collect(Collectors.toList());
 	}
 
 	private Currency convert(Entry<String, DailyFxQuoteImportDto> entry, CurrencyKey from_curr, CurrencyKey to_curr) {
-		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-				from_curr, to_curr, new BigDecimal(entry.getValue().getOpen()),
-				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),
-				new BigDecimal(entry.getValue().getClose()));
+		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")), from_curr,
+				to_curr, new BigDecimal(entry.getValue().getOpen()), new BigDecimal(entry.getValue().getHigh()),
+				new BigDecimal(entry.getValue().getLow()), new BigDecimal(entry.getValue().getClose()));
 	}
 
 	private Mono<List<IntraDayQuote>> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
