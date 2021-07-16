@@ -51,6 +51,7 @@ import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.mapping.QuoteMapper;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -201,13 +202,12 @@ public class QuoteImportService {
 						.collect(Collectors.toList());
 	}
 
-	public Mono<Long> importFxDailyQuoteHistory(String to_currency) {
+	public Integer importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
-//		return this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
-//				.flatMap(currencyMap -> this.alphavatageConnector.getFxTimeseriesDailyHistory(to_currency, true)
-//						.flatMap(wrapper -> this.currencyRepository.saveAll(this.convert(wrapper, currencyMap))
-//								.count()));
-		return null;
+		return Flux.fromIterable(this.currencyRepository.findAll()).collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
+				.flatMap(currencyMap -> this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
+						.flatMap(wrapper -> Mono.just(this.currencyRepository.saveAll(this.convert(wrapper, currencyMap))
+								.size()))).block();
 	}
 
 	private Map<LocalDate, Collection<Currency>> createCurrencyMap() {

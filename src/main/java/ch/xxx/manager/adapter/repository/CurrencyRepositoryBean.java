@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -32,6 +34,14 @@ public class CurrencyRepositoryBean implements CurrencyRepository {
 	public Optional<Currency> findByToCurr(CurrencyKey toCurr) {
 		return this.jpaCurrencyRepository.findByToCurr(toCurr);
 	}
-	
-	
+
+	@Override
+	public List<Currency> findAll() {
+		return this.jpaCurrencyRepository.findAll();
+	}
+
+	@Override
+	public List<Currency> saveAll(Collection<Currency> currencies) {
+		return this.jpaCurrencyRepository.saveAll(currencies);
+	}
 }

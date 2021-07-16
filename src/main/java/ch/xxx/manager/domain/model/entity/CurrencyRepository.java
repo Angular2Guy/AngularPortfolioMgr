@@ -12,10 +12,14 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 public interface CurrencyRepository {
 	Optional<Currency> findByToCurr(CurrencyKey toCurr);
+	List<Currency> findAll();
+	List<Currency> saveAll(Collection<Currency> currencies);
 }
