@@ -50,7 +50,6 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
-import ch.xxx.manager.usecase.mapping.QuoteMapper;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,33 +63,34 @@ public class QuoteImportService {
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final SymbolRepository symbolRepository;
 	private final CurrencyRepository currencyRepository;
-	private final QuoteMapper quoteMapper;
 
 	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
 			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
-			SymbolRepository symbolRepository, CurrencyRepository currencyRepository, QuoteMapper quoteMapper) {
+			SymbolRepository symbolRepository, CurrencyRepository currencyRepository) {
 		this.alphavatageClient = alphavatageConnector;
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.intraDayQuoteRepository = intraDayQuoteRepository;
 		this.symbolRepository = symbolRepository;
 		this.currencyRepository = currencyRepository;
-		this.quoteMapper = quoteMapper;
 	}
 
 	public Long importIntraDayQuotes(String symbol) {
 		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
 		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
 		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
-		
-		record SymbolAndWrapper(Symbol symbol, IntraDayWrapperImportDto intraDayWrapperImportDto) {}
+
+		record SymbolAndWrapper(Symbol symbol, IntraDayWrapperImportDto intraDayWrapperImportDto) {
+		}
 
 		LOGGER.info("importIntraDayQuotes() called for symbol: {}", symbol);
-		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-				.stream().filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
-				.map(mySymbol -> new SymbolAndWrapper(mySymbol, this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol())
-						.blockOptional(Duration.ofSeconds(10)).orElse(intraDayWrapperImportDto)))
-				.peek(myRecord -> this.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))						
+		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
+				.filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
+				.map(mySymbol -> new SymbolAndWrapper(mySymbol,
+						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol())
+								.blockOptional(Duration.ofSeconds(10)).orElse(intraDayWrapperImportDto)))
+				.peek(myRecord -> this
+						.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))
 				.map(myRecord -> this.convert(myRecord.symbol, myRecord.intraDayWrapperImportDto))
 				.map(myQuotes -> this.saveAllIntraDayQuotes(myQuotes)).count();
 	}
@@ -120,11 +120,15 @@ public class QuoteImportService {
 
 	public Long importUpdateDailyQuotes(Set<String> symbols) {
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
-		return symbols.stream().flatMap(symbol -> Stream.of(this.symbolRepository
-				.findBySymbolSingle(symbol.toLowerCase()).stream()
-				.flatMap(symbolEntity -> Stream.of(this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))
-						.map(entities -> this.customImport(symbol, currencyMap, symbolEntity, entities)))
-				.map(values -> this.saveAllDailyQuotes(values)).count())).reduce(0L, (a, b) -> a + b);
+		record SymbolAndQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
+		}
+		return symbols.stream()
+				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
+						.flatMap(symbolEntity -> Stream.of(new SymbolAndQuotes(symbolEntity,
+								this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))))
+						.map(myRecord -> this.customImport(symbol, currencyMap, myRecord.symbol, myRecord.dailyQuotes))
+						.map(values -> this.saveAllDailyQuotes(values)).count()))
+				.reduce(0L, (a, b) -> a + b);
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
