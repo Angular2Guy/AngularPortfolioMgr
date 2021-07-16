@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,6 @@ import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteService;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/quote")
@@ -57,14 +58,14 @@ public class QuoteController {
 		return this.quoteService.getIntraDayQuotes(symbol);
 	}
 
-//	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
-//	public Flux<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol,
-//			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {
-//		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-//		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
-//		return this.quoteService.getDailyQuotes(symbol, start, end);
-//	}
-//
+	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
+	public List<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol,
+			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
+		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
+		return this.quoteService.getDailyQuotes(symbol, start, end);
+	}
+
 //	@GetMapping("/daily/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
 //	public Flux<QuoteDto> getAllDailyComparisonIndexQuotesFromStartToEnd(@PathVariable("portfolioId") Long portfolioId,
 //			@PathVariable("indexSymbol") String indexSymbol, @PathVariable("start") String isodateStart,
@@ -76,18 +77,18 @@ public class QuoteController {
 //		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
 //	}
 
-//	@GetMapping("/import/daily/symbol/{symbol}")
-//	public Long importDailyQuotes(@PathVariable("symbol") String symbol) {
-//		return this.quoteImportService.importDailyQuoteHistory(symbol);
-//	}
-//
-//	@GetMapping("/import/intraday/symbol/{symbol}")
-//	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol) {
-//		return this.quoteImportService.importIntraDayQuotes(symbol);
-//	}
-//
-//	@GetMapping("/import/daily/currency/{to_curr}")
-//	public Long importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
-//		return this.quoteImportService.importFxDailyQuoteHistory(to_curr);
-//	}
+	@GetMapping("/import/daily/symbol/{symbol}")
+	public Long importDailyQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteImportService.importDailyQuoteHistory(symbol);
+	}
+
+	@GetMapping("/import/intraday/symbol/{symbol}")
+	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol) {
+		return this.quoteImportService.importIntraDayQuotes(symbol);
+	}
+
+	@GetMapping("/import/daily/currency/{to_curr}")
+	public Long importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
+		return this.quoteImportService.importFxDailyQuoteHistory(to_curr);
+	}
 }

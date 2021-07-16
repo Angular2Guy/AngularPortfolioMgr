@@ -196,14 +196,14 @@ public class QuoteImportService {
 						.collect(Collectors.toList());
 	}
 
-	public Integer importFxDailyQuoteHistory(String to_currency) {
+	public Long importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
 		return Flux.fromIterable(this.currencyRepository.findAll())
 				.collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
 				.flatMap(currencyMap -> this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
 						.flatMap(wrapper -> Mono
 								.just(this.currencyRepository.saveAll(this.convert(wrapper, currencyMap)).size())))
-				.block();
+				.block().longValue();
 	}
 
 	private Map<LocalDate, Collection<Currency>> createCurrencyMap() {
