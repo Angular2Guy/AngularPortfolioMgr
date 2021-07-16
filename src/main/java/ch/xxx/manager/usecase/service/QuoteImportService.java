@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.persistence.EntityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -220,24 +218,22 @@ public class QuoteImportService {
 
 	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		LOGGER.info(wrapperDto.getDailyQuotes().get(LocalDate.of(2014, 12, 29)).getClose());
-//		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
-//				entry -> Stream.of(this.convert(entry, SymbolCurrency.valueOf(wrapperDto.getMetadata().getFromSymbol()),
-//						SymbolCurrency.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-//				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null
-//						|| currencyMap.get(entity.getLocalDay()).stream()
-//								.anyMatch(mapEntity -> SymbolCurrency.valueOf(entity.getTo_curr())
-//										.equals(SymbolCurrency.valueOf(mapEntity.getTo_curr()))))
-//				.collect(Collectors.toList());
-		return null;
+		LOGGER.info(wrapperDto.getDailyQuotes().get(LocalDate.of(2014, 12, 29)).getClose());
+		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
+				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
+						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))
+				.filter(entity -> currencyMap.get(entity.getLocalDay()) == null
+						|| currencyMap.get(entity.getLocalDay()).stream()
+								.anyMatch(mapEntity -> entity.getToCurrKey()
+										.equals(mapEntity.getToCurrKey())))
+				.collect(Collectors.toList());
 	}
 
 	private Currency convert(Entry<String, DailyFxQuoteImportDto> entry, CurrencyKey from_curr, CurrencyKey to_curr) {
-//		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-//				from_curr.toString(), to_curr.toString(), new BigDecimal(entry.getValue().getOpen()),
-//				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),
-//				new BigDecimal(entry.getValue().getClose()));
-		return null;
+		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+				from_curr, to_curr, new BigDecimal(entry.getValue().getOpen()),
+				new BigDecimal(entry.getValue().getHigh()), new BigDecimal(entry.getValue().getLow()),
+				new BigDecimal(entry.getValue().getClose()));
 	}
 
 	private Mono<List<IntraDayQuote>> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
@@ -270,19 +266,19 @@ public class QuoteImportService {
 
 	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		Optional<Long> currencyIdOpt = currencyMap
-//				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
-//						? Optional.empty()
-//						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
-//								.filter(entity -> entity.getTo_curr() == null || (entity.getTo_curr() != null
-//										&& entity.getTo_curr().equalsIgnoreCase(symbolEntity.getCurr())))
-//								.flatMap(entity -> Stream.of(entity.getId())).findFirst();
-//		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-//				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
-//				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
-//				symbolEntity.getId(), currencyIdOpt.orElse(null));
-//		return entity;
-		return null;
+		Optional<CurrencyKey> currencyIdOpt = currencyMap
+				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
+						? Optional.empty()
+						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
+								.filter(entity -> Optional.ofNullable(entity.getToCurrKey())
+										.filter(myCurrKey -> myCurrKey.equals(symbolEntity.getCurrencyKey()))
+										.isPresent())
+								.flatMap(entity -> Stream.of(entity.getToCurrKey())).findFirst();
+		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
+				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
+				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
+				symbolEntity, currencyIdOpt.orElse(null));
+		return entity;
 	}
 
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
