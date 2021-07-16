@@ -19,4 +19,5 @@ public interface IntraDayQuoteRepository {
 	List<IntraDayQuote> findBySymbol(String symbol);
 	List<IntraDayQuote> findBySymbolId(Long symbolId);
 	List<IntraDayQuote> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
+	void deleteAll(List<IntraDayQuote> intraDayQuotes);
 }

@@ -43,4 +43,8 @@ public class IntraDayQuoteRepositoryBean implements IntraDayQuoteRepository{
 			LocalDateTime end) {
 		return this.jpaIntraDayQuoteRepository.findBySymbolAndLocaldatetimeBetween(symbol, start, end);
 	}
+	
+	public void deleteAll(List<IntraDayQuote> intraDayQuotes) {
+		this.jpaIntraDayQuoteRepository.deleteAll(intraDayQuotes);
+	}
 }

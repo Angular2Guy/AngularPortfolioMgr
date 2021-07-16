@@ -21,4 +21,5 @@ public interface DailyQuoteRepository {
 	List<DailyQuote> findBySymbolId(Long symbolId);
 
 	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
+	List<DailyQuote> saveAll(List<DailyQuote> dailyquotes);
 }

@@ -21,7 +21,7 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 
 @Repository
-public class DailyQuoteRepositoryBean implements DailyQuoteRepository{
+public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	private final JpaDailyQuoteRepository jpaDailyQuoteRepository;
 	
 	public DailyQuoteRepositoryBean(JpaDailyQuoteRepository jpaDailyQuoteRepository) {
@@ -41,5 +41,10 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository{
 	@Override
 	public List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end) {
 		return this.jpaDailyQuoteRepository.findBySymbolAndDayBetween(symbol, start, end);
+	}
+
+	@Override
+	public List<DailyQuote> saveAll(List<DailyQuote> dailyquotes) {
+		return this.jpaDailyQuoteRepository.saveAll(dailyquotes);
 	}
 }
