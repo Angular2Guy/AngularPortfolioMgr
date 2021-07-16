@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +37,7 @@ import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.model.entity.Currency;
@@ -79,40 +79,20 @@ public class QuoteImportService {
 	}
 
 	public Long importIntraDayQuotes(String symbol) {
-//		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
-//		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
-//		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
-//
-//		LOGGER.info("importIntraDayQuotes() called for symbol: {}", symbol);
-//		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
-//				.flatMap(symbolEntity -> (QuoteSource.ALPHAVANTAGE.toString().equals(symbolEntity.getSource())
-//						? this.alphavatageConnector.getTimeseriesIntraDay(symbol)
-//						: Mono.just(intraDayWrapperImportDto)).flatMap(wrapper -> this.convert(symbolEntity, wrapper))
-//								.flatMapMany(values -> this.saveAllIntraDayQuotes(values)).count()
-//								.doAfterTerminate(() -> this.intraDayQuoteRepository
-//										.findBySymbolId(symbolEntity.getId())
-//										.groupBy(intraDayQuote -> intraDayQuote.getLocalDateTime().toLocalDate())
-//										.flatMap(group -> group.collectList())
-//										.map(groupList -> this.createIntraDayQuoteMap(groupList))
-//										.map(quotesMap -> this.deleteIntraDayQuotes(this.filterNewestDay(quotesMap)))
-//										.subscribe()));
-		return null;
-	}
+		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
+		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
+		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
+		
+		record SymbolAndWrapper(Symbol symbol, IntraDayWrapperImportDto intraDayWrapperImportDto) {}
 
-	private List<IntraDayQuote> filterNewestDay(Map<LocalDate, List<IntraDayQuote>> quotesMap) {
-		LocalDate max = quotesMap.keySet().stream().max(LocalDate::compareTo).get();
-		quotesMap.remove(max);
-		return quotesMap.values().stream().reduce(new ArrayList<IntraDayQuote>(), (list, entityList) -> {
-			list.addAll(entityList);
-			return list;
-		});
-
-	}
-
-	private Map<LocalDate, List<IntraDayQuote>> createIntraDayQuoteMap(List<IntraDayQuote> entities) {
-		Map<LocalDate, List<IntraDayQuote>> myMap = new HashMap<>();
-		myMap.put(entities.get(0).getLocalDateTime().toLocalDate(), entities);
-		return myMap;
+		LOGGER.info("importIntraDayQuotes() called for symbol: {}", symbol);
+		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase())
+				.stream().filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
+				.map(mySymbol -> new SymbolAndWrapper(mySymbol, this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol())
+						.blockOptional(Duration.ofSeconds(10)).orElse(intraDayWrapperImportDto)))
+				.peek(myRecord -> this.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))						
+				.map(myRecord -> this.convert(myRecord.symbol, myRecord.intraDayWrapperImportDto))
+				.map(myQuotes -> this.saveAllIntraDayQuotes(myQuotes)).count();
 	}
 
 	public Long importDailyQuoteHistory(String symbol) {
@@ -228,11 +208,11 @@ public class QuoteImportService {
 				new BigDecimal(entry.getValue().getLow()), new BigDecimal(entry.getValue().getClose()));
 	}
 
-	private Mono<List<IntraDayQuote>> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
+	private List<IntraDayQuote> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
 		List<IntraDayQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue()))
 				.collect(Collectors.toList());
-		return Mono.just(quotes);
+		return quotes;
 	}
 
 	private IntraDayQuote convert(Symbol symbolEntity, String dateStr, IntraDayQuoteImportDto dto) {
@@ -278,8 +258,9 @@ public class QuoteImportService {
 		return this.dailyQuoteRepository.saveAll(entities);
 	}
 
-	private void deleteIntraDayQuotes(List<IntraDayQuote> entities) {
+	private Long deleteIntraDayQuotes(List<IntraDayQuote> entities) {
 		LOGGER.info("deleteIntraDayQuotes() {} to delete", entities.size());
 		this.intraDayQuoteRepository.deleteAll(entities);
+		return Integer.valueOf(entities.size()).longValue();
 	}
 }

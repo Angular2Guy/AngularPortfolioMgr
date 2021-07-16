@@ -25,7 +25,6 @@ import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteService;
-import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("rest/quote")
