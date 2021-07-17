@@ -13,6 +13,7 @@
 package ch.xxx.manager.domain.model.entity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SymbolRepository {
 	List<Symbol> findBySymbol(String symbol);
@@ -20,5 +21,6 @@ public interface SymbolRepository {
 	List<Symbol> findByName(String name);
 	List<Symbol> findByPortfolioId(Long portfolioId);
 	List<Symbol> findAll();
+	Optional<Symbol> findById(Long id);
 	Symbol save(Symbol symbol);
 }

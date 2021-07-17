@@ -12,12 +12,23 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
 
+import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.usecase.service.PortfolioService;
 
 @RestController
@@ -31,27 +42,27 @@ public class PortfolioController {
 		this.portfolioService = portfolioService;
 	}
 
-//	@GetMapping("/userid/{userId}")
-//	public Flux<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
-//		return this.portfolioService.getPortfoliosByUserId(userId);
-//	}
-//
-//	@GetMapping("/id/{portfolioId}")
-//	public Mono<PortfolioDto> getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
-//		return this.portfolioService.getPortfolioById(portfolioId);
-//	}
-//
-//	@PostMapping
-//	public Mono<PortfolioDto> createPortfolio(@RequestBody PortfolioDto dto) {
-//		return this.portfolioService.addPortfolio(dto);
-//	}
-//
-//	@PostMapping("/symbol/{symbolId}/weight/{weight}")
-//	public Mono<PortfolioDto> addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
-//			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
-//		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
-//	}
-//
+	@GetMapping("/userid/{userId}")
+	public List<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
+		return this.portfolioService.getPortfoliosByUserId(userId);
+	}
+
+	@GetMapping("/id/{portfolioId}")
+	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
+		return this.portfolioService.getPortfolioById(portfolioId);
+	}
+
+	@PostMapping
+	public PortfolioDto createPortfolio(@RequestBody PortfolioDto dto) {
+		return this.portfolioService.addPortfolio(dto);
+	}
+
+	@PostMapping("/symbol/{symbolId}/weight/{weight}")
+	public PortfolioDto addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
+			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
+		return this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
+	}
+
 //	@PutMapping("/symbol/{symbolId}/weight/{weight}")
 //	public Mono<PortfolioDto> updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 //			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
@@ -63,13 +74,13 @@ public class PortfolioController {
 //			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
 //		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
 //	}
-//	
-//	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {
-//		if(isoString == null || isoString.trim().isBlank()) {
-//			return LocalDateTime.now();
-//		}
-//		String changedAtStr = UriUtils.decode(isoString, StandardCharsets.UTF_8.name());
-//		LOGGER.info(changedAtStr);
-//		return LocalDateTime.parse(changedAtStr, DateTimeFormatter.ISO_DATE_TIME);
-//	}
+	
+	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {
+		if(isoString == null || isoString.trim().isBlank()) {
+			return LocalDateTime.now();
+		}
+		String changedAtStr = UriUtils.decode(isoString, StandardCharsets.UTF_8.name());
+		LOGGER.info(changedAtStr);
+		return LocalDateTime.parse(changedAtStr, DateTimeFormatter.ISO_DATE_TIME);
+	}
 }

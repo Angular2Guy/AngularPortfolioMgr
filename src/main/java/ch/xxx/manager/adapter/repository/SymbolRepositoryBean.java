@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -55,6 +56,11 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	@Override
 	public Symbol save(Symbol symbol) {
 		return this.jpaSymbolRepository.save(symbol);
+	}
+
+	@Override
+	public Optional<Symbol> findById(Long id) {
+		return this.jpaSymbolRepository.findById(id);
 	}
 	
 }

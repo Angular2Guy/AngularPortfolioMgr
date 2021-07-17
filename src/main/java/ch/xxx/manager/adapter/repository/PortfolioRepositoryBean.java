@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -36,5 +37,15 @@ public class PortfolioRepositoryBean implements PortfolioRepository{
 	@Override
 	public List<PortfolioAndSymbolDto> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId) {
 		return this.jpaPortfolioRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId);
+	}
+
+	@Override
+	public Optional<Portfolio> findById(Long id) {
+		return this.jpaPortfolioRepository.findById(id);
+	}
+
+	@Override
+	public Portfolio save(Portfolio portfolio) {
+		return this.jpaPortfolioRepository.save(portfolio);
 	}
 }

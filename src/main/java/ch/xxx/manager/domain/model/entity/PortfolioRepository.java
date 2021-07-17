@@ -13,10 +13,13 @@
 package ch.xxx.manager.domain.model.entity;
 
 import java.util.List;
+import java.util.Optional;
 
 import ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto;
 
 public interface PortfolioRepository {
+	Optional<Portfolio> findById(Long id);
 	List<Portfolio> findByUserId(Long userId);
 	List<PortfolioAndSymbolDto> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId);
+	Portfolio save(Portfolio portfolio);
 }
