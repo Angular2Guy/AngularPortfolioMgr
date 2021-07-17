@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.util.UriUtils;
 
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.usecase.service.PortfolioService;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("rest/portfolio")
@@ -69,11 +71,11 @@ public class PortfolioController {
 //		return this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 //	}
 //
-//	@DeleteMapping("/{id}/symbol/{symbolId}")
-//	public Mono<PortfolioDto> deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
-//			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
-//		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
-//	}
+	@DeleteMapping("/{id}/symbol/{symbolId}")
+	public PortfolioDto deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
+			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
+		return this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
+	}
 	
 	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {
 		if(isoString == null || isoString.trim().isBlank()) {

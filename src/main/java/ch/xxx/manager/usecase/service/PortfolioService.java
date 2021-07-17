@@ -68,10 +68,9 @@ public class PortfolioService {
 		return this.convert(this.portfolioRepository.save(this.convert(dto)));
 	}
 
-	public PortfolioDto addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight,
-			LocalDateTime changedAt) {
+	public PortfolioDto addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
 		return this.convert(this.portfolioToSymbolRepository
-						.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
+				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
 	}
 
 //	public Mono<PortfolioDto> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
@@ -85,16 +84,16 @@ public class PortfolioService {
 //				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(dto.getId()))
 //				.flatMap(entity -> this.convert(entity));
 //	}
-//
-//	public Mono<PortfolioDto> removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
-//		return Mono
-//				.just(this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId)
-//						.flatMap(entity -> Flux.just(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
-//								Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
-//						.count().block())
+
+	public PortfolioDto removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
+		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
+				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
+						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 //				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(portfolioId))
-//				.flatMap(entity -> this.convert(entity));
-//	}
+				.flatMap(entity -> Stream.of(this.convert(entity.getPortfolio()))).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
+	}
 
 	private PortfolioToSymbol updatePtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate changedAt,
 			Optional<LocalDate> removedAtOpt) {
