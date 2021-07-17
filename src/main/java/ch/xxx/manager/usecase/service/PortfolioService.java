@@ -73,17 +73,17 @@ public class PortfolioService {
 				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
 	}
 
-//	public Mono<PortfolioDto> updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
-//			LocalDateTime changedAt) {
-//		return Mono
-//				.just(this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId)
-//						.flatMap(myEntity -> Flux.just(this.updatePtsEntity(myEntity, Optional.of(weight),
-//								changedAt.toLocalDate(), Optional.empty())))
-//						.flatMap(newEntity -> Flux.just(this.portfolioToSymbolRepository.save(newEntity))).count()
-//						.block())
+	public PortfolioDto updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
+			LocalDateTime changedAt) {
+		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
+				.flatMap(myEntity -> Stream.of(
+						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
+				.flatMap(newEntity -> Stream.of(this.portfolioToSymbolRepository.save(newEntity)))
 //				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(dto.getId()))
-//				.flatMap(entity -> this.convert(entity));
-//	}
+				.flatMap(entity -> Stream.of(this.convert(entity.getPortfolio()))).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
+	}
 
 	public PortfolioDto removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
