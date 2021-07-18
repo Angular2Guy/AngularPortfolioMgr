@@ -15,11 +15,16 @@ package ch.xxx.manager.usecase.mapping;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.SymbolDto;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 
 @Component
 public class SymbolMapper {
 	public SymbolDto convert(Symbol entity) {
-		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getQuoteSource().toString());
+		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getQuoteSource().toString(), null);
+	}
+	
+	public SymbolDto convert(Symbol symbol, PortfolioToSymbol portfolioToSymbol) {
+		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), null, null, symbol.getQuoteSource().toString(), portfolioToSymbol.getWeight());
 	}
 }

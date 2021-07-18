@@ -35,6 +35,8 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.usecase.mapping.PortfolioMapper;
+import ch.xxx.manager.usecase.mapping.SymbolMapper;
 
 @Service
 @Transactional
@@ -44,15 +46,19 @@ public class PortfolioService {
 	private final SymbolRepository symbolRepository;
 	private final AppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
+	private final SymbolMapper symbolMapper;
+	private final PortfolioMapper portfolioMapper;
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
-			PortfolioCalculationService portfolioCalculationService) {
+			PortfolioCalculationService portfolioCalculationService, SymbolMapper symbolMapper, PortfolioMapper portfolioMapper) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.appUserRepository = appUserRepository;
+		this.symbolMapper = symbolMapper;
+		this.portfolioMapper = portfolioMapper;
 	}
 
 	public List<PortfolioDto> getPortfoliosByUserId(Long userId) {
@@ -120,10 +126,7 @@ public class PortfolioService {
 	}
 
 	private PortfolioDto updatePortfolioDto(PortfolioToSymbol entity, Symbol symbolEntity, PortfolioDto dto) {
-		SymbolDto symbolDto = new SymbolDto(symbolEntity.getId(), symbolEntity.getSymbol(), symbolEntity.getName(),
-				entity.getChangedAt(), entity.getRemovedAt(), symbolEntity.getQuoteSource().name());
-		symbolDto.setWeight(entity.getWeight());
-		dto.getSymbols().add(symbolDto);
+		SymbolDto symbolDto = this.symbolMapper.convert(symbolEntity, entity);
 		return dto;
 	}
 
@@ -134,9 +137,7 @@ public class PortfolioService {
 	}
 
 	private PortfolioDto convert(Portfolio entity) {
-		final PortfolioDto dto = new PortfolioDto(entity.getId(), entity.getAppUser().getId(), entity.getName(),
-				entity.getCreatedAt().atStartOfDay(), entity.getMonth1(), entity.getMonth6(), entity.getYear1(),
-				entity.getYear2(), entity.getYear5(), entity.getYear10());
+		final PortfolioDto dto = this.portfolioMapper.toDto(entity);
 		List<PortfolioToSymbol> portfolioToSymbols = this.portfolioToSymbolRepository.findByPortfolioId(dto.getId());
 		return portfolioToSymbols.isEmpty() ? this.convert(new PortfolioToSymbol(), dto)
 				: portfolioToSymbols.stream().map(pts -> this.convert(pts, dto))

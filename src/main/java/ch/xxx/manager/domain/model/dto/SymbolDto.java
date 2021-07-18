@@ -33,12 +33,13 @@ public class SymbolDto {
 		
 	}
 	
-	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source) {
+	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source, Long weight) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
 		this.name = name;
 		this.source = source;
+		this.weight = weight;
 		this.changedAt = changedAt == null ? null : LocalDateTime.of(changedAt, LocalTime.now());
 		this.removedAt = removedAt == null ? null : LocalDateTime.of(removedAt, LocalTime.now());
 	}
