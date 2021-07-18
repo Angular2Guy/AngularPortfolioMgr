@@ -127,6 +127,7 @@ public class PortfolioService {
 
 	private PortfolioDto updatePortfolioDto(PortfolioToSymbol entity, Symbol symbolEntity, PortfolioDto dto) {
 		SymbolDto symbolDto = this.symbolMapper.convert(symbolEntity, entity);
+		dto.getSymbols().add(symbolDto);
 		return dto;
 	}
 
