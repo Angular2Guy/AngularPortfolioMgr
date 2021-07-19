@@ -12,31 +12,37 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.ImmutableSortedMap;
+
+import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
-import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
-import reactor.core.publisher.Mono;
 
 @Service
-@Transactional(propagation = Propagation.MANDATORY)
+@Transactional
 public class PortfolioCalculationService {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final PortfolioRepository portfolioRepository;
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyRepository currencyRepository;
 	private final PortfolioToSymbolRepository portfolioAndSymbolRepository;
+	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
 
 	public PortfolioCalculationService(PortfolioRepository portfolioRepository,
 			DailyQuoteRepository dailyQuoteRepository, CurrencyRepository currencyRepository,
@@ -47,6 +53,12 @@ public class PortfolioCalculationService {
 		this.portfolioAndSymbolRepository = portfolioAndSymbolRepository;
 	}
 
+	@PostConstruct
+	public void initCurrencyMap() {
+		this.currencyMap = ImmutableSortedMap.copyOf(
+				this.currencyRepository.findAll().stream().collect(Collectors.groupingBy(Currency::getLocalDay)));
+	}
+	
 	public Portfolio calculatePortfolio(Long portfolioId) {
 		List<PortfolioToSymbol> portfolioToSymbols = this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId);
 		

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
 import ch.xxx.manager.usecase.service.HkexClient;
 import ch.xxx.manager.usecase.service.NasdaqClient;
+import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.XetraClient;
 import ch.xxx.manager.usecase.service.YahooClient;
@@ -36,27 +37,32 @@ public class CronJob {
 	private final YahooClient yahooClient;
 	private final AlphavatageClient alphavatageClient;
 	private final SymbolImportService symbolImportService;
+	private final PortfolioCalculationService portfolioCalculationService;
 
 	public CronJob(HkexClient hkexClient, XetraClient xetraClient, NasdaqClient nasdaqClient, YahooClient yahooClient,
-			AlphavatageClient alphavatageClient, SymbolImportService symbolImportService) {
+			AlphavatageClient alphavatageClient, SymbolImportService symbolImportService,
+			PortfolioCalculationService portfolioCalculationService) {
 		this.hkexClient = hkexClient;
 		this.xetraClient = xetraClient;
 		this.nasdaqClient = nasdaqClient;
 		this.yahooClient = yahooClient;
 		this.alphavatageClient = alphavatageClient;
 		this.symbolImportService = symbolImportService;
+		this.portfolioCalculationService = portfolioCalculationService;
 	}
 
 	@PostConstruct
 	public void init() {
 		LOGGER.info("init called");
 	}
-	
+
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_scheduledImporter", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporter() {
-		this.alphavatageClient.getFxTimeseriesDailyHistory(null, true)
-				.subscribe(dto -> LOGGER.info("Import of {} currency quotes finished.", dto.getDailyQuotes().size()));
+		this.alphavatageClient.getFxTimeseriesDailyHistory(null, true).subscribe(dto -> {
+			this.portfolioCalculationService.initCurrencyMap();
+			LOGGER.info("Import of {} currency quotes finished.", dto.getDailyQuotes().size());
+		});
 		this.hkexClient.importSymbols().subscribe(dtos -> {
 			this.symbolImportService.importHkSymbols(dtos);
 			LOGGER.info("Import of {} hk symbols finished.", dtos.size());

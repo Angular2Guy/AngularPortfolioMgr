@@ -14,27 +14,19 @@ package ch.xxx.manager.usecase.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.ImmutableSortedMap;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
-import ch.xxx.manager.domain.model.entity.Currency;
-import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
@@ -52,15 +44,14 @@ public class PortfolioService {
 	private final PortfolioRepository portfolioRepository;
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
-	private final CurrencyRepository currencyRepository;
 	private final AppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
 	private final SymbolMapper symbolMapper;
 	private final PortfolioMapper portfolioMapper;
-	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
+
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
-			CurrencyRepository currencyRepository, PortfolioToSymbolRepository portfolioToSymbolRepository,
+			PortfolioToSymbolRepository portfolioToSymbolRepository,
 			SymbolRepository symbolRepository, PortfolioCalculationService portfolioCalculationService,
 			SymbolMapper symbolMapper, PortfolioMapper portfolioMapper) {
 		this.portfolioRepository = portfolioRepository;
@@ -70,14 +61,9 @@ public class PortfolioService {
 		this.appUserRepository = appUserRepository;
 		this.symbolMapper = symbolMapper;
 		this.portfolioMapper = portfolioMapper;
-		this.currencyRepository = currencyRepository;
 	}
 
-	@PostConstruct
-	public void initCurrencyMap() {
-		this.currencyMap = ImmutableSortedMap.copyOf(
-				this.currencyRepository.findAll().stream().collect(Collectors.groupingBy(Currency::getLocalDay)));
-	}
+
 
 	public List<PortfolioDto> getPortfoliosByUserId(Long userId) {
 		return this.portfolioRepository.findByUserId(userId).stream().flatMap(entity -> Stream.of(this.convert(entity)))
