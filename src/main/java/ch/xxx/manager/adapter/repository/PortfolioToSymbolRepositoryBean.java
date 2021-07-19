@@ -46,6 +46,11 @@ public class PortfolioToSymbolRepositoryBean implements PortfolioToSymbolReposit
 	public PortfolioToSymbol save(PortfolioToSymbol portfolioToSymbol) {
 		return this.jpaPortfolioToSymbolRepository.save(portfolioToSymbol);
 	}
+
+	@Override
+	public List<PortfolioToSymbol> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId) {
+		return this.jpaPortfolioToSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId);
+	}
 	
 	
 }

@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(propagation = Propagation.MANDATORY)
@@ -40,11 +46,12 @@ public class PortfolioCalculationService {
 		this.currencyRepository = currencyRepository;
 		this.portfolioAndSymbolRepository = portfolioAndSymbolRepository;
 	}
-//
-//	public Mono<Portfolio> calculatePortfolio(Long portfolioId) {
-//		this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId)
-//				.subscribe(entity -> LOG.info(entity.toString()));
-//		Mono<List<DailyQuote>> portfolioQuotes = Mono.zip(
+
+	public Portfolio calculatePortfolio(Long portfolioId) {
+		List<PortfolioToSymbol> portfolioToSymbols = this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId);
+		
+		return null;
+//		List<DailyQuote> portfolioQuotes = Mono.zip(
 //				this.portfolioAndSymbolRepository.findPortfolioCalcEntitiesByPortfolioId(portfolioId)
 //						.collectMap(myEntity -> myEntity.getSymbolId(), myEntity -> myEntity),
 //				this.currencyRepository.findAll().collectMultimap(entity -> entity.getLocalDay(), entity -> entity))
@@ -53,8 +60,8 @@ public class PortfolioCalculationService {
 //		return this.portfolioRepository.findById(portfolioId)
 //				.flatMap(portfolio -> this.updatePortfolio(portfolio, portfolioQuotes))
 //				.flatMap(portfolio -> this.portfolioRepository.save(portfolio));
-//	}
-//
+	}
+
 //	private Mono<List<DailyQuote>> updatePortfolioQuotes(
 //			Tuple3<Map<Long, PortfolioAndSymbol>, Map<Long, Collection<DailyQuote>>, Map<LocalDate, Collection<Currency>>> myTuple) {
 //		Optional<PortfolioAndSymbol> pAndSymEntityOpt = myTuple.getA().values().stream()

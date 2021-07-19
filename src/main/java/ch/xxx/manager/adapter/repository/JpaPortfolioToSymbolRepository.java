@@ -26,4 +26,6 @@ public interface JpaPortfolioToSymbolRepository extends JpaRepository<PortfolioT
 	List<PortfolioToSymbol> findBySymbolId(Long symbolId);
 	@Query("select pts from PortfolioToSymbol pts where pts.symbol.id = :symbolId and pts.portfolio.id = :portfolioId")
 	List<PortfolioToSymbol> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
+	@Query("select pts from PortfolioToSymbol pts inner join pts.symbol s inner join pts.portfolio p where p.id = :portfolioId")
+	List<PortfolioToSymbol> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId);
 }
