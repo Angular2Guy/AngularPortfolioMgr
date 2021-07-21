@@ -28,7 +28,6 @@ import javax.persistence.PrePersist;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
-
 @Entity
 public class Portfolio {
 	@Id
@@ -48,7 +47,7 @@ public class Portfolio {
 	private BigDecimal year10;
 	@OneToMany(mappedBy = "portfolio")
 	private Set<PortfolioToSymbol> portfolioToSymbols;
-	
+
 	@PrePersist
 	void init() {
 		this.createdAt = LocalDate.now();
@@ -57,51 +56,67 @@ public class Portfolio {
 	public LocalDate getCreatedAt() {
 		return createdAt;
 	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public BigDecimal getMonth1() {
 		return month1;
 	}
+
 	public void setMonth1(BigDecimal month1) {
 		this.month1 = month1;
 	}
+
 	public BigDecimal getMonth6() {
 		return month6;
 	}
+
 	public void setMonth6(BigDecimal month6) {
 		this.month6 = month6;
 	}
+
 	public BigDecimal getYear1() {
 		return year1;
 	}
+
 	public void setYear1(BigDecimal year1) {
 		this.year1 = year1;
 	}
+
 	public BigDecimal getYear2() {
 		return year2;
 	}
+
 	public void setYear2(BigDecimal year2) {
 		this.year2 = year2;
 	}
+
 	public BigDecimal getYear5() {
 		return year5;
 	}
+
 	public void setYear5(BigDecimal year5) {
 		this.year5 = year5;
 	}
+
 	public BigDecimal getYear10() {
 		return year10;
 	}
+
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
 	}
@@ -128,5 +143,13 @@ public class Portfolio {
 				+ ", month1=" + month1 + ", month6=" + month6 + ", year1=" + year1 + ", year2=" + year2 + ", year5="
 				+ year5 + ", year10=" + year10 + ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}
-	
+
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
+	}
+
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
+	}
+
 }

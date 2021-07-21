@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -64,14 +66,12 @@ public class PortfolioCalculationService {
 
 	@PostConstruct
 	public void initCurrencyMap() {
-		Optional<LocalDateTime> localDateTimeOpt = Optional.ofNullable(this.lastCurrencyUpdate)
-				.filter(myDate -> LocalDateTime.now().plusHours(1).isAfter(myDate));
-		localDateTimeOpt.orElseGet(() -> {
-			this.currencyMap = ImmutableSortedMap.copyOf(
-					this.currencyRepository.findAll().stream().collect(Collectors.groupingBy(Currency::getLocalDay)));
-			return LocalDate.now().atStartOfDay();
-		});
-		
+		this.lastCurrencyUpdate = Optional.ofNullable(this.lastCurrencyUpdate)
+				.filter(myDate -> LocalDateTime.now().plusHours(1).isAfter(myDate)).orElseGet(() -> {
+					this.currencyMap = ImmutableSortedMap.copyOf(this.currencyRepository.findAll().stream()
+							.collect(Collectors.groupingBy(Currency::getLocalDay)));
+					return LocalDate.now().atStartOfDay();
+				});
 	}
 
 	public Portfolio calculatePortfolio(Long portfolioId) {
@@ -81,13 +81,30 @@ public class PortfolioCalculationService {
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-
+		List<PortfolioElement> collect = portfolioToSymbols.stream()
+				.map(pts -> this.calcPortfolioElementsForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId())))
+				.flatMap(Collection::stream).collect(Collectors.toList());
 		return null;
 	}
 
 	private Collection<PortfolioElement> calcPortfolioElementsForSymbol(PortfolioToSymbol portfolioToSymbol,
 			List<DailyQuote> dailyQuotes) {
-
+		dailyQuotes.stream()
+				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) >= 0
+						&& Optional.ofNullable(myDailyQuote.getLocalDay()).stream()
+								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) < 0)
+								.findFirst().isEmpty())
+				.map(myDailyQuote -> getCurrencyQuote(portfolioToSymbol, myDailyQuote));
 		return null;
+	}
+
+	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
+		return LongStream.range(0, 7).boxed()
+				.map(minusDays -> this.currencyMap.get(myDailyQuote.getLocalDay().minusDays(minusDays)).stream()
+						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
+								.equals(myCurrency.getFromCurrKey())
+								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
+						.findFirst())
+				.filter(Optional::isPresent).map(myOpt -> myOpt.get()).findFirst();
 	}
 }
