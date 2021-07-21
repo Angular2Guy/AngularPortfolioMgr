@@ -27,6 +27,9 @@ public interface JpaDailyQuoteRepository extends JpaRepository<DailyQuote, Long>
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id = :symbolId order by dq.localDay asc")
 	List<DailyQuote> findBySymbolId(Long symbolId);
 	
+	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id in(:symbolIds) order by dq.localDay asc")
+	List<DailyQuote> findBySymbolIds(List<Long> symbolIds);
+	
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol and dq.localDay between :start and :end order by dq.localDay asc")
 	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 }

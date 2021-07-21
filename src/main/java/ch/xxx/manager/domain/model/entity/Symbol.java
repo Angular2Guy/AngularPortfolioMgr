@@ -39,9 +39,9 @@ public class Symbol {
 	private CurrencyKey currencyKey;
 	@Enumerated(EnumType.STRING)
 	private QuoteSource quoteSource;
-	@OneToMany(mappedBy = "symbol")
+	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
 	private Set<DailyQuote> dailyQuotes;
-	@OneToMany(mappedBy = "symbol")
+	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
 	private Set<IntraDayQuote> intraDayQuotes;
 	@OneToMany(mappedBy = "symbol")
 	private Set<PortfolioToSymbol> portfolioToSymbols;
