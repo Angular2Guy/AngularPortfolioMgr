@@ -81,7 +81,7 @@ public class PortfolioCalculationService {
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-		List<PortfolioElement> collect = portfolioToSymbols.stream()
+		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.map(pts -> this.calcPortfolioElementsForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId())))
 				.flatMap(Collection::stream).collect(Collectors.toList());
 		return null;
@@ -89,13 +89,21 @@ public class PortfolioCalculationService {
 
 	private Collection<PortfolioElement> calcPortfolioElementsForSymbol(PortfolioToSymbol portfolioToSymbol,
 			List<DailyQuote> dailyQuotes) {
-		dailyQuotes.stream()
+		return dailyQuotes.stream()
 				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) >= 0
 						&& Optional.ofNullable(myDailyQuote.getLocalDay()).stream()
 								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) < 0)
 								.findFirst().isEmpty())
-				.map(myDailyQuote -> getCurrencyQuote(portfolioToSymbol, myDailyQuote));
-		return null;
+				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol))
+				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+	}
+
+	private Optional<PortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
+			PortfolioToSymbol portfolioToSymbol) {
+		return getCurrencyQuote(portfolioToSymbol, dailyQuote)
+				.map(currencyQuote -> new PortfolioElement(portfolioToSymbol.getSymbol().getId(),
+						dailyQuote.getLocalDay(), currencyQuote.getClose().multiply(dailyQuote.getClose())));
+
 	}
 
 	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
@@ -105,6 +113,6 @@ public class PortfolioCalculationService {
 								.equals(myCurrency.getFromCurrKey())
 								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
 						.findFirst())
-				.filter(Optional::isPresent).map(myOpt -> myOpt.get()).findFirst();
+				.filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
 }
