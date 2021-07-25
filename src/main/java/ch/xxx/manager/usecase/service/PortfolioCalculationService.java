@@ -15,13 +15,14 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSortedMap;
 
+import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
@@ -83,8 +85,34 @@ public class PortfolioCalculationService {
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.map(pts -> this.calcPortfolioElementsForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId())))
-				.flatMap(Collection::stream).collect(Collectors.toList());
-		return null;
+				.flatMap(Collection::stream).sorted(Comparator.comparing(PortfolioElement::localDate))
+				.collect(Collectors.toList());
+		Portfolio portfolio = this.portfolioRepository.findById(portfolioId).orElseThrow(() -> new ResourceNotFoundException(String.format("Portfolio with id: %d not found.", portfolioId)));
+		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
+		portfolio.setMonth1(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
+		portfolio.setMonth6(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
+		portfolio.setYear1(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
+		portfolio.setYear2(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
+		portfolio.setYear5(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
+		portfolio.setYear10(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
+		return portfolio;
+	}
+
+	private BigDecimal portfolioValueAtDate(List<PortfolioToSymbol> portfolioToSymbols,
+			List<PortfolioElement> portfolioElements, LocalDate cutOffDate) {
+		BigDecimal result = portfolioToSymbols.stream().map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId())).filter(Optional::isEmpty).map(pe -> pe.get()).map(pe -> pe.value).reduce(BigDecimal.ZERO, (acc,value) -> acc.add(value));
+		return result;
+	}
+
+	private Optional<PortfolioElement> findValueAtDate(List<PortfolioElement> portfolioElements, LocalDate cutOffDate, Long symbolId) {
+		return portfolioElements.stream().filter(pts -> pts.symbolId.equals(symbolId))
+				.filter(pts -> pts.localDate().isBefore(cutOffDate))
+				.max(Comparator.comparing(PortfolioElement::localDate));
 	}
 
 	private Collection<PortfolioElement> calcPortfolioElementsForSymbol(PortfolioToSymbol portfolioToSymbol,
