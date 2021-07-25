@@ -21,9 +21,7 @@
 			<column name="user_name" type="varchar(255)" >
 				<constraints uniqueConstraintName="app_user_user_name_unique" unique="true" nullable="false" notNullConstraintName="app_user_user_name_not_null"/>
 			</column>
-			<column name="birth_date" type="date" >
-				<constraints nullable="false" notNullConstraintName="app_user_user_name_not_null"/>
-			</column>
+			<column name="birth_date" type="date" />
 			<column name="updated_at" type="datetime" />
 			<column name="password" type="varchar(255)" >
 				<constraints nullable="false" notNullConstraintName="app_user_password_not_null"/>

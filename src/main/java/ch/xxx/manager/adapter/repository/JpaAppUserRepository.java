@@ -16,12 +16,13 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.AppUser;
 
 public interface JpaAppUserRepository extends JpaRepository<AppUser, Long> {
 		@Query("select au from AppUser au where au.userName = :username")
-		Optional<AppUser> findByUsername(String username);
+		Optional<AppUser> findByUsername(@Param(value = "username") String username);
 		@Query("select au from AppUser au where au.uuid = :uuid")
-		Optional<AppUser> findByUuid(String uuid);
+		Optional<AppUser> findByUuid(@Param(value = "uuid") String uuid);
 }

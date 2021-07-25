@@ -81,10 +81,9 @@ public class AppUserService {
 
 	public Boolean signin(AppUserDto appUserDto) {
 		return Optional.ofNullable(appUserDto.getId()).stream()
-				.flatMap(id -> id != null ? Stream.of(Boolean.FALSE)
-						: Stream.of(this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
-								this.repository.findByUsername(appUserDto.getUsername())))))
-				.findFirst().orElse(Boolean.FALSE);
+				.flatMap(id -> Stream.of(Boolean.FALSE))
+				.findFirst().orElseGet(() ->  this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
+						this.repository.findByUsername(appUserDto.getUsername()))));
 	}
 
 	private Boolean checkSaveSignin(AppUser entity) {
