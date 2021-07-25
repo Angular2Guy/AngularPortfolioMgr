@@ -20,18 +20,18 @@ export class SymbolImportService {
   constructor(private http: HttpClient) { }
 
   getSymbolImportUs(): Observable<string> {
-	return this.http.get<string>('/rest/symbol/importus/all');
+	return this.http.get('/rest/symbol/importus/all', {responseType: 'text'});
   }
 
   getSymbolImportHk(): Observable<string> {
-	return this.http.get<string>('/rest/symbol/importhk/all');
+	return this.http.get('/rest/symbol/importhk/all', {responseType: 'text'});
   }
 
   getSymbolImportDe(): Observable<string> {
-	return this.http.get<string>('/rest/symbol/importde/all');
+	return this.http.get('/rest/symbol/importde/all', {responseType: 'text'});
   }
   
   getIndexSymbols(): Observable<string> {
-	return this.http.get<string>('/rest/symbol/importindex/all');
+	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
   }
 }
