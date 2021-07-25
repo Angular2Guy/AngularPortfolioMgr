@@ -17,14 +17,18 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.IntraDayQuote;
 
 public interface JpaIntraDayQuoteRepository extends JpaRepository<IntraDayQuote, Long> {
 	@Query("select idq from IntraDayQuote idq where idq.symbol.symbol = :symbol order by idq.localDateTime asc")
-	List<IntraDayQuote> findBySymbol(String symbol);
+	List<IntraDayQuote> findBySymbol(@Param(value = "symbol") String symbol);
+
 	@Query("select idq from IntraDayQuote idq where idq.symbol.id = :symbolId order by idq.localDateTime asc")
-	List<IntraDayQuote> findBySymbolId(Long symbolId);
+	List<IntraDayQuote> findBySymbolId(@Param(value = "symbolId") Long symbolId);
+
 	@Query("select idq from IntraDayQuote idq where idq.symbol.symbol = :symbol and idq.localDateTime between :start and :end order by idq.localDateTime asc")
-	List<IntraDayQuote> findBySymbolAndLocaldatetimeBetween(String symbol, LocalDateTime start, LocalDateTime end);
+	List<IntraDayQuote> findBySymbolAndLocaldatetimeBetween(@Param(value = "symbol") String symbol,
+			@Param(value = "start") LocalDateTime start, @Param(value = "end") LocalDateTime end);
 }

@@ -17,19 +17,21 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 
 public interface JpaDailyQuoteRepository extends JpaRepository<DailyQuote, Long> {
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol order by dq.localDay asc")
-	List<DailyQuote> findBySymbol(String symbol);
-	
+	List<DailyQuote> findBySymbol(@Param(value = "symbol") String symbol);
+
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id = :symbolId order by dq.localDay asc")
-	List<DailyQuote> findBySymbolId(Long symbolId);
-	
+	List<DailyQuote> findBySymbolId(@Param(value = "symbolId") Long symbolId);
+
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id in(:symbolIds) order by dq.localDay asc")
-	List<DailyQuote> findBySymbolIds(List<Long> symbolIds);
-	
+	List<DailyQuote> findBySymbolIds(@Param(value = "symbolIds") List<Long> symbolIds);
+
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol and dq.localDay between :start and :end order by dq.localDay asc")
-	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
+	List<DailyQuote> findBySymbolAndDayBetween(@Param(value = "symbol") String symbol,
+			@Param(value = "start") LocalDate start, @Param(value = "end") LocalDate end);
 }

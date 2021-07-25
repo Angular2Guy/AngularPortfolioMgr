@@ -16,16 +16,17 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 
 public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {	
 	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
-	List<Symbol> findBySymbol(String symbol);
+	List<Symbol> findBySymbol(@Param(value = "symbol") String symbol);
 	@Query("select s from Symbol s where lower(s.symbol) = :symbol")
-	List<Symbol> findBySymbolSingle(String symbol);
+	List<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
 	@Query("select s from Symbol s where lower(s.name) like :name")
-	List<Symbol> findByName(String name);
+	List<Symbol> findByName(@Param(value = "name") String name);
 	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
-	List<Symbol> findByPortfolioId(Long portfolioId);
+	List<Symbol> findByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
 }
