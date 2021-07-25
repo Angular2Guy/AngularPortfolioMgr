@@ -197,7 +197,7 @@ public class QuoteImportService {
 
 	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-		LOGGER.info(wrapperDto.getDailyQuotes().get(LocalDate.of(2014, 12, 29)).getClose());
+		LOGGER.info("" + wrapperDto.getDailyQuotes().size());
 		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))

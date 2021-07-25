@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,24 +36,24 @@ public class SymbolController {
 		this.service = service;
 	}
 
-	@GetMapping("/importus/all")
-	public ResponseEntity<String> importUsSymbols() {
-		return ResponseEntity.ok(this.importService.importUsSymbols());
+	@GetMapping(path = "/importus/all", produces = MediaType.TEXT_PLAIN_VALUE)
+	public String importUsSymbols() {
+		return this.importService.importUsSymbols();
 	}
 
-	@GetMapping("/importhk/all")
-	public ResponseEntity<String> importHkSymbols() {
-		return ResponseEntity.ok(this.importService.importHkSymbols());
+	@GetMapping(path = "/importhk/all", produces = MediaType.TEXT_PLAIN_VALUE)
+	public String importHkSymbols() {
+		return this.importService.importHkSymbols();
 	}
 
-	@GetMapping("/importde/all")
-	public ResponseEntity<String> importDeSymbols() {
-		return ResponseEntity.ok(this.importService.importDeSymbols());
+	@GetMapping(path = "/importde/all", produces = MediaType.TEXT_PLAIN_VALUE)
+	public String importDeSymbols() {
+		return this.importService.importDeSymbols();
 	}
 
-	@GetMapping("/importindex/all")
-	public ResponseEntity<Long> importIndexSymbols() {
-		return ResponseEntity.ok(this.importService.importReferenceIndexes(List.of()));
+	@GetMapping(path = "/importindex/all", produces = MediaType.TEXT_PLAIN_VALUE)
+	public Long importIndexSymbols() {
+		return this.importService.importReferenceIndexes(List.of());
 	}
 
 	@GetMapping("/all")

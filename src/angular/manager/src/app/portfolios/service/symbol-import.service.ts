@@ -19,19 +19,19 @@ export class SymbolImportService {
 
   constructor(private http: HttpClient) { }
 
-  getSymbolImportUs(): Observable<number> {
-	return this.http.get<number>('/rest/symbol/importus/all');
+  getSymbolImportUs(): Observable<string> {
+	return this.http.get<string>('/rest/symbol/importus/all');
   }
 
-  getSymbolImportHk(): Observable<number> {
-	return this.http.get<number>('/rest/symbol/importhk/all');
+  getSymbolImportHk(): Observable<string> {
+	return this.http.get<string>('/rest/symbol/importhk/all');
   }
 
-  getSymbolImportDe(): Observable<number> {
-	return this.http.get<number>('/rest/symbol/importde/all');
+  getSymbolImportDe(): Observable<string> {
+	return this.http.get<string>('/rest/symbol/importde/all');
   }
   
-  getIndexSymbols(): Observable<number> {
-	return this.http.get<number>('/rest/symbol/importindex/all');
+  getIndexSymbols(): Observable<string> {
+	return this.http.get<string>('/rest/symbol/importindex/all');
   }
 }
