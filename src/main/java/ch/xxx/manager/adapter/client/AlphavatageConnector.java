@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AlphavatageConnector implements AlphavatageClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlphavatageConnector.class);
-	@Value("${api.key:xxx}")
+	@Value("${api.key}")
 	private String apiKey;
 	
 	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
