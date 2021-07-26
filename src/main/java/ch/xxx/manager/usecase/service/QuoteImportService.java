@@ -108,8 +108,8 @@ public class QuoteImportService {
 	private List<DailyQuote> customImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities) {
 		return switch (symbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, List.of());
-		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, List.of());
+		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, entities);
+		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, entities);
 		default -> List.of();
 		};
 	}

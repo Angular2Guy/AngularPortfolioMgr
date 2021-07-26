@@ -76,7 +76,7 @@ public class SymbolImportService {
 	public Long importUsSymbols(List<String> nasdaq) {
 		LOGGER.info("importUsSymbols() called.");
 		return nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
 	public String importHkSymbols() {
@@ -87,7 +87,7 @@ public class SymbolImportService {
 	public Long importHkSymbols(List<HkSymbolImportDto> hkex) {
 		LOGGER.info("importHkSymbols() called.");
 		return hkex.stream().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
 	public String importDeSymbols() {
@@ -100,7 +100,7 @@ public class SymbolImportService {
 		return xetra.stream().filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
 				.collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet().stream()
 				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
-				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count();
+				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
 	public List<String> importReferenceIndexes(List<String> symbolStrs) {
@@ -108,30 +108,24 @@ public class SymbolImportService {
 		final List<String> localSymbolStrs = symbolStrs.isEmpty() ? List.of(ComparisonIndex.SP500.getSymbol(),
 				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()) : symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
-		final List<Symbol> availiableSymbolEntities = new ArrayList<>();
-		return this.repository.findAll().stream().flatMap(symbolEntities -> {
-			availiableSymbolEntities.add(symbolEntities);
-			return Stream.of(localSymbolStrs);
-		}).flatMap(Collection::stream)
-				.filter(symbolStr -> Stream.of(ComparisonIndex.values()).map(ComparisonIndex::getSymbol)
-						.anyMatch(indexSymbol -> indexSymbol.equalsIgnoreCase(symbolStr)))
-				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol, availiableSymbolEntities)).map(entity -> {
+		return localSymbolStrs.stream()				
+				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
 					symbolStrsToImport.add(entity.getSymbol());
 					return entity;
 				}).map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
 	}
 
-	private Stream<Symbol> upsertSymbolEntity(String indexSymbol, List<Symbol> availiableSymbolEntities) {
+	private Stream<Symbol> upsertSymbolEntity(String indexSymbol) {
 		ComparisonIndex compIndex = Stream.of(ComparisonIndex.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()
 				.orElseThrow(() -> new RuntimeException("Unknown indexSymbol: " + indexSymbol));
 		Symbol symbolEntity = new Symbol(null, compIndex.getSymbol(), compIndex.getName(), compIndex.getCurrencyKey(),
 				compIndex.getSource(), null, null, null);
-		return this.replaceEntity(symbolEntity, Optional.of(availiableSymbolEntities));
+		return this.replaceEntity(symbolEntity);
 	}
 
-	private Stream<Symbol> replaceEntity(Symbol entity, Optional<List<Symbol>> availiableSymbolEntitiesOpt) {
-		return this.updateEntity(availiableSymbolEntitiesOpt.orElse(this.allSymbolEntities.get()).stream()
+	private Stream<Symbol> replaceEntity(Symbol entity) {
+		return this.updateEntity(this.allSymbolEntities.get().stream()
 				.filter(mySymbol -> mySymbol.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
 				.findFirst().orElse(this.repository.save(entity)), entity);
 	}
@@ -140,6 +134,8 @@ public class SymbolImportService {
 		if (!dbEntity.equals(importEntity)) {
 			dbEntity.setName(importEntity.getName());
 			dbEntity.setSymbol(importEntity.getSymbol());
+			dbEntity.setCurrencyKey(importEntity.getCurrencyKey());
+			dbEntity.setQuoteSource(importEntity.getQuoteSource());
 		}
 		return Stream.of(dbEntity);
 	}
