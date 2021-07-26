@@ -19,12 +19,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 
 @Entity
 public class PortfolioToSymbol {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
 	private Long id;
 	@ManyToOne
 	private Portfolio portfolio;

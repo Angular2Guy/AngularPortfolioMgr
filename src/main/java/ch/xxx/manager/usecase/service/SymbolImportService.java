@@ -44,15 +44,13 @@ public class SymbolImportService {
 	private final HkexClient hkexClient;
 	private final SymbolRepository repository;
 	private final XetraClient xetraClient;
-	private final QuoteImportService quoteImportService;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(
 			new ArrayList<>());
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
-			XetraClient xetraClient, QuoteImportService quoteImportService) {
+			XetraClient xetraClient) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;
-		this.quoteImportService = quoteImportService;
 		this.repository = repository;
 		this.xetraClient = xetraClient;
 	}
@@ -121,10 +119,6 @@ public class SymbolImportService {
 					symbolStrsToImport.add(entity.getSymbol());
 					return entity;
 				}).map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
-//				.onClose(() -> {
-//					this.quoteImportService.importUpdateDailyQuotes(symbolStrsToImport);
-//					LOGGER.info("Indexquotes import done for: {}", symbolStrsToImport);
-//				}).count();
 	}
 
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol, List<Symbol> availiableSymbolEntities) {

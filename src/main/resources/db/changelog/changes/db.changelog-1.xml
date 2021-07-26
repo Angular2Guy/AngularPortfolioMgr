@@ -13,7 +13,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 	<changeSet author="angular2guy" id="1">
 		<createSequence sequenceName="hibernate_sequence"
-			startValue="1000" />
+			startValue="1000" incrementBy="50" />
 		<createTable tableName="app_user">
 			<column name="id" type="bigint">
 				<constraints primaryKey="true" />

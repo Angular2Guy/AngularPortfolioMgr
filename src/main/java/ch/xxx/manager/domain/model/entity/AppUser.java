@@ -23,12 +23,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.SequenceGenerator;
 
 
 @Entity
 public class AppUser {
 	@Id	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
 	private Long id;
 	private String userName;
 	private LocalDate birthDate;

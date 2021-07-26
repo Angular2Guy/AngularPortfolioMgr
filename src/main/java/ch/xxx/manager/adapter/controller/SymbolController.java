@@ -44,17 +44,23 @@ public class SymbolController {
 
 	@GetMapping(path = "/importus/all", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String importUsSymbols() {
-		return this.importService.importUsSymbols();
+		String result = this.importService.importUsSymbols();
+		this.importService.refreshSymbolEntities();
+		return result;
 	}
 
 	@GetMapping(path = "/importhk/all", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String importHkSymbols() {
-		return this.importService.importHkSymbols();
+		String result = this.importService.importHkSymbols();
+		this.importService.refreshSymbolEntities();
+		return result;
 	}
 
 	@GetMapping(path = "/importde/all", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String importDeSymbols() {
-		return this.importService.importDeSymbols();
+		String result = this.importService.importDeSymbols();
+		this.importService.refreshSymbolEntities();
+		return result;
 	}
 
 	@GetMapping(path = "/importindex/all", produces = MediaType.TEXT_PLAIN_VALUE)

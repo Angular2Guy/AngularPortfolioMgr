@@ -25,13 +25,15 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.SequenceGenerator;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class Portfolio {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
 	private Long id;
 	@ManyToOne
 	private AppUser appUser;
