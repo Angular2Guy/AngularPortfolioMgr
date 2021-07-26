@@ -64,12 +64,12 @@ public class SymbolController {
 	}
 
 	@GetMapping(path = "/importindex/all", produces = MediaType.TEXT_PLAIN_VALUE)
-	public Long importIndexSymbols() {
+	public String importIndexSymbols() {
 		List<String> symbols = this.importService.importReferenceIndexes(List.of());
 		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
-		return symbolCount;
+		return symbolCount.toString();
 	}
 
 	@GetMapping("/all")
