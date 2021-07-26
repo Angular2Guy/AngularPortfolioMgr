@@ -45,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/**").permitAll()
 		.anyRequest().authenticated()
 		.and().csrf().disable()
-		.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+		.headers().frameOptions().sameOrigin()
+		.and().apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 	}
 
 	@Bean
