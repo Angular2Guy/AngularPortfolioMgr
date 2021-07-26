@@ -14,26 +14,32 @@ package ch.xxx.manager.adapter.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.SymbolDto;
+import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
 
 @RestController
 @RequestMapping("rest/symbol")
 public class SymbolController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolController.class);
 	private final SymbolImportService importService;
 	private final SymbolService service;
-	
-	public SymbolController(SymbolImportService importService, SymbolService service) {
+	private final QuoteImportService quoteImportService;
+
+	public SymbolController(SymbolImportService importService, SymbolService service,
+			QuoteImportService quoteImportService) {
 		this.importService = importService;
 		this.service = service;
+		this.quoteImportService = quoteImportService;
 	}
 
 	@GetMapping(path = "/importus/all", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -53,7 +59,11 @@ public class SymbolController {
 
 	@GetMapping(path = "/importindex/all", produces = MediaType.TEXT_PLAIN_VALUE)
 	public Long importIndexSymbols() {
-		return this.importService.importReferenceIndexes(List.of());
+		List<String> symbols = this.importService.importReferenceIndexes(List.of());
+		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
+				.reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Indexquotes import done for: {}", symbolCount);
+		return symbolCount;
 	}
 
 	@GetMapping("/all")

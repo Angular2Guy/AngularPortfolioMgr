@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public interface SymbolRepository {
 	List<Symbol> findBySymbol(String symbol);
-	List<Symbol> findBySymbolSingle(String symbol);
+	Optional<Symbol> findBySymbolSingle(String symbol);
 	List<Symbol> findByName(String name);
 	List<Symbol> findByPortfolioId(Long portfolioId);
 	List<Symbol> findAll();

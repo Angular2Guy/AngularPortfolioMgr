@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
@@ -36,7 +37,7 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class SymbolImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
 	private final NasdaqClient nasdaqClient;
@@ -104,7 +105,7 @@ public class SymbolImportService {
 				.flatMap(entity -> this.replaceEntity(entity, Optional.empty())).count();
 	}
 
-	public Long importReferenceIndexes(List<String> symbolStrs) {
+	public List<String> importReferenceIndexes(List<String> symbolStrs) {
 		LOGGER.info("importReferenceIndexes() called.");
 		final List<String> localSymbolStrs = symbolStrs.isEmpty() ? List.of(ComparisonIndex.SP500.getSymbol(),
 				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()) : symbolStrs;
@@ -119,10 +120,11 @@ public class SymbolImportService {
 				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol, availiableSymbolEntities)).map(entity -> {
 					symbolStrsToImport.add(entity.getSymbol());
 					return entity;
-				}).onClose(() -> {
-					this.quoteImportService.importUpdateDailyQuotes(symbolStrsToImport);
-					LOGGER.info("Indexquotes import done for: {}", symbolStrsToImport);
-				}).count();
+				}).map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
+//				.onClose(() -> {
+//					this.quoteImportService.importUpdateDailyQuotes(symbolStrsToImport);
+//					LOGGER.info("Indexquotes import done for: {}", symbolStrsToImport);
+//				}).count();
 	}
 
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol, List<Symbol> availiableSymbolEntities) {

@@ -34,7 +34,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	}
 
 	@Override
-	public List<Symbol> findBySymbolSingle(String symbol) {
+	public Optional<Symbol> findBySymbolSingle(String symbol) {
 		return this.jpaSymbolRepository.findBySymbolSingle(symbol);
 	}
 
