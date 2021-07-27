@@ -26,28 +26,21 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
-import ch.xxx.manager.usecase.service.AlphavatageClient;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
-import ch.xxx.manager.usecase.service.YahooClient;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class CronJob {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronJob.class);
-	private final YahooClient yahooClient;
-	private final AlphavatageClient alphavatageClient;
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
 	private final PortfolioCalculationService portfolioCalculationService;
 
-	public CronJob(YahooClient yahooClient, AlphavatageClient alphavatageClient,
-			SymbolImportService symbolImportService, QuoteImportService quoteImportService,
+	public CronJob(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
 			PortfolioCalculationService portfolioCalculationService) {
-		this.yahooClient = yahooClient;
-		this.alphavatageClient = alphavatageClient;
 		this.symbolImportService = symbolImportService;
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.quoteImportService = quoteImportService;
