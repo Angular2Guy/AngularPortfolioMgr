@@ -38,10 +38,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSchedulerLock(defaultLockAtMostFor = "PT2H")
 public class ApplicationConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
-	
+
 	@Value("${spring.profiles.active:}")
 	private String activeProfile;
-	
+
 	@Bean
 	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -49,14 +49,14 @@ public class ApplicationConfig {
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		return objectMapper;
 	}
-		
+
 	@Bean
 	public ServerCodecConfigurer serverCodecConfigurer() {
 		return new DefaultServerCodecConfigurer();
 	}
-	
+
 	@Bean
-    public LockProvider lockProvider(DataSource dataSource) {
-        return new JdbcTemplateLockProvider(dataSource);
-    }
+	public LockProvider lockProvider(DataSource dataSource) {
+		return new JdbcTemplateLockProvider(dataSource);
+	}
 }

@@ -14,9 +14,13 @@ package ch.xxx.manager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.FilterType;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "ch.xxx.manager", excludeFilters = 
+@Filter(type = FilterType.CUSTOM, classes = ComponentScanCustomFilter.class))
 public class ManagerApplication {
 
 	public static void main(String[] args) {

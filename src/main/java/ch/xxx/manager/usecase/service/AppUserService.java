@@ -20,6 +20,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,7 @@ public class AppUserService {
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenService jwtTokenProvider;
+	private final MyService myService;
 
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -56,14 +59,20 @@ public class AppUserService {
 	private String confirmUrl;
 
 	public AppUserService(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
-			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider) {
+			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, MyService myService) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.appUserMapper = appUserMapper;
+		this.myService = myService;
 	}
 
+	@PostConstruct
+	public void init() {
+		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfile(), this.myService.getClassName());
+	}
+	
 	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
