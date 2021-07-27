@@ -36,6 +36,7 @@ export class OverviewComponent implements OnInit {
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
   importingSymbols = false;
   showPortfolioTable = true;
+  private timeoutId = -1;
 
   constructor(private tokenService: TokenService,
 		private router: Router,
@@ -98,6 +99,9 @@ export class OverviewComponent implements OnInit {
 
   importSymbols():void {
 	this.importingSymbols = true;
+	if( this.timeoutId >= 0) {
+		clearTimeout(this.timeoutId);
+	} 
 	forkJoin(
 		this.symbolImportService.getSymbolImportUs(),
 		this.symbolImportService.getSymbolImportHk(),
@@ -106,7 +110,8 @@ export class OverviewComponent implements OnInit {
 		this.quoteImportService.importFxDailyQuotes('HKD'))
 		.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => { 
 			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
-			this.symbolImportService.getIndexSymbols().pipe(delay(60000)).subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`));
+			setTimeout(() => this.symbolImportService.getIndexSymbols()
+				.subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`)), 60000);
 			this.importingSymbols = false;
 		});
   }
