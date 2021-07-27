@@ -17,6 +17,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +79,12 @@ public class QuoteImportService {
 	}
 
 	public Long importIntraDayQuotes(String symbol) {
+		return this.importIntraDayQuotes(symbol, null);
+	}
+
+	public Long importIntraDayQuotes(String symbol, Duration delay) {
+		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
+		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
 		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
 		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
@@ -88,10 +96,8 @@ public class QuoteImportService {
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 				.filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
 				.map(mySymbol -> new SymbolAndWrapper(mySymbol,
-						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol())
-//								.delayElement(Duration.ofSeconds(3))
-						.blockOptional(Duration.ofSeconds(13))
-								.orElse(intraDayWrapperImportDto)))
+						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol()).delayElement(myDelay)
+								.blockOptional(myTimeout).orElse(intraDayWrapperImportDto)))
 				.peek(myRecord -> this
 						.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))
 				.map(myRecord -> this.convert(myRecord.symbol, myRecord.intraDayWrapperImportDto))
@@ -102,8 +108,9 @@ public class QuoteImportService {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-				.flatMap(symbolEntity -> Stream.of(this.customImport(symbol, currencyMap, symbolEntity, List.of(), null))
-						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
+				.flatMap(
+						symbolEntity -> Stream.of(this.customImport(symbol, currencyMap, symbolEntity, List.of(), null))
+								.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
 				.count();
 	}
 
@@ -120,7 +127,7 @@ public class QuoteImportService {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
 		return this.importUpdateDailyQuotes(Set.of(symbol), null);
 	}
-	
+
 	public Long importUpdateDailyQuotes(String symbol, Duration delay) {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
 		return this.importUpdateDailyQuotes(Set.of(symbol), delay);
@@ -130,26 +137,24 @@ public class QuoteImportService {
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
 		record SymbolAndQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 		}
-		return symbols.stream()
-				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-						.flatMap(symbolEntity -> Stream.of(new SymbolAndQuotes(symbolEntity,
-								this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))))
-						.map(myRecord -> this.customImport(symbol, currencyMap, myRecord.symbol, myRecord.dailyQuotes, delay))
-						.map(values -> this.saveAllDailyQuotes(values)).count()))
-				.reduce(0L, (a, b) -> a + b);
+		return symbols.stream().flatMap(symbol -> Stream.of(this.symbolRepository
+				.findBySymbolSingle(symbol.toLowerCase()).stream()
+				.flatMap(symbolEntity -> Stream.of(new SymbolAndQuotes(symbolEntity,
+						this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))))
+				.map(myRecord -> this.customImport(symbol, currencyMap, myRecord.symbol, myRecord.dailyQuotes, delay))
+				.map(values -> this.saveAllDailyQuotes(values)).count())).reduce(0L, (a, b) -> a + b);
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
+		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		return entities.isEmpty()
-				? this.yahooClient.getTimeseriesDailyHistory(symbol)
-						.delayElement(myDelay)
-						.blockOptional(Duration.ofSeconds(13))
+				? this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay)
+						.blockOptional(myTimeout)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
-				: this.yahooClient.getTimeseriesDailyHistory(symbol)
-				.delayElement(myDelay)
-				.blockOptional(Duration.ofSeconds(13))
+				: this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay)
+						.blockOptional(myTimeout)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 						.stream()
 						.filter(dto -> entities.stream()
@@ -183,15 +188,14 @@ public class QuoteImportService {
 
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
-		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);  
+		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
+		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		return entities.isEmpty()
-				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true)
-						.delayElement(myDelay)
-						.blockOptional(Duration.ofSeconds(13))
+				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay)
+						.blockOptional(myTimeout)
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of())
-				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false)
-				.delayElement(myDelay)
-						.blockOptional(Duration.ofSeconds(13))
+				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay)
+						.blockOptional(myTimeout)
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of()).stream()
 						.filter(dto -> entities.stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
@@ -200,16 +204,13 @@ public class QuoteImportService {
 
 	public Long importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
-		return Flux
-				.fromIterable(
-						this.currencyRepository.findAll())
+		return Flux.fromIterable(this.currencyRepository.findAll())
 				.collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
-				.flatMap(
-						currencyMap -> Mono.just(this.currencyRepository.saveAll(this.convert(
-								this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
+				.flatMap(currencyMap -> Mono.just(this.currencyRepository
+						.saveAll(this.convert(this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
 //										.delayElement(Duration.ofSeconds(3))
-										.block(Duration.ofSeconds(13)),
-								currencyMap)).size()))
+								.block(Duration.ofSeconds(13)), currencyMap))
+						.size()))
 				.blockOptional(Duration.ofSeconds(10)).orElse(0).longValue();
 	}
 

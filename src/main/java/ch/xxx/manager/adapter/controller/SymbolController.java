@@ -68,7 +68,7 @@ public class SymbolController {
 		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
-		return symbolCount.toString();
+		return String.format("Indexquotes import done for: %d", symbolCount);
 	}
 
 	@GetMapping("/all")
