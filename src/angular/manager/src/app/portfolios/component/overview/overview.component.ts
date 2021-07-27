@@ -23,6 +23,7 @@ import { forkJoin } from 'rxjs';
 import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
 import { Symbol } from '../../model/symbol';
 import { QuoteImportService } from '../../service/quote-import.service';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-overview',
@@ -105,7 +106,7 @@ export class OverviewComponent implements OnInit {
 		this.quoteImportService.importFxDailyQuotes('HKD'))
 		.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => { 
 			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
-			this.symbolImportService.getIndexSymbols().subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`));
+			this.symbolImportService.getIndexSymbols().pipe(delay(60000)).subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`));
 			this.importingSymbols = false;
 		});
   }

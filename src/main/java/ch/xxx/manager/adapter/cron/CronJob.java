@@ -64,7 +64,7 @@ public class CronJob {
 		this.symbolImportService.refreshSymbolEntities();
 	}
 
-	@Scheduled(cron = "0 0 15 * * ?")
+	@Scheduled(cron = "0 10 1 * * ?")
 	@SchedulerLock(name = "CronJob_refIndexes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterRefIndexes() {
 		List<String> symbols = this.symbolImportService
@@ -75,7 +75,7 @@ public class CronJob {
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 	}
 
-	@Scheduled(cron = "0 0 25 * * ?")
+	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
 		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
