@@ -1,7 +1,10 @@
 package ch.xxx.manager.usecase.mapping;
 
 import java.time.LocalTime;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -28,8 +31,10 @@ public class PortfolioMapper {
 		dto.setYear2(portfolio.getYear2());
 		dto.setYear5(portfolio.getYear5());
 		dto.setYear10(portfolio.getYear10());
-		dto.getSymbols().addAll(portfolio.getPortfolioToSymbols().stream()
-				.map(pts -> this.symbolMapper.convert(pts.getSymbol())).collect(Collectors.toList()));
+		dto.getSymbols()
+				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
+						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol())))
+						.collect(Collectors.toList()));
 		return dto;
 	}
 }

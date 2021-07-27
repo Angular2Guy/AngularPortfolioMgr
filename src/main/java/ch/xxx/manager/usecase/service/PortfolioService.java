@@ -125,7 +125,7 @@ public class PortfolioService {
 		Portfolio entity = new Portfolio();
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
-		entity.setAppUser(this.appUserRepository.findById(dto.getId()).orElse(null));
+		entity.setAppUser(this.appUserRepository.findById(dto.getUserId()).orElse(null));
 		return entity;
 	}
 

@@ -111,8 +111,8 @@ export class OverviewComponent implements OnInit {
 		.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => { 
 			console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
 			setTimeout(() => this.symbolImportService.getIndexSymbols()
-				.subscribe(resultIndex => console.log(`Index Symbols: ${resultIndex}`)), 60000);
-			this.importingSymbols = false;
+				.subscribe(resultIndex => {console.log(`Index Symbols: ${resultIndex}`);
+					this.importingSymbols = false;}), 60000);			
 		});
   }
 
