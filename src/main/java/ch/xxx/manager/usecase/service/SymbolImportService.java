@@ -35,6 +35,7 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -69,8 +70,8 @@ public class SymbolImportService {
 	}
 
 	public String importUsSymbols() {
-		this.nasdaqClient.importSymbols().subscribe(nasdaq -> this.importUsSymbols(nasdaq));
-		return "Nasdaq import";
+		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq))).block();
+		return String.format("Nasdaq imported symbols: %d", symbolCount);
 	}
 
 	public Long importUsSymbols(List<String> nasdaq) {
@@ -80,8 +81,8 @@ public class SymbolImportService {
 	}
 
 	public String importHkSymbols() {
-		this.hkexClient.importSymbols().subscribe(hkex -> this.importHkSymbols(hkex));
-		return "Hkex import";
+		Long symbolCount = this.hkexClient.importSymbols().flatMap(hkex -> Mono.just(this.importHkSymbols(hkex))).block();
+		return String.format("Hkex imported symbols: %d", symbolCount);
 	}
 
 	public Long importHkSymbols(List<HkSymbolImportDto> hkex) {
@@ -91,8 +92,8 @@ public class SymbolImportService {
 	}
 
 	public String importDeSymbols() {
-		this.xetraClient.importXetraSymbols().subscribe(xetra -> this.importDeSymbols(xetra));
-		return "Xetra import";
+		Long symbolCount = this.xetraClient.importXetraSymbols().flatMap(xetra -> Mono.just(this.importDeSymbols(xetra))).block();
+		return String.format("Xetra imported symbols: %d", symbolCount);
 	}
 
 	public Long importDeSymbols(List<String> xetra) {
@@ -105,8 +106,7 @@ public class SymbolImportService {
 
 	public List<String> importReferenceIndexes(List<String> symbolStrs) {
 		LOGGER.info("importReferenceIndexes() called.");
-		final List<String> localSymbolStrs = symbolStrs.isEmpty() ? List.of(ComparisonIndex.SP500.getSymbol(),
-				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()) : symbolStrs;
+		final List<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
 		return localSymbolStrs.stream()				
 				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {

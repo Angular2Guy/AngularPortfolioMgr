@@ -89,7 +89,9 @@ public class QuoteImportService {
 				.filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
 				.map(mySymbol -> new SymbolAndWrapper(mySymbol,
 						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol())
-								.blockOptional(Duration.ofSeconds(10)).orElse(intraDayWrapperImportDto)))
+//								.delayElement(Duration.ofSeconds(3))
+						.blockOptional(Duration.ofSeconds(13))
+								.orElse(intraDayWrapperImportDto)))
 				.peek(myRecord -> this
 						.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))
 				.map(myRecord -> this.convert(myRecord.symbol, myRecord.intraDayWrapperImportDto))
@@ -135,9 +137,13 @@ public class QuoteImportService {
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
-				? this.yahooClient.getTimeseriesDailyHistory(symbol).blockOptional(Duration.ofSeconds(10))
+				? this.yahooClient.getTimeseriesDailyHistory(symbol)
+//						.delayElement(Duration.ofSeconds(3))
+						.blockOptional(Duration.ofSeconds(13))
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
-				: this.yahooClient.getTimeseriesDailyHistory(symbol).blockOptional(Duration.ofSeconds(10))
+				: this.yahooClient.getTimeseriesDailyHistory(symbol)
+//				.delayElement(Duration.ofSeconds(3))
+				.blockOptional(Duration.ofSeconds(13))
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 						.stream()
 						.filter(dto -> entities.stream()
@@ -172,9 +178,13 @@ public class QuoteImportService {
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, List<DailyQuote> entities) {
 		return entities.isEmpty()
-				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).blockOptional(Duration.ofSeconds(10))
+				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true)
+//						.delayElement(Duration.ofSeconds(3))
+						.blockOptional(Duration.ofSeconds(13))
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of())
-				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).blockOptional(Duration.ofSeconds(10))
+				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false)
+//				.delayElement(Duration.ofSeconds(3))
+						.blockOptional(Duration.ofSeconds(13))
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of()).stream()
 						.filter(dto -> entities.stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
@@ -183,12 +193,17 @@ public class QuoteImportService {
 
 	public Long importFxDailyQuoteHistory(String to_currency) {
 		LOGGER.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
-		return Flux.fromIterable(this.currencyRepository.findAll())
+		return Flux
+				.fromIterable(
+						this.currencyRepository.findAll())
 				.collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
-				.flatMap(currencyMap -> this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
-						.flatMap(wrapper -> Mono
-								.just(this.currencyRepository.saveAll(this.convert(wrapper, currencyMap)).size())))
-				.block().longValue();
+				.flatMap(
+						currencyMap -> Mono.just(this.currencyRepository.saveAll(this.convert(
+								this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
+//										.delayElement(Duration.ofSeconds(3))
+										.block(Duration.ofSeconds(13)),
+								currencyMap)).size()))
+				.blockOptional(Duration.ofSeconds(10)).orElse(0).longValue();
 	}
 
 	private Map<LocalDate, Collection<Currency>> createCurrencyMap() {

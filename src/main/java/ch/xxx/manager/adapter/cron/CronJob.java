@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.adapter.cron;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
@@ -19,36 +21,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
-import ch.xxx.manager.usecase.service.HkexClient;
-import ch.xxx.manager.usecase.service.NasdaqClient;
+import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.PortfolioCalculationService;
+import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
-import ch.xxx.manager.usecase.service.XetraClient;
 import ch.xxx.manager.usecase.service.YahooClient;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class CronJob {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronJob.class);
-	private final HkexClient hkexClient;
-	private final XetraClient xetraClient;
-	private final NasdaqClient nasdaqClient;
 	private final YahooClient yahooClient;
 	private final AlphavatageClient alphavatageClient;
 	private final SymbolImportService symbolImportService;
+	private final QuoteImportService quoteImportService;
 	private final PortfolioCalculationService portfolioCalculationService;
 
-	public CronJob(HkexClient hkexClient, XetraClient xetraClient, NasdaqClient nasdaqClient, YahooClient yahooClient,
+	public CronJob(YahooClient yahooClient,
 			AlphavatageClient alphavatageClient, SymbolImportService symbolImportService,
-			PortfolioCalculationService portfolioCalculationService) {
-		this.hkexClient = hkexClient;
-		this.xetraClient = xetraClient;
-		this.nasdaqClient = nasdaqClient;
+			QuoteImportService quoteImportService, PortfolioCalculationService portfolioCalculationService) {
 		this.yahooClient = yahooClient;
 		this.alphavatageClient = alphavatageClient;
 		this.symbolImportService = symbolImportService;
 		this.portfolioCalculationService = portfolioCalculationService;
+		this.quoteImportService = quoteImportService;
 	}
 
 	@PostConstruct
@@ -57,27 +55,25 @@ public class CronJob {
 	}
 
 	@Scheduled(cron = "0 0 1 * * ?")
-	@SchedulerLock(name = "CronJob_scheduledImporter", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
-	public void scheduledImporter() {
-		this.alphavatageClient.getFxTimeseriesDailyHistory(null, true).subscribe(dto -> {
-			this.portfolioCalculationService.initCurrencyMap();
-			LOGGER.info("Import of {} currency quotes finished.", dto.getDailyQuotes().size());
-		});
-		this.hkexClient.importSymbols().subscribe(dtos -> {
-			this.symbolImportService.importHkSymbols(dtos);
-			LOGGER.info("Import of {} hk symbols finished.", dtos.size());
-		});
-		this.xetraClient.importXetraSymbols().subscribe(dtos -> {
-			this.symbolImportService.importDeSymbols(dtos);
-			LOGGER.info("Import of {} de symbols finished.", dtos.size());
-		});
-		this.nasdaqClient.importSymbols().subscribe(dtos -> {
-			this.symbolImportService.importDeSymbols(dtos);
-			LOGGER.info("Import of {} us symbols finished.", dtos.size());
-		});
-		this.yahooClient.getTimeseriesDailyHistory(null)
-				.subscribe(quotes -> LOGGER.info("Import of {} index symbols finished.", quotes.size()));
-		this.alphavatageClient.getTimeseriesDailyHistory(null, true).subscribe(
-				dto -> LOGGER.info("Import of {} index symbols finished.", dto.getDailyQuotes().entrySet().size()));
+	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
+	public void scheduledImporterSymbols() {
+		LOGGER.info("Import of {} Hkd quotes finished.",
+				this.quoteImportService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
+		LOGGER.info("Import of {} Usd quotes finished.",
+				this.quoteImportService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
+		LOGGER.info(this.symbolImportService.importDeSymbols());
+		LOGGER.info(this.symbolImportService.importHkSymbols());
+		LOGGER.info(this.symbolImportService.importUsSymbols());
+		this.symbolImportService.refreshSymbolEntities();
+	}
+
+	@Scheduled(cron = "0 0 10 * * ?")
+	@SchedulerLock(name = "CronJob_refIndexes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
+	public void scheduledImporterRefIndexes() {
+		List<String> symbols = this.symbolImportService.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
+				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
+		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
+				.reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 	}
 }

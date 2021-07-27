@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.SymbolDto;
+import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -65,7 +66,8 @@ public class SymbolController {
 
 	@GetMapping(path = "/importindex/all", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String importIndexSymbols() {
-		List<String> symbols = this.importService.importReferenceIndexes(List.of());
+		List<String> symbols = this.importService.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
+				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
 		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
