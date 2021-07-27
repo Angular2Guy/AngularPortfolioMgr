@@ -12,7 +12,10 @@
  */
 package ch.xxx.manager.adapter.cron;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
@@ -39,9 +43,9 @@ public class CronJob {
 	private final QuoteImportService quoteImportService;
 	private final PortfolioCalculationService portfolioCalculationService;
 
-	public CronJob(YahooClient yahooClient,
-			AlphavatageClient alphavatageClient, SymbolImportService symbolImportService,
-			QuoteImportService quoteImportService, PortfolioCalculationService portfolioCalculationService) {
+	public CronJob(YahooClient yahooClient, AlphavatageClient alphavatageClient,
+			SymbolImportService symbolImportService, QuoteImportService quoteImportService,
+			PortfolioCalculationService portfolioCalculationService) {
 		this.yahooClient = yahooClient;
 		this.alphavatageClient = alphavatageClient;
 		this.symbolImportService = symbolImportService;
@@ -67,13 +71,30 @@ public class CronJob {
 		this.symbolImportService.refreshSymbolEntities();
 	}
 
-	@Scheduled(cron = "0 0 10 * * ?")
+	@Scheduled(cron = "0 0 15 * * ?")
 	@SchedulerLock(name = "CronJob_refIndexes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterRefIndexes() {
-		List<String> symbols = this.symbolImportService.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
-				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
+		List<String> symbols = this.symbolImportService
+				.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
+						ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
 		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
+	}
+
+	@Scheduled(cron = "0 0 25 * * ?")
+	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
+	public void scheduledImporterQuotes() {
+		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
+				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
+		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
+				.filter(mySymbol -> symbolsToFilter.stream()
+						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
+				.collect(Collectors.toList());
+		Long quoteCount = symbolsToUpdate.stream()
+				.flatMap(mySymbol -> Stream.of(
+						this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(), Duration.ofSeconds(15))))
+				.reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Quote import done for: {}", quoteCount);
 	}
 }

@@ -102,26 +102,31 @@ public class QuoteImportService {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-				.flatMap(symbolEntity -> Stream.of(this.customImport(symbol, currencyMap, symbolEntity, List.of()))
+				.flatMap(symbolEntity -> Stream.of(this.customImport(symbol, currencyMap, symbolEntity, List.of(), null))
 						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
 				.count();
 	}
 
 	private List<DailyQuote> customImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities) {
+			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
 		return switch (symbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, entities);
-		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, entities);
+		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, entities, delay);
+		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, entities, delay);
 		default -> List.of();
 		};
 	}
 
 	public Long importUpdateDailyQuotes(String symbol) {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
-		return this.importUpdateDailyQuotes(Set.of(symbol));
+		return this.importUpdateDailyQuotes(Set.of(symbol), null);
+	}
+	
+	public Long importUpdateDailyQuotes(String symbol, Duration delay) {
+		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
+		return this.importUpdateDailyQuotes(Set.of(symbol), delay);
 	}
 
-	public Long importUpdateDailyQuotes(Set<String> symbols) {
+	public Long importUpdateDailyQuotes(Set<String> symbols, Duration delay) {
 		Map<LocalDate, Collection<Currency>> currencyMap = this.createCurrencyMap();
 		record SymbolAndQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 		}
@@ -129,20 +134,21 @@ public class QuoteImportService {
 				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 						.flatMap(symbolEntity -> Stream.of(new SymbolAndQuotes(symbolEntity,
 								this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))))
-						.map(myRecord -> this.customImport(symbol, currencyMap, myRecord.symbol, myRecord.dailyQuotes))
+						.map(myRecord -> this.customImport(symbol, currencyMap, myRecord.symbol, myRecord.dailyQuotes, delay))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities) {
+			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
+		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		return entities.isEmpty()
 				? this.yahooClient.getTimeseriesDailyHistory(symbol)
-//						.delayElement(Duration.ofSeconds(3))
+						.delayElement(myDelay)
 						.blockOptional(Duration.ofSeconds(13))
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 				: this.yahooClient.getTimeseriesDailyHistory(symbol)
-//				.delayElement(Duration.ofSeconds(3))
+				.delayElement(myDelay)
 				.blockOptional(Duration.ofSeconds(13))
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 						.stream()
@@ -176,14 +182,15 @@ public class QuoteImportService {
 	}
 
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities) {
+			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
+		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);  
 		return entities.isEmpty()
 				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true)
-//						.delayElement(Duration.ofSeconds(3))
+						.delayElement(myDelay)
 						.blockOptional(Duration.ofSeconds(13))
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of())
 				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false)
-//				.delayElement(Duration.ofSeconds(3))
+				.delayElement(myDelay)
 						.blockOptional(Duration.ofSeconds(13))
 						.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).orElse(List.of()).stream()
 						.filter(dto -> entities.stream()

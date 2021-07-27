@@ -14,9 +14,9 @@ package ch.xxx.manager.usecase.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -57,35 +57,37 @@ public class SymbolImportService {
 	}
 
 	@EventListener
-	public Integer onApplicationEvent(ApplicationReadyEvent event) {
+	public void onApplicationEvent(ApplicationReadyEvent event) {
 		LOGGER.info("Refresh Symbols");
-		return this.refreshSymbolEntities();
+		this.refreshSymbolEntities();
 	}
 
-	public Integer refreshSymbolEntities() {
+	public List<Symbol> refreshSymbolEntities() {
 		List<Symbol> symbolEnities = this.repository.findAll();
 		this.allSymbolEntities.set(symbolEnities);
 		LOGGER.info("{} symbols updated.", symbolEnities.size());
-		return symbolEnities.size();
+		return Collections.unmodifiableList(new ArrayList<Symbol>(this.allSymbolEntities.get()));
 	}
 
-	public String importUsSymbols() {
+	public String importUsSymbols() {		
 		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq))).block();
 		return String.format("Nasdaq imported symbols: %d", symbolCount);
 	}
 
 	public Long importUsSymbols(List<String> nasdaq) {
+		this.refreshSymbolEntities();
 		LOGGER.info("importUsSymbols() called.");
 		return nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
 	}
 
-	public String importHkSymbols() {
+	public String importHkSymbols() {		
 		Long symbolCount = this.hkexClient.importSymbols().flatMap(hkex -> Mono.just(this.importHkSymbols(hkex))).block();
 		return String.format("Hkex imported symbols: %d", symbolCount);
 	}
 
 	public Long importHkSymbols(List<HkSymbolImportDto> hkex) {
+		this.refreshSymbolEntities();
 		LOGGER.info("importHkSymbols() called.");
 		return hkex.stream().filter(this::filter).flatMap(myDto -> this.convert(myDto))
 				.flatMap(entity -> this.replaceEntity(entity)).count();
@@ -97,6 +99,7 @@ public class SymbolImportService {
 	}
 
 	public Long importDeSymbols(List<String> xetra) {
+		this.refreshSymbolEntities();
 		LOGGER.info("importDeSymbols() called.");
 		return xetra.stream().filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
 				.collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet().stream()
