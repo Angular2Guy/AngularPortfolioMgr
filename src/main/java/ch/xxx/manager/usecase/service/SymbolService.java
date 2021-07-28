@@ -41,15 +41,15 @@ public class SymbolService {
 	}
 
 	public List<SymbolDto> getSymbolBySymbol(String symbol) {
-		return Optional.ofNullable(symbol).filter(mySymbol -> mySymbol.trim().length() > 2)
-				.map(mySymbol -> this.repository.findBySymbol("%" + mySymbol.trim().toLowerCase() + "%").stream()
+		return Optional.ofNullable(symbol).filter(mySymbol -> mySymbol.trim().length() >= 2)
+				.map(mySymbol -> this.repository.findBySymbol(mySymbol.trim().toLowerCase()).stream()
 						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
 				.orElse(List.of());
 	}
 
 	public List<SymbolDto> getSymbolByName(String name) {
-		return Optional.ofNullable(name).filter(myName -> name.trim().length() > 2)
-				.map(myName -> this.repository.findByName("%" + myName.trim().toLowerCase() + "%").stream()
+		return Optional.ofNullable(name).filter(myName -> myName.trim().length() >= 2)
+				.map(myName -> this.repository.findByName(myName.trim().toLowerCase()).stream()
 						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
 				.orElse(List.of());
 	}
