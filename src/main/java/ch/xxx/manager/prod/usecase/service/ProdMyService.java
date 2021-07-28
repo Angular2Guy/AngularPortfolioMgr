@@ -15,7 +15,7 @@ package ch.xxx.manager.prod.usecase.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.usecase.service.MyService;
+import ch.xxx.manager.common.usecase.service.MyService;
 
 @Service
 public class ProdMyService implements MyService {
