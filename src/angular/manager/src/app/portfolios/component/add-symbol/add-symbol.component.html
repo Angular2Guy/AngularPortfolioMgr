@@ -3,7 +3,7 @@
 			<ul class="list-style">
 				<li>
 					<mat-form-field class="form-field"> 
-						<input matInput type="text" [matAutocomplete]="autoName" [formControl]="symbolNameFormControl"
+						<input matInput type="text" [matAutocomplete]="autoName" formControlName="symbolName"
 							i18n-placeholder placeholder="symbolName" tabindex="1" (keyup.enter)="findSymbolByName()">
 						<mat-autocomplete autoActiveFirstOption #autoName="matAutocomplete">
       						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol.name" class="symbol-text" i18n>
@@ -14,7 +14,7 @@
 				</li>
 				<li>
 					<mat-form-field class="form-field"> 
-						<input matInput type="text" [matAutocomplete]="autoSymbol" [formControl]="symbolSymbolFormControl"
+						<input matInput type="text" [matAutocomplete]="autoSymbol" formControlName="symbolSymbol"
 							i18n-placeholder placeholder="symbol" tabindex="2" (keyup.enter)="findSymbolBySymbol()">
 						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete">
       						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol.symbol" class="symbol-text" i18n>

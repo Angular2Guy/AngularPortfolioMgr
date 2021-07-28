@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControlOptions, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControlOptions, FormControl, Validators, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
 import { PortfolioData } from '../../model/portfolio-data';
@@ -36,8 +36,6 @@ export class AddSymbolComponent implements OnInit {
   loading = false;
   importingQuotes = false;
   formValid = true;  
-  symbolNameFormControl = new FormControl();
-  symbolSymbolFormControl = new FormControl();
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
@@ -56,7 +54,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   ngOnInit() {	
-	this.symbolsName = this.symbolNameFormControl.valueChanges.pipe(
+	this.symbolsName = this.symbolForm.get('symbolName').valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
@@ -64,11 +62,11 @@ export class AddSymbolComponent implements OnInit {
 			.pipe(map(localSymbols => this.filterPortfolioSymbols(localSymbols))) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
-	this.symbolsSymbol = this.symbolSymbolFormControl.valueChanges.pipe(
+	this.symbolsSymbol = this.symbolForm.get('symbolSymbol').valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
-        switchMap( name => name && name.length > 2 ? this.symbolService.getSymbolBySymbol( name )
+        switchMap( name => name && name.length >= 2 ? this.symbolService.getSymbolBySymbol( name )
 			.pipe(map(localSymbols => this.filterPortfolioSymbols(localSymbols))) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
@@ -84,7 +82,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   findSymbolByName() {
-	const symbolNameStr = this.symbolNameFormControl.value;
+	const symbolNameStr = this.symbolForm.get('symbolName').value;
 	this.symbolService.getSymbolByName(symbolNameStr)
 		.subscribe(mySymbols => {
 			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.name === symbolNameStr)[0] : null;
@@ -93,9 +91,11 @@ export class AddSymbolComponent implements OnInit {
   }
 
   findSymbolBySymbol() {
-	const symbolStr = this.symbolSymbolFormControl.value;
+	const symbolStr = this.symbolForm.get('symbolSymbol').value;
+	console.log(symbolStr);
 	this.symbolService.getSymbolBySymbol(symbolStr)
 		.subscribe(mySymbols => {
+			console.log(mySymbols + ' ' + symbolStr);
 			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.symbol === symbolStr)[0] : null;
 			this.updateSymbolWeight();
 		});
@@ -129,9 +129,8 @@ export class AddSymbolComponent implements OnInit {
 	this.dialogRef.close();
   }
 
-  validate(formGroup: FormGroup) {
-	/*
-	if (formGroup.get('portfolioName').touched) {
+  validate(formGroup: FormGroup): ValidationErrors {
+/*	if (formGroup.get('portfolioName').touched) {
 		const myValue: string = formGroup.get('portfolioName').value;
 		if(myValue && myValue.trim().length > 4) {
 			formGroup.get('portfolioName').setErrors(null);
@@ -141,9 +140,8 @@ export class AddSymbolComponent implements OnInit {
 			this.formValid = false;			
 		}
 	}
-	return { MatchPassword: true } as ValidationErrors;
-	return null;
-	*/
+	return { MatchPassword: true } as ValidationErrors;*/
+	return { xxx: true } as ValidationErrors;
   }
 
 }

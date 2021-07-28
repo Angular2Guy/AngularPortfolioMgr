@@ -23,7 +23,7 @@ import { TokenService } from '../../../service/token.service';
   templateUrl: './new-portfolio.component.html',
   styleUrls: ['./new-portfolio.component.scss']
 })
-export class NewPortfolioComponent implements OnInit {
+export class NewPortfolioComponent {
   portfolioForm: FormGroup;
   formValid = true;
 
@@ -31,15 +31,12 @@ export class NewPortfolioComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private tokenService: TokenService,
 		private fb: FormBuilder) { 
-	this.portfolioForm = fb.group({
-		portfolioName: ['', Validators.required],
-		createdAt: [new Date(data.portfolio.createdAt), Validators.required]
-	}, {
-		validator: this.validate.bind(this)
-	});
-  }
-
-  ngOnInit() {
+		this.portfolioForm = this.fb.group({
+			portfolioName: ['', Validators.required],
+			createdAt: [new Date(this.data.portfolio.createdAt), Validators.required]
+		}, {
+			validator: this.validate.bind(this)
+		});
   }
 
   onAddClick(): void {
