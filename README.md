@@ -7,6 +7,9 @@ Author: Sven Loesekann
 
 Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, Liquibase, Gradle, Docker, H2, Postgresql
 
+## Articles
+* [Angular JWT Autorefresh With Spring Boot](https://dzone.com/articles/angular-jwt-token-autoupdates-with-spring-boot)
+
 ## What is the goal?
 The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle.
 
