@@ -79,8 +79,8 @@ public class PortfolioService {
 	}
 
 	public PortfolioDto addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
-		return this.convert(this.portfolioToSymbolRepository
-				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
+		return this.convert(this.portfolioCalculationService.calculatePortfolio(this.portfolioToSymbolRepository
+				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio()));
 	}
 
 	public PortfolioDto updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
@@ -89,8 +89,8 @@ public class PortfolioService {
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.flatMap(newEntity -> Stream.of(this.portfolioToSymbolRepository.save(newEntity)))
-//				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(dto.getId()))
-				.flatMap(entity -> Stream.of(this.convert(entity.getPortfolio()))).findFirst()
+				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
+				.map(entity -> this.convert(entity)).findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
@@ -99,8 +99,8 @@ public class PortfolioService {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
-//				.flatMap(num -> this.portfolioCalculationService.calculatePortfolio(portfolioId))
-				.flatMap(entity -> Stream.of(this.convert(entity.getPortfolio()))).findFirst()
+				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
+				.map(entity -> this.convert(entity)).findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}

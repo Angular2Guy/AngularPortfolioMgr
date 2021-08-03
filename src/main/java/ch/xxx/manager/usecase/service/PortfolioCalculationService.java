@@ -76,9 +76,9 @@ public class PortfolioCalculationService {
 				});
 	}
 
-	public Portfolio calculatePortfolio(Long portfolioId) {
-		List<PortfolioToSymbol> portfolioToSymbols = this.portfolioAndSymbolRepository
-				.findPortfolioCalcEntitiesByPortfolioId(portfolioId);
+	public Portfolio calculatePortfolio(Portfolio portfolio) {		
+		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
+		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
@@ -87,7 +87,6 @@ public class PortfolioCalculationService {
 				.map(pts -> this.calcPortfolioElementsForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId())))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(PortfolioElement::localDate))
 				.collect(Collectors.toList());
-		Portfolio portfolio = this.portfolioRepository.findById(portfolioId).orElseThrow(() -> new ResourceNotFoundException(String.format("Portfolio with id: %d not found.", portfolioId)));
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
 		portfolio.setMonth1(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
