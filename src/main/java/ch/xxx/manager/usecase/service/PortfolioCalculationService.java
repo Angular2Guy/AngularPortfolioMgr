@@ -76,8 +76,9 @@ public class PortfolioCalculationService {
 				});
 	}
 
-	public Portfolio calculatePortfolio(Portfolio portfolio) {		
+	public Portfolio calculatePortfolio(Portfolio portfolio) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
+		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
 		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
@@ -104,11 +105,15 @@ public class PortfolioCalculationService {
 
 	private BigDecimal portfolioValueAtDate(List<PortfolioToSymbol> portfolioToSymbols,
 			List<PortfolioElement> portfolioElements, LocalDate cutOffDate) {
-		BigDecimal result = portfolioToSymbols.stream().map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId())).filter(Optional::isEmpty).map(pe -> pe.get()).map(pe -> pe.value).reduce(BigDecimal.ZERO, (acc,value) -> acc.add(value));
+		BigDecimal result = portfolioToSymbols.stream()
+				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
+				.filter(Optional::isEmpty).map(pe -> pe.get()).map(pe -> pe.value)
+				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
 
-	private Optional<PortfolioElement> findValueAtDate(List<PortfolioElement> portfolioElements, LocalDate cutOffDate, Long symbolId) {
+	private Optional<PortfolioElement> findValueAtDate(List<PortfolioElement> portfolioElements, LocalDate cutOffDate,
+			Long symbolId) {
 		return portfolioElements.stream().filter(pts -> pts.symbolId.equals(symbolId))
 				.filter(pts -> pts.localDate().isBefore(cutOffDate))
 				.max(Comparator.comparing(PortfolioElement::localDate));
@@ -135,7 +140,9 @@ public class PortfolioCalculationService {
 
 	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
 		return LongStream.range(0, 7).boxed()
-				.map(minusDays -> this.currencyMap.get(myDailyQuote.getLocalDay().minusDays(minusDays)).stream()
+				.map(minusDays -> Optional
+						.ofNullable(this.currencyMap.get(myDailyQuote.getLocalDay().minusDays(minusDays)))
+						.orElse(List.of()).stream()
 						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
 								.equals(myCurrency.getFromCurrKey())
 								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
