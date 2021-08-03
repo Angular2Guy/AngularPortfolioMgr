@@ -14,8 +14,8 @@ package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSortedMap;
@@ -39,41 +40,30 @@ import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
-import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
-import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PortfolioCalculationService {
 	private record PortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value) {
 	};
 
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
-	private final PortfolioRepository portfolioRepository;
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyRepository currencyRepository;
-	private final PortfolioToSymbolRepository portfolioAndSymbolRepository;
 	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
-	private LocalDateTime lastCurrencyUpdate;
 
-	public PortfolioCalculationService(PortfolioRepository portfolioRepository,
-			DailyQuoteRepository dailyQuoteRepository, CurrencyRepository currencyRepository,
-			PortfolioToSymbolRepository portfolioAndSymbolRepository) {
-		this.portfolioRepository = portfolioRepository;
+	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository,
+			CurrencyRepository currencyRepository) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyRepository = currencyRepository;
-		this.portfolioAndSymbolRepository = portfolioAndSymbolRepository;
 	}
 
 	@PostConstruct
 	public void initCurrencyMap() {
-		this.lastCurrencyUpdate = Optional.ofNullable(this.lastCurrencyUpdate)
-				.filter(myDate -> LocalDateTime.now().plusHours(1).isAfter(myDate)).orElseGet(() -> {
-					this.currencyMap = ImmutableSortedMap.copyOf(this.currencyRepository.findAll().stream()
-							.collect(Collectors.groupingBy(Currency::getLocalDay)));
-					return LocalDate.now().atStartOfDay();
-				});
+		LOG.info("CurrencyMap updated.");
+		this.currencyMap = ImmutableSortedMap.copyOf(
+				this.currencyRepository.findAll().stream().collect(Collectors.groupingBy(Currency::getLocalDay)));
 	}
 
 	public Portfolio calculatePortfolio(Portfolio portfolio) {
@@ -122,10 +112,10 @@ public class PortfolioCalculationService {
 	private Collection<PortfolioElement> calcPortfolioElementsForSymbol(PortfolioToSymbol portfolioToSymbol,
 			List<DailyQuote> dailyQuotes) {
 		return dailyQuotes.stream()
-				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) >= 0
-						&& Optional.ofNullable(myDailyQuote.getLocalDay()).stream()
-								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) < 0)
-								.findFirst().isEmpty())
+				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
+						&& Optional.ofNullable(portfolioToSymbol.getRemovedAt()).stream()
+								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) >= 0)										
+								.findAny().isEmpty())
 				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol))
 				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
@@ -139,6 +129,7 @@ public class PortfolioCalculationService {
 	}
 
 	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
+//		LOG.info(myDailyQuote.getLocalDay().format(DateTimeFormatter.ISO_LOCAL_DATE));		
 		return LongStream.range(0, 7).boxed()
 				.map(minusDays -> Optional
 						.ofNullable(this.currencyMap.get(myDailyQuote.getLocalDay().minusDays(minusDays)))
