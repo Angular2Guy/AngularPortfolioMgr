@@ -31,6 +31,7 @@ public class PortfolioMapper {
 		dto.setYear2(portfolio.getYear2());
 		dto.setYear5(portfolio.getYear5());
 		dto.setYear10(portfolio.getYear10());
+		dto.setCurrencyKey(portfolio.getCurrencyKey());
 		dto.getSymbols()
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol())))

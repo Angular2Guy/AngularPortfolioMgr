@@ -19,6 +19,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ch.xxx.manager.domain.utils.CurrencyKey;
+
 public class PortfolioDto {
 	private Long id;
 	private Long userId;
@@ -30,15 +32,15 @@ public class PortfolioDto {
 	private BigDecimal year1;
 	private BigDecimal year2;
 	private BigDecimal year5;
-	private BigDecimal year10;
+	private BigDecimal year10;	
+	private CurrencyKey currencyKey;
 	private List<SymbolDto> symbols = new ArrayList<>();
-	
 
-	public PortfolioDto() {		
+	public PortfolioDto() {
 	}
-	
+
 	public PortfolioDto(Long id, Long userId, String name, LocalDateTime createdAt, BigDecimal month1,
-			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10) {
+			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10, CurrencyKey currencyKey) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -50,6 +52,7 @@ public class PortfolioDto {
 		this.year2 = year2;
 		this.year5 = year5;
 		this.year10 = year10;
+		this.currencyKey = currencyKey;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -63,18 +66,23 @@ public class PortfolioDto {
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public Long getUserId() {
 		return userId;
 	}
+
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -130,5 +138,13 @@ public class PortfolioDto {
 	public List<SymbolDto> getSymbols() {
 		return symbols;
 	}
-	
+
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
+	}
+
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
+	}
+
 }

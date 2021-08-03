@@ -18,6 +18,8 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ch.xxx.manager.domain.utils.CurrencyKey;
+
 public class SymbolDto {
 	private Long id;
 	private String symbol;
@@ -28,12 +30,13 @@ public class SymbolDto {
 	private LocalDateTime changedAt;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime removedAt;
+	private CurrencyKey currencyKey;
 	
 	public SymbolDto() {
 		
 	}
 	
-	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source, Long weight) {
+	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source, Long weight, CurrencyKey currencyKey) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
@@ -42,6 +45,7 @@ public class SymbolDto {
 		this.weight = weight;
 		this.changedAt = changedAt == null ? null : LocalDateTime.of(changedAt, LocalTime.now());
 		this.removedAt = removedAt == null ? null : LocalDateTime.of(removedAt, LocalTime.now());
+		this.currencyKey = currencyKey;
 	}
 	
 	public LocalDateTime getChangedAt() {
@@ -93,6 +97,14 @@ public class SymbolDto {
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
+	}
+
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
 	}
 	
 }

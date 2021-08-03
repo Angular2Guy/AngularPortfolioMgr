@@ -127,6 +127,7 @@ public class PortfolioService {
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
 		entity.setAppUser(this.appUserRepository.findById(dto.getUserId()).orElse(null));
+		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
 		return entity;
 	}
 

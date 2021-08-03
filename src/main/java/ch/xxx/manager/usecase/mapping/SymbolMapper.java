@@ -21,10 +21,12 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 @Component
 public class SymbolMapper {
 	public SymbolDto convert(Symbol entity) {
-		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null, entity.getQuoteSource().toString(), null);
+		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null,
+				entity.getQuoteSource().toString(), null, entity.getCurrencyKey());
 	}
-	
+
 	public SymbolDto convert(Symbol symbol, PortfolioToSymbol portfolioToSymbol) {
-		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), null, null, symbol.getQuoteSource().toString(), portfolioToSymbol.getWeight());
+		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), null, null,
+				symbol.getQuoteSource().toString(), portfolioToSymbol.getWeight(), symbol.getCurrencyKey());
 	}
 }
