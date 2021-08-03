@@ -49,11 +49,10 @@ public class PortfolioService {
 	private final SymbolMapper symbolMapper;
 	private final PortfolioMapper portfolioMapper;
 
-
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
-			PortfolioToSymbolRepository portfolioToSymbolRepository,
-			SymbolRepository symbolRepository, PortfolioCalculationService portfolioCalculationService,
-			SymbolMapper symbolMapper, PortfolioMapper portfolioMapper) {
+			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
+			PortfolioCalculationService portfolioCalculationService, SymbolMapper symbolMapper,
+			PortfolioMapper portfolioMapper) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
@@ -62,8 +61,6 @@ public class PortfolioService {
 		this.symbolMapper = symbolMapper;
 		this.portfolioMapper = portfolioMapper;
 	}
-
-
 
 	public List<PortfolioDto> getPortfoliosByUserId(Long userId) {
 		return this.portfolioRepository.findByUserId(userId).stream().flatMap(entity -> Stream.of(this.convert(entity)))
@@ -90,8 +87,7 @@ public class PortfolioService {
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.flatMap(newEntity -> Stream.of(this.portfolioToSymbolRepository.save(newEntity)))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.map(entity -> this.convert(entity)).findFirst()
-				.orElseThrow(() -> new ResourceNotFoundException(
+				.map(entity -> this.convert(entity)).findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
 
@@ -100,8 +96,7 @@ public class PortfolioService {
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.map(entity -> this.convert(entity)).findFirst()
-				.orElseThrow(() -> new ResourceNotFoundException(
+				.map(entity -> this.convert(entity)).findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
 
@@ -114,8 +109,14 @@ public class PortfolioService {
 
 	private PortfolioToSymbol createPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDate changedAt) {
 		PortfolioToSymbol entity = new PortfolioToSymbol();
-		entity.setPortfolio(this.portfolioRepository.findById(dto.getId()).orElse(null));
-		entity.setSymbol(this.symbolRepository.findById(symbolId).orElse(null));
+		entity.setPortfolio(this.portfolioRepository.findById(dto.getId()).map(myPts -> {
+			myPts.getPortfolioToSymbols().add(entity);
+			return myPts;
+		}).orElse(null));
+		entity.setSymbol(this.symbolRepository.findById(symbolId).map(myPts -> {
+			myPts.getPortfolioToSymbols().add(entity);
+			return myPts;
+		}).orElse(null));
 		entity.setWeight(weight);
 		entity.setChangedAt(changedAt);
 		return entity;

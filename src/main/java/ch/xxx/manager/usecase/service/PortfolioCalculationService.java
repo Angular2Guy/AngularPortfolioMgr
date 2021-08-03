@@ -107,7 +107,7 @@ public class PortfolioCalculationService {
 			List<PortfolioElement> portfolioElements, LocalDate cutOffDate) {
 		BigDecimal result = portfolioToSymbols.stream()
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
-				.filter(Optional::isEmpty).map(pe -> pe.get()).map(pe -> pe.value)
+				.filter(Optional::isPresent).map(pe -> pe.get()).map(pe -> pe.value)
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
