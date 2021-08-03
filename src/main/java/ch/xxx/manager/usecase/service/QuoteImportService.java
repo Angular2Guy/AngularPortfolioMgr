@@ -266,18 +266,18 @@ public class QuoteImportService {
 
 	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-		Optional<CurrencyKey> currencyIdOpt = currencyMap
-				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
-						? Optional.empty()
-						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
-								.filter(entity -> Optional.ofNullable(entity.getToCurrKey())
-										.filter(myCurrKey -> myCurrKey.equals(symbolEntity.getCurrencyKey()))
-										.isPresent())
-								.flatMap(entity -> Stream.of(entity.getToCurrKey())).findFirst();
+//		Optional<CurrencyKey> currencyIdOpt = currencyMap
+//				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
+//						? Optional.empty()
+//						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
+//								.filter(entity -> Optional.ofNullable(entity.getToCurrKey())
+//										.filter(myCurrKey -> myCurrKey.equals(symbolEntity.getCurrencyKey()))
+//										.isPresent())
+//								.flatMap(entity -> Stream.of(entity.getToCurrKey())).findFirst();
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
-				symbolEntity, currencyIdOpt.orElse(null));
+				symbolEntity, symbolEntity.getCurrencyKey());
 		return entity;
 	}
 
