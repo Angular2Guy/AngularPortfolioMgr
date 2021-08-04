@@ -15,7 +15,7 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -74,8 +74,17 @@ public class PortfolioCalculationService {
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
+		List<DailyQuote> portfolioQuotes = dailyQuotesMap.entrySet().stream()
+				.filter(entry -> entry.getValue().stream()
+						.anyMatch(myDailyQuote -> myDailyQuote.getSymbolKey().contains(ServiceUtils.PORTFOLIO_MARKER)))
+				.findFirst()
+				.map(myEntry -> new ArrayList<>(myEntry.getValue()).stream().map(myDailyQuote -> resetPortfolioQuote(myDailyQuote))
+						.collect(Collectors.toList()))
+				.orElseThrow(() -> new ResourceNotFoundException("Should not happen"));
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
-				.map(pts -> this.calcPortfolioElementsForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId())))
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
+						portfolioQuotes))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(PortfolioElement::localDate))
 				.collect(Collectors.toList());
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
@@ -91,6 +100,14 @@ public class PortfolioCalculationService {
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
 		portfolio.setYear10(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
 		return portfolio;
+	}
+
+	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
+		myDailyQuote.setClose(BigDecimal.ZERO);
+		myDailyQuote.setHigh(BigDecimal.ZERO);
+		myDailyQuote.setLow(BigDecimal.ZERO);
+		myDailyQuote.setOpen(BigDecimal.ZERO);
+		return myDailyQuote;
 	}
 
 	private BigDecimal portfolioValueAtDate(List<PortfolioToSymbol> portfolioToSymbols,
@@ -109,23 +126,57 @@ public class PortfolioCalculationService {
 				.max(Comparator.comparing(PortfolioElement::localDate));
 	}
 
-	private Collection<PortfolioElement> calcPortfolioElementsForSymbol(PortfolioToSymbol portfolioToSymbol,
-			List<DailyQuote> dailyQuotes) {
+	private Collection<PortfolioElement> calcPortfolioQuotesForSymbol(PortfolioToSymbol portfolioToSymbol,
+			List<DailyQuote> dailyQuotes, List<DailyQuote> portfolioQuotes) {
 		return dailyQuotes.stream()
 				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
 						&& Optional.ofNullable(portfolioToSymbol.getRemovedAt()).stream()
-								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) >= 0)										
-								.findAny().isEmpty())
-				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol))
+								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) >= 0).findAny()
+								.isEmpty())
+				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol, portfolioQuotes))
 				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
 
 	private Optional<PortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
-			PortfolioToSymbol portfolioToSymbol) {
-		return getCurrencyQuote(portfolioToSymbol, dailyQuote)
-				.map(currencyQuote -> new PortfolioElement(portfolioToSymbol.getSymbol().getId(),
-						dailyQuote.getLocalDay(), currencyQuote.getClose().multiply(dailyQuote.getClose())));
+			PortfolioToSymbol portfolioToSymbol, List<DailyQuote> portfolioQuotes) {
+		return getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
+			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
+					portfolioQuotes);
+			return new PortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
+					myPortfolioQuote.getClose());
+		});
 
+	}
+
+	private DailyQuote upsertPortfolioQuote(Currency currencyQuote, DailyQuote dailyQuote,
+			PortfolioToSymbol portfolioToSymbol, List<DailyQuote> portfolioQuotes) {
+		final DailyQuote portfolioQuote = portfolioQuotes.stream()
+				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isEqual(dailyQuote.getLocalDay())).findFirst()
+				.orElse(this.dailyQuoteRepository.save(new DailyQuote()));
+		portfolioQuote.setClose(this.calcValue(currencyQuote.getClose(), dailyQuote.getClose(), portfolioToSymbol,
+				portfolioQuote.getClose()));
+		portfolioQuote.setCurrencyKey(portfolioToSymbol.getSymbol().getCurrencyKey());
+		portfolioQuote.setHigh(this.calcValue(currencyQuote.getHigh(), dailyQuote.getHigh(), portfolioToSymbol,
+				portfolioQuote.getHigh()));
+		portfolioQuote.setLocalDay(dailyQuote.getLocalDay());
+		portfolioQuote.setLow(this.calcValue(currencyQuote.getLow(), dailyQuote.getLow(), portfolioToSymbol,
+				portfolioQuote.getLow()));
+		portfolioQuote.setOpen(this.calcValue(currencyQuote.getOpen(), dailyQuote.getOpen(), portfolioToSymbol,
+				portfolioQuote.getOpen()));
+		portfolioQuote.setSymbol(portfolioToSymbol.getSymbol());
+		portfolioQuote.setSymbolKey(portfolioToSymbol.getSymbol().getSymbol());
+		portfolioQuote.setVolume(0L);
+		if (Optional.ofNullable(portfolioQuote.getId()).isEmpty()) {
+			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
+			portfolioQuotes.add(portfolioQuote);
+		}
+		return portfolioQuote;
+	}
+
+	private BigDecimal calcValue(BigDecimal currClose, BigDecimal dailyClose, PortfolioToSymbol portfolioToSymbol,
+			final BigDecimal portfolioClose) {
+		return Optional.ofNullable(portfolioClose).orElse(BigDecimal.ZERO)
+				.add(currClose.multiply(dailyClose).multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight())));
 	}
 
 	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {

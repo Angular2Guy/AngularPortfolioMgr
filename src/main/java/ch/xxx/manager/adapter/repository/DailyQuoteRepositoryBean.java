@@ -52,4 +52,9 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	public List<DailyQuote> findBySymbolIds(List<Long> symbolId) {
 		return this.jpaDailyQuoteRepository.findBySymbolIds(symbolId);
 	}
+
+	@Override
+	public DailyQuote save(DailyQuote dailyQuote) {
+		return this.jpaDailyQuoteRepository.save(dailyQuote);
+	}
 }

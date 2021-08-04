@@ -14,6 +14,7 @@ package ch.xxx.manager.usecase.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -67,7 +68,9 @@ public class PortfolioService {
 	}
 
 	public PortfolioDto addPortfolio(PortfolioDto dto) {
-		return this.convert(this.portfolioRepository.save(this.convert(dto)));
+		Portfolio portfolio = this.portfolioRepository.save(this.convert(dto));
+		portfolio.getPortfolioToSymbols().add(createPortfolioPtSAndSymbol(portfolio));
+		return this.convert(portfolio);
 	}
 
 	public PortfolioDto addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
@@ -130,8 +133,9 @@ public class PortfolioService {
 
 	private PortfolioToSymbol createPortfolioPtSAndSymbol(Portfolio portfolioEntity) {
 		Symbol symbolEntity = new Symbol(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(),
-				CurrencyKey.EUR, QuoteSource.PORTFOLIO, Set.of(), Set.of(), Set.of());
-		return this.createPtSEntity(portfolioEntity, this.symbolRepository.save(symbolEntity));
+				CurrencyKey.EUR, QuoteSource.PORTFOLIO, Set.of(), Set.of(), new HashSet<PortfolioToSymbol>());
+		return this.portfolioToSymbolRepository
+				.save(this.createPtSEntity(portfolioEntity, this.symbolRepository.save(symbolEntity)));
 	}
 
 	private PortfolioToSymbol createPtSEntity(Portfolio portfolioEntity, Symbol symbol) {
@@ -140,6 +144,7 @@ public class PortfolioService {
 		ptSEntity.setPortfolio(portfolioEntity);
 		ptSEntity.setWeight(1L);
 		ptSEntity.setSymbol(symbol);
+		symbol.getPortfolioToSymbols().add(ptSEntity);
 		return ptSEntity;
 	}
 }
