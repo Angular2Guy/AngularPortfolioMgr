@@ -78,8 +78,8 @@ public class PortfolioCalculationService {
 				.filter(entry -> entry.getValue().stream()
 						.anyMatch(myDailyQuote -> myDailyQuote.getSymbolKey().contains(ServiceUtils.PORTFOLIO_MARKER)))
 				.findFirst()
-				.map(myEntry -> new ArrayList<>(myEntry.getValue()).stream().map(myDailyQuote -> resetPortfolioQuote(myDailyQuote))
-						.collect(Collectors.toList()))
+				.map(myEntry -> myEntry.getValue().stream()
+						.map(myDailyQuote -> resetPortfolioQuote(myDailyQuote)).collect(Collectors.toList()))
 				.orElseThrow(() -> new ResourceNotFoundException("Should not happen"));
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
