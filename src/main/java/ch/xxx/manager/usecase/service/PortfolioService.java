@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
-import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
@@ -36,7 +35,6 @@ import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.mapping.PortfolioMapper;
-import ch.xxx.manager.usecase.mapping.SymbolMapper;
 
 @Service
 @Transactional
@@ -46,19 +44,16 @@ public class PortfolioService {
 	private final SymbolRepository symbolRepository;
 	private final AppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
-	private final SymbolMapper symbolMapper;
 	private final PortfolioMapper portfolioMapper;
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
-			PortfolioCalculationService portfolioCalculationService, SymbolMapper symbolMapper,
-			PortfolioMapper portfolioMapper) {
+			PortfolioCalculationService portfolioCalculationService, PortfolioMapper portfolioMapper) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.appUserRepository = appUserRepository;
-		this.symbolMapper = symbolMapper;
 		this.portfolioMapper = portfolioMapper;
 	}
 
