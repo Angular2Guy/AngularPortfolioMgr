@@ -131,25 +131,9 @@ public class PortfolioService {
 		return entity;
 	}
 
-	private PortfolioDto updatePortfolioDto(PortfolioToSymbol entity, Symbol symbolEntity, PortfolioDto dto) {
-		SymbolDto symbolDto = this.symbolMapper.convert(symbolEntity, entity);
-		dto.getSymbols().add(symbolDto);
-		return dto;
-	}
-
-	private PortfolioDto convert(PortfolioToSymbol entity, PortfolioDto dto) {
-		return entity.getId() == null ? dto
-				: this.symbolRepository.findById(entity.getSymbol().getId())
-						.map(symbolEntity -> updatePortfolioDto(entity, symbolEntity, dto)).orElse(dto);
-	}
-
 	private PortfolioDto convert(Portfolio entity) {
 		final PortfolioDto dto = this.portfolioMapper.toDto(entity);
-		List<PortfolioToSymbol> portfolioToSymbols = this.portfolioToSymbolRepository.findByPortfolioId(dto.getId());
-		return portfolioToSymbols.isEmpty() ? this.convert(new PortfolioToSymbol(), dto)
-				: portfolioToSymbols.stream().map(pts -> this.convert(pts, dto))
-						.filter(myDto -> myDto.getId().equals(dto.getId())).findFirst()
-						.orElseThrow(() -> new ResourceNotFoundException("Should not happen."));
+		return dto;
 	}
 
 	private PortfolioToSymbol createPortfolioPtSAndSymbol(Portfolio portfolioEntity) {
