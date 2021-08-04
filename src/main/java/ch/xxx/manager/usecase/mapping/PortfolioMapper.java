@@ -9,7 +9,9 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
+import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Component
 public class PortfolioMapper {
@@ -34,8 +36,17 @@ public class PortfolioMapper {
 		dto.setCurrencyKey(portfolio.getCurrencyKey());
 		dto.getSymbols()
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
-						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol())))
+						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
 		return dto;
+	}
+	
+	public Portfolio toEntity(PortfolioDto dto, AppUser appUser) {
+		Portfolio entity = new Portfolio();
+		entity.setId(dto.getId());
+		entity.setName(dto.getName());
+		entity.setAppUser(Optional.ofNullable(appUser).orElse(null));
+		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
+		return entity;
 	}
 }

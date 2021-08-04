@@ -118,11 +118,8 @@ public class PortfolioService {
 	}
 
 	private Portfolio convert(PortfolioDto dto) {
-		Portfolio entity = new Portfolio();
-		entity.setId(dto.getId());
-		entity.setName(dto.getName());
-		entity.setAppUser(this.appUserRepository.findById(dto.getUserId()).orElse(null));
-		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
+		Portfolio entity = this.portfolioMapper.toEntity(dto,
+				this.appUserRepository.findById(dto.getUserId()).orElse(null));
 		return entity;
 	}
 
