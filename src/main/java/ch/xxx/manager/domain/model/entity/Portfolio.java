@@ -14,6 +14,7 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -48,7 +49,7 @@ public class Portfolio {
 	private BigDecimal year5;
 	private BigDecimal year10;
 	@OneToMany(mappedBy = "portfolio")
-	private Set<PortfolioToSymbol> portfolioToSymbols;
+	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
 
 	@PrePersist
 	void init() {

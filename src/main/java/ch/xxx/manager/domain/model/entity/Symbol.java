@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -42,11 +43,11 @@ public class Symbol {
 	@Enumerated(EnumType.STRING)
 	private QuoteSource quoteSource;
 	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
-	private Set<DailyQuote> dailyQuotes;
+	private Set<DailyQuote> dailyQuotes = new HashSet<>();
 	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
-	private Set<IntraDayQuote> intraDayQuotes;
+	private Set<IntraDayQuote> intraDayQuotes = new HashSet<>();
 	@OneToMany(mappedBy = "symbol")
-	private Set<PortfolioToSymbol> portfolioToSymbols;
+	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
 
 	public Symbol() {
 	}

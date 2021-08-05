@@ -14,6 +14,7 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -42,7 +43,7 @@ public class AppUser {
 	private boolean enabled;
 	private String uuid;
 	@OneToMany(mappedBy = "appUser")
-	private Set<Portfolio> portfolios;
+	private Set<Portfolio> portfolios = new HashSet<>();
 	
 	
 	public AppUser(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
