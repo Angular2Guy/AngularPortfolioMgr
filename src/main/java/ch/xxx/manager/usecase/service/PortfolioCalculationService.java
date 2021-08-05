@@ -74,13 +74,11 @@ public class PortfolioCalculationService {
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-		List<DailyQuote> portfolioQuotes = dailyQuotesMap.entrySet().stream()
-				.filter(entry -> entry.getValue().stream()
-						.anyMatch(myDailyQuote -> myDailyQuote.getSymbolKey().contains(ServiceUtils.PORTFOLIO_MARKER)))
-				.findFirst()
-				.map(myEntry -> myEntry.getValue().stream()
-						.map(myDailyQuote -> resetPortfolioQuote(myDailyQuote)).collect(Collectors.toList()))
-				.orElseThrow(() -> new ResourceNotFoundException("Should not happen"));
+		List<DailyQuote> portfolioQuotes = portfolioToSymbols.stream()
+				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.map(pts -> Optional.ofNullable(dailyQuotesMap.get(pts.getSymbol().getId())).orElse(List.of()))
+				.flatMap(Collection::stream).map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
+				.collect(Collectors.toList());
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
@@ -145,14 +143,13 @@ public class PortfolioCalculationService {
 			return new PortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
 					myPortfolioQuote.getClose());
 		});
-
 	}
 
 	private DailyQuote upsertPortfolioQuote(Currency currencyQuote, DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, List<DailyQuote> portfolioQuotes) {
-		final DailyQuote portfolioQuote = portfolioQuotes.stream()
+		DailyQuote portfolioQuote = portfolioQuotes.stream()
 				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isEqual(dailyQuote.getLocalDay())).findFirst()
-				.orElse(this.dailyQuoteRepository.save(new DailyQuote()));
+				.orElse(new DailyQuote());
 		portfolioQuote.setClose(this.calcValue(currencyQuote.getClose(), dailyQuote.getClose(), portfolioToSymbol,
 				portfolioQuote.getClose()));
 		portfolioQuote.setCurrencyKey(portfolioToSymbol.getSymbol().getCurrencyKey());
@@ -167,6 +164,7 @@ public class PortfolioCalculationService {
 		portfolioQuote.setSymbolKey(portfolioToSymbol.getSymbol().getSymbol());
 		portfolioQuote.setVolume(0L);
 		if (Optional.ofNullable(portfolioQuote.getId()).isEmpty()) {
+			portfolioQuote = this.dailyQuoteRepository.save(portfolioQuote);
 			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
 			portfolioQuotes.add(portfolioQuote);
 		}

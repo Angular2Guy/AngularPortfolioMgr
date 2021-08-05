@@ -15,6 +15,7 @@ package ch.xxx.manager.domain.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -41,7 +42,7 @@ public class DailyQuote {
 	private BigDecimal close;
 	private Long volume;
 	private LocalDate localDay;
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private Symbol symbol;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
