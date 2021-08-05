@@ -15,7 +15,6 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -41,10 +40,14 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.model.entity.Symbol;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PortfolioCalculationService {
+	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
+	};
+
 	private record PortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value) {
 	};
 
@@ -74,11 +77,14 @@ public class PortfolioCalculationService {
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
 				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-		List<DailyQuote> portfolioQuotes = portfolioToSymbols.stream()
+		PortfolioSymbolWithDailyQuotes portfolioQuotes = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.map(pts -> Optional.ofNullable(dailyQuotesMap.get(pts.getSymbol().getId())).orElse(List.of()))
-				.flatMap(Collection::stream).map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
-				.collect(Collectors.toList());
+				.peek(pts -> LOG.info(pts.getSymbol().getSymbol() + " " + pts.getSymbol().getId()))
+				.map(pts -> new PortfolioSymbolWithDailyQuotes(pts.getSymbol(),
+						Optional.ofNullable(dailyQuotesMap.get(pts.getSymbol().getId())).stream()
+								.flatMap(Collection::stream).map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
+								.collect(Collectors.toList())))
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
@@ -125,7 +131,7 @@ public class PortfolioCalculationService {
 	}
 
 	private Collection<PortfolioElement> calcPortfolioQuotesForSymbol(PortfolioToSymbol portfolioToSymbol,
-			List<DailyQuote> dailyQuotes, List<DailyQuote> portfolioQuotes) {
+			List<DailyQuote> dailyQuotes, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
 		return dailyQuotes.stream()
 				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
 						&& Optional.ofNullable(portfolioToSymbol.getRemovedAt()).stream()
@@ -136,7 +142,7 @@ public class PortfolioCalculationService {
 	}
 
 	private Optional<PortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
-			PortfolioToSymbol portfolioToSymbol, List<DailyQuote> portfolioQuotes) {
+			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
 		return getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
@@ -146,8 +152,8 @@ public class PortfolioCalculationService {
 	}
 
 	private DailyQuote upsertPortfolioQuote(Currency currencyQuote, DailyQuote dailyQuote,
-			PortfolioToSymbol portfolioToSymbol, List<DailyQuote> portfolioQuotes) {
-		DailyQuote portfolioQuote = portfolioQuotes.stream()
+			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
+		DailyQuote portfolioQuote = portfolioQuotes.dailyQuotes.stream()
 				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isEqual(dailyQuote.getLocalDay())).findFirst()
 				.orElse(new DailyQuote());
 		portfolioQuote.setClose(this.calcValue(currencyQuote.getClose(), dailyQuote.getClose(), portfolioToSymbol,
@@ -160,13 +166,13 @@ public class PortfolioCalculationService {
 				portfolioQuote.getLow()));
 		portfolioQuote.setOpen(this.calcValue(currencyQuote.getOpen(), dailyQuote.getOpen(), portfolioToSymbol,
 				portfolioQuote.getOpen()));
-		portfolioQuote.setSymbol(portfolioToSymbol.getSymbol());
-		portfolioQuote.setSymbolKey(portfolioToSymbol.getSymbol().getSymbol());
-		portfolioQuote.setVolume(0L);
+		portfolioQuote.setSymbol(portfolioQuotes.symbol);
+		portfolioQuote.setSymbolKey(portfolioQuotes.symbol.getSymbol());
+		portfolioQuote.setVolume(1L);
 		if (Optional.ofNullable(portfolioQuote.getId()).isEmpty()) {
 			portfolioQuote = this.dailyQuoteRepository.save(portfolioQuote);
 			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
-			portfolioQuotes.add(portfolioQuote);
+			portfolioQuotes.dailyQuotes.add(portfolioQuote);
 		}
 		return portfolioQuote;
 	}
