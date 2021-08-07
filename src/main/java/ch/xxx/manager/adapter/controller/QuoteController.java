@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.QuoteDto;
+import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
@@ -48,13 +49,13 @@ public class QuoteController {
 		return this.quoteService.getDailyQuotes(symbol);
 	}
 
-//	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}")
-//	public Flux<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId,
-//			@PathVariable("indexSymbol") String indexSymbol) {
-//		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
-//				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
-//		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
-//	}
+	@GetMapping("/daily/all/portfolio/{portfolioId}/index/{indexSymbol}")
+	public List<QuoteDto> getAllDailyComparisonIndexQuotes(@PathVariable("portfolioId") Long portfolioId,
+			@PathVariable("indexSymbol") String indexSymbol) {
+		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
+				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
+	}
 
 	@GetMapping("/intraday/symbol/{symbol}")
 	public List<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
@@ -69,16 +70,16 @@ public class QuoteController {
 		return this.quoteService.getDailyQuotes(symbol, start, end);
 	}
 
-//	@GetMapping("/daily/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
-//	public Flux<QuoteDto> getAllDailyComparisonIndexQuotesFromStartToEnd(@PathVariable("portfolioId") Long portfolioId,
-//			@PathVariable("indexSymbol") String indexSymbol, @PathVariable("start") String isodateStart,
-//			@PathVariable("end") String isodateEnd) {
-//		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
-//				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
-//		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-//		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
-//		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
-//	}
+	@GetMapping("/daily/portfolio/{portfolioId}/index/{indexSymbol}/start/{start}/end/{end}")
+	public List<QuoteDto> getAllDailyComparisonIndexQuotesFromStartToEnd(@PathVariable("portfolioId") Long portfolioId,
+			@PathVariable("indexSymbol") String indexSymbol, @PathVariable("start") String isodateStart,
+			@PathVariable("end") String isodateEnd) {
+		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
+				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
+		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
+	}
 
 	@GetMapping("/import/daily/symbol/{symbol}")
 	public Long importDailyQuotes(@PathVariable("symbol") String symbol) {

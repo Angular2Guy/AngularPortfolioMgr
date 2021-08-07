@@ -12,10 +12,14 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
@@ -36,6 +40,15 @@ public class PortfolioToIndexService {
 		this.symbolRepository = symbolRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyRepository = currencyRepository;
+	}
+
+	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
+		return List.of();
+	}
+
+	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
+			LocalDate to) {
+		return List.of();
 	}
 
 //	public Flux<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
