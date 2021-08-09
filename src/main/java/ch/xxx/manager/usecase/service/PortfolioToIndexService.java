@@ -31,15 +31,15 @@ public class PortfolioToIndexService {
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
 	private final DailyQuoteRepository dailyQuoteRepository;
-	private final CurrencyRepository currencyRepository;
+	private final CurrencyService currencyService;
 
 	public PortfolioToIndexService(PortfolioToSymbolRepository portfolioToSymbolRepository,
 			SymbolRepository symbolRepository, DailyQuoteRepository dailyQuoteRepository,
-			CurrencyRepository currencyRepository) {
+			CurrencyService currencyService) {
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;
-		this.currencyRepository = currencyRepository;
+		this.currencyService = currencyService;
 	}
 
 	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {

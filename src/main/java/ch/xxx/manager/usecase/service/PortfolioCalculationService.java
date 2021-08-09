@@ -53,20 +53,12 @@ public class PortfolioCalculationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final DailyQuoteRepository dailyQuoteRepository;
-	private final CurrencyRepository currencyRepository;
-	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
+	private final CurrencyService currencyService;
 
 	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository,
-			CurrencyRepository currencyRepository) {
+			CurrencyService currencyService) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
-		this.currencyRepository = currencyRepository;
-	}
-
-	@PostConstruct
-	public void initCurrencyMap() {
-		LOG.info("CurrencyMap updated.");
-		this.currencyMap = ImmutableSortedMap.copyOf(
-				this.currencyRepository.findAll().stream().collect(Collectors.groupingBy(Currency::getLocalDay)));
+		this.currencyService = currencyService;
 	}
 
 	public Portfolio calculatePortfolio(Portfolio portfolio) {
@@ -187,7 +179,7 @@ public class PortfolioCalculationService {
 //		LOG.info(myDailyQuote.getLocalDay().format(DateTimeFormatter.ISO_LOCAL_DATE));		
 		return LongStream.range(0, 7).boxed()
 				.map(minusDays -> Optional
-						.ofNullable(this.currencyMap.get(myDailyQuote.getLocalDay().minusDays(minusDays)))
+						.ofNullable(this.currencyService.getCurrencyMap().get(myDailyQuote.getLocalDay().minusDays(minusDays)))
 						.orElse(List.of()).stream()
 						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
 								.equals(myCurrency.getFromCurrKey())

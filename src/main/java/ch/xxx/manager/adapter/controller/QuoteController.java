@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
+import ch.xxx.manager.usecase.service.CurrencyService;
 import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
@@ -34,14 +35,14 @@ public class QuoteController {
 	private final QuoteService quoteService;
 	private final QuoteImportService quoteImportService;
 	private final PortfolioToIndexService portfolioToIndexService;
-	private final PortfolioCalculationService portfolioCalculationService;
+	private final CurrencyService currencyService;
 
 	public QuoteController(QuoteService quoteService, QuoteImportService quoteImportService,
-			PortfolioToIndexService portfolioToIndexService, PortfolioCalculationService portfolioCalculationService) {
+			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService) {
 		this.quoteService = quoteService;
 		this.quoteImportService = quoteImportService;
 		this.portfolioToIndexService = portfolioToIndexService;
-		this.portfolioCalculationService = portfolioCalculationService;
+		this.currencyService = currencyService;
 	}
 
 	@GetMapping("/daily/all/symbol/{symbol}")
@@ -94,7 +95,7 @@ public class QuoteController {
 	@GetMapping("/import/daily/currency/{to_curr}")
 	public Long importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
 		Long count = this.quoteImportService.importFxDailyQuoteHistory(to_curr);
-		this.portfolioCalculationService.initCurrencyMap();
+		this.currencyService.initCurrencyMap();
 		return count;
 	}
 }
