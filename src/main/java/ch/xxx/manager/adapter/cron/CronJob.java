@@ -61,6 +61,7 @@ public class CronJob {
 				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
 		LOGGER.info("Import of {} Usd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
+		this.currencyService.initCurrencyMap();
 		LOGGER.info(this.symbolImportService.importDeSymbols());
 		LOGGER.info(this.symbolImportService.importHkSymbols());
 		LOGGER.info(this.symbolImportService.importUsSymbols());
