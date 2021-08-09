@@ -12,21 +12,37 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSortedMap;
+
 import ch.xxx.manager.domain.model.dto.QuoteDto;
-import ch.xxx.manager.domain.model.entity.CurrencyRepository;
+import ch.xxx.manager.domain.model.entity.Currency;
+import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
 public class PortfolioToIndexService {
+	record QuoteDtoAndWeight(BigDecimal weight, QuoteDto quoteDto) {
+	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
@@ -43,7 +59,55 @@ public class PortfolioToIndexService {
 	}
 
 	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
+		List<PortfolioToSymbol> portfolioChanges = portfolioToSymbolRepository.findByPortfolioId(portfolioId);
+		List<DailyQuote> dailyQuotes = this.dailyQuoteRepository.findBySymbol(comparisonIndex.getSymbol());
+		List<QuoteDto> result = compareToIndex(portfolioChanges, dailyQuotes);
+
 		return List.of();
+	}
+
+	private List<QuoteDto> compareToIndex(List<PortfolioToSymbol> portfolioChanges, List<DailyQuote> dailyQuotes) {
+		record PtsChangesByDay(LocalDate day, PortfolioToSymbol ptsChange) {
+		}
+		Map<LocalDate, List<PortfolioToSymbol>> portfolioChangesMap = portfolioChanges.stream()
+				.filter(pts -> Optional.fromNullable(pts.getChangedAt()).isPresent()
+						|| Optional.fromNullable(pts.getRemovedAt()).isPresent())
+				.map(pts -> Optional.fromNullable(pts.getChangedAt()).isPresent()
+						? new PtsChangesByDay(pts.getChangedAt(), pts)
+						: new PtsChangesByDay(pts.getRemovedAt(), pts))
+				.collect(Collectors.groupingBy(PtsChangesByDay::day,
+						Collectors.flatMapping(pts -> Stream.of(pts.ptsChange), Collectors.toList())));
+		SortedMap<LocalDate, List<PortfolioToSymbol>> sortedPortfolioChangesMap = ImmutableSortedMap
+				.copyOf(portfolioChangesMap, (date1, date2) -> date1.compareTo(date2));
+		final AtomicReference<QuoteDtoAndWeight> atomicWeight = new AtomicReference<>(new QuoteDtoAndWeight(BigDecimal.valueOf(-1L), new QuoteDto()));
+		return dailyQuotes.stream()
+				.map(myDailyQuote -> this.calcQuote(myDailyQuote.getLocalDay(), sortedPortfolioChangesMap, myDailyQuote,
+						atomicWeight))
+				.filter(myDto -> 0 < BigDecimal.ZERO.compareTo(myDto.getClose())).collect(Collectors.toList());
+	}
+
+	private QuoteDto calcQuote(LocalDate day, SortedMap<LocalDate, List<PortfolioToSymbol>> portfolioChangesMap,
+			DailyQuote dailyQuote, final AtomicReference<QuoteDtoAndWeight> atomicWeight) {
+		if (dailyQuote.getLocalDay().isBefore(portfolioChangesMap.firstKey())) {
+			throw new RuntimeException(String.format("No quotes for first portfolioChange: %s with Index: %s",
+					portfolioChangesMap.firstKey().atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE),
+					dailyQuote.getSymbol()));
+		}
+		QuoteDto result = portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote)).reduce(new QuoteDto(null, null, null, BigDecimal.ZERO, 0L,
+				day.atStartOfDay(), ""), (acc, value) -> {
+					acc.setSymbol(value.getSymbol());
+					acc.setClose(acc.getClose().add(value.getClose()));
+					return acc;
+				});
+		return null;
+	}
+
+	private QuoteDto createQuote(LocalDate day, PortfolioToSymbol portfolioToSymbol, DailyQuote dailyQuote) {
+		return new QuoteDto(null, null, null,
+				this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote)
+						.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ZERO)).getClose()
+						.multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight())).multiply(dailyQuote.getClose()),
+				0L, day.atStartOfDay(), portfolioToSymbol.getSymbol().getSymbol());
 	}
 
 	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
@@ -78,7 +142,7 @@ public class PortfolioToIndexService {
 //										return newQuote;
 //									})))
 //							.collect(Collectors.toList());
-//					return Mono.just(sumedEntities);
+//					return Mono.just(sumedE)ntities);
 //				})
 ////				.collectList().flatMap(entities -> {
 ////					LOGGER.info("List filer called. Size: {}", entities.size());

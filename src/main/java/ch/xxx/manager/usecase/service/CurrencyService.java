@@ -1,3 +1,15 @@
+/**
+ *    Copyright 2019 Sven Loesekann
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
 package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
@@ -7,8 +19,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +39,8 @@ import ch.xxx.manager.domain.model.dto.DailyFxQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuote;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -76,6 +92,23 @@ public class CurrencyService {
 		return new Currency(LocalDate.parse(entry.getKey(), DateTimeFormatter.ofPattern("yyyy-MM-dd")), from_curr,
 				to_curr, new BigDecimal(entry.getValue().getOpen()), new BigDecimal(entry.getValue().getHigh()),
 				new BigDecimal(entry.getValue().getLow()), new BigDecimal(entry.getValue().getClose()));
+	}
+	
+	public Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
+		return this.getCurrencyQuote(myDailyQuote.getLocalDay(), portfolioToSymbol);
+	}
+	
+	public Optional<Currency> getCurrencyQuote(LocalDate day, PortfolioToSymbol portfolioToSymbol) {
+//		LOG.info(myDailyQuote.getLocalDay().format(DateTimeFormatter.ISO_LOCAL_DATE));		
+		return LongStream.range(0, 7).boxed()
+				.map(minusDays -> Optional
+						.ofNullable(this.currencyMap.get(day.minusDays(minusDays)))
+						.orElse(List.of()).stream()
+						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
+								.equals(myCurrency.getFromCurrKey())
+								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
+						.findFirst())
+				.filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
 	
 	public ImmutableSortedMap<LocalDate, Collection<Currency>> getCurrencyMap() {

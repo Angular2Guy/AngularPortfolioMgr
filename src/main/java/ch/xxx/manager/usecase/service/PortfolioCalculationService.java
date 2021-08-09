@@ -23,19 +23,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.ImmutableSortedMap;
-
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.entity.Currency;
-import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
@@ -135,7 +130,7 @@ public class PortfolioCalculationService {
 
 	private Optional<PortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
-		return getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
+		return this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
 			return new PortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
@@ -173,18 +168,5 @@ public class PortfolioCalculationService {
 			final BigDecimal portfolioClose) {
 		return Optional.ofNullable(portfolioClose).orElse(BigDecimal.ZERO)
 				.add(currClose.multiply(dailyClose).multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight())));
-	}
-
-	private Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
-//		LOG.info(myDailyQuote.getLocalDay().format(DateTimeFormatter.ISO_LOCAL_DATE));		
-		return LongStream.range(0, 7).boxed()
-				.map(minusDays -> Optional
-						.ofNullable(this.currencyService.getCurrencyMap().get(myDailyQuote.getLocalDay().minusDays(minusDays)))
-						.orElse(List.of()).stream()
-						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
-								.equals(myCurrency.getFromCurrKey())
-								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
-						.findFirst())
-				.filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
 }
