@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
-import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteService;
@@ -94,7 +93,7 @@ public class QuoteController {
 
 	@GetMapping("/import/daily/currency/{to_curr}")
 	public Long importFxDailyQuotes(@PathVariable("to_curr") String to_curr) {
-		Long count = this.quoteImportService.importFxDailyQuoteHistory(to_curr);
+		Long count = this.currencyService.importFxDailyQuoteHistory(to_curr);
 		this.currencyService.initCurrencyMap();
 		return count;
 	}

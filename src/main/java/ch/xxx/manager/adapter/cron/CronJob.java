@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
+import ch.xxx.manager.usecase.service.CurrencyService;
 import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
@@ -38,12 +39,14 @@ public class CronJob {
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
 	private final PortfolioCalculationService portfolioCalculationService;
+	private final CurrencyService currencyService;
 
 	public CronJob(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
-			PortfolioCalculationService portfolioCalculationService) {
+			PortfolioCalculationService portfolioCalculationService, CurrencyService currencyService) {
 		this.symbolImportService = symbolImportService;
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.quoteImportService = quoteImportService;
+		this.currencyService = currencyService;
 	}
 
 	@PostConstruct
@@ -55,9 +58,9 @@ public class CronJob {
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterSymbols() {
 		LOGGER.info("Import of {} Hkd quotes finished.",
-				this.quoteImportService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
+				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
 		LOGGER.info("Import of {} Usd quotes finished.",
-				this.quoteImportService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
+				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
 		LOGGER.info(this.symbolImportService.importDeSymbols());
 		LOGGER.info(this.symbolImportService.importHkSymbols());
 		LOGGER.info(this.symbolImportService.importUsSymbols());
