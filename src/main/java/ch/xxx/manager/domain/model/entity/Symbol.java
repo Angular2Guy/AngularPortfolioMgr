@@ -13,6 +13,7 @@
 package ch.xxx.manager.domain.model.entity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -130,10 +131,32 @@ public class Symbol {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(currencyKey, dailyQuotes, id, intraDayQuotes, name, portfolioToSymbols, quoteSource,
+				symbol);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Symbol other = (Symbol) obj;
+		return currencyKey == other.currencyKey && Objects.equals(dailyQuotes, other.dailyQuotes)
+				&& Objects.equals(id, other.id) && Objects.equals(intraDayQuotes, other.intraDayQuotes)
+				&& Objects.equals(name, other.name) && Objects.equals(portfolioToSymbols, other.portfolioToSymbols)
+				&& quoteSource == other.quoteSource && Objects.equals(symbol, other.symbol);
+	}
+
+	@Override
 	public String toString() {
 		return "Symbol [id=" + id + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
 				+ ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes=" + intraDayQuotes
 				+ ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}
+
 
 }

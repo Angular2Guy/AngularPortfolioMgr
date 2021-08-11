@@ -35,6 +35,19 @@ public class PortfolioToSymbol {
 	private Long weight;
 	private LocalDate changedAt;
 	private LocalDate removedAt;
+	
+	public PortfolioToSymbol(Long id, Portfolio portfolio, Symbol symbol, Long weight, LocalDate changedAt,
+			LocalDate removedAt) {
+		super();
+		this.id = id;
+		this.portfolio = portfolio;
+		this.symbol = symbol;
+		this.weight = weight;
+		this.changedAt = changedAt;
+		this.removedAt = removedAt;
+	}
+	
+	public PortfolioToSymbol() {}
 
 	public LocalDate getChangedAt() {
 		return changedAt;

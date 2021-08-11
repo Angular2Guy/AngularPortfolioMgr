@@ -14,10 +14,12 @@ package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -27,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSortedMap;
 
 import ch.xxx.manager.domain.model.dto.QuoteDto;
@@ -36,13 +37,14 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
+import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
-import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
 public class PortfolioToIndexService {
 	record QuoteDtoAndWeight(BigDecimal weight, QuoteDto quoteDto) {
 	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
@@ -67,23 +69,43 @@ public class PortfolioToIndexService {
 	}
 
 	private List<QuoteDto> compareToIndex(List<PortfolioToSymbol> portfolioChanges, List<DailyQuote> dailyQuotes) {
-		record PtsChangesByDay(LocalDate day, PortfolioToSymbol ptsChange) {
+		record PtsChangesByDay(LocalDate day, PortfolioToSymbol ptsChange, Optional<PortfolioToSymbol> ptsChangeOld) {
 		}
-		Map<LocalDate, List<PortfolioToSymbol>> portfolioChangesMap = portfolioChanges.stream()
-				.filter(pts -> Optional.fromNullable(pts.getChangedAt()).isPresent()
-						|| Optional.fromNullable(pts.getRemovedAt()).isPresent())
-				.map(pts -> Optional.fromNullable(pts.getChangedAt()).isPresent()
-						? new PtsChangesByDay(pts.getChangedAt(), pts)
-						: new PtsChangesByDay(pts.getRemovedAt(), pts))
+		List<PortfolioToSymbol> myPortfolioChanges = portfolioChanges.stream()
+				.filter(pts -> Optional.ofNullable(pts.getChangedAt()).isPresent()
+						|| Optional.ofNullable(pts.getRemovedAt()).isPresent())
+				.collect(Collectors.toList());
+		Map<Symbol, List<PortfolioToSymbol>> symbolToPtsMap = myPortfolioChanges.stream()
+				.collect(Collectors.groupingBy(PortfolioToSymbol::getSymbol,
+						Collectors.flatMapping((PortfolioToSymbol pts) -> Stream.of(pts), Collectors.toList())));
+		symbolToPtsMap.entrySet().stream().map(entry -> {
+			entry.setValue(entry.getValue().stream()
+					.sorted((a, b) -> Optional.ofNullable(a.getChangedAt()).orElse(a.getRemovedAt())
+							.compareTo(Optional.ofNullable(b.getChangedAt()).orElse(b.getRemovedAt())))
+					.collect(Collectors.toList()));
+			return entry;
+		}).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		Map<LocalDate, List<PortfolioToSymbol>> portfolioChangesMap = myPortfolioChanges.stream()
+				.map(pts -> new PtsChangesByDay(Optional.ofNullable(pts.getChangedAt()).orElse(pts.getRemovedAt()), pts,
+						findPreviousPts(symbolToPtsMap, pts)))
 				.collect(Collectors.groupingBy(PtsChangesByDay::day,
 						Collectors.flatMapping(pts -> Stream.of(pts.ptsChange), Collectors.toList())));
 		SortedMap<LocalDate, List<PortfolioToSymbol>> sortedPortfolioChangesMap = ImmutableSortedMap
 				.copyOf(portfolioChangesMap, (date1, date2) -> date1.compareTo(date2));
-		final AtomicReference<QuoteDtoAndWeight> atomicWeight = new AtomicReference<>(new QuoteDtoAndWeight(BigDecimal.valueOf(-1L), new QuoteDto()));
+		final AtomicReference<QuoteDtoAndWeight> atomicWeight = new AtomicReference<>(
+				new QuoteDtoAndWeight(BigDecimal.valueOf(-1L), new QuoteDto()));
 		return dailyQuotes.stream()
 				.map(myDailyQuote -> this.calcQuote(myDailyQuote.getLocalDay(), sortedPortfolioChangesMap, myDailyQuote,
 						atomicWeight))
 				.filter(myDto -> 0 < BigDecimal.ZERO.compareTo(myDto.getClose())).collect(Collectors.toList());
+	}
+
+	private Optional<PortfolioToSymbol> findPreviousPts(Map<Symbol, List<PortfolioToSymbol>> symbolToPtsMap,
+			PortfolioToSymbol pts) {
+		List<PortfolioToSymbol> listCopy = List.copyOf(symbolToPtsMap.get(pts.getSymbol()));
+		Collections.reverse(listCopy); //needs check
+		return listCopy.stream().filter(myPts -> Optional.ofNullable(myPts.getChangedAt()).orElse(myPts.getRemovedAt())
+				.isBefore(Optional.ofNullable(pts.getChangedAt()).orElse(pts.getRemovedAt()))).findFirst();
 	}
 
 	private QuoteDto calcQuote(LocalDate day, SortedMap<LocalDate, List<PortfolioToSymbol>> portfolioChangesMap,
@@ -93,8 +115,8 @@ public class PortfolioToIndexService {
 					portfolioChangesMap.firstKey().atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE),
 					dailyQuote.getSymbol()));
 		}
-		QuoteDto result = portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote)).reduce(new QuoteDto(null, null, null, BigDecimal.ZERO, 0L,
-				day.atStartOfDay(), ""), (acc, value) -> {
+		QuoteDto result = portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote))
+				.reduce(new QuoteDto(null, null, null, BigDecimal.ZERO, 0L, day.atStartOfDay(), ""), (acc, value) -> {
 					acc.setSymbol(value.getSymbol());
 					acc.setClose(acc.getClose().add(value.getClose()));
 					return acc;
