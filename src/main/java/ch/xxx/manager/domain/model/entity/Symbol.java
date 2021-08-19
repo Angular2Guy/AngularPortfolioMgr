@@ -132,8 +132,7 @@ public class Symbol {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(currencyKey, dailyQuotes, id, intraDayQuotes, name, portfolioToSymbols, quoteSource,
-				symbol);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -145,10 +144,7 @@ public class Symbol {
 		if (getClass() != obj.getClass())
 			return false;
 		Symbol other = (Symbol) obj;
-		return currencyKey == other.currencyKey && Objects.equals(dailyQuotes, other.dailyQuotes)
-				&& Objects.equals(id, other.id) && Objects.equals(intraDayQuotes, other.intraDayQuotes)
-				&& Objects.equals(name, other.name) && Objects.equals(portfolioToSymbols, other.portfolioToSymbols)
-				&& quoteSource == other.quoteSource && Objects.equals(symbol, other.symbol);
+		return Objects.equals(id, other.id);
 	}
 
 	@Override
