@@ -50,6 +50,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { HttpClientModule }    from '@angular/common/http';
+import { NgxSimpleChartsModule } from 'ngx-simple-charts';
 
 @NgModule({
 	declarations: [],
@@ -94,7 +95,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatTableModule,
 		MatIconModule,
 		MatNativeDateModule,
-		NgxChartsModule
+		NgxChartsModule,
+		NgxSimpleChartsModule
 	],
 	exports: [		
 		CommonModule,
@@ -137,7 +139,8 @@ import { HttpClientModule }    from '@angular/common/http';
 		MatTableModule,
 		MatIconModule,
 		MatNativeDateModule,
-		NgxChartsModule
+		NgxChartsModule,
+		NgxSimpleChartsModule
 		]
 })
 export class BaseModule { }

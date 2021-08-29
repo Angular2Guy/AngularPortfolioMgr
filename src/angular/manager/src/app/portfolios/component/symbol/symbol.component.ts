@@ -83,14 +83,14 @@ export class SymbolComponent implements OnInit {
 		@Inject(LOCALE_ID) private locale: string) { }
 
 	ngOnInit(): void {
-		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: this.document.getElementById('intraDay').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Month, periodText: this.document.getElementById('oneMonth').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: this.document.getElementById('threeMonths').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: this.document.getElementById('sixMonths').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Year, periodText: this.document.getElementById('oneYear').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: this.document.getElementById('threeYears').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: this.document.getElementById('fiveYears').textContent },
-		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: this.document.getElementById('tenYears').textContent }];
+		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: $localize `:@@intraDay:IntraDay` },
+		{ quotePeriodKey: QuotePeriodKey.Month, periodText: $localize `:@@oneMonth:1 Month` },
+		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: $localize `:@@threeMonths:3 Months` },
+		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: $localize `:@@sixMonths:6 Months` },
+		{ quotePeriodKey: QuotePeriodKey.Year, periodText: $localize `:@@oneYear:1 Year` },
+		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: $localize `:@@threeYears:3 Years` },
+		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: $localize `:@@fiveYears:5 Years` },
+		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: $localize `:@@tenYears:10 Years` }];
 		this.selQuotePeriod = this.quotePeriods[0];
 	}	
 
