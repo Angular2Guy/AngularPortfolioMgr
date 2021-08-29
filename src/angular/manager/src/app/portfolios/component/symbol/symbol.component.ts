@@ -18,6 +18,7 @@ import { MyChartData, MyChartValue } from '../../model/my-chart-data';
 import { DOCUMENT, formatDate } from '@angular/common';
 import { ServiceUtils } from '../../model/service-utils';
 import { forkJoin } from 'rxjs';
+import { ChartPoints } from 'ngx-simple-charts';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
@@ -63,6 +64,7 @@ export class SymbolComponent implements OnInit {
 	loadingData = new EventEmitter<boolean>();
 	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
 	readonly ComparisonIndex = ComparisonIndex; 
+	chartPoints: ChartPoints[] = [];
 
 	multi: MyChartData[] = [{ name: 'none', series: [] }];	
 	legend = false;

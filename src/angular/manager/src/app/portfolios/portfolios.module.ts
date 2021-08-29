@@ -27,12 +27,14 @@ import { PortfolioComponent } from './component/portfolio/portfolio.component';
 import { SymbolComponent } from './component/symbol/symbol.component';
 import { PortfolioTableComponent } from './component/portfolio-table/portfolio-table.component';
 import { PortfolioChartsComponent } from './component/portfolio-charts/portfolio-charts.component';
+import { NgxSimpleChartsModule } from 'ngx-simple-charts'
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
   imports: [
     BaseModule,
-    PortfoliosRoutingModule
+    PortfoliosRoutingModule,
+	NgxSimpleChartsModule
   ],
   entryComponents: [NewPortfolioComponent],
   providers: [PortfolioService, SymbolService, QuoteService, SymbolImportService, QuoteImportService,
