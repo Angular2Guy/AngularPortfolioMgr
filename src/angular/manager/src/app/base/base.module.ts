@@ -48,7 +48,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { HttpClientModule }    from '@angular/common/http';
 import { NgxSimpleChartsModule } from 'ngx-simple-charts';
 
@@ -95,7 +94,6 @@ import { NgxSimpleChartsModule } from 'ngx-simple-charts';
 		MatTableModule,
 		MatIconModule,
 		MatNativeDateModule,
-		NgxChartsModule,
 		NgxSimpleChartsModule
 	],
 	exports: [		
@@ -139,7 +137,6 @@ import { NgxSimpleChartsModule } from 'ngx-simple-charts';
 		MatTableModule,
 		MatIconModule,
 		MatNativeDateModule,
-		NgxChartsModule,
 		NgxSimpleChartsModule
 		]
 })

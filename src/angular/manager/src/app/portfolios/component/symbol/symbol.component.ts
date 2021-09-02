@@ -98,7 +98,8 @@ export class SymbolComponent implements OnInit {
 		return !mySymbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
 	}
 	
-	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {		
+	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
+		//this.chartPoints = this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex).length > 0 ? this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex)[0].chartPointList = this.quotesES50 : this.chartPoints.push
 		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
 	}
 
@@ -135,7 +136,7 @@ export class SymbolComponent implements OnInit {
 	}
 
 	private updateChartData(): void {
-		this.chartPoints = [{name: this.symbol.name, chartPointList: this.createChartValues(),xScaleHeight: 20, yScaleWidth: 50} as ChartPoints];
+		this.chartPoints = [{name: this.symbol.symbol, chartPointList: this.createChartValues(),xScaleHeight: 20, yScaleWidth: 50} as ChartPoints];
 		//console.log(this.chartPoints);
 	}
 
@@ -170,10 +171,10 @@ export class SymbolComponent implements OnInit {
 					this.updateSymbolData();
 					if(ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
 						console.log('add comparison index quotes.')
-						forkJoin(
+						forkJoin([
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.EUROSTOXX50, startDate, endDate),
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.MSCI_CHINA, startDate, endDate),
-							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.SP500, startDate, endDate),
+							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.SP500, startDate, endDate)]
 						).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
 							this.quotesES50 = myQuotesES50;
 							this.quotesMsciCH = myQuotesMsciCh;
