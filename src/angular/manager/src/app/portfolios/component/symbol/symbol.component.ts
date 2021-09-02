@@ -14,7 +14,6 @@ import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID, View
 import { Symbol } from '../../model/symbol';
 import { QuoteService, ComparisonIndex } from '../../service/quote.service';
 import { Quote } from '../../model/quote';
-import { MyChartData, MyChartValue } from '../../model/my-chart-data';
 import { DOCUMENT, formatDate } from '@angular/common';
 import { ServiceUtils } from '../../model/service-utils';
 import { forkJoin } from 'rxjs';
