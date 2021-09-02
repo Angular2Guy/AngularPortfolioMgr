@@ -3,7 +3,7 @@
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-       http://www.apache.org/licenses/LICENSE-2.0
+	   http://www.apache.org/licenses/LICENSE-2.0
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ interface SymbolData {
 	templateUrl: './symbol.component.html',
 	styleUrls: ['./symbol.component.scss']
 })
-export class SymbolComponent implements OnInit {	
+export class SymbolComponent implements OnInit {
 	private readonly dayInMs = 24 * 60 * 60 * 1000;
 	private readonly hourInMs = 1 * 60 * 60 * 1000;
 	@Input()
@@ -53,32 +53,35 @@ export class SymbolComponent implements OnInit {
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
 	quotes: Quote[] = [];
-	quotesSP500: Quote[] = [];
-	quotesES50: Quote[] = [];
-	quotesMsciCH: Quote[] = [];
+	compIndexes = new Map<string, Quote[]>([[ComparisonIndex.SP500, []], [ComparisonIndex.EUROSTOXX50, []], [ComparisonIndex.MSCI_CHINA, []]]);
 	quotesLoading = true;
-	symbolData = { avgVolume: null, close: null, end: null, high: null, low: null, 
-		open: null, start: null, avgClose: null, medianClose: null, volatilityClose: null } as SymbolData;
+	symbolData = {
+		avgVolume: null, close: null, end: null, high: null, low: null,
+		open: null, start: null, avgClose: null, medianClose: null, volatilityClose: null
+	} as SymbolData;
 	@Output()
 	loadingData = new EventEmitter<boolean>();
 	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
-	readonly ComparisonIndex = ComparisonIndex; 
-	chartPoints: [ChartPoints] = [{chartPointList: [], name: ''} as ChartPoints];
+	readonly ComparisonIndex = ComparisonIndex;
+	showSP500 = false;
+	showMsciCH = false;
+	showES50 = false;
+	chartPoints: ChartPoints[] = [{ chartPointList: [], name: '', xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
 
-	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document, 
+	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document,
 		@Inject(LOCALE_ID) private locale: string) { }
 
 	ngOnInit(): void {
-		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: $localize `:@@intraDay:IntraDay` },
-		{ quotePeriodKey: QuotePeriodKey.Month, periodText: $localize `:@@oneMonth:1 Month` },
-		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: $localize `:@@threeMonths:3 Months` },
-		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: $localize `:@@sixMonths:6 Months` },
-		{ quotePeriodKey: QuotePeriodKey.Year, periodText: $localize `:@@oneYear:1 Year` },
-		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: $localize `:@@threeYears:3 Years` },
-		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: $localize `:@@fiveYears:5 Years` },
-		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: $localize `:@@tenYears:10 Years` }];
+		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: $localize`:@@intraDay:IntraDay` },
+		{ quotePeriodKey: QuotePeriodKey.Month, periodText: $localize`:@@oneMonth:1 Month` },
+		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: $localize`:@@threeMonths:3 Months` },
+		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: $localize`:@@sixMonths:6 Months` },
+		{ quotePeriodKey: QuotePeriodKey.Year, periodText: $localize`:@@oneYear:1 Year` },
+		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: $localize`:@@threeYears:3 Years` },
+		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: $localize`:@@fiveYears:5 Years` },
+		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years` }];
 		this.selQuotePeriod = this.quotePeriods[0];
-	}	
+	}
 
 	replacePortfolioSymbol(symbolStr: string): string {
 		return ServiceUtils.isPortfolioSymbol(symbolStr) ? 'SymbolId' : symbolStr;
@@ -89,26 +92,39 @@ export class SymbolComponent implements OnInit {
 		console.log(this.selQuotePeriod);
 	}
 
-	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {		
+	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
 		//console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
 		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
 	}
-	
+
 	isPortfolioSymbol(mySymbol: Symbol): boolean {
 		return !mySymbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
 	}
-	
+
 	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
-		//this.chartPoints = this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex).length > 0 ? this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex)[0].chartPointList = this.quotesES50 : this.chartPoints.push
+		if (value) {
+			if(this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex).length > 0) {
+				this.chartPoints.filter(myChartPoints => myChartPoints.name === comparisonIndex)[0].chartPointList = this.createChartPoints(comparisonIndex);
+			} else {
+				this.chartPoints.push({name: comparisonIndex, xScaleHeight: 20, yScaleWidth: 50, 
+				chartPointList: this.createChartPoints(comparisonIndex)} as ChartPoints);					
+			}			
+		} else {
+			this.chartPoints = this.chartPoints.filter(myChartPoints => myChartPoints.name !== comparisonIndex);
+		}
 		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
 	}
 
-	private updateSymbolData() {
+	private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {
+		return this.compIndexes.get(comparisonIndex).map(myQuote => ({x: new Date(Date.parse(myQuote.timestamp)), y: myQuote.close} as ChartPoint));
+	}
+
+	private updateSymbolData(): void {
 		const localQuotes = this.quotes && this.quotes.length > 0 ? this.quotes.
-			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length -1].timestamp).getTime() -this.dayInMs + this.hourInMs) 
-			|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day) : null;
+			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length - 1].timestamp).getTime() - this.dayInMs + this.hourInMs)
+				|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day) : null;
 		this.symbolData.start = localQuotes && localQuotes.length > 0 ? new Date(localQuotes[0].timestamp) : null;
-		this.symbolData.end = localQuotes && localQuotes.length > 0 ? new Date(localQuotes[localQuotes.length -1].timestamp) : null;			
+		this.symbolData.end = localQuotes && localQuotes.length > 0 ? new Date(localQuotes[localQuotes.length - 1].timestamp) : null;
 		this.symbolData.open = localQuotes && localQuotes.length > 0 ? localQuotes[0].open : null;
 		this.symbolData.close = localQuotes && localQuotes.length > 0 ? localQuotes[localQuotes.length - 1].close : null;
 		this.symbolData.high = localQuotes && localQuotes.length > 0 ? Math.max(...localQuotes.map(quote => quote.high)) : null;
@@ -117,33 +133,36 @@ export class SymbolComponent implements OnInit {
 			(localQuotes.map(quote => quote.volume).reduce((result, volume) => result + volume, 0) / localQuotes.length) : null;
 		this.symbolData.avgClose = localQuotes && localQuotes.length > 0 ?
 			(localQuotes.map(quote => quote.close).reduce((result, close) => result + close, 0) / localQuotes.length) : null;
-		this.symbolData.medianClose = localQuotes && localQuotes.length > 0 ? (localQuotes.map(quote => quote.close).sort((a,b) => a-b)[Math.round(localQuotes.length / 2)]) : null;
-		this.symbolData.volatilityClose = this.calcVolatility(localQuotes); 
+		this.symbolData.medianClose = localQuotes && localQuotes.length > 0 ? (localQuotes.map(quote => quote.close).sort((a, b) => a - b)[Math.round(localQuotes.length / 2)]) : null;
+		this.symbolData.volatilityClose = this.calcVolatility(localQuotes);
+		this.showES50 = false;
+		this.showMsciCH = false;
+		this.showSP500 = false;
 		this.updateChartData();
 	}
 
 	private calcVolatility(localQuotes: Quote[]): number {
-		if(!localQuotes || localQuotes.length < 1) {
+		if (!localQuotes || localQuotes.length < 1) {
 			return 0;
 		}
 		const variances = [];
-		for(let i = 1; i < localQuotes.length;i++) {
-			const myVariance = Math.log(localQuotes[i].close) - Math.log(localQuotes[i-1].close);
+		for (let i = 1; i < localQuotes.length; i++) {
+			const myVariance = Math.log(localQuotes[i].close) - Math.log(localQuotes[i - 1].close);
 			variances.push(myVariance);
 		}
-		const realizedVariance = variances.map(localVar => localVar*localVar).reduce((acc, value) => acc + value, 0);
+		const realizedVariance = variances.map(localVar => localVar * localVar).reduce((acc, value) => acc + value, 0);
 		return Math.sqrt(realizedVariance);
 	}
 
 	private updateChartData(): void {
-		this.chartPoints = [{name: this.symbol.symbol, chartPointList: this.createChartValues(),xScaleHeight: 20, yScaleWidth: 50} as ChartPoints];
+		this.chartPoints = [{ name: this.symbol.symbol, chartPointList: this.createChartValues(), xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
 		//console.log(this.chartPoints);
 	}
 
 	private createChartValues(): ChartPoint[] {
 		const myChartValues = this.quotes.
-			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length -1].timestamp).getTime() -this.dayInMs + this.hourInMs) 
-			|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day)
+			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length - 1].timestamp).getTime() - this.dayInMs + this.hourInMs)
+				|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day)
 			.map(quote => ({ x: new Date(Date.parse(quote.timestamp)), y: quote.close } as ChartPoint));
 		return myChartValues;
 	}
@@ -154,7 +173,7 @@ export class SymbolComponent implements OnInit {
 			this.loadingData.emit(true);
 			this.quotesLoading = true;
 			this.quoteService.getIntraDayQuotes(this.symbol.symbol)
-				.subscribe(myQuotes => {										
+				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.updateSymbolData();
 					this.loadingData.emit(false);
@@ -169,16 +188,16 @@ export class SymbolComponent implements OnInit {
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.updateSymbolData();
-					if(ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
+					if (ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
 						console.log('add comparison index quotes.')
 						forkJoin([
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.EUROSTOXX50, startDate, endDate),
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.MSCI_CHINA, startDate, endDate),
 							this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(this.portfolioId, ComparisonIndex.SP500, startDate, endDate)]
 						).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
-							this.quotesES50 = myQuotesES50;
-							this.quotesMsciCH = myQuotesMsciCh;
-							this.quotesSP500 = myQuotesSP500;
+							this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
+							this.compIndexes.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
+							this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
 							this.loadingData.emit(false);
 							this.quotesLoading = false;
 						});
@@ -186,7 +205,7 @@ export class SymbolComponent implements OnInit {
 						this.loadingData.emit(false);
 						this.quotesLoading = false;
 					}
-				});			
+				});
 		}
 	}
 
