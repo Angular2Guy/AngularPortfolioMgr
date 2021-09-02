@@ -18,7 +18,7 @@ import { MyChartData, MyChartValue } from '../../model/my-chart-data';
 import { DOCUMENT, formatDate } from '@angular/common';
 import { ServiceUtils } from '../../model/service-utils';
 import { forkJoin } from 'rxjs';
-import { ChartPoints } from 'ngx-simple-charts';
+import { ChartPoint, ChartPoints } from 'ngx-simple-charts';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 
@@ -64,20 +64,7 @@ export class SymbolComponent implements OnInit {
 	loadingData = new EventEmitter<boolean>();
 	readonly quotePeriodKeyDay = QuotePeriodKey.Day;
 	readonly ComparisonIndex = ComparisonIndex; 
-	chartPoints: ChartPoints[] = [];
-
-	multi: MyChartData[] = [{ name: 'none', series: [] }];	
-	legend = false;
-	showLabels = true;
-	animations = true;
-	xAxis = true;
-	yAxis = true;
-	showYAxisLabel = true;
-	showXAxisLabel = true;
-	xAxisLabel: string = 'Time';
-	yAxisLabel: string = 'Value';
-	timeline = true;
-	autoScale = true;
+	chartPoints: [ChartPoints] = [{chartPointList: [], name: ''} as ChartPoints];
 
 	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document, 
 		@Inject(LOCALE_ID) private locale: string) { }
@@ -149,17 +136,15 @@ export class SymbolComponent implements OnInit {
 	}
 
 	private updateChartData(): void {
-		const myChartData = { name: this.symbol.symbol, series: this.createChartValues() } as MyChartData;
-		this.multi = [myChartData];
-		//console.log(this.multi);
+		this.chartPoints = [{name: this.symbol.name, chartPointList: this.createChartValues(),xScaleHeight: 20, yScaleWidth: 50} as ChartPoints];
+		//console.log(this.chartPoints);
 	}
 
-	private createChartValues(): MyChartValue[] {
-		const dateFormatStr = this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day ? 'mediumTime' : 'shortDate';		
+	private createChartValues(): ChartPoint[] {
 		const myChartValues = this.quotes.
 			filter(myQuote => (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day && new Date(myQuote.timestamp).getTime() > new Date(this.quotes[this.quotes.length -1].timestamp).getTime() -this.dayInMs + this.hourInMs) 
 			|| this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day)
-			.map(quote => ({ name: formatDate(quote.timestamp, dateFormatStr, this.locale), value: quote.close } as MyChartValue));
+			.map(quote => ({ x: new Date(Date.parse(quote.timestamp)), y: quote.close } as ChartPoint));
 		return myChartValues;
 	}
 

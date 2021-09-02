@@ -39,18 +39,6 @@
 	<div i18>Please select an instrument</div>
 </div>
 <div *ngIf="symbol" #chartContainer class="chart-container">
-	<!-- sc-line-chart [chartPoints]="chartPoints"></sc-line-chart-->			
-	<ngx-charts-line-chart	
-	  [legend]="legend"
-	  [showXAxisLabel]="showXAxisLabel"
-	  [showYAxisLabel]="showYAxisLabel"
-	  [xAxis]="xAxis"
-	  [yAxis]="yAxis"
-	  [xAxisLabel]="xAxisLabel"
-	  [yAxisLabel]="yAxisLabel"
-	  [timeline]="timeline"
-	  [autoScale]="autoScale"
-	  [results]="multi">
-	</ngx-charts-line-chart>
+	<sc-line-chart [chartPoints]="chartPoints"></sc-line-chart>				
 </div>
 </div>
