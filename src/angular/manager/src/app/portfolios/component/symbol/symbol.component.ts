@@ -113,6 +113,7 @@ export class SymbolComponent implements OnInit {
 			this.chartPoints = this.chartPoints.filter(myChartPoints => myChartPoints.name !== comparisonIndex);
 		}
 		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
+		console.log(this.chartPoints);
 	}
 
 	private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {

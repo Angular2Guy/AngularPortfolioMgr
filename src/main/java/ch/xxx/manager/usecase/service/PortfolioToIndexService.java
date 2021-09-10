@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.collect.ImmutableSortedMap;
 
+import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
@@ -50,7 +52,6 @@ public class PortfolioToIndexService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final SymbolRepository symbolRepository;
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyService currencyService;
 
@@ -58,7 +59,6 @@ public class PortfolioToIndexService {
 			SymbolRepository symbolRepository, DailyQuoteRepository dailyQuoteRepository,
 			CurrencyService currencyService) {
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
-		this.symbolRepository = symbolRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;
 	}
@@ -71,6 +71,8 @@ public class PortfolioToIndexService {
 		record PtsChangesByDay(LocalDate day, PortfolioToSymbol ptsChange, Optional<PortfolioToSymbol> ptsChangeOld,
 				Optional<DailyQuote> dailyQuoteOld) {
 		}
+		final AtomicReference<BigDecimal> currentWeight = calcWeight(portfolioChanges, dailyQuotes);
+
 		List<PortfolioToSymbol> myPortfolioChanges = portfolioChanges.stream()
 				.filter(pts -> Optional.ofNullable(pts.getChangedAt()).isPresent()
 						|| Optional.ofNullable(pts.getRemovedAt()).isPresent())
@@ -96,7 +98,6 @@ public class PortfolioToIndexService {
 						pts -> Stream.of(new PtsChangePair(pts.ptsChange, pts.ptsChangeOld)), Collectors.toList())));
 		SortedMap<LocalDate, List<PtsChangePair>> sortedPortfolioChangesMap = ImmutableSortedMap
 				.copyOf(portfolioChangesMap, (date1, date2) -> date1.compareTo(date2));
-		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(BigDecimal.ZERO);
 		record DailyQuoteEntityDto(DailyQuote entity, QuoteDto dto) {
 		}
 		return dailyQuotes.stream()
@@ -105,6 +106,28 @@ public class PortfolioToIndexService {
 								currentWeight)))
 				.filter(myRecord -> 0 <= BigDecimal.ZERO.compareTo(myRecord.dto.getClose()))
 				.map(DailyQuoteEntityDto::dto).collect(Collectors.toList());
+	}
+
+	private AtomicReference<BigDecimal> calcWeight(List<PortfolioToSymbol> portfolioChanges,
+			List<DailyQuote> dailyQuotes) {
+		PortfolioToSymbol portfolioPts = portfolioChanges.stream()
+				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
+		List<DailyQuote> myDailyQuotesPortfolio = dailyQuotes.stream()
+				.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList());
+		DailyQuote firstDailyQuotePortfolio = this.dailyQuoteRepository
+				.findBySymbolAndDayBetween(portfolioPts.getSymbol().getSymbol(),
+						myDailyQuotesPortfolio.get(0).getLocalDay(),
+						myDailyQuotesPortfolio.get(myDailyQuotesPortfolio.size() - 1).getLocalDay())
+				.stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("PortfolioQuote not found"));
+		DailyQuote indexQuote = dailyQuotes.stream().filter(
+				myDailyQuotes -> myDailyQuotesPortfolio.get(0).getLocalDay().isEqual(myDailyQuotes.getLocalDay()))
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Indexquote not found."));
+		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioPts, indexQuote)
+				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ZERO));
+		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(
+				indexQuote.getClose().multiply(currencyChange.getClose()).divide(firstDailyQuotePortfolio.getClose()));
+		return currentWeight;
 	}
 
 	private Optional<PortfolioToSymbol> findPreviousPts(Map<Symbol, List<PortfolioToSymbol>> symbolToPtsMap,
