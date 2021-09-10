@@ -13,6 +13,7 @@
 package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -104,7 +105,7 @@ public class PortfolioToIndexService {
 				.map(myDailyQuote -> new DailyQuoteEntityDto(myDailyQuote,
 						this.calcQuote(myDailyQuote.getLocalDay(), sortedPortfolioChangesMap, myDailyQuote,
 								currentWeight)))
-				.filter(myRecord -> 0 <= BigDecimal.ZERO.compareTo(myRecord.dto.getClose()))
+				.filter(myRecord -> 0 >= BigDecimal.ZERO.compareTo(myRecord.dto.getClose()))
 				.map(DailyQuoteEntityDto::dto).collect(Collectors.toList());
 	}
 
@@ -124,9 +125,9 @@ public class PortfolioToIndexService {
 				myDailyQuotes -> myDailyQuotesPortfolio.get(0).getLocalDay().isEqual(myDailyQuotes.getLocalDay()))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Indexquote not found."));
 		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioPts, indexQuote)
-				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ZERO));
+				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
 		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(
-				indexQuote.getClose().multiply(currencyChange.getClose()).divide(firstDailyQuotePortfolio.getClose()));
+				indexQuote.getClose().multiply(currencyChange.getClose()).divide(firstDailyQuotePortfolio.getClose(), 10, RoundingMode.HALF_UP));
 		return currentWeight;
 	}
 
@@ -160,9 +161,9 @@ public class PortfolioToIndexService {
 
 	private QuoteDto createQuote(LocalDate day, PtsChangePair portfolioToSymbol, DailyQuote dailyQuote) {
 		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange, dailyQuote)
-				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ZERO));
+				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
 		Currency currencyChangeOld = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange, dailyQuote)
-				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ZERO));
+				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
 		BigDecimal changeOld = currencyChangeOld.getClose()
 				.multiply(
 						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld.map(PortfolioToSymbol::getWeight).orElse(0L)))
