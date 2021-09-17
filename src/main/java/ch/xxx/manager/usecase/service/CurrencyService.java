@@ -52,12 +52,12 @@ public class CurrencyService {
 	private final CurrencyRepository currencyRepository;
 	private final AlphavatageClient alphavatageClient;
 	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
-	
+
 	public CurrencyService(CurrencyRepository currencyRepository, AlphavatageClient alphavatageClient) {
 		this.currencyRepository = currencyRepository;
 		this.alphavatageClient = alphavatageClient;
 	}
-	
+
 	@PostConstruct
 	public void initCurrencyMap() {
 		LOG.info("CurrencyMap updated.");
@@ -76,15 +76,16 @@ public class CurrencyService {
 						.size()))
 				.blockOptional(Duration.ofSeconds(10)).orElse(0).longValue();
 	}
-	
+
 	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
 			Map<LocalDate, Collection<Currency>> myCurrencyMap) {
 		LOG.info("" + wrapperDto.getDailyQuotes().size());
 		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-				.filter(entity -> myCurrencyMap.get(entity.getLocalDay()) == null || myCurrencyMap.get(entity.getLocalDay())
-						.stream().anyMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
+				.filter(entity -> myCurrencyMap.get(entity.getLocalDay()) == null
+						|| myCurrencyMap.get(entity.getLocalDay()).stream()
+								.anyMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
 				.collect(Collectors.toList());
 	}
 
@@ -93,24 +94,60 @@ public class CurrencyService {
 				to_curr, new BigDecimal(entry.getValue().getOpen()), new BigDecimal(entry.getValue().getHigh()),
 				new BigDecimal(entry.getValue().getLow()), new BigDecimal(entry.getValue().getClose()));
 	}
-	
+
 	public Optional<Currency> getCurrencyQuote(PortfolioToSymbol portfolioToSymbol, DailyQuote myDailyQuote) {
 		return this.getCurrencyQuote(myDailyQuote.getLocalDay(), portfolioToSymbol);
 	}
-	
+
 	public Optional<Currency> getCurrencyQuote(LocalDate day, PortfolioToSymbol portfolioToSymbol) {
 //		LOG.info(myDailyQuote.getLocalDay().format(DateTimeFormatter.ISO_LOCAL_DATE));		
+//		LOG.info(Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).toString());
+//		LOG.info(Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+//				.peek(myCurrency -> LOG.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: "
+//						+ myCurrency.getToCurrKey() + " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey()
+//						+ " symCur: " + portfolioToSymbol.getSymbol().getCurrencyKey()))
+//				.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
+//						.equals(myCurrency.getFromCurrKey())
+//						&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
+//				.findFirst()
+//				.orElse(Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+//						.peek(myCurrency -> LOG
+//								.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: " + myCurrency.getToCurrKey()
+//										+ " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey() + " symCur: "
+//										+ portfolioToSymbol.getSymbol().getCurrencyKey()))
+//						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
+//								.equals(myCurrency.getToCurrKey())
+//								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getFromCurrKey()))
+//						.map(myCurr -> new Currency(myCurr.getLocalDay(), myCurr.getToCurrKey(),
+//								myCurr.getFromCurrKey(), BigDecimal.ONE.divide(myCurr.getOpen()),
+//								BigDecimal.ONE.divide(myCurr.getHigh()), BigDecimal.ONE.divide(myCurr.getLow()),
+//								BigDecimal.ONE.divide(myCurr.getClose())))
+//						.findFirst().orElse(new Currency()))
+//				.toString());
 		return LongStream.range(0, 7).boxed()
-				.map(minusDays -> Optional
-						.ofNullable(this.currencyMap.get(day.minusDays(minusDays)))
-						.orElse(List.of()).stream()
+				.map(minusDays -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+						.peek(myCurrency -> LOG.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: "
+								+ myCurrency.getToCurrKey() + " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey()
+								+ " symCur: " + portfolioToSymbol.getSymbol().getCurrencyKey()))
 						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
 								.equals(myCurrency.getFromCurrKey())
 								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
-						.findFirst())
-				.filter(Optional::isPresent).map(Optional::get).findFirst();
+						.findFirst()
+						.or(() -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+								.peek(myCurrency -> LOG
+										.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: " + myCurrency.getToCurrKey()
+												+ " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey() + " symCur: "
+												+ portfolioToSymbol.getSymbol().getCurrencyKey()))
+								.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
+										.equals(myCurrency.getToCurrKey())
+										&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getFromCurrKey()))
+								.map(myCurr -> new Currency(myCurr.getLocalDay(), myCurr.getToCurrKey(),
+										myCurr.getFromCurrKey(), BigDecimal.ONE.divide(myCurr.getOpen()),
+										BigDecimal.ONE.divide(myCurr.getHigh()), BigDecimal.ONE.divide(myCurr.getLow()),
+										BigDecimal.ONE.divide(myCurr.getClose())))
+								.findFirst())).filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
-	
+
 	public ImmutableSortedMap<LocalDate, Collection<Currency>> getCurrencyMap() {
 		return currencyMap;
 	}
