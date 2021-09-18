@@ -126,8 +126,8 @@ public class PortfolioToIndexService {
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Indexquote not found."));
 		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioPts, indexQuote)
 				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
-		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(
-				indexQuote.getClose().multiply(currencyChange.getClose()).divide(firstDailyQuotePortfolio.getClose(), 10, RoundingMode.HALF_UP));
+		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(firstDailyQuotePortfolio.getClose()
+				.divide(indexQuote.getClose().multiply(currencyChange.getClose()), 10, RoundingMode.HALF_UP));
 		return currentWeight;
 	}
 
