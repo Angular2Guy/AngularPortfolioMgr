@@ -42,6 +42,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button'; 
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
+
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
@@ -62,6 +64,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 	MatTableModule,
 	MatButtonModule,
 	MatDialogModule,
+	MatLuxonDateModule,
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
