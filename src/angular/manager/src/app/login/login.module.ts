@@ -20,6 +20,9 @@ import { LoginService } from './service/login.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog'; 
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [LoginComponent, MainComponent],
@@ -28,6 +31,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 	MatToolbarModule,
 	MatFormFieldModule,
 	MatTabsModule,
+	MatDialogModule,
+	MatButtonModule,
+	MatInputModule,
     LoginRoutingModule
   ],
   entryComponents: [LoginComponent],

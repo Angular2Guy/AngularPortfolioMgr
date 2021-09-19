@@ -40,6 +40,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button'; 
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
@@ -58,6 +59,7 @@ import { MatTableModule } from '@angular/material/table';
 	MatSelectModule,
 	MatAutocompleteModule,
 	MatTableModule,
+	MatButtonModule,
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
