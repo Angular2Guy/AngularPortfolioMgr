@@ -27,11 +27,37 @@ import { PortfolioComponent } from './component/portfolio/portfolio.component';
 import { SymbolComponent } from './component/symbol/symbol.component';
 import { PortfolioTableComponent } from './component/portfolio-table/portfolio-table.component';
 import { PortfolioChartsComponent } from './component/portfolio-charts/portfolio-charts.component';
+import { NgxSimpleChartsModule } from 'ngx-simple-charts';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
   imports: [
     BaseModule,
+	NgxSimpleChartsModule,
+	MatCheckboxModule,
+	MatRadioModule,
+	MatListModule,
+	MatProgressSpinnerModule,
+	MatSidenavModule,
+	MatToolbarModule,
+	MatIconModule,
+	MatDatepickerModule,
+	MatFormFieldModule,
+	MatSelectModule,
+	MatAutocompleteModule,
+	MatTableModule,
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],

@@ -17,11 +17,17 @@ import { LoginComponent } from './component/login/login.component';
 import { BaseModule } from '../base/base.module';
 import { MainComponent } from './component/main/main.component';
 import { LoginService } from './service/login.service';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [LoginComponent, MainComponent],
   imports: [
     BaseModule,
+	MatToolbarModule,
+	MatFormFieldModule,
+	MatTabsModule,
     LoginRoutingModule
   ],
   entryComponents: [LoginComponent],
