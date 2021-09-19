@@ -41,6 +41,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button'; 
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
@@ -60,6 +61,7 @@ import { MatButtonModule } from '@angular/material/button';
 	MatAutocompleteModule,
 	MatTableModule,
 	MatButtonModule,
+	MatDialogModule,
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
