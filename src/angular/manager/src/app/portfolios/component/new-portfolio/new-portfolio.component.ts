@@ -17,6 +17,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Portfolio } from '../../model/portfolio';
 import { PortfolioData } from '../../model/portfolio-data';
 import { TokenService } from '../../../service/token.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-new-portfolio',
@@ -40,9 +41,9 @@ export class NewPortfolioComponent {
   }
 
   onAddClick(): void {
-	const createdAt = this.portfolioForm.get('createdAt').value as Date;
-	createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
-	const portfolio: Portfolio = {id: null,createdAt: createdAt.toISOString(),
+	const createdAt = this.portfolioForm.get('createdAt').value as DateTime;
+	//createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
+	const portfolio: Portfolio = {id: null,createdAt: new Date(createdAt.toMillis()).toISOString(),
 		 month1: null, month6: null, name: this.portfolioForm.get('portfolioName').value, 
 		symbols: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
 	this.dialogRef.close(portfolio);		

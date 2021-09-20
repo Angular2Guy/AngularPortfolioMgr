@@ -43,6 +43,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button'; 
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 
 @NgModule({
@@ -65,6 +67,8 @@ import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 	MatButtonModule,
 	MatDialogModule,
 	MatLuxonDateModule,
+	MatInputModule,
+	//MatNativeDateModule,
     PortfoliosRoutingModule
   ],
   entryComponents: [NewPortfolioComponent],
