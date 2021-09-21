@@ -21,6 +21,7 @@ import { SymbolService } from '../../service/symbol.service';
 import { Observable, of, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap, map } from 'rxjs/operators';
 import { QuoteImportService } from '../../service/quote-import.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-add-symbol',
@@ -46,7 +47,7 @@ export class AddSymbolComponent implements OnInit {
 				symbolSymbol: '',	
 				symbolName: '',
 				symbolWeight: 0,
-				createdAt: [new Date(), Validators.required]
+				createdAt: [DateTime.now(), Validators.required]
 			}, {
 				validators: [this.validate]
 			} as AbstractControlOptions);
@@ -111,9 +112,9 @@ export class AddSymbolComponent implements OnInit {
 	if(this.selSymbol) {
 		this.importingQuotes = true;
 		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
-		const changedAt = this.symbolForm.controls['createdAt'].value as Date;
-		changedAt.setMinutes(changedAt.getMinutes() - changedAt.getTimezoneOffset());
-		this.selSymbol.changedAt = changedAt.toISOString();
+		const changedAt = this.symbolForm.controls['createdAt'].value as DateTime;
+		//changedAt.setMinutes(changedAt.getMinutes() - changedAt.getTimezoneOffset());
+		this.selSymbol.changedAt = new Date(changedAt.toMillis()).toISOString();
 		forkJoin(
 			this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
 			this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol))

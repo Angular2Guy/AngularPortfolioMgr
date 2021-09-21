@@ -34,7 +34,7 @@ export class NewPortfolioComponent {
 		private fb: FormBuilder) { 
 		this.portfolioForm = this.fb.group({
 			portfolioName: ['', Validators.required],
-			createdAt: [new Date(this.data.portfolio.createdAt), Validators.required]
+			createdAt: [DateTime.fromISO(this.data.portfolio.createdAt), Validators.required]
 		}, {
 			validator: this.validate.bind(this)
 		});
