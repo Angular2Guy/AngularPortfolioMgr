@@ -135,11 +135,7 @@ export class SymbolComponent implements OnInit {
 		this.symbolData.avgClose = localQuotes && localQuotes.length > 0 ?
 			(localQuotes.map(quote => quote.close).reduce((result, close) => result + close, 0) / localQuotes.length) : null;
 		this.symbolData.medianClose = localQuotes && localQuotes.length > 0 ? (localQuotes.map(quote => quote.close).sort((a, b) => a - b)[Math.round(localQuotes.length / 2)]) : null;
-		this.symbolData.volatilityClose = this.calcVolatility(localQuotes);
-		this.showES50 = false;
-		this.showMsciCH = false;
-		this.showSP500 = false;
-		this.updateChartData();
+		this.symbolData.volatilityClose = this.calcVolatility(localQuotes);		
 	}
 
 	private calcVolatility(localQuotes: Quote[]): number {
@@ -177,6 +173,7 @@ export class SymbolComponent implements OnInit {
 				.subscribe(myQuotes => {
 					this.quotes = myQuotes;
 					this.updateSymbolData();
+					this.updateChartData();
 					this.loadingData.emit(false);
 					this.quotesLoading = false;
 				});
@@ -199,10 +196,15 @@ export class SymbolComponent implements OnInit {
 							this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
 							this.compIndexes.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
 							this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
+							this.updateChartData();
 							this.loadingData.emit(false);
 							this.quotesLoading = false;
 						});
 					} else {
+						this.showES50 = false;
+						this.showMsciCH = false;
+						this.showSP500 = false;
+						this.updateChartData();
 						this.loadingData.emit(false);
 						this.quotesLoading = false;
 					}
