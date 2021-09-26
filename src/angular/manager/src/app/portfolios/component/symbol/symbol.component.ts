@@ -152,6 +152,7 @@ export class SymbolComponent implements OnInit {
 	}
 
 	private updateChartData(): void {
+		
 		this.chartPoints = [{ name: this.symbol.symbol, chartPointList: this.createChartValues(), xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
 		//console.log(this.chartPoints);
 	}

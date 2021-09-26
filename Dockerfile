@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim
+FROM openjdk:17-alpine
 VOLUME /tmp
 RUN sh -c 'touch /app.jar'
 ARG JAR_FILE

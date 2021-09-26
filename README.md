@@ -1,8 +1,6 @@
 # AngularPortfolioMgr
 
 
-![Build Status](https://travis-ci.org/Angular2Guy/AngularPortfolioMgr.svg?branch=master)
-
 Author: Sven Loesekann
 
 Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, Liquibase, Gradle, Docker, H2, Postgresql
