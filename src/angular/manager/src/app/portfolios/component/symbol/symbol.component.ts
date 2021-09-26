@@ -89,7 +89,7 @@ export class SymbolComponent implements OnInit {
 
 	quotePeriodChanged() {
 		this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
-		console.log(this.selQuotePeriod);
+		//console.log(this.selQuotePeriod);
 	}
 
 	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
