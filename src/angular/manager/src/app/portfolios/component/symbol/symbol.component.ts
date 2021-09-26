@@ -114,8 +114,8 @@ export class SymbolComponent implements OnInit {
 		} else {
 			this.chartPoints = this.chartPoints.filter(myChartPoints => myChartPoints.name !== comparisonIndex);
 		}
-		console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
-		console.log(this.chartPoints);
+		//console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
+		//console.log(this.chartPoints);
 	}
 
 	private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {
@@ -154,11 +154,11 @@ export class SymbolComponent implements OnInit {
 	}
 
 	private updateChartData(): void {
-		const myChartPoints = [{ name: this.symbol.symbol, chartPointList: this.createChartValues(), xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
+		this.chartPoints = [{ name: this.symbol.symbol, chartPointList: this.createChartValues(), xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
 		this.compIndexUpdate(this.showMsciCH, ComparisonIndex.MSCI_CHINA);
 		this.compIndexUpdate(this.showES50, ComparisonIndex.EUROSTOXX50);
 		this.compIndexUpdate(this.showSP500, ComparisonIndex.SP500);
-		this.chartPoints = myChartPoints;
+		this.chartPoints = [...this.chartPoints];
 		//console.log(this.chartPoints);
 	}
 
