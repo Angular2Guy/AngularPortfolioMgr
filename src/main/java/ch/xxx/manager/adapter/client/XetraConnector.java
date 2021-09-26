@@ -68,12 +68,11 @@ public class XetraConnector implements XetraClient {
 			hrefs.add(matcher.group(1));
 		}
 		// create csv url for the xetra stocks
-		Optional<String> csvUrlOpt = hrefs.stream().filter(href -> href.contains("allTradableInstruments.csv"))
-				.map(href -> this.createCsvUrl(href)).findFirst();
-		if (csvUrlOpt.isEmpty()) {
-			throw new RuntimeException("allTradableInstruments.csv not found.");
-		}
-		return csvUrlOpt.get();
+		String csvUrl = hrefs.stream().filter(href -> href.contains("allTradableInstruments.csv"))
+				.map(href -> this.createCsvUrl(href)).findFirst()
+				.orElseThrow(() -> new RuntimeException("allTradableInstruments.csv not found."));
+		LOGGER.info(csvUrl);
+		return csvUrl;
 	}
 
 	private String createCsvUrl(String href) {

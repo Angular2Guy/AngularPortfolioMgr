@@ -39,7 +39,7 @@ import reactor.core.publisher.Mono;
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private CsvMapper csvMapper = new CsvMapper();
-	
+
 	@PostConstruct
 	public void init() {
 		this.csvMapper.registerModule(new JavaTimeModule());
@@ -49,13 +49,14 @@ public class YahooConnector implements YahooClient {
 		try {
 			LocalDateTime toTime = LocalDateTime.now();
 			LocalDateTime fromTime = toTime.minusYears(10);
+			final String myUrl = String.format(
+					"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
+					symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
+					toTime.toEpochSecond(OffsetDateTime.now().getOffset()));
+			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get()
-					.uri(new URI(String.format(
-							"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
-							symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
-							toTime.toEpochSecond(OffsetDateTime.now().getOffset()))))
-					.retrieve().toEntity(String.class).flatMap(response -> this.convert(response.getBody()));
+					.get().uri(new URI(myUrl)).retrieve().toEntity(String.class)
+					.flatMap(response -> this.convert(response.getBody()));
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.", e);
 		}

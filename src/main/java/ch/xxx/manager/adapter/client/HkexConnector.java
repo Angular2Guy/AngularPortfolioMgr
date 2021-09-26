@@ -28,14 +28,15 @@ import reactor.core.publisher.Mono;
 @Component
 public class HkexConnector implements HkexClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HkexConnector.class);
-	
+
 	public Mono<List<HkSymbolImportDto>> importSymbols() {
 		try {
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build().get()
-				.uri(new URI("https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json"))
-				.retrieve().bodyToFlux(HkSymbolImportDto.class).collectList();
+			final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
+			LOGGER.info(myUrl);
+			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
+					.get().uri(new URI(myUrl)).retrieve().bodyToFlux(HkSymbolImportDto.class).collectList();
 		} catch (URISyntaxException e) {
-			LOGGER.error("Import hk symbols failed.",e);
+			LOGGER.error("Import hk symbols failed.", e);
 		}
 		return Mono.empty();
 	}

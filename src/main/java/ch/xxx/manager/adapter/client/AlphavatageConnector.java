@@ -47,12 +47,12 @@ public class AlphavatageConnector implements AlphavatageClient {
 
 	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
 		try {
+			final String myUrl = String.format(
+					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
+					symbol, this.apiKey);
+			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get()
-					.uri(new URI(String.format(
-							"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
-							symbol, this.apiKey)))
-					.retrieve().bodyToMono(IntraDayWrapperImportDto.class);
+					.get().uri(new URI(myUrl)).retrieve().bodyToMono(IntraDayWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.", e);
 		}
@@ -62,12 +62,12 @@ public class AlphavatageConnector implements AlphavatageClient {
 	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
+			final String myUrl = String.format(
+					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s",
+					symbol, fullSeriesStr, this.apiKey);
+			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get()
-					.uri(new URI(String.format(
-							"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s",
-							symbol, fullSeriesStr, this.apiKey)))
-					.retrieve().bodyToMono(DailyWrapperImportDto.class);
+					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.", e);
 		}
@@ -78,12 +78,12 @@ public class AlphavatageConnector implements AlphavatageClient {
 		try {
 			final String from_currency = CurrencyKey.EUR.toString();
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
+			final String myUrl = String.format(
+					"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
+					from_currency, to_currency, fullSeriesStr, this.apiKey);
+			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get()
-					.uri(new URI(String.format(
-							"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
-							from_currency, to_currency, fullSeriesStr, this.apiKey)))
-					.retrieve().bodyToMono(DailyFxWrapperImportDto.class);
+					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyFxWrapperImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.error("getTimeseriesHistory failed.", e);
 		}
