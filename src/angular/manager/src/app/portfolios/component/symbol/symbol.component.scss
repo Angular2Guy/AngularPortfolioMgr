@@ -34,3 +34,21 @@
 	align-items: center;
 	justify-content: center;
 }
+
+::ng-deep .line-sxrt {
+    fill: none !important;
+    stroke: #7CFC00 !important;
+    stroke-width: 2 !important;
+}
+
+::ng-deep .line-icga {
+    fill: none !important;
+    stroke: #eff542 !important;
+    stroke-width: 2 !important;
+}
+
+::ng-deep .line-ivv {
+    fill: none !important;
+    stroke: #ff0000 !important;
+    stroke-width: 2 !important;
+}
