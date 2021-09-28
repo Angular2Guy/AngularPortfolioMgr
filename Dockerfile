@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
 RUN sh -c 'touch /app.jar'
 ARG JAR_FILE
