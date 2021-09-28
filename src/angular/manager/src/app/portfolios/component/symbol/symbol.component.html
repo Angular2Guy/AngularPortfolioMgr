@@ -39,6 +39,6 @@
 	<div i18>Please select an instrument</div>
 </div>
 <div *ngIf="symbol" #chartContainer class="chart-container">
-	<sc-line-chart [chartPoints]="chartPoints"></sc-line-chart>				
+	<sc-line-chart [chartPoints]="chartPoints" [replaceName]="portfolioName" [replaceSymbol]="portfolioSymbol"></sc-line-chart>				
 </div>
 </div>
