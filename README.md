@@ -7,6 +7,7 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 
 ## Articles
 * [Angular JWT Autorefresh With Spring Boot](https://angular2guy.wordpress.com/2021/07/31/angular-jwt-autorefresh-with-spring-boot/)
+* [Ngx-Simple-Charts multiline and legend support howto](https://angular2guy.wordpress.com/2021/10/02/ngx-simple-charts-multiline-and-legend-support-howto/)
 
 ## What is the goal?
 The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle.
