@@ -47,7 +47,7 @@ public class RestJwtFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
-		if (httpReq.getRequestURI().contains("/rest") && !httpReq.getRequestURI().contains("/rest/auth")) {			
+		if (httpReq.getRequestURI().contains("/rest") && this.isNotOpenRestEndpoint(httpReq)) {			
 			TokenSubjectRole tokenTuple = this.jwtTokenService.getTokenUserRoles(createHeaderMap(request));
 			if (tokenTuple.role() == null || !tokenTuple.role().contains(Role.USERS.name())) {
 				HttpServletResponse httpRes = (HttpServletResponse) response;
@@ -59,6 +59,10 @@ public class RestJwtFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
+	private boolean isNotOpenRestEndpoint(HttpServletRequest httpReq) {
+		return !httpReq.getRequestURI().contains("/rest/auth") && !httpReq.getRequestURI().contains("/rest/config");
+	}
+	
 	private Map<String,String> createHeaderMap(ServletRequest req) {
 		Map<String, String> header = new HashMap<>();
 		HttpServletRequest httpReq = (HttpServletRequest) req;

@@ -1,0 +1,13 @@
+<div mat-dialog-content>
+	<ul>
+		<li>
+			<span i18n>Dev Config Values</span>		
+		</li>
+		<li>
+			<mat-label i18n>Classname: </mat-label><span>{{classNameObs | async}}</span>
+		</li>
+		<li>
+			<button mat-button (click)="closeDialog()" i18n>Close</button>
+		</li>
+	</ul>
+</div>

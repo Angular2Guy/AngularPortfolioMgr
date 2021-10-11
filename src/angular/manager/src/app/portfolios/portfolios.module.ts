@@ -3,7 +3,7 @@
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-       http://www.apache.org/licenses/LICENSE-2.0
+	   http://www.apache.org/licenses/LICENSE-2.0
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,39 +40,43 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button'; 
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { DevAppInfoService } from './service/dev-app-info.service';
+import { ProdAppInfoService } from './service/prod-app-info.service';
+import { ProdConfigComponent } from './component/prod-config/prod-config.component';
+import { DevConfigComponent } from './component/dev-config/dev-config.component';
 
 
 @NgModule({
-  declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent],
-  imports: [
-    BaseModule,
-	NgxSimpleChartsModule,
-	MatCheckboxModule,
-	MatRadioModule,
-	MatListModule,
-	MatProgressSpinnerModule,
-	MatSidenavModule,
-	MatToolbarModule,
-	MatIconModule,
-	MatDatepickerModule,
-	MatFormFieldModule,
-	MatSelectModule,
-	MatAutocompleteModule,
-	MatTableModule,
-	MatButtonModule,
-	MatDialogModule,
-	MatLuxonDateModule,
-	MatInputModule,
-	//MatNativeDateModule,
-    PortfoliosRoutingModule
-  ],
-  entryComponents: [NewPortfolioComponent],
-  providers: [PortfolioService, SymbolService, QuoteService, SymbolImportService, QuoteImportService,
-	  { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+	declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, 
+		SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
+	imports: [
+		BaseModule,
+		NgxSimpleChartsModule,
+		MatCheckboxModule,
+		MatRadioModule,
+		MatListModule,
+		MatProgressSpinnerModule,
+		MatSidenavModule,
+		MatToolbarModule,
+		MatIconModule,
+		MatDatepickerModule,
+		MatFormFieldModule,
+		MatSelectModule,
+		MatAutocompleteModule,
+		MatTableModule,
+		MatButtonModule,
+		MatDialogModule,
+		MatLuxonDateModule,
+		MatInputModule,
+		PortfoliosRoutingModule
+	],
+	entryComponents: [NewPortfolioComponent],
+	providers: [PortfolioService, SymbolService, QuoteService, SymbolImportService, QuoteImportService, 
+		DevAppInfoService, ProdAppInfoService,
+		{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
 })
 export class PortfoliosModule { }
