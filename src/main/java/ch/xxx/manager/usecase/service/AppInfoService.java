@@ -10,9 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.common.usecase.service;
+package ch.xxx.manager.usecase.service;
 
-public interface MyService {
-	String getProfile();
+public interface AppInfoService {
+	String getProfiles();
 	String getClassName();
 }

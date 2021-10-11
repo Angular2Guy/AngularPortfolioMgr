@@ -17,6 +17,8 @@ package ch.xxx.manager.architecture;
 
 import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.junit.jupiter.api.Test;
@@ -53,7 +55,8 @@ public class MyArchitectureTests {
 
 	@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
-			.applicationServices("..usecase..").adapter("rest", "..adapter.controller..")
+			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
+			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
 			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..")
 			.adapter("client", "..adapter.client..").adapter("config", "..adapter.config..").withOptionalLayers(true);
 
@@ -69,11 +72,31 @@ public class MyArchitectureTests {
 	static final ArchRule cyclesAdapter = SlicesRuleDefinition.slices().matching("..adapter.(*)..").should()
 			.beFreeOfCycles();
 
+	@ArchTest
+	static final ArchRule cyclesDevUseCases = SlicesRuleDefinition.slices().matching("..dev.usecase.(*)..").should()
+			.beFreeOfCycles();
+
+	@ArchTest
+	static final ArchRule cyclesDevAdapter = SlicesRuleDefinition.slices().matching("..prod.adapter.(*)..").should()
+			.beFreeOfCycles();
+
+	@ArchTest
+	static final ArchRule cyclesProdUseCases = SlicesRuleDefinition.slices().matching("..dev.usecase.(*)..").should()
+			.beFreeOfCycles();
+
+	@ArchTest
+	static final ArchRule cyclesProdAdapter = SlicesRuleDefinition.slices().matching("..prod.adapter.(*)..").should()
+			.beFreeOfCycles();
+
 	@Test
 	public void ruleControllerAnnotations() {
-		ArchRule beAnnotatedWith = ArchRuleDefinition.classes().that().resideInAPackage("..adapter.controller..")
-				.should().beAnnotatedWith(RestController.class).orShould().beAnnotatedWith(Configuration.class);
-		beAnnotatedWith.check(this.importedClasses);
+		List.of("..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
+				.forEach(myPackage -> {
+					ArchRule beAnnotatedWith = ArchRuleDefinition.classes().that()
+							.resideInAPackage("..adapter.controller..").should().beAnnotatedWith(RestController.class)
+							.orShould().beAnnotatedWith(Configuration.class);
+					beAnnotatedWith.check(this.importedClasses);
+				});
 	}
 
 	@Test

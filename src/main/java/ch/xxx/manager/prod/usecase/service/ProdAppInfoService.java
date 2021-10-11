@@ -15,21 +15,21 @@ package ch.xxx.manager.prod.usecase.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.common.usecase.service.MyService;
+import ch.xxx.manager.usecase.service.AppInfoService;
 
 @Service
-public class ProdMyService implements MyService {
+public class ProdAppInfoService implements AppInfoService {
 	@Value("${spring.profiles.active:}")
 	private String profiles;
 
 	@Override
-	public String getProfile() {
+	public String getProfiles() {
 		return this.profiles;
 	}
 
 	@Override
 	public String getClassName() {
-		return ProdMyService.class.getCanonicalName();
+		return ProdAppInfoService.class.getCanonicalName();
 	}
 
 }

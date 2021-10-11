@@ -34,7 +34,6 @@ import ch.xxx.manager.domain.model.dto.AuthCheckDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.AppUserService;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/rest/auth")
@@ -55,12 +54,12 @@ public class AuthenticationController {
 	}
 	
 	@PostMapping("/authorize")
-	public Mono<AuthCheckDto> postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
+	public AuthCheckDto postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
 		String tokenRoles = this.appUserService.getTokenRoles(header).role();
 		if (tokenRoles != null && tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
-			return Mono.just(new AuthCheckDto(authcheck.getPath(), true));
+			return new AuthCheckDto(authcheck.getPath(), true);
 		} else {
-			return Mono.just(new AuthCheckDto(authcheck.getPath(), false));
+			return new AuthCheckDto(authcheck.getPath(), false);
 		}
 	}
 	

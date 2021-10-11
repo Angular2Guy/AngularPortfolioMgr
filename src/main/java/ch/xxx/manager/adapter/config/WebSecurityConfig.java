@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +29,12 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 @Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {	
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	private static final String DEVPATH="/rest/dev/**";
+	private static final String PRODPATH="/rest/prod/**";
 	private final JwtTokenService jwtTokenProvider;
+	@Value("${spring.profiles.active:}")
+	private String activeProfile;	
 	
 	public WebSecurityConfig(JwtTokenService jwtTokenProvider) {
 		this.jwtTokenProvider = jwtTokenProvider;
@@ -37,10 +42,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
 		http.httpBasic()
 		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and().authorizeRequests()
+		.and().authorizeRequests()		
+		.antMatchers("rest/config/**").permitAll()
 		.antMatchers("/rest/auth/**").permitAll()
+		.antMatchers(blockedPath).denyAll()
 		.antMatchers("/rest/**").authenticated()
 		.antMatchers("/**").permitAll()
 		.anyRequest().authenticated()

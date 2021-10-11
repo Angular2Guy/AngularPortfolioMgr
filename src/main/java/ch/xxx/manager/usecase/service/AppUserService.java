@@ -32,7 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.common.usecase.service.MyService;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
@@ -50,7 +49,7 @@ public class AppUserService {
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenService jwtTokenProvider;
-	private final MyService myService;
+	private final AppInfoService myService;
 
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -60,7 +59,7 @@ public class AppUserService {
 	private String confirmUrl;
 
 	public AppUserService(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
-			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, MyService myService) {
+			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
@@ -71,7 +70,7 @@ public class AppUserService {
 
 	@PostConstruct
 	public void init() {
-		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfile(), this.myService.getClassName());
+		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfiles(), this.myService.getClassName());
 	}
 	
 	public RefreshTokenDto refreshToken(String bearerToken) {
