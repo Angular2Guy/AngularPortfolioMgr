@@ -2,7 +2,7 @@
 <mat-toolbar color="primary">
 	<span i18n>Portfolio Manager</span>
 	<span class="example-fill-remaining-space"></span>
-	<span class="header-space"><button mat-button (click)="showConfig()" i18n>Config</button></span>
+	<span class="header-space"><button mat-button (click)="showConfig()" [disabled]="!!dialogRef" i18n>Config</button></span>
 	<span class="custom-spinner header-space" *ngIf="importingSymbols">
 		<mat-progress-spinner
 					diameter="32" 

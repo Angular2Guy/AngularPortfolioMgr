@@ -134,8 +134,9 @@ export class OverviewComponent implements OnInit {
 
 	showConfig(): void {
 		if (!this.dialogRef && this.profiles) {
+			const myOptions = { width: '700px' };
 			this.dialogRef = this.profiles.toLowerCase().includes('prod') ? 
-				this.dialog.open(ProdConfigComponent, { width: '500px' }) : this.dialog.open(DevConfigComponent, { width: '500px' });
+				this.dialog.open(ProdConfigComponent, myOptions) : this.dialog.open(DevConfigComponent, myOptions);
 			this.dialogRef.afterClosed().subscribe(() => this.dialogRef = null);
 		}
 	}
