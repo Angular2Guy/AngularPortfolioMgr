@@ -2,7 +2,7 @@ import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { DevAppInfoService } from '../../service/dev-app-info.service';
+import { ProdAppInfoService } from '../../service/prod-app-info.service';
 import { OverviewComponent } from '../overview/overview.component';
 
 @Component({
@@ -13,10 +13,10 @@ import { OverviewComponent } from '../overview/overview.component';
 export class ProdConfigComponent implements OnInit {
   classNameObs: Observable<string>;
   
-  constructor(private dialogRef: MatDialogRef<OverviewComponent>, private devAppInfoService: DevAppInfoService) { }
+  constructor(private dialogRef: MatDialogRef<OverviewComponent>, private prodAppInfoService: ProdAppInfoService) { }
 
   ngOnInit(): void {
-	this.classNameObs = this.devAppInfoService.getClassName();
+	this.classNameObs = this.prodAppInfoService.getClassName();
   }
 
   closeDialog(): void {
