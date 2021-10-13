@@ -61,6 +61,14 @@ public class MyArchitectureTests {
 			.adapter("client", "..adapter.client..").adapter("config", "..adapter.config..").withOptionalLayers(true);
 
 	@ArchTest
+	static final ArchRule devDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..dev..").should()
+			.dependOnClassesThat().resideInAPackage("..prod..");
+
+	@ArchTest
+	static final ArchRule prodDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..prod..").should()
+			.dependOnClassesThat().resideInAPackage("..dev..");
+	
+	@ArchTest
 	static final ArchRule cyclesDomain = SlicesRuleDefinition.slices().matching("..domain.(*)..").should()
 			.beFreeOfCycles();
 
