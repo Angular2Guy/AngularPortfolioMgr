@@ -19,5 +19,12 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. 
 * The setup of the Angular fronted is done. 
 
+## Monitoring
+The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
+
+[Monitoring Spring Boot with Prometheus and Grafana](https://ordina-jworks.github.io/monitoring/2020/11/16/monitoring-spring-prometheus-grafana.html)
+
+To test the setup the application has to be started and the Docker Images for Prometheus and Grafana have to be started and configured. The scripts 'runGraphana.sh' and 'runPrometheus.sh' can be used as a starting point.
+
 ## R2DBC Implementation
 A retired R2DBC backend implementation can be found in the 'R2DBC-Implementation' branch.

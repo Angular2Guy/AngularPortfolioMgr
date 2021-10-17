@@ -30,10 +30,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableSwagger2
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "PT2H")
 public class ApplicationConfig {
