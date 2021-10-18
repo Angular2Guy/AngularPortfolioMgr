@@ -19,20 +19,21 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
 import { PortfolioData } from '../../model/portfolio-data';
 import { SymbolImportService } from '../../service/symbol-import.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
 import { Symbol } from '../../model/symbol';
 import { QuoteImportService } from '../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
+import { OnDestroy } from '@angular/core';
 
 @Component({
 	selector: 'app-overview',
 	templateUrl: './overview.component.html',
 	styleUrls: ['./overview.component.scss']
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
 	windowHeight: number = null;
 	portfolios: Portfolio[] = [];
 	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
@@ -40,6 +41,7 @@ export class OverviewComponent implements OnInit {
 	showPortfolioTable = true;
 	private timeoutId = -1;
 	dialogRef: MatDialogRef<unknown, any> = null;
+	dialogSubscription: Subscription;
 	private profiles: string = null;
 
 	constructor(private tokenService: TokenService, private configService: ConfigService,
@@ -55,6 +57,14 @@ export class OverviewComponent implements OnInit {
 		this.configService.getProfiles().subscribe(value => this.profiles = !value ? 'dev' : value);
 	}
 
+    ngOnDestroy(): void {
+        this.dialogRef = null;
+		if(!!this.dialogSubscription) {
+			this.dialogSubscription.unsubscribe();
+			this.dialogSubscription = null;
+		}
+    }
+
 	@HostListener('window:resize', ['$event'])
 	onResize(event: any) {
 		this.windowHeight = event.target.innerHeight - 84;
@@ -62,13 +72,16 @@ export class OverviewComponent implements OnInit {
 
 	newPortfolio() {
 		if (!this.dialogRef) {
+			if(!!this.dialogSubscription) {
+				this.dialogSubscription.unsubscribe();
+			}
 			const portfolio: Portfolio = {
 				id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [],
 				userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null
 			};
 			const newPortfolioData: PortfolioData = { portfolio: portfolio };
 			this.dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
-			this.dialogRef.afterClosed().subscribe(result => {
+			this.dialogSubscription = this.dialogRef.afterClosed().subscribe(result => {
 				if (result) {
 					this.portfolioService.postPortfolio(result)
 						.subscribe(myPortfolio => this.portfolios = [...this.portfolios, myPortfolio]);
@@ -91,8 +104,11 @@ export class OverviewComponent implements OnInit {
 
 	addSymbol(portfolio: Portfolio) {
 		const portfolioData: PortfolioData = { portfolio: portfolio };
+		if(!!this.dialogSubscription) {
+			this.dialogSubscription.unsubscribe();
+		}
 		const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData });
-		dialogRef.afterClosed().subscribe((symbol: Symbol) => {
+		this.dialogSubscription = dialogRef.afterClosed().subscribe((symbol: Symbol) => {
 			if (symbol) {
 				symbol.weight = !symbol.weight ? 0 : symbol.weight;
 				this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight, symbol.changedAt)
@@ -134,10 +150,13 @@ export class OverviewComponent implements OnInit {
 
 	showConfig(): void {
 		if (!this.dialogRef && this.profiles) {
+			if(!!this.dialogSubscription) {
+				this.dialogSubscription.unsubscribe();				
+			}
 			const myOptions = { width: '700px' };
 			this.dialogRef = this.profiles.toLowerCase().includes('prod') ? 
 				this.dialog.open(ProdConfigComponent, myOptions) : this.dialog.open(DevConfigComponent, myOptions);
-			this.dialogRef.afterClosed().subscribe(() => this.dialogRef = null);
+			this.dialogSubscription = this.dialogRef.afterClosed().subscribe(() => this.dialogRef = null);
 		}
 	}
 }
