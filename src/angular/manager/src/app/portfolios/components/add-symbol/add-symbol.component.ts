@@ -14,13 +14,13 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControlOptions, FormControl, Validators, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
-import { PortfolioData } from '../../model/portfolio-data';
-import { Portfolio } from '../../model/portfolio';
-import { Symbol } from '../../model/symbol';
-import { SymbolService } from '../../service/symbol.service';
+import { PortfolioData } from '../../../model/portfolio-data';
+import { Portfolio } from '../../../model/portfolio';
+import { Symbol } from '../../../model/symbol';
+import { SymbolService } from '../../../service/symbol.service';
 import { Observable, of, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap, map } from 'rxjs/operators';
-import { QuoteImportService } from '../../service/quote-import.service';
+import { QuoteImportService } from '../../../service/quote-import.service';
 import { DateTime } from 'luxon';
 
 @Component({

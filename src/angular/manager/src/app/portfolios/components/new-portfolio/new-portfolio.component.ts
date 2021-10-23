@@ -14,8 +14,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { OverviewComponent } from '../overview/overview.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Portfolio } from '../../model/portfolio';
-import { PortfolioData } from '../../model/portfolio-data';
+import { Portfolio } from '../../../model/portfolio';
+import { PortfolioData } from '../../../model/portfolio-data';
 import { TokenService } from '../../../service/token.service';
 import { DateTime } from 'luxon';
 

@@ -13,9 +13,9 @@
 import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
-import { Symbol } from '../../model/symbol';
-import { TokenService } from '../../../service/token.service';
-import { PortfolioService } from '../../service/portfolio.service';
+import { Symbol } from '../../../../model/symbol';
+import { TokenService } from '../../../../service/token.service';
+import { PortfolioService } from '../../../../service/portfolio.service';
 import { Subscription, Subject } from 'rxjs';
 
 

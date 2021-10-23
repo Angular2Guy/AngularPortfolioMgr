@@ -12,12 +12,11 @@
  */
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { OverviewComponent } from './component/overview/overview.component';
-import { PortfolioComponent } from './component/portfolio/portfolio.component';
+import { OverviewComponent } from './components/overview/overview.component';
 
 const routes: Routes = [
-	{ path: 'overview', component: OverviewComponent },
-	{ path: 'portfolio/:portfolioId', component: PortfolioComponent},
+	{ path: 'overview', component: OverviewComponent },	
+	{ path: 'portfolio-detail', loadChildren: () => import('./portfolio-detail/portfolio-detail.module').then(m => m.PortfolioDetailModule) },
 	{ path: '**', redirectTo: 'overview' }
 ];
 

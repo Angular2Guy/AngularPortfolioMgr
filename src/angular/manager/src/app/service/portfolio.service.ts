@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
 import { Portfolio } from '../model/portfolio'
 import { HttpClient } from '@angular/common/http';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class PortfolioService {
 
   constructor(private http: HttpClient) { }

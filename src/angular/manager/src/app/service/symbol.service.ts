@@ -13,25 +13,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Symbol } from '../model/symbol';
 
-@Injectable()
-export class SymbolImportService {
+@Injectable({providedIn: 'root'})
+export class SymbolService {
 
-  constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient) { }
 
-  getSymbolImportUs(): Observable<string> {
-	return this.http.get('/rest/symbol/importus/all', {responseType: 'text'});
-  }
+	getSymbolBySymbol(symbol: string): Observable<Symbol[]> {
+		return this.http.get<Symbol[]>(`/rest/symbol/symbol/${symbol}`);
+	}
 
-  getSymbolImportHk(): Observable<string> {
-	return this.http.get('/rest/symbol/importhk/all', {responseType: 'text'});
-  }
-
-  getSymbolImportDe(): Observable<string> {
-	return this.http.get('/rest/symbol/importde/all', {responseType: 'text'});
-  }
-  
-  getIndexSymbols(): Observable<string> {
-	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
-  }
+	getSymbolByName(name: string): Observable<Symbol[]> {
+		return this.http.get<Symbol[]>(`/rest/symbol/name/${name}`);
+	}
 }

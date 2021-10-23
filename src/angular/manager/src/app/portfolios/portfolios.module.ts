@@ -13,23 +13,13 @@
 import { NgModule } from '@angular/core';
 import { PortfoliosRoutingModule } from './portfolios-routing.module';
 import { BaseModule } from '../base/base.module';
-import { OverviewComponent } from './component/overview/overview.component';
-import { PortfolioService } from './service/portfolio.service';
-import { SymbolService } from './service/symbol.service';
-import { QuoteService } from './service/quote.service';
-import { NewPortfolioComponent } from './component/new-portfolio/new-portfolio.component';
+import { OverviewComponent } from './components/overview/overview.component';
+import { NewPortfolioComponent } from './components/new-portfolio/new-portfolio.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from '../service/token.interceptor';
-import { SymbolImportService } from './service/symbol-import.service';
-import { AddSymbolComponent } from './component/add-symbol/add-symbol.component';
-import { QuoteImportService } from './service/quote-import.service';
-import { PortfolioComponent } from './component/portfolio/portfolio.component';
-import { SymbolComponent } from './component/symbol/symbol.component';
-import { PortfolioTableComponent } from './component/portfolio-table/portfolio-table.component';
-import { PortfolioChartsComponent } from './component/portfolio-charts/portfolio-charts.component';
-import { NgxSimpleChartsModule } from 'ngx-simple-charts';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
+import { AddSymbolComponent } from './components/add-symbol/add-symbol.component';
+import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
+import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -46,18 +36,15 @@ import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 import { MatInputModule } from '@angular/material/input';
 import { DevAppInfoService } from './service/dev-app-info.service';
 import { ProdAppInfoService } from './service/prod-app-info.service';
-import { ProdConfigComponent } from './component/prod-config/prod-config.component';
-import { DevConfigComponent } from './component/dev-config/dev-config.component';
+import { ProdConfigComponent } from './components/prod-config/prod-config.component';
+import { DevConfigComponent } from './components/dev-config/dev-config.component';
 
 
 @NgModule({
-	declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, PortfolioComponent, 
-		SymbolComponent, PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
+	declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,  
+		 PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
 	imports: [
 		BaseModule,
-		NgxSimpleChartsModule,
-		MatCheckboxModule,
-		MatRadioModule,
 		MatListModule,
 		MatProgressSpinnerModule,
 		MatSidenavModule,
@@ -75,8 +62,7 @@ import { DevConfigComponent } from './component/dev-config/dev-config.component'
 		PortfoliosRoutingModule
 	],
 	entryComponents: [NewPortfolioComponent],
-	providers: [PortfolioService, SymbolService, QuoteService, SymbolImportService, QuoteImportService, 
-		DevAppInfoService, ProdAppInfoService,
+	providers: [DevAppInfoService, ProdAppInfoService,
 		{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
 })
 export class PortfoliosModule { }

@@ -21,7 +21,7 @@ export enum ComparisonIndex {
 	MSCI_CHINA = 'ICGA.DE'
 }
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class QuoteService {
   constructor(private http: HttpClient) { }
 

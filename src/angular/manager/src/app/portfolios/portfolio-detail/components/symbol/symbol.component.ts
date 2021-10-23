@@ -11,13 +11,13 @@
    limitations under the License.
  */
 import { Component, Input, Output, EventEmitter, OnInit, Inject, LOCALE_ID, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { Symbol } from '../../model/symbol';
-import { QuoteService, ComparisonIndex } from '../../service/quote.service';
-import { Quote } from '../../model/quote';
+import { Symbol } from '../../../../model/symbol';
+import { QuoteService, ComparisonIndex } from '../../../../service/quote.service';
+import { Quote } from '../../../../model/quote';
 import { DOCUMENT, formatDate } from '@angular/common';
-import { ServiceUtils } from '../../model/service-utils';
+import { ServiceUtils } from '../../../../model/service-utils';
 import { forkJoin } from 'rxjs';
-import { ChartPoint, ChartPoints } from 'ngx-simple-charts';
+import { ChartPoint, ChartPoints } from 'ngx-simple-charts/line';
 
 const enum QuotePeriodKey { Day, Month, Months3, Months6, Year, Year3, Year5, Year10 }
 

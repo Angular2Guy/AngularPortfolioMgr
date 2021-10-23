@@ -12,7 +12,7 @@
  */
 import { Component, OnInit, Input } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Portfolio } from '../../model/portfolio';
+import { Portfolio } from '../../../model/portfolio';
 import { Router } from '@angular/router';
 
 @Component({
@@ -26,7 +26,8 @@ export class PortfolioTableComponent implements OnInit {
 
   constructor(private router: Router) { }
 
-  ngOnInit(): void {	
+  ngOnInit(): void {
+	const x = 1 + 1;
   }
 
   selPortfolio(portfolio: Portfolio) {
