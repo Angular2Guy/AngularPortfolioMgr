@@ -18,7 +18,8 @@ import { AppComponent } from './app.component';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule }    from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
+import { TokenInterceptor } from './service/token.interceptor';
 
 @NgModule({
   declarations: [
@@ -31,8 +32,9 @@ import { HttpClientModule }    from '@angular/common/http';
     AppRoutingModule,
 	MatProgressSpinnerModule,
 	BrowserAnimationsModule
-  ],
-  providers: [],
+  ],  
+  providers: [
+		{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

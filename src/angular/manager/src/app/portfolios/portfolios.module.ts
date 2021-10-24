@@ -62,7 +62,6 @@ import { DevConfigComponent } from './components/dev-config/dev-config.component
 		PortfoliosRoutingModule
 	],
 	entryComponents: [NewPortfolioComponent],
-	providers: [DevAppInfoService, ProdAppInfoService,
-		{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+	providers: [DevAppInfoService, ProdAppInfoService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
 })
 export class PortfoliosModule { }

@@ -31,7 +31,7 @@ export class PortfolioTableComponent implements OnInit {
   }
 
   selPortfolio(portfolio: Portfolio) {
-	this.router.navigate(['/portfolios/portfolio', portfolio.id]);
+	this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);	
   }
 
   @Input()

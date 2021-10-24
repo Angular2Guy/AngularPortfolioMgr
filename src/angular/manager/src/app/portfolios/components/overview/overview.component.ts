@@ -92,7 +92,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	selPortfolio(portfolio: Portfolio) {
-		this.router.navigate(['/portfolios/portfolio', portfolio.id]);
+		this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);
 	}
 
 	private refreshPortfolios() {
