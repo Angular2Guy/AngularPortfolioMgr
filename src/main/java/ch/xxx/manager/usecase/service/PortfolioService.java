@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
+import ch.xxx.manager.domain.model.dto.BarDto;
+import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
@@ -64,7 +67,17 @@ public class PortfolioService {
 	}
 
 	public PortfolioDto getPortfolioById(Long portfolioId) {
-		return this.portfolioRepository.findById(portfolioId).map(entity -> this.convert(entity)).orElse(null);
+		return this.portfolioRepository.findById(portfolioId).map(entity -> this.convert(entity))
+				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
+	}
+
+	public PortfolioBarsDto getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
+		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
+				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
+		List<BarDto> barDtos = List.of(new BarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
+				new BarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
+				new BarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
+		return new PortfolioBarsDto(portfolio.getName(), start, barDtos);
 	}
 
 	public PortfolioDto addPortfolio(PortfolioDto dto) {

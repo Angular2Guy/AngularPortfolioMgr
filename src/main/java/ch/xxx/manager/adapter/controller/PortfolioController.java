@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.controller;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
+import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.usecase.service.PortfolioService;
 
@@ -54,6 +56,12 @@ public class PortfolioController {
 		return this.portfolioService.getPortfolioById(portfolioId);
 	}
 
+	@GetMapping("/id/{portfolioId}/start/{start}")
+	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId, @PathVariable("start") String isodateStart) {
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
+		return this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start);
+	}
+	
 	@PostMapping
 	public PortfolioDto createPortfolio(@RequestBody PortfolioDto dto) {
 		return this.portfolioService.addPortfolio(dto);
