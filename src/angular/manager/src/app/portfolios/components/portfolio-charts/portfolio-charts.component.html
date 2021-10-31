@@ -1,1 +1,28 @@
-<p>portfolio-charts works!</p>
+<div class="myContainer">
+<div>
+	<span i18n="@@PortfolioChartName">Portfolio: {{selPortfolio.name}}</span> 
+	<span i18n="@@PortfolioChartStartDate">Start Date: {{startDate}}</span>
+</div>
+<div class="text-container">
+	<label id="my-radio-group-label" i18n>Pick your timeframe:</label>
+	<mat-radio-group
+	  aria-labelledby="my-radio-group-label"
+	  class="my-radio-group" (change)="chartPeriodChanged()"
+	  [(ngModel)]="selChartPeriod">
+	  <mat-radio-button class="my-radio-button" *ngFor="let myQuotePeriod of chartPeriods" [value]="myChartPeriod" [disabled]="chartsLoading">
+	    {{myQuotePeriod.periodText}}
+	  </mat-radio-button>
+	</mat-radio-group>
+</div>
+<div class="text-container">
+	<label id="my-checkbox-group-label" i18n>Pick your comparison index:</label>
+	<span>
+		<mat-checkbox class="my-checkbox" [(ngModel)]="showES50" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)" i18n>EuroStoxx 50</mat-checkbox>
+		<mat-checkbox class="my-checkbox" [(ngModel)]="showMsciCH" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)" i18n>Msci China</mat-checkbox>
+		<mat-checkbox class="my-checkbox" [(ngModel)]="showSP500" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)" i18n>S&P 500</mat-checkbox>
+	</span>
+</div>
+<div>
+	Test
+</div>
+</div>

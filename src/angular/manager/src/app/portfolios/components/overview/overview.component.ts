@@ -36,6 +36,7 @@ import { OnDestroy } from '@angular/core';
 export class OverviewComponent implements OnInit, OnDestroy {
 	windowHeight: number = null;
 	portfolios: Portfolio[] = [];
+	myPortfolio!: Portfolio;
 	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 	importingSymbols = false;
 	showPortfolioTable = true;
@@ -57,7 +58,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.configService.getProfiles().subscribe(value => this.profiles = !value ? 'dev' : value);
 	}
 
-    ngOnDestroy(): void {
+    ngOnDestroy(): void {		
         this.dialogRef = null;
 		if(!!this.dialogSubscription) {
 			this.dialogSubscription.unsubscribe();
@@ -92,7 +93,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	selPortfolio(portfolio: Portfolio) {
-		this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);
+		this.myPortfolio = portfolio;
+		this.showPortfolioTable = !this.showPortfolioTable;
+		//this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);
 	}
 
 	private refreshPortfolios() {

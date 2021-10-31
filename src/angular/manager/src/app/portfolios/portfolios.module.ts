@@ -38,6 +38,8 @@ import { DevAppInfoService } from './service/dev-app-info.service';
 import { ProdAppInfoService } from './service/prod-app-info.service';
 import { ProdConfigComponent } from './components/prod-config/prod-config.component';
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 @NgModule({
@@ -59,6 +61,8 @@ import { DevConfigComponent } from './components/dev-config/dev-config.component
 		MatDialogModule,
 		MatLuxonDateModule,
 		MatInputModule,
+		MatRadioModule,
+		MatCheckboxModule,
 		PortfoliosRoutingModule
 	],
 	entryComponents: [NewPortfolioComponent],

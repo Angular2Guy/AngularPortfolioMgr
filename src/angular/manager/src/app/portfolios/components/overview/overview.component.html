@@ -27,6 +27,7 @@
   </mat-sidenav>
   <mat-sidenav-content opened mode="side">
 	<app-portfolio-table [localPortfolios]="portfolios" *ngIf="showPortfolioTable"></app-portfolio-table>
+	<app-portfolio-charts [selPortfolio]="myPortfolio" *ngIf="!showPortfolioTable"></app-portfolio-charts>
   </mat-sidenav-content>
 </mat-sidenav-container>
 <div style="display:none">
