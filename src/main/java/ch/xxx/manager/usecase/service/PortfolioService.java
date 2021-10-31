@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
-import ch.xxx.manager.domain.model.dto.PorfolioBarDto;
+import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
@@ -74,9 +74,9 @@ public class PortfolioService {
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
-		List<PorfolioBarDto> barDtos = List.of(new PorfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
-				new PorfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
-				new PorfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
+		List<PortfolioBarDto> barDtos = List.of(new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
+				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
+				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
 		return new PortfolioBarsDto(portfolio.getName(), start, barDtos);
 	}
 

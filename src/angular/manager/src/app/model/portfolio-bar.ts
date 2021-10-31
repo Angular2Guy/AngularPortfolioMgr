@@ -11,5 +11,7 @@
    limitations under the License.
  */
 export interface PortfolioBar {
-
+  value: number;
+  name: string;
+  weight: number;
 }

@@ -30,7 +30,7 @@ export class PortfolioService {
 	}
 	
 	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date): Observable<PortfolioBars> {
-		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString()}`);
+		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString().split('T')[0]}`);
 	}	
 	
 	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
