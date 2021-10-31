@@ -2,15 +2,18 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.math.BigDecimal;
 
-public class BarDto {
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+@JsonTypeName("portfolio-bar")
+public class PorfolioBarDto {
 	private BigDecimal value;
 	private String name;
 	private BigDecimal weight;
 	
-	public BarDto() {		
+	public PorfolioBarDto() {		
 	}
 	
-	public BarDto(BigDecimal value, String name, BigDecimal weight) {
+	public PorfolioBarDto(BigDecimal value, String name, BigDecimal weight) {
 		this.value = value;
 		this.name = name;
 		this.weight = weight;

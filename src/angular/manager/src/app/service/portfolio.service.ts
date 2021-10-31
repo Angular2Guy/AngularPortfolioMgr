@@ -12,7 +12,8 @@
  */
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Portfolio } from '../model/portfolio'
+import { Portfolio } from '../model/portfolio';
+import { PortfolioBars } from '../model/portfolio-bars';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({providedIn: 'root'})
@@ -27,6 +28,10 @@ export class PortfolioService {
 	getPortfolioById(portfolioId: number): Observable<Portfolio> {
 		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`);
 	}
+	
+	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date): Observable<PortfolioBars> {
+		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString()}`);
+	}	
 	
 	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
 		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
