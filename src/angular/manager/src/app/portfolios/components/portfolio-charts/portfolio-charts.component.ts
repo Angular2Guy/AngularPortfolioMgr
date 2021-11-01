@@ -13,6 +13,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DateTime, Duration } from 'luxon';
 import { Portfolio } from 'src/app/model/portfolio';
+import { PortfolioBars } from 'src/app/model/portfolio-bars';
 import { PortfolioService } from 'src/app/service/portfolio.service';
 import { ComparisonIndex } from 'src/app/service/quote.service';
 
@@ -34,8 +35,7 @@ export class PortfolioChartsComponent implements OnInit {
   selPortfolio: Portfolio;
   startDate: Date;
   chartPeriods: ChartPeriod[] = [];
-  myChartPeriod: ChartPeriod;
-  chartsLoading: true;
+  chartsLoading = true;
   readonly ComparisonIndex = ComparisonIndex;
   readonly compIndexes = new Map<string, number>([[ComparisonIndex.SP500, 0], [ComparisonIndex.EUROSTOXX50, 0], [ComparisonIndex.MSCI_CHINA, 0]]);
   showSP500 = false;
@@ -54,11 +54,19 @@ export class PortfolioChartsComponent implements OnInit {
 		{ chartPeriodKey: ChartPeriodKey.Year5, periodText: $localize`:@@fiveYears:5 Years`, periodDuration:  {years: 5} },
 		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years`, periodDuration:  {years: 10} }];
 		this.selChartPeriod = this.chartPeriods[0];	
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate()).subscribe(result => console.log(result));
+	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
+	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate).subscribe(result => this.updateChartData(result));
   }
 
   chartPeriodChanged(): void {
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate()).subscribe(result => console.log(result));	
+	this.chartsLoading = true;
+	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
+	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate).subscribe(result => this.updateChartData(result));	
+  }
+
+  private updateChartData(portfolioBars: PortfolioBars): void {
+	this.chartsLoading = false;
+	console.log(portfolioBars);	
   }
 
   compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {

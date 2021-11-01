@@ -1,4 +1,30 @@
-.myContainer{
+.my-container{
 	background: #ffffff;
 	height: 100%;
+	width: 100%;
+}
+.my-span {
+	margin-right: 10px;
+}
+.my-radio-group {
+	margin: 0 10px;
+}
+.my-radio-button {
+	margin: 0 10px;
+}
+.my-checkbox {
+	margin-left: 10px;
+}
+.text-container {
+	margin-bottom: 10px;
+}
+.center-div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: calc(100% - 94px);
+}
+.example-margin {
+  margin: 0 10px;
 }
