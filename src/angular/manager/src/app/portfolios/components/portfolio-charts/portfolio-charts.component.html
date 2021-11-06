@@ -27,7 +27,7 @@
 			mode="indeterminate"
 			color="primary"></mat-progress-spinner>
 </div>
-<div *ngIf="!chartsLoading">
-	test chart
+<div *ngIf="!chartsLoading" class="chart-container">
+	<sc-bar-chart [chartBars]="chartBars"></sc-bar-chart>
 </div>
 </div>

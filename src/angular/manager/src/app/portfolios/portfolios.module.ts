@@ -40,6 +40,7 @@ import { ProdConfigComponent } from './components/prod-config/prod-config.compon
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
 
 
 @NgModule({
@@ -63,6 +64,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 		MatInputModule,
 		MatRadioModule,
 		MatCheckboxModule,
+		NgxBarChartsModule,
 		PortfoliosRoutingModule
 	],
 	entryComponents: [NewPortfolioComponent],

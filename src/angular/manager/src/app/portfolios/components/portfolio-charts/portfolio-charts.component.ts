@@ -12,6 +12,7 @@
  */
 import { Component, Input, OnInit } from '@angular/core';
 import { DateTime, Duration } from 'luxon';
+import { ChartBars, ChartBar } from 'ngx-simple-charts/bar';
 import { Portfolio } from 'src/app/model/portfolio';
 import { PortfolioBars } from 'src/app/model/portfolio-bars';
 import { PortfolioService } from 'src/app/service/portfolio.service';
@@ -42,6 +43,7 @@ export class PortfolioChartsComponent implements OnInit {
   showMsciCH = false;
   showES50 = false;  
   selChartPeriod: ChartPeriod = null;
+  chartBars!: ChartBars;
 
   constructor(private portfolioService: PortfolioService) { }
 
@@ -66,7 +68,10 @@ export class PortfolioChartsComponent implements OnInit {
 
   private updateChartData(portfolioBars: PortfolioBars): void {
 	this.chartsLoading = false;
-	console.log(portfolioBars);	
+	//console.log(portfolioBars);	
+	const chartBars = portfolioBars.portfolioBars.map(value => ({x: value.name, y: value.value} as ChartBar));
+	this.chartBars = {title: portfolioBars.title, from: this.startDate.toLocaleDateString(), yScaleWidth: 30, xScaleHeight: 50, chartBars: chartBars } as ChartBars;
+	//console.log(this.chartBars);
   }
 
   compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
