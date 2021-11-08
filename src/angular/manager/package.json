@@ -32,8 +32,8 @@
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
     "core-js": "^2.5.7",
+    "ngx-simple-charts": "^13.0.0",
     "material-design-icons": "3.0.1",
-    "ngx-simple-charts": "^1.1.0",
     "rxjs": "~6.6.3",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"
