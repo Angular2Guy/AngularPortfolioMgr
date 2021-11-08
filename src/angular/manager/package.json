@@ -5,8 +5,8 @@
     "ng": "ng",
     "start": "ng serve --hmr --proxy-config proxy.conf.js",
     "build": "ng build --localize --configuration production",
-    "test": "ng test --browsers ChromeHeadless --watch=false",
-    "test-chromium": "ng test --browsers ChromiumHeadless --watch=false",
+    "test": "ng test --browsers ChromeHeadless --watch=false --code-coverage=true",
+    "test-chromium": "ng test --browsers ChromiumHeadless --watch=false --code-coverage=true",
     "test-local": "ng test --browsers Chromium --watch=true",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -31,12 +31,12 @@
     "@angular/platform-browser": "~13.0.0",
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
-    "core-js": "^2.5.7",
     "ngx-simple-charts": "^13.0.0",
     "material-design-icons": "3.0.1",
-    "rxjs": "~6.6.3",
-    "tslib": "^2.0.0",
-    "zone.js": "~0.11.4"
+    "rxjs": "~7.4.0",
+    "tslib": "^2.3.1",
+    "zone.js": "~0.11.4",
+    "core-js": "^3.19.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.0.1",
