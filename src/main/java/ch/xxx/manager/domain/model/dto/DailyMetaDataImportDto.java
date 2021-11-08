@@ -23,8 +23,8 @@ public class DailyMetaDataImportDto {
 	@JsonProperty("2. Symbol")
 	private String symbol;
 	@JsonProperty("3. Last Refreshed")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate lastRefreshed;
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private String lastRefreshed;
 	@JsonProperty("4. Output Size")
 	private String outputSize;
 	@JsonProperty("5. Time Zone")
@@ -42,10 +42,10 @@ public class DailyMetaDataImportDto {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public LocalDate getLastRefreshed() {
+	public String getLastRefreshed() {
 		return lastRefreshed;
 	}
-	public void setLastRefreshed(LocalDate lastRefreshed) {
+	public void setLastRefreshed(String lastRefreshed) {
 		this.lastRefreshed = lastRefreshed;
 	}
 	public String getOutputSize() {
