@@ -49,4 +49,5 @@ public class PortfolioMapper {
 		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
 		return entity;
 	}
+	
 }

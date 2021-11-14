@@ -42,6 +42,7 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 
 @Service
 public class PortfolioToIndexService {
@@ -64,11 +65,11 @@ public class PortfolioToIndexService {
 		this.currencyService = currencyService;
 	}
 
-	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
+	public List<DailyQuoteEntityDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex) {
 		return this.calculateIndexComparison(portfolioId, comparisonIndex, null, null);
 	}
 
-	private List<QuoteDto> compareToIndex(List<PortfolioToSymbol> portfolioChanges, List<DailyQuote> dailyQuotes) {
+	private List<DailyQuoteEntityDto> compareToIndex(List<PortfolioToSymbol> portfolioChanges, List<DailyQuote> dailyQuotes) {
 		record PtsChangesByDay(LocalDate day, PortfolioToSymbol ptsChange, Optional<PortfolioToSymbol> ptsChangeOld,
 				Optional<DailyQuote> dailyQuoteOld) {
 		}
@@ -99,14 +100,12 @@ public class PortfolioToIndexService {
 						pts -> Stream.of(new PtsChangePair(pts.ptsChange, pts.ptsChangeOld)), Collectors.toList())));
 		SortedMap<LocalDate, List<PtsChangePair>> sortedPortfolioChangesMap = ImmutableSortedMap
 				.copyOf(portfolioChangesMap, (date1, date2) -> date1.compareTo(date2));
-		record DailyQuoteEntityDto(DailyQuote entity, QuoteDto dto) {
-		}
 		return dailyQuotes.stream()
 				.map(myDailyQuote -> new DailyQuoteEntityDto(myDailyQuote,
 						this.calcQuote(myDailyQuote.getLocalDay(), sortedPortfolioChangesMap, myDailyQuote,
 								currentWeight)))
-				.filter(myRecord -> 0 >= BigDecimal.ZERO.compareTo(myRecord.dto.getClose()))
-				.map(DailyQuoteEntityDto::dto).collect(Collectors.toList());
+				.filter(myRecord -> 0 >= BigDecimal.ZERO.compareTo(myRecord.dto().getClose()))
+				.collect(Collectors.toList());
 	}
 
 	private AtomicReference<BigDecimal> calcWeight(List<PortfolioToSymbol> portfolioChanges,
@@ -174,13 +173,13 @@ public class PortfolioToIndexService {
 				portfolioToSymbol.ptsChange.getSymbol().getSymbol());
 	}
 
-	public List<QuoteDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
+	public List<DailyQuoteEntityDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex, LocalDate from,
 			LocalDate to) {
 		List<PortfolioToSymbol> portfolioChanges = portfolioToSymbolRepository.findByPortfolioId(portfolioId);
 		List<DailyQuote> dailyQuotes = Optional.ofNullable(from).filter(xxx -> Optional.ofNullable(to).isPresent())
 				.map(xxx -> this.dailyQuoteRepository.findBySymbolAndDayBetween(comparisonIndex.getSymbol(), from, to))
 				.orElse(this.dailyQuoteRepository.findBySymbol(comparisonIndex.getSymbol()));
-		List<QuoteDto> result = compareToIndex(portfolioChanges, dailyQuotes);
+		List<DailyQuoteEntityDto> result = compareToIndex(portfolioChanges, dailyQuotes);
 		return result;
 	}
 }

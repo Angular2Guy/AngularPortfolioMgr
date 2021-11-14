@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.IntraDayQuote;
+import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 
 @Component
 public class QuoteMapper {
@@ -29,4 +30,8 @@ public class QuoteMapper {
 		return new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getVolume(),
 				entity.getLocalDay().atStartOfDay(), entity.getSymbol().getSymbol());
 	}
+	
+	public QuoteDto convert(DailyQuoteEntityDto myRecord) {
+		return myRecord.dto();
+	}		
 }

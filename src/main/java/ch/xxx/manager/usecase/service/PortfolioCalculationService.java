@@ -35,6 +35,8 @@ import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -42,23 +44,63 @@ public class PortfolioCalculationService {
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
 
-	private record PortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value) {
+	private record PortfolioData(Map<Long, List<DailyQuote>> dailyQuotesMap,
+			PortfolioSymbolWithDailyQuotes portfolioQuotes, List<PortfolioElement> portfolioElements) {
 	};
 
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyService currencyService;
+	public record ComparisonIndexQuotes(ComparisonIndex comparisonIndex, List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {};
 
-	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository,
-			CurrencyService currencyService) {
+	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;
+	}
+
+	public List<PortfolioElement> calculatePortfolioBars(Portfolio portfolio, LocalDate cutOffDate,
+			List<ComparisonIndexQuotes> comparisonQuotes) {
+		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
+		LOG.info("Portfolio calculation bars called for: {}", portfolio.getId());
+		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
+		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolioToSymbols);
+		List<PortfolioElement> portfolioElements = myPortfolioData.portfolioElements.stream()
+				.map(pe -> this.findValueAtDate(myPortfolioData.portfolioElements, cutOffDate, pe.symbolId()))
+				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());		
+		BigDecimal portfolioValueAtDate = this.portfolioValueAtDate(portfolioToSymbols,
+				myPortfolioData.portfolioElements(), cutOffDate);
+		portfolioElements.add(new PortfolioElement(myPortfolioData.portfolioQuotes.symbol.getId(), cutOffDate, portfolioValueAtDate));
+		
+		return List.of();
 	}
 
 	public Portfolio calculatePortfolio(Portfolio portfolio) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
 		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
+		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolioToSymbols);
+		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
+		portfolio.setMonth1(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
+		portfolio.setMonth6(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
+		portfolio.setYear1(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
+		portfolio.setYear2(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
+		portfolio.setYear5(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
+		portfolio.setYear10(
+				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
+		return portfolio;
+	}
+
+	private PortfolioData calculatePortfolioData(List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
@@ -77,19 +119,7 @@ public class PortfolioCalculationService {
 						portfolioQuotes))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(PortfolioElement::localDate))
 				.collect(Collectors.toList());
-		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
-		portfolio.setMonth1(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
-		portfolio.setMonth6(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
-		portfolio.setYear1(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
-		portfolio.setYear2(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
-		portfolio.setYear5(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
-		portfolio.setYear10(portfolioValueAtDate(portfolioToSymbols, portfolioElements, cutOffDate));
-		return portfolio;
+		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements);
 	}
 
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
@@ -104,14 +134,14 @@ public class PortfolioCalculationService {
 			List<PortfolioElement> portfolioElements, LocalDate cutOffDate) {
 		BigDecimal result = portfolioToSymbols.stream()
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
-				.filter(Optional::isPresent).map(pe -> pe.get()).map(pe -> pe.value)
+				.filter(Optional::isPresent).map(pe -> pe.get()).map(pe -> pe.value())
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
 
 	private Optional<PortfolioElement> findValueAtDate(List<PortfolioElement> portfolioElements, LocalDate cutOffDate,
 			Long symbolId) {
-		return portfolioElements.stream().filter(pts -> pts.symbolId.equals(symbolId))
+		return portfolioElements.stream().filter(pts -> pts.symbolId().equals(symbolId))
 				.filter(pts -> pts.localDate().isBefore(cutOffDate))
 				.max(Comparator.comparing(PortfolioElement::localDate));
 	}

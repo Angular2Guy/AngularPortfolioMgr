@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.QuoteDto;
+import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
@@ -54,7 +55,8 @@ public class QuoteController {
 			@PathVariable("indexSymbol") String indexSymbol) {
 		ComparisonIndex comparisonIndex = List.of(ComparisonIndex.values()).stream()
 				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
-		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex);
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex).stream()
+				.map(DailyQuoteEntityDto::dto).toList();
 	}
 
 	@GetMapping("/intraday/symbol/{symbol}")
@@ -78,7 +80,8 @@ public class QuoteController {
 				.filter(value -> value.getSymbol().equals(indexSymbol)).findFirst().orElseThrow();
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
 		LocalDate end = LocalDate.parse(isodateEnd, DateTimeFormatter.ISO_DATE);
-		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end);
+		return this.portfolioToIndexService.calculateIndexComparison(portfolioId, comparisonIndex, start, end).stream()
+				.map(DailyQuoteEntityDto::dto).toList();
 	}
 
 	@GetMapping("/import/daily/symbol/{symbol}")

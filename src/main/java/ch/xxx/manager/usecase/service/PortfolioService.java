@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.CurrencyKey;
-import ch.xxx.manager.usecase.mapping.PortfolioMapper;
+import ch.xxx.manager.usecase.service.PortfolioCalculationService.ComparisonIndexQuotes;
 
 @Service
 @Transactional
@@ -48,66 +47,72 @@ public class PortfolioService {
 	private final SymbolRepository symbolRepository;
 	private final AppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
-	private final PortfolioMapper portfolioMapper;
+	private final PortfolioToIndexService portfolioToIndexService;
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
-			PortfolioCalculationService portfolioCalculationService, PortfolioMapper portfolioMapper) {
+			PortfolioCalculationService portfolioCalculationService, PortfolioToIndexService portfolioToIndexService) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.symbolRepository = symbolRepository;
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.appUserRepository = appUserRepository;
-		this.portfolioMapper = portfolioMapper;
+		this.portfolioToIndexService = portfolioToIndexService;
 	}
 
-	public List<PortfolioDto> getPortfoliosByUserId(Long userId) {
-		return this.portfolioRepository.findByUserId(userId).stream().flatMap(entity -> Stream.of(this.convert(entity)))
-				.collect(Collectors.toList());
+	public List<Portfolio> getPortfoliosByUserId(Long userId) {
+		return this.portfolioRepository.findByUserId(userId);
 	}
 
-	public PortfolioDto getPortfolioById(Long portfolioId) {
-		return this.portfolioRepository.findById(portfolioId).map(entity -> this.convert(entity))
+	public Portfolio getPortfolioById(Long portfolioId) {
+		return this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 	}
 
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
-		List<PortfolioBarDto> barDtos = List.of(new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
+		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = List.of(ComparisonIndex.values()).stream()
+				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
+						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start, LocalDate.now())))
+				.toList();
+		//this.portfolioCalculationService.calculatePortfolioBars(portfolio, start, comparisonQuotes);
+		List<PortfolioBarDto> barDtos = List.of(
+				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
 				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
 				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
 		return new PortfolioBarsDto(portfolio.getName(), start, barDtos);
 	}
 
-	public PortfolioDto addPortfolio(PortfolioDto dto) {
-		Portfolio portfolio = this.portfolioRepository.save(this.convert(dto));
+	public Portfolio addPortfolio(Portfolio entity, Long userId) {
+		entity.setAppUser(this.appUserRepository.findById(userId).orElse(null));
+		Portfolio portfolio = this.portfolioRepository.save(entity);
 		portfolio.getPortfolioToSymbols().add(createPortfolioPtSAndSymbol(portfolio));
-		return this.convert(portfolio);
+		return portfolio;
 	}
 
-	public PortfolioDto addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
-		return this.convert(this.portfolioCalculationService.calculatePortfolio(this.portfolioToSymbolRepository
-				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio()));
+	public Portfolio addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
+		return this.portfolioCalculationService.calculatePortfolio(this.portfolioToSymbolRepository
+				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
 	}
 
-	public PortfolioDto updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
+	public Portfolio updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.flatMap(newEntity -> Stream.of(this.portfolioToSymbolRepository.save(newEntity)))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.map(entity -> this.convert(entity)).findFirst().orElseThrow(() -> new ResourceNotFoundException(
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
 
-	public PortfolioDto removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
+	public Portfolio removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.map(entity -> this.convert(entity)).findFirst().orElseThrow(() -> new ResourceNotFoundException(
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
 
@@ -131,17 +136,6 @@ public class PortfolioService {
 		entity.setWeight(weight);
 		entity.setChangedAt(changedAt);
 		return entity;
-	}
-
-	private Portfolio convert(PortfolioDto dto) {
-		Portfolio entity = this.portfolioMapper.toEntity(dto,
-				this.appUserRepository.findById(dto.getUserId()).orElse(null));
-		return entity;
-	}
-
-	private PortfolioDto convert(Portfolio entity) {
-		final PortfolioDto dto = this.portfolioMapper.toDto(entity);
-		return dto;
 	}
 
 	private PortfolioToSymbol createPortfolioPtSAndSymbol(Portfolio portfolioEntity) {
