@@ -12,7 +12,9 @@
  */
 package ch.xxx.manager.domain.model.entity.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
-public record PortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value, String symbolName, Long weight) {}
+import ch.xxx.manager.domain.model.entity.Portfolio;
+
+public record PortfolioBarsWrapper(Portfolio portfolio, LocalDate start, List<PortfolioElement> portfolioElements) {}

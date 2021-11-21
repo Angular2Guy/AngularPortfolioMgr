@@ -51,7 +51,10 @@ public class PortfolioCalculationService {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyService currencyService;
-	public record ComparisonIndexQuotes(ComparisonIndex comparisonIndex, List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {};
+
+	public record ComparisonIndexQuotes(ComparisonIndex comparisonIndex,
+			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
+	};
 
 	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
@@ -66,12 +69,12 @@ public class PortfolioCalculationService {
 		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolioToSymbols);
 		List<PortfolioElement> portfolioElements = myPortfolioData.portfolioElements.stream()
 				.map(pe -> this.findValueAtDate(myPortfolioData.portfolioElements, cutOffDate, pe.symbolId()))
-				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());		
+				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 		BigDecimal portfolioValueAtDate = this.portfolioValueAtDate(portfolioToSymbols,
 				myPortfolioData.portfolioElements(), cutOffDate);
-		portfolioElements.add(new PortfolioElement(myPortfolioData.portfolioQuotes.symbol.getId(), cutOffDate, portfolioValueAtDate));
-		
-		return List.of();
+		portfolioElements.add(new PortfolioElement(myPortfolioData.portfolioQuotes.symbol.getId(), cutOffDate,
+				portfolioValueAtDate, myPortfolioData.portfolioQuotes.symbol.getName(), 0L));
+		return portfolioElements;
 	}
 
 	public Portfolio calculatePortfolio(Portfolio portfolio) {
@@ -163,7 +166,8 @@ public class PortfolioCalculationService {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
 			return new PortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
-					myPortfolioQuote.getClose());
+					myPortfolioQuote.getClose(), portfolioToSymbol.getSymbol().getName(),
+					portfolioToSymbol.getWeight());
 		});
 	}
 

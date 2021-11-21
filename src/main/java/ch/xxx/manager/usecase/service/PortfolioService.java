@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
-import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
@@ -36,8 +34,9 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
 import ch.xxx.manager.domain.utils.CurrencyKey;
-import ch.xxx.manager.usecase.service.PortfolioCalculationService.ComparisonIndexQuotes;
 
 @Service
 @Transactional
@@ -69,19 +68,17 @@ public class PortfolioService {
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 	}
 
-	public PortfolioBarsDto getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
+	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
-		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = List.of(ComparisonIndex.values()).stream()
+		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = List.of(ComparisonIndex.values())
+				.stream()
 				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
 						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start, LocalDate.now())))
 				.toList();
-		//this.portfolioCalculationService.calculatePortfolioBars(portfolio, start, comparisonQuotes);
-		List<PortfolioBarDto> barDtos = List.of(
-				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
-				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
-				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
-		return new PortfolioBarsDto(portfolio.getName(), start, barDtos);
+		List<PortfolioElement> portfolioBars = this.portfolioCalculationService
+				.calculatePortfolioBars(portfolio, start, comparisonQuotes);
+		return new PortfolioBarsWrapper(portfolio, start, portfolioBars);
 	}
 
 	public Portfolio addPortfolio(Portfolio entity, Long userId) {

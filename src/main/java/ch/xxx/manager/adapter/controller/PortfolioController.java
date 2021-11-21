@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
+import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.usecase.mapping.PortfolioMapper;
@@ -64,7 +66,12 @@ public class PortfolioController {
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
 			@PathVariable("start") String isodateStart) {
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-		return this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start);
+//		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start));
+		List<PortfolioBarDto> barDtos = List.of(
+				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
+				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
+				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
+		return new PortfolioBarsDto("Portfolioname", start, barDtos);
 	}
 
 	@PostMapping

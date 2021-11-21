@@ -1,6 +1,20 @@
+/**
+ *    Copyright 2019 Sven Loesekann
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
 package ch.xxx.manager.usecase.mapping;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,9 +22,12 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
+import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Component
@@ -48,6 +65,12 @@ public class PortfolioMapper {
 		entity.setAppUser(Optional.ofNullable(appUser).orElse(null));
 		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
 		return entity;
+	}
+	
+	public PortfolioBarsDto toBarsDto(PortfolioBarsWrapper portfolioBarsWrapper) {
+		List<PortfolioBarDto> portfolioBars = portfolioBarsWrapper.portfolioElements()
+			.stream().map(pe -> new PortfolioBarDto(pe.value(), pe.symbolName(), BigDecimal.valueOf(pe.weight()))).toList();
+		return new PortfolioBarsDto(portfolioBarsWrapper.portfolio().getName(), portfolioBarsWrapper.start(), portfolioBars);
 	}
 	
 }
