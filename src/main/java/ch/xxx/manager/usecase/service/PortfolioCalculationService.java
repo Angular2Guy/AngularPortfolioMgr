@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,7 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -66,15 +68,32 @@ public class PortfolioCalculationService {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation bars called for: {}", portfolio.getId());
 		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
-		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolioToSymbols);
-		List<PortfolioElement> portfolioElements = myPortfolioData.portfolioElements.stream()
-				.map(pe -> this.findValueAtDate(myPortfolioData.portfolioElements, cutOffDate, pe.symbolId()))
-				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-		BigDecimal portfolioValueAtDate = this.portfolioValueAtDate(portfolioToSymbols,
-				myPortfolioData.portfolioElements(), cutOffDate);
-		portfolioElements.add(new PortfolioElement(myPortfolioData.portfolioQuotes.symbol.getId(), cutOffDate,
-				portfolioValueAtDate, myPortfolioData.portfolioQuotes.symbol.getName(), 0L));
-		return portfolioElements;
+		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
+				.flatMap(portfolioPts -> StreamHelpers
+						.toStream(this.dailyQuoteRepository.findBySymbolId(portfolioPts.getSymbol().getId()))
+						.map(dailyQuote -> new PortfolioElement(portfolioPts.getSymbol().getId(),
+								dailyQuote.getLocalDay(), dailyQuote.getClose(), portfolioPts.getSymbol().getName(),
+								portfolioPts.getWeight())))
+				.toList();
+		List<PortfolioElement> cutOffPEs = portfolioElements.stream()
+				.flatMap(pe -> this.findValueAtDate(portfolioElements, cutOffDate, pe.symbolId()).stream())
+				.filter(StreamHelpers.distinctByKey(PortfolioElement::symbolId)).toList();
+		List<PortfolioElement> maxPEs = portfolioElements.stream().collect(Collectors.groupingBy(pe -> pe.symbolId()))
+				.entrySet().stream()
+				.flatMap(entry -> StreamHelpers
+						.toStream(entry.getValue().stream().max(Comparator.comparing(PortfolioElement::localDate))
+								.orElseThrow(NoSuchElementException::new)))
+				.toList();
+		List<PortfolioElement> resultPortfolioElements = maxPEs.stream()
+				.map(pe -> {
+					BigDecimal value = cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
+							.map(myPe -> myPe.value()).findFirst().isEmpty() ? BigDecimal.ZERO : pe.value()
+									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
+											.map(myPe -> myPe.value()).findFirst().get());  
+					return new PortfolioElement(pe.symbolId(), pe.localDate(),
+						value, pe.symbolName(), pe.weight());})
+				.toList();
+		return resultPortfolioElements;
 	}
 
 	public Portfolio calculatePortfolio(Portfolio portfolio) {
