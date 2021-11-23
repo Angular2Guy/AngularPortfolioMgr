@@ -66,12 +66,12 @@ public class PortfolioController {
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
 			@PathVariable("start") String isodateStart) {
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-//		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start));
-		List<PortfolioBarDto> barDtos = List.of(
-				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
-				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
-				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
-		return new PortfolioBarsDto("Portfolioname", start, barDtos);
+		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start));
+//		List<PortfolioBarDto> barDtos = List.of(
+//				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
+//				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
+//				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
+//		return new PortfolioBarsDto("Portfolioname", start, barDtos);
 	}
 
 	@PostMapping

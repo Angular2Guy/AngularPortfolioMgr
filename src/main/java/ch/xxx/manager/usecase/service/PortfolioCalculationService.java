@@ -13,8 +13,11 @@
 package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -68,12 +71,11 @@ public class PortfolioCalculationService {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation bars called for: {}", portfolio.getId());
 		List<PortfolioToSymbol> portfolioToSymbols = List.copyOf(portfolio.getPortfolioToSymbols());
-		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
-				.flatMap(portfolioPts -> StreamHelpers
-						.toStream(this.dailyQuoteRepository.findBySymbolId(portfolioPts.getSymbol().getId()))
-						.map(dailyQuote -> new PortfolioElement(portfolioPts.getSymbol().getId(),
-								dailyQuote.getLocalDay(), dailyQuote.getClose(), portfolioPts.getSymbol().getName(),
-								portfolioPts.getWeight())))
+		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream().flatMap(portfolioPts -> StreamHelpers
+				.toStream(this.dailyQuoteRepository.findBySymbolId(portfolioPts.getSymbol().getId(),
+						cutOffDate.minus(1, ChronoUnit.MONTHS), LocalDate.now()))
+				.map(dailyQuote -> new PortfolioElement(portfolioPts.getSymbol().getId(), dailyQuote.getLocalDay(),
+						dailyQuote.getClose(), portfolioPts.getSymbol().getName(), portfolioPts.getWeight())))
 				.toList();
 		List<PortfolioElement> cutOffPEs = portfolioElements.stream()
 				.flatMap(pe -> this.findValueAtDate(portfolioElements, cutOffDate, pe.symbolId()).stream())
@@ -84,15 +86,16 @@ public class PortfolioCalculationService {
 						.toStream(entry.getValue().stream().max(Comparator.comparing(PortfolioElement::localDate))
 								.orElseThrow(NoSuchElementException::new)))
 				.toList();
-		List<PortfolioElement> resultPortfolioElements = maxPEs.stream()
-				.map(pe -> {
-					BigDecimal value = cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-							.map(myPe -> myPe.value()).findFirst().isEmpty() ? BigDecimal.ZERO : pe.value()
+		List<PortfolioElement> resultPortfolioElements = maxPEs.stream().map(pe -> {
+			BigDecimal value = cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
+					.map(myPe -> myPe.value()).findFirst().isEmpty()
+							? BigDecimal.ZERO
+							: pe.value()
 									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-											.map(myPe -> myPe.value()).findFirst().get());  
-					return new PortfolioElement(pe.symbolId(), pe.localDate(),
-						value, pe.symbolName(), pe.weight());})
-				.toList();
+											.map(myPe -> myPe.value()).findFirst().get(), 8, RoundingMode.HALF_EVEN)
+									.multiply(BigDecimal.valueOf(100));
+			return new PortfolioElement(pe.symbolId(), pe.localDate(), value, pe.symbolName(), pe.weight());
+		}).toList();
 		return resultPortfolioElements;
 	}
 

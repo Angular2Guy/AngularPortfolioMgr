@@ -19,6 +19,7 @@ public interface DailyQuoteRepository {
 	List<DailyQuote> findBySymbol(String symbol);
 
 	List<DailyQuote> findBySymbolId(Long symbolId);
+	List<DailyQuote> findBySymbolId(Long symbolId, LocalDate start, LocalDate end);
 	List<DailyQuote> findBySymbolIds(List<Long> symbolId);
 
 	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
