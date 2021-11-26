@@ -22,16 +22,12 @@ import { Router } from '@angular/router';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit {	
+export class MainComponent {	
   login: Login = null;
 
   constructor(private dialog: MatDialog, 
 		private tokenService: TokenService,
 		private router: Router) { }
-
-  ngOnInit() {
-	
-  }
 
   openLoginDialog():void {
 	const dialogRef = this.dialog.open(LoginComponent, { width: '500px', data: {login: this.login}});
