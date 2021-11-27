@@ -75,7 +75,7 @@ public class PortfolioCalculationService {
 				.toStream(this.dailyQuoteRepository.findBySymbolId(portfolioPts.getSymbol().getId(),
 						cutOffDate.minus(1, ChronoUnit.MONTHS), LocalDate.now()))
 				.map(dailyQuote -> new PortfolioElement(portfolioPts.getSymbol().getId(), dailyQuote.getLocalDay(),
-						dailyQuote.getClose(), portfolioPts.getSymbol().getName(), portfolioPts.getWeight())))
+						dailyQuote.getClose(), Symbol.QuoteSource.PORTFOLIO.equals(portfolioPts.getSymbol().getQuoteSource()) ? portfolioPts.getSymbol().getName() : portfolioPts.getSymbol().getSymbol(), portfolioPts.getWeight())))
 				.toList();
 		List<PortfolioElement> cutOffPEs = portfolioElements.stream()
 				.flatMap(pe -> this.findValueAtDate(portfolioElements, cutOffDate, pe.symbolId()).stream())
@@ -93,6 +93,7 @@ public class PortfolioCalculationService {
 							: pe.value()
 									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
 											.map(myPe -> myPe.value()).findFirst().get(), 8, RoundingMode.HALF_EVEN)
+									.subtract(BigDecimal.ONE)
 									.multiply(BigDecimal.valueOf(100));
 			return new PortfolioElement(pe.symbolId(), pe.localDate(), value, pe.symbolName(), pe.weight());
 		}).toList();
