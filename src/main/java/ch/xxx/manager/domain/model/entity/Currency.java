@@ -25,13 +25,8 @@ import javax.persistence.SequenceGenerator;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
-
 @Entity
-public class Currency {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
+public class Currency extends EntityBase {
 	private LocalDate localDay;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey fromCurrKey;
@@ -41,12 +36,13 @@ public class Currency {
 	private BigDecimal high;
 	private BigDecimal low;
 	private BigDecimal close;
-	
+
 	public Currency() {
+		super();
 	}
-	
-	public Currency(LocalDate localDay, CurrencyKey fromCurrKey, CurrencyKey toCurrKey, BigDecimal open, BigDecimal high, BigDecimal low,
-			BigDecimal close) {
+
+	public Currency(LocalDate localDay, CurrencyKey fromCurrKey, CurrencyKey toCurrKey, BigDecimal open,
+			BigDecimal high, BigDecimal low, BigDecimal close) {
 		super();
 		this.localDay = localDay;
 		this.fromCurrKey = fromCurrKey;
@@ -55,14 +51,6 @@ public class Currency {
 		this.high = high;
 		this.low = low;
 		this.close = close;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public BigDecimal getOpen() {
@@ -105,7 +93,6 @@ public class Currency {
 		this.localDay = localDay;
 	}
 
-
 	public CurrencyKey getFromCurrKey() {
 		return fromCurrKey;
 	}
@@ -124,7 +111,7 @@ public class Currency {
 
 	@Override
 	public String toString() {
-		return "Currency [id=" + id + ", localDay=" + localDay + ", fromCurrKey=" + fromCurrKey + ", toCurrKey="
+		return "Currency [id=" + this.getId() + ", localDay=" + localDay + ", fromCurrKey=" + fromCurrKey + ", toCurrKey="
 				+ toCurrKey + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + "]";
 	}
 

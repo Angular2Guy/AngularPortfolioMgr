@@ -31,11 +31,7 @@ import javax.persistence.SequenceGenerator;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
-public class Portfolio {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
+public class Portfolio extends EntityBase {
 	@ManyToOne
 	private AppUser appUser;
 	private String name;
@@ -58,14 +54,6 @@ public class Portfolio {
 
 	public LocalDate getCreatedAt() {
 		return createdAt;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getName() {
@@ -142,7 +130,7 @@ public class Portfolio {
 
 	@Override
 	public String toString() {
-		return "Portfolio [id=" + id + ", appUser=" + appUser + ", name=" + name + ", createdAt=" + createdAt
+		return "Portfolio [id=" + this.getId() + ", appUser=" + appUser + ", name=" + name + ", createdAt=" + createdAt
 				+ ", month1=" + month1 + ", month6=" + month6 + ", year1=" + year1 + ", year2=" + year2 + ", year5="
 				+ year5 + ", year10=" + year10 + ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}

@@ -28,15 +28,11 @@ import javax.persistence.SequenceGenerator;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
-public class Symbol {
+public class Symbol extends EntityBase {
 	public enum QuoteSource {
 		ALPHAVANTAGE, YAHOO, PORTFOLIO
 	}
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
 	private String symbol;
 	private String name;
 	@Enumerated(EnumType.STRING)
@@ -51,12 +47,13 @@ public class Symbol {
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
 
 	public Symbol() {
+		super();
 	}
 
 	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource,
 			Set<DailyQuote> dailyQuotes, Set<IntraDayQuote> intraDayQuotes, Set<PortfolioToSymbol> portfolioToSymbols) {
 		super();
-		this.id = id;
+		super.setId(id);
 		this.symbol = symbol;
 		this.name = name;
 		this.currencyKey = currencyKey;
@@ -64,14 +61,6 @@ public class Symbol {
 		this.dailyQuotes = dailyQuotes;
 		this.intraDayQuotes = intraDayQuotes;
 		this.portfolioToSymbols = portfolioToSymbols;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getSymbol() {
@@ -132,7 +121,7 @@ public class Symbol {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(this.getId());
 	}
 
 	@Override
@@ -144,12 +133,12 @@ public class Symbol {
 		if (getClass() != obj.getClass())
 			return false;
 		Symbol other = (Symbol) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(this.getId(), other.getId());
 	}
 
 	@Override
 	public String toString() {
-		return "Symbol [id=" + id + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
+		return "Symbol [id=" + this.getId() + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
 				+ ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes=" + intraDayQuotes
 				+ ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}

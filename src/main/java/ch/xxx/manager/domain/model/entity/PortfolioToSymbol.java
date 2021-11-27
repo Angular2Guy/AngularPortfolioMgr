@@ -23,11 +23,7 @@ import javax.persistence.SequenceGenerator;
 
 
 @Entity
-public class PortfolioToSymbol {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
+public class PortfolioToSymbol extends EntityBase {
 	@ManyToOne
 	private Portfolio portfolio;
 	@ManyToOne
@@ -39,7 +35,7 @@ public class PortfolioToSymbol {
 	public PortfolioToSymbol(Long id, Portfolio portfolio, Symbol symbol, Long weight, LocalDate changedAt,
 			LocalDate removedAt) {
 		super();
-		this.id = id;
+		super.setId(id);
 		this.portfolio = portfolio;
 		this.symbol = symbol;
 		this.weight = weight;
@@ -67,12 +63,6 @@ public class PortfolioToSymbol {
 	public void setWeight(Long weight) {
 		this.weight = weight;
 	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
 	public Portfolio getPortfolio() {
 		return portfolio;
 	}
@@ -88,7 +78,7 @@ public class PortfolioToSymbol {
 	
 	@Override
 	public String toString() {
-		return "PortfolioToSymbol [id=" + id + ", portfolio=" + portfolio + ", symbol=" + symbol + ", weight=" + weight
+		return "PortfolioToSymbol [id=" + this.getId() + ", portfolio=" + portfolio + ", symbol=" + symbol + ", weight=" + weight
 				+ ", changedAt=" + changedAt + ", removedAt=" + removedAt + "]";
 	}
 }

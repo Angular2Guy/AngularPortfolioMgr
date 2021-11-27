@@ -15,26 +15,17 @@ package ch.xxx.manager.domain.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 
 @Entity
-public class DailyQuote {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
+public class DailyQuote extends EntityBase {
 	private String symbolKey;
 	private BigDecimal open;
 	private BigDecimal high;
@@ -48,12 +39,13 @@ public class DailyQuote {
 	private CurrencyKey currencyKey;
 
 	public DailyQuote() {
+		super();
 	}
 
 	public DailyQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
 			Long volume, LocalDate localDay, Symbol symbol, CurrencyKey currencyKey) {
 		super();
-		this.id = id;
+		super.setId(id);
 		this.symbolKey = symbolKey;
 		this.open = open;
 		this.high = high;
@@ -65,9 +57,6 @@ public class DailyQuote {
 		this.currencyKey = currencyKey;
 	}
 
-	public Long getId() {
-		return id;
-	}
 
 	public LocalDate getLocalDay() {
 		return localDay;
@@ -75,10 +64,6 @@ public class DailyQuote {
 
 	public void setLocalDay(LocalDate localDay) {
 		this.localDay = localDay;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public BigDecimal getOpen() {
@@ -147,7 +132,7 @@ public class DailyQuote {
 
 	@Override
 	public String toString() {
-		return "DailyQuote [id=" + id + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
+		return "DailyQuote [id=" + this.getId() + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
 				+ low + ", close=" + close + ", volume=" + volume + ", localDay=" + localDay + ", symbol=" + symbol
 				+ ", currencyKey=" + currencyKey + "]";
 	}

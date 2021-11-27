@@ -25,11 +25,7 @@ import javax.persistence.SequenceGenerator;
 
 
 @Entity
-public class IntraDayQuote {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
-	private Long id;
+public class IntraDayQuote extends EntityBase {
 	private String symbolKey;
 	private BigDecimal open;
 	private BigDecimal high;
@@ -40,13 +36,14 @@ public class IntraDayQuote {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Symbol symbol;
 
-	public IntraDayQuote() {		
+	public IntraDayQuote() {
+		super();
 	}
 	
 	public IntraDayQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low,
 			BigDecimal close, Long volume, LocalDateTime localDateTime, Symbol symbol) {
 		super();
-		this.id = id;
+		super.setId(id);
 		this.symbolKey = symbolKey;
 		this.open = open;
 		this.high = high;
@@ -63,13 +60,6 @@ public class IntraDayQuote {
 
 	public void setLocalDateTime(LocalDateTime localDateTime) {
 		this.localDateTime = localDateTime;
-	}
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
 	}
 	public BigDecimal getOpen() {
 		return open;
@@ -120,7 +110,7 @@ public class IntraDayQuote {
 
 	@Override
 	public String toString() {
-		return "IntraDayQuote [id=" + id + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
+		return "IntraDayQuote [id=" + this.getId() + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
 				+ low + ", close=" + close + ", volume=" + volume + ", localDateTime=" + localDateTime + ", symbol="
 				+ symbol + "]";
 	}
