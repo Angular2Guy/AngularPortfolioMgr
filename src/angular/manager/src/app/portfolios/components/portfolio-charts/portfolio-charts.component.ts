@@ -70,7 +70,7 @@ export class PortfolioChartsComponent implements OnInit {
 	this.chartsLoading = false;
 	//console.log(portfolioBars);	
 	const chartBars = portfolioBars.portfolioBars.map(value => ({x: value.name, y: value.value} as ChartBar));
-	this.chartBars = {title: portfolioBars.title, from: this.startDate.toLocaleDateString(), yScaleWidth: 30, xScaleHeight: 50, chartBars: chartBars } as ChartBars;
+	this.chartBars = {title: portfolioBars.title, from: this.startDate.toLocaleDateString(), yScaleWidth: 50, xScaleHeight: 50, chartBars: chartBars } as ChartBars;
 	//console.log(this.chartBars);
   }
 
