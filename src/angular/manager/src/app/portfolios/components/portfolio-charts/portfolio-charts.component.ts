@@ -38,12 +38,12 @@ export class PortfolioChartsComponent implements OnInit {
   chartPeriods: ChartPeriod[] = [];
   chartsLoading = true;
   readonly ComparisonIndex = ComparisonIndex;
-  readonly compIndexes = new Map<string, number>([[ComparisonIndex.SP500, 0], [ComparisonIndex.EUROSTOXX50, 0], [ComparisonIndex.MSCI_CHINA, 0]]);
   showSP500 = false;
   showMsciCH = false;
   showES50 = false;  
   selChartPeriod: ChartPeriod = null;
   chartBars!: ChartBars;
+  selCompIndexes: ComparisonIndex[] = [];
 
   constructor(private portfolioService: PortfolioService) { }
 
@@ -57,13 +57,13 @@ export class PortfolioChartsComponent implements OnInit {
 		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years`, periodDuration:  {years: 10} }];
 		this.selChartPeriod = this.chartPeriods[0];	
 	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate).subscribe(result => this.updateChartData(result));
+	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));
   }
 
   chartPeriodChanged(): void {
 	this.chartsLoading = true;
 	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate).subscribe(result => this.updateChartData(result));	
+	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));	
   }
 
   private updateChartData(portfolioBars: PortfolioBars): void {
@@ -75,6 +75,7 @@ export class PortfolioChartsComponent implements OnInit {
   }
 
   compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
-	
+	this.selCompIndexes = !value ? this.selCompIndexes.filter(ci => comparisonIndex === ci) : 
+		this.selCompIndexes.filter(ci => comparisonIndex === ci).concat(comparisonIndex);
   }
 }

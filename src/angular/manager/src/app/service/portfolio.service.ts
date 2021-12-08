@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 import { Portfolio } from '../model/portfolio';
 import { PortfolioBars } from '../model/portfolio-bars';
 import { HttpClient } from '@angular/common/http';
+import { ComparisonIndex } from './quote.service';
 
 @Injectable({providedIn: 'root'})
 export class PortfolioService {
@@ -29,8 +30,9 @@ export class PortfolioService {
 		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`);
 	}
 	
-	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date): Observable<PortfolioBars> {
-		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString().split('T')[0]}`);
+	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date, compSyms: ComparisonIndex[]): Observable<PortfolioBars> {
+		const compSymStrs = compSyms.length === 0 ? '' : ('?compSymbols=' + compSyms.join(','));
+		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString().split('T')[0]}${compSymStrs}`);
 	}	
 	
 	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
