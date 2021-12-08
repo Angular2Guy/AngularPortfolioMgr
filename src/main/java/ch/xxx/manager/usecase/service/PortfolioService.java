@@ -68,11 +68,10 @@ public class PortfolioService {
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 	}
 
-	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start) {
+	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start, List<ComparisonIndex> compIndexes) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
-		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = List.of(ComparisonIndex.values())
-				.stream()
+		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = compIndexes.stream()
 				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
 						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start, LocalDate.now())))
 				.toList();

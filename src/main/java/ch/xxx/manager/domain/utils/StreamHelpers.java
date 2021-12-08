@@ -13,7 +13,9 @@
 package ch.xxx.manager.domain.utils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,7 +33,15 @@ public class StreamHelpers {
 		return collection.stream();
 	}
 	
+	public static <T> Stream<T> toStream(T[] array) {
+		return List.of(array).stream();
+	}
+	
 	public static <T> Stream<T> toStream(T object) {
 		return Stream.of(object);
+	}
+	
+	public static <T> Stream<T> unboxOptionals(Stream<Optional<T>> optSteam) {
+		return optSteam.filter(Optional::isPresent).map(Optional::get);
 	}
 }

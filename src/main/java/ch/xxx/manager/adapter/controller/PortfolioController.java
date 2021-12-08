@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,9 @@ import org.springframework.web.util.UriUtils;
 import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.mapping.PortfolioMapper;
+import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.PortfolioService;
 
 @RestController
@@ -64,14 +67,13 @@ public class PortfolioController {
 
 	@GetMapping("/id/{portfolioId}/start/{start}")
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
-			@PathVariable("start") String isodateStart) {
+			@PathVariable("start") String isodateStart, @RequestParam(name = "compSymbols") List<String> compSymbols) {
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start));
-//		List<PortfolioBarDto> barDtos = List.of(
-//				new PortfolioBarDto(BigDecimal.valueOf(5.5D), "abc", BigDecimal.valueOf(20L)),
-//				new PortfolioBarDto(BigDecimal.valueOf(10.5D), "def", BigDecimal.valueOf(30L)),
-//				new PortfolioBarDto(BigDecimal.valueOf(15.5D), "hij", BigDecimal.valueOf(50L)));
-//		return new PortfolioBarsDto("Portfolioname", start, barDtos);
+		List<ComparisonIndex> compIndexes = StreamHelpers.unboxOptionals(compSymbols.stream()
+		.filter(cSym -> StreamHelpers.toStream(ComparisonIndex.values()).anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
+			.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values()).filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr))
+					.findFirst())).toList();
+		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));
 	}
 
 	@PostMapping
