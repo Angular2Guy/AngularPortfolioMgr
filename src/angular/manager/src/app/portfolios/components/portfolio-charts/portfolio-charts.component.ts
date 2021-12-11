@@ -74,8 +74,9 @@ export class PortfolioChartsComponent implements OnInit {
 	//console.log(this.chartBars);
   }
 
-  compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
-	this.selCompIndexes = !value ? this.selCompIndexes.filter(ci => comparisonIndex === ci) : 
-		this.selCompIndexes.filter(ci => comparisonIndex === ci).concat(comparisonIndex);
+  compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {	
+	this.selCompIndexes = !value ? this.selCompIndexes.filter(ci => comparisonIndex !== ci) : 
+		this.selCompIndexes.filter(ci => comparisonIndex !== ci).concat(comparisonIndex);
+	this.chartPeriodChanged();
   }
 }
