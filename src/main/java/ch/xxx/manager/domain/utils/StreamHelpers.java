@@ -44,4 +44,8 @@ public class StreamHelpers {
 	public static <T> Stream<T> unboxOptionals(Stream<Optional<T>> optSteam) {
 		return optSteam.filter(Optional::isPresent).map(Optional::get);
 	}
+	
+	public static <T> Stream<T> unboxOptionals(Optional<T> opt) {
+		return opt.stream();
+	}
 }

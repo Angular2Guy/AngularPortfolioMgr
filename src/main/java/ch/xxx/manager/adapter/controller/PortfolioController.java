@@ -12,14 +12,11 @@
  */
 package ch.xxx.manager.adapter.controller;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
-import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.utils.StreamHelpers;
@@ -70,10 +66,11 @@ public class PortfolioController {
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
 			@PathVariable("start") String isodateStart, @RequestParam(name = "compSymbols", required = false) List<String> compSymbols) {
 		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);		
-		List<ComparisonIndex> compIndexes = StreamHelpers.unboxOptionals(StreamHelpers.toStream(compSymbols)
+		List<ComparisonIndex> compIndexes = StreamHelpers.toStream(compSymbols)
 		.filter(cSym -> StreamHelpers.toStream(ComparisonIndex.values()).anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
 			.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values()).filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr))
-					.findFirst())).toList();
+					.findFirst()).flatMap(StreamHelpers::unboxOptionals).toList();
+//		LOGGER.info(compIndexes.stream().map(value -> value.getSymbol()).collect(Collectors.joining(",")));
 		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));
 	}
 
