@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,9 +68,9 @@ public class PortfolioController {
 
 	@GetMapping("/id/{portfolioId}/start/{start}")
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
-			@PathVariable("start") String isodateStart, @RequestParam(name = "compSymbols") List<String> compSymbols) {
-		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
-		List<ComparisonIndex> compIndexes = StreamHelpers.unboxOptionals(compSymbols.stream()
+			@PathVariable("start") String isodateStart, @RequestParam(name = "compSymbols", required = false) List<String> compSymbols) {
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);		
+		List<ComparisonIndex> compIndexes = StreamHelpers.unboxOptionals(StreamHelpers.toStream(compSymbols)
 		.filter(cSym -> StreamHelpers.toStream(ComparisonIndex.values()).anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
 			.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values()).filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr))
 					.findFirst())).toList();

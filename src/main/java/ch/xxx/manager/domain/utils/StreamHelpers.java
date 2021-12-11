@@ -30,15 +30,15 @@ public class StreamHelpers {
 		}
 	
 	public static <T> Stream<T> toStream(Collection<T> collection) {
-		return collection.stream();
+		return Optional.ofNullable(collection).stream().flatMap(myList -> myList.stream());
 	}
 	
 	public static <T> Stream<T> toStream(T[] array) {
-		return List.of(array).stream();
+		return Optional.ofNullable(array).stream().flatMap(myArray -> List.of(array).stream());
 	}
 	
 	public static <T> Stream<T> toStream(T object) {
-		return Stream.of(object);
+		return Optional.ofNullable(object).stream();
 	}
 	
 	public static <T> Stream<T> unboxOptionals(Stream<Optional<T>> optSteam) {
