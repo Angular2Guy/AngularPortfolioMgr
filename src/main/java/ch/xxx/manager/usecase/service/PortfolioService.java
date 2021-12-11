@@ -20,9 +20,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.adapter.controller.PortfolioController;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
@@ -41,6 +44,7 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 @Service
 @Transactional
 public class PortfolioService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioService.class);
 	private final PortfolioRepository portfolioRepository;
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
@@ -75,6 +79,7 @@ public class PortfolioService {
 				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
 						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start, LocalDate.now())))
 				.toList();
+		//LOGGER.info("" + comparisonQuotes.size());
 		List<PortfolioElement> portfolioBars = this.portfolioCalculationService
 				.calculatePortfolioBars(portfolio, start, comparisonQuotes);
 		return new PortfolioBarsWrapper(portfolio, start, portfolioBars);
