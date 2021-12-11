@@ -14,6 +14,7 @@ package ch.xxx.manager.usecase.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +78,7 @@ public class PortfolioService {
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = compIndexes.stream()
 				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
-						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start, LocalDate.now())))
+						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start.minus(1, ChronoUnit.MONTHS), LocalDate.now())))
 				.toList();
 		//LOGGER.info("" + comparisonQuotes.size());
 		List<PortfolioElement> portfolioBars = this.portfolioCalculationService
