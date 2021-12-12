@@ -41,7 +41,6 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
-import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
@@ -173,8 +172,11 @@ public class PortfolioCalculationService {
 	private BigDecimal portfolioValueAtDate(List<PortfolioToSymbol> portfolioToSymbols,
 			List<PortfolioElement> portfolioElements, LocalDate cutOffDate) {
 		BigDecimal result = portfolioToSymbols.stream()
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+//				.peek(pts -> LOG.info(pts.getSymbol().getSymbol()))
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
-				.filter(Optional::isPresent).map(pe -> pe.get()).map(pe -> pe.value())
+				.flatMap(value -> StreamHelpers.unboxOptionals(value))
+				.map(pe -> pe.value())
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
