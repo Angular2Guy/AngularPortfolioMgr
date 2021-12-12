@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
+import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
@@ -211,15 +213,15 @@ public class PortfolioCalculationService {
 		DailyQuote portfolioQuote = portfolioQuotes.dailyQuotes.stream()
 				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isEqual(dailyQuote.getLocalDay())).findFirst()
 				.orElse(new DailyQuote());
-		portfolioQuote.setClose(this.calcValue(currencyQuote.getClose(), dailyQuote.getClose(), portfolioToSymbol,
+		portfolioQuote.setClose(this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote, portfolioToSymbol,
 				portfolioQuote.getClose()));
 		portfolioQuote.setCurrencyKey(portfolioToSymbol.getSymbol().getCurrencyKey());
-		portfolioQuote.setHigh(this.calcValue(currencyQuote.getHigh(), dailyQuote.getHigh(), portfolioToSymbol,
+		portfolioQuote.setHigh(this.calcValue(Currency::getHigh, currencyQuote, DailyQuote::getHigh, dailyQuote, portfolioToSymbol,
 				portfolioQuote.getHigh()));
 		portfolioQuote.setLocalDay(dailyQuote.getLocalDay());
-		portfolioQuote.setLow(this.calcValue(currencyQuote.getLow(), dailyQuote.getLow(), portfolioToSymbol,
+		portfolioQuote.setLow(this.calcValue(Currency::getLow, currencyQuote, DailyQuote::getLow, dailyQuote, portfolioToSymbol,
 				portfolioQuote.getLow()));
-		portfolioQuote.setOpen(this.calcValue(currencyQuote.getOpen(), dailyQuote.getOpen(), portfolioToSymbol,
+		portfolioQuote.setOpen(this.calcValue(Currency::getOpen, currencyQuote, DailyQuote::getOpen, dailyQuote, portfolioToSymbol,
 				portfolioQuote.getOpen()));
 		portfolioQuote.setSymbol(portfolioQuotes.symbol);
 		portfolioQuote.setSymbolKey(portfolioQuotes.symbol.getSymbol());
@@ -232,9 +234,19 @@ public class PortfolioCalculationService {
 		return portfolioQuote;
 	}
 
-	private BigDecimal calcValue(BigDecimal currClose, BigDecimal dailyClose, PortfolioToSymbol portfolioToSymbol,
-			final BigDecimal portfolioClose) {
+	private BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote, Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, 
+			PortfolioToSymbol portfolioToSymbol, final BigDecimal portfolioClose) {
+		final BigDecimal currValue = currExtractor.apply(currencyQuote);
+		final BigDecimal quoteValue = quoteExtractor.apply(dailyQuote);
+		BigDecimal calcValue = BigDecimal.ZERO;
+		if(dailyQuote.getCurrencyKey().equals(currencyQuote.getFromCurrKey()) 
+				&& portfolioToSymbol.getPortfolio().getCurrencyKey().equals(currencyQuote.getToCurrKey())) {
+			calcValue = quoteValue.multiply(currValue);
+		} else if(dailyQuote.getCurrencyKey().equals(currencyQuote.getToCurrKey()) 
+				&& portfolioToSymbol.getPortfolio().getCurrencyKey().equals(currencyQuote.getFromCurrKey())) {
+			calcValue = quoteValue.divide(currValue, 10, RoundingMode.HALF_UP);
+		}
 		return Optional.ofNullable(portfolioClose).orElse(BigDecimal.ZERO)
-				.add(currClose.multiply(dailyClose).multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight())));
+				.add(calcValue).multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight()));
 	}
 }

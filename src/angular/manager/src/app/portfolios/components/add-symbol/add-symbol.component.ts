@@ -22,6 +22,7 @@ import { Observable, of, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap, map } from 'rxjs/operators';
 import { QuoteImportService } from '../../../service/quote-import.service';
 import { DateTime } from 'luxon';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-add-symbol',
@@ -82,25 +83,12 @@ export class AddSymbolComponent implements OnInit {
 	return of([]) as Observable<Symbol[]>;
   }
 
-  findSymbolByName() {
-	const symbolNameStr = this.symbolForm.get('symbolName').value;
-	this.symbolService.getSymbolByName(symbolNameStr)
-		.subscribe(mySymbols => {
-			this.selSymbol = mySymbols.length > 0 ? 
-				mySymbols.filter(sym => !!sym?.name && sym.name.includes(symbolNameStr))[0] : null;
-			this.updateSymbolWeight();
-		});
-  }
-
-  findSymbolBySymbol() {
-	const symbolStr = this.symbolForm.get('symbolSymbol').value;
-	console.log(symbolStr);
-	this.symbolService.getSymbolBySymbol(symbolStr)
-		.subscribe(mySymbols => {
-			console.log(mySymbols + ' ' + symbolStr);
-			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.symbol === symbolStr)[0] : null;
-			this.updateSymbolWeight();
-		});
+  symbolSelected(event: MatAutocompleteSelectedEvent): void {
+	//console.log(event.option.value);
+	this.selSymbol = event.option.value;
+	this.symbolForm.controls['symbolSymbol'].patchValue(this.selSymbol.symbol);
+	this.symbolForm.controls['symbolName'].patchValue(this.selSymbol.name);
+	this.updateSymbolWeight();	
   }
 
   updateSymbolWeight() {

@@ -4,9 +4,10 @@
 				<li>
 					<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="autoName" formControlName="symbolName"
-							i18n-placeholder placeholder="symbolName" tabindex="1" (keyup.enter)="findSymbolByName()">
-						<mat-autocomplete autoActiveFirstOption #autoName="matAutocomplete">
-      						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol.name" class="symbol-text" i18n>
+							i18n-placeholder placeholder="symbolName" tabindex="1">
+						<mat-autocomplete autoActiveFirstOption #autoName="matAutocomplete" (optionSelected)="symbolSelected($event)">
+      						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol" 
+      						  	class="symbol-text" i18n>
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
@@ -15,9 +16,10 @@
 				<li>
 					<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="autoSymbol" formControlName="symbolSymbol"
-							i18n-placeholder placeholder="symbol" tabindex="2" (keyup.enter)="findSymbolBySymbol()">
-						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete">
-      						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol.symbol" class="symbol-text" i18n>
+							i18n-placeholder placeholder="symbol" tabindex="2">
+						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete" (optionSelected)="symbolSelected($event)">
+      						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol" 
+      						    class="symbol-text" i18n>
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 

@@ -163,17 +163,17 @@ public class QuoteImportService {
 
 	private DailyQuote convert(Symbol symbolEntity, HkDailyQuoteImportDto importDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-		Optional<CurrencyKey> currencyOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
-				: currencyMap.get(importDto.getDate()).stream()
-						.filter(entity -> Optional.ofNullable(entity)
-								.filter(myEntity -> myEntity.getFromCurrKey().equals(symbolEntity.getCurrencyKey()))
-								.isPresent())
-						.flatMap(entity -> Stream.of(entity.getFromCurrKey())).findFirst();
+//		Optional<CurrencyKey> currencyOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
+//				: currencyMap.get(importDto.getDate()).stream()
+//						.filter(entity -> Optional.ofNullable(entity)
+//								.filter(myEntity -> myEntity.getFromCurrKey().equals(symbolEntity.getCurrencyKey()))
+//								.isPresent())
+//						.flatMap(entity -> Stream.of(entity.getFromCurrKey())).findFirst();
 //		LOGGER.info(importDto.toString());
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(), importDto.getHigh(),
 				importDto.getLow(), importDto.getAdjClose(),
 				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
-				symbolEntity, currencyOpt.orElse(null));
+				symbolEntity, symbolEntity.getCurrencyKey());
 		return entity;
 	}
 
