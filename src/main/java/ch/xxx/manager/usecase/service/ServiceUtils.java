@@ -12,11 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ServiceUtils {
 	public final static String PORTFOLIO_MARKER = "äüè";
@@ -36,8 +32,4 @@ public class ServiceUtils {
 				.toString();
 	}
 
-	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-	}
 }

@@ -86,7 +86,8 @@ export class AddSymbolComponent implements OnInit {
 	const symbolNameStr = this.symbolForm.get('symbolName').value;
 	this.symbolService.getSymbolByName(symbolNameStr)
 		.subscribe(mySymbols => {
-			this.selSymbol = mySymbols.length > 0 ? mySymbols.filter(sym => sym.name === symbolNameStr)[0] : null;
+			this.selSymbol = mySymbols.length > 0 ? 
+				mySymbols.filter(sym => !!sym?.name && sym.name.includes(symbolNameStr))[0] : null;
 			this.updateSymbolWeight();
 		});
   }
