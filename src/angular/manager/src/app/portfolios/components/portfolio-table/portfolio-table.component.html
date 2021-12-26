@@ -8,7 +8,7 @@
 
     <ng-container matColumnDef="stocks">
       <th mat-header-cell *matHeaderCellDef i18n> Stocks </th>
-      <td mat-cell *matCellDef="let element" class="table-cell"> {{ !element.symbols ? 0 : element.symbols.length}} </td>
+      <td mat-cell *matCellDef="let element" class="table-cell"> {{ !element.symbols ? 0 : element.symbols.length -1}} </td>
     </ng-container>
 
     <ng-container matColumnDef="month1">
