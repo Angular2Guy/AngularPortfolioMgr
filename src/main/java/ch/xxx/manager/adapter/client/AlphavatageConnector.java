@@ -63,7 +63,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s",
+					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s",
 					symbol, fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()

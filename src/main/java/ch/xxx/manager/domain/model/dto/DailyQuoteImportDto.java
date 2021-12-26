@@ -23,29 +23,19 @@ public class DailyQuoteImportDto {
 	private String low;
 	@JsonProperty("4. close")	
 	private String close;
-	@JsonProperty("6. volume")
+	@JsonProperty("5. volume")
 	private String volume;
-	@JsonProperty("5. adjusted close")
-	private String ajustedClose;
-	@JsonProperty("7. dividend amount")
-	private String dividendAmount;
-	@JsonProperty("8. split coefficient")
-	private String splitCoeficent;
 	
 	public DailyQuoteImportDto() {		
 	}
 	
-	public DailyQuoteImportDto(String open, String high, String low, String close, String volume, String ajustedClose,
-			String dividendAmount, String splitCoeficent) {
+	public DailyQuoteImportDto(String open, String high, String low, String close, String volume) {
 		super();
 		this.open = open;
 		this.high = high;
 		this.low = low;
 		this.close = close;
 		this.volume = volume;
-		this.ajustedClose = ajustedClose;
-		this.dividendAmount = dividendAmount;
-		this.splitCoeficent = splitCoeficent;
 	}
 	
 	public String getOpen() {
@@ -77,23 +67,5 @@ public class DailyQuoteImportDto {
 	}
 	public void setVolume(String volume) {
 		this.volume = volume;
-	}
-	public String getAjustedClose() {
-		return ajustedClose;
-	}
-	public void setAjustedClose(String ajustedClose) {
-		this.ajustedClose = ajustedClose;
-	}
-	public String getDividendAmount() {
-		return dividendAmount;
-	}
-	public void setDividendAmount(String dividendAmount) {
-		this.dividendAmount = dividendAmount;
-	}
-	public String getSplitCoeficent() {
-		return splitCoeficent;
-	}
-	public void setSplitCoeficent(String splitCoeficent) {
-		this.splitCoeficent = splitCoeficent;
 	}
 }

@@ -232,7 +232,7 @@ public class QuoteImportService {
 //										.isPresent())
 //								.flatMap(entity -> Stream.of(entity.getToCurrKey())).findFirst();
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getAjustedClose()),
+				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
 				symbolEntity, symbolEntity.getCurrencyKey());
 		return entity;
