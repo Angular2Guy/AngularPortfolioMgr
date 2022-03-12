@@ -87,12 +87,12 @@ public class AuthenticationController {
 	public AppUserDto getUser(@PathVariable Long id) {
 		return this.appUserService.load(id);
 	}
-	
+	/*
 	@GetMapping("/all")
 	public List<AppUserDto> getUsers() {
 		return this.appUserService.loadAll();
 	}
-	
+	*/
 	@PutMapping()
 	public AppUserDto putUser(@RequestBody AppUserDto appUserDto) {
 		return this.appUserService.save(appUserDto);
