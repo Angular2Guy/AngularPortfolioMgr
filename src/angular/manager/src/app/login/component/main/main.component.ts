@@ -40,6 +40,6 @@ export class MainComponent {
   }
 
   logout():void {
-	this.tokenService.clear();
+	this.tokenService.logout();
   }
 }

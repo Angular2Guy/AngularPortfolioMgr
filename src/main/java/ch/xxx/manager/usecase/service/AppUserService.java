@@ -12,7 +12,10 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,7 @@ import ch.xxx.manager.usecase.mapping.AppUserMapper;
 @Service
 public class AppUserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserService.class);
+	private static final long LOGIN_TIMEOUT = 245L;
 	private final AppUserRepository repository;
 	private final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
@@ -75,17 +79,20 @@ public class AppUserService {
 	public void init() {
 		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfiles(), this.myService.getClassName());
 	}
-	
+
 	public void updateLoggedOutUsers() {
 		final List<AppUser> users = this.repository.findLoggedOut();
-		this.repository.saveAll(users.stream().filter(myUser -> myUser.getLastLogout() != null
-				&& myUser.getLastLogout().isBefore(LocalDateTime.now().minusMinutes(2L))).map(myUser -> {
-					myUser.setLastLogout(null);
-					return myUser;
-				}).toList());
+		this.repository
+				.saveAll(users.stream()
+						.filter(myUser -> myUser.getLastLogout() != null
+								&& myUser.getLastLogout().isBefore(LocalDateTime.now().minusMinutes(2L)))
+						.map(myUser -> {
+							myUser.setLastLogout(null);
+							return myUser;
+						}).toList());
 		this.jwtTokenService.updateLoggedOutUsers(this.repository.findLoggedOut());
-	}	
-	
+	}
+
 	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenService.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
@@ -97,14 +104,15 @@ public class AppUserService {
 	}
 
 	public AppUserDto save(AppUserDto appUser) {
-		return this.appUserMapper.convert(Optional.of(
-				this.repository.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))), 10L);
+		return this.appUserMapper.convert(
+				Optional.of(this.repository
+						.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))),
+				null, 10L);
 	}
 
 	public Boolean signin(AppUserDto appUserDto) {
-		return Optional.ofNullable(appUserDto.getId()).stream()
-				.flatMap(id -> Stream.of(Boolean.FALSE))
-				.findFirst().orElseGet(() ->  this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
+		return Optional.ofNullable(appUserDto.getId()).stream().flatMap(id -> Stream.of(Boolean.FALSE)).findFirst()
+				.orElseGet(() -> this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
 						this.repository.findByUsername(appUserDto.getUsername()))));
 	}
 
@@ -154,22 +162,25 @@ public class AppUserService {
 		this.repository.save(user1);
 		return Boolean.TRUE;
 	}
-	
+
 	private AppUserDto loginHelp(Optional<AppUser> entityOpt, String passwd) {
-		AppUserDto user = this.appUserMapper.convert(entityOpt, 0L);
-		Optional<Role> myRole = Arrays.stream(Role.values()).filter(role1 -> role1.name().equals(user.getUserRole()))
-				.findAny();
-		if (user.getId() != null && myRole.isPresent() && entityOpt.isPresent() &&  entityOpt.get().isEnabled()) {
-			if (this.passwordEncoder.matches(passwd, user.getPassword())) {
-				String jwtToken = this.jwtTokenService.createToken(user.getUsername(), Arrays.asList(myRole.get()),
+		AppUserDto user = new AppUserDto();
+		Optional<Role> myRole = entityOpt.stream().flatMap(myUser -> Arrays.stream(Role.values())
+				.filter(role1 -> role1.name().equalsIgnoreCase(myUser.getUserRole()))).findAny();
+		if (myRole.isPresent() && entityOpt.get().isEnabled()) {			
+			if (entityOpt.get().getLastLogout() == null && this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
+				String jwtToken = this.jwtTokenService.createToken(entityOpt.get().getUserName(), Arrays.asList(myRole.get()),
 						Optional.empty());
-				user.setToken(jwtToken);
-				user.setPassword("XXX");
-				user.setUuid("XXX");
-				return user;
+				user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
+			} else if (this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
+				Instant now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+				Instant lastLogout = entityOpt.get().getLastLogout() == null ? now.minusSeconds(LOGIN_TIMEOUT)
+						: entityOpt.get().getLastLogout().atZone(ZoneId.systemDefault()).toInstant();
+				Duration sinceLastLogout = Duration.between(lastLogout, now);
+				user.setSecUntilNexLogin(LOGIN_TIMEOUT - sinceLastLogout.getSeconds());
 			}
 		}
-		return new AppUserDto();
+		return user;
 	}
 
 	private void sendConfirmMail(AppUser entity) {
@@ -188,12 +199,12 @@ public class AppUserService {
 	}
 
 	public AppUserDto load(Long id) {
-		return this.appUserMapper.convert(this.repository.findById(id), 10L);
+		return this.appUserMapper.convert(this.repository.findById(id), null, 10L);
 	}
 
 	public List<AppUserDto> loadAll() {
 		return this.repository.findAll().stream()
-				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), 10L)))
+				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), null, 10L)))
 				.collect(Collectors.toList());
 	}
 }

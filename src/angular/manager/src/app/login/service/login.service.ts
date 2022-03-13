@@ -24,7 +24,8 @@ export class LoginService {
 
 	postLogin(login: Login): Observable<Login> {
 		return this.http.post<Login>('/rest/auth/login', login, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('postLogin')));
+			.pipe(map(res => res, this.handleError('postLogin')), 
+				tap(res => this.tokenService.secUntilNextLogin = !!res?.secUntilNexLogin ? res?.secUntilNexLogin : 24 * 60 * 60));
 	}
 
 	postSignin(login: Login): Observable<boolean> {

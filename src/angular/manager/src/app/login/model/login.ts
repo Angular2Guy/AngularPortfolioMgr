@@ -16,4 +16,5 @@ export interface Login {
 	password: string;
 	emailAddress: string;
 	token: string;
+	secUntilNexLogin?: number;
 }

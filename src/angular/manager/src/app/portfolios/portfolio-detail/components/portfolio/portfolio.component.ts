@@ -69,6 +69,6 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   logout():void {
-	this.tokenService.clear();	
+	this.tokenService.logout();	
   }
 }

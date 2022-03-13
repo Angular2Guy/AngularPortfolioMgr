@@ -12,8 +12,8 @@
  */
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Observable, of, timer, Subscription, Subject } from 'rxjs';
-import { shareReplay, switchMap, map, takeUntil } from 'rxjs/operators';
+import { Observable, timer, Subscription, Subject } from 'rxjs';
+import { shareReplay, switchMap, map, takeUntil, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 export interface RefreshTokenResponse {
@@ -31,6 +31,7 @@ export class TokenService {
   private myUserId: number;
   private myTokenSubscription: Subscription;
   private stopTimer: Subject<boolean>;
+  public secUntilNextLogin = 0;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -48,7 +49,13 @@ export class TokenService {
 	    return reqOptions;
 	}
 	
-  public clear() {
+  public logout(): void {
+	this.http.put<boolean>('/rest/auth/logout',{
+		headers: this.createTokenHeader()
+	}).pipe(tap(() => this.clear())).subscribe();
+  } 	
+	
+  private clear() {		
 	if(this.myTokenSubscription) {
 		this.myTokenSubscription.unsubscribe();		
 	}
@@ -62,15 +69,15 @@ export class TokenService {
 	this.router.navigate(['/login']);
   }
 
-  get tokenStream(): Observable<string> {
+  public get tokenStream(): Observable<string> {
 	return this.myTokenCache.pipe(map(response => response.refreshToken));
   }
 
-  get token(): string {	
+  public get token(): string {	
 	return this.myToken;
   }
  
-  set token(token: string) {
+  public set token(token: string) {
 	this.myToken = token;
 	if(token && !this.myTokenCache) {
 		const myStopTimer = new Subject<boolean>();
@@ -84,11 +91,11 @@ export class TokenService {
 	}
   }
 
-  get userId(): number {
+  public get userId(): number {
 	return this.myUserId;
   }
 
-  set userId(userId: number) {
+  public set userId(userId: number) {
 	this.myUserId = userId;
   }
 }

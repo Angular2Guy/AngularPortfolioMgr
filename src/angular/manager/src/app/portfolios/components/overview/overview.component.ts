@@ -148,7 +148,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	logout(): void {
-		this.tokenService.clear();
+		this.tokenService.logout();
 	}
 
 	showConfig(): void {
