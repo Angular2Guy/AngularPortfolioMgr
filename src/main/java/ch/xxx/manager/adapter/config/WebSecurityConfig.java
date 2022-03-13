@@ -23,6 +23,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import ch.xxx.manager.usecase.service.JwtTokenService;
 
@@ -32,16 +33,17 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String DEVPATH="/rest/dev/**";
 	private static final String PRODPATH="/rest/prod/**";
-	private final JwtTokenService jwtTokenProvider;
+	private final JwtTokenService jwtTokenService;
 	@Value("${spring.profiles.active:}")
 	private String activeProfile;	
 	
 	public WebSecurityConfig(JwtTokenService jwtTokenProvider) {
-		this.jwtTokenProvider = jwtTokenProvider;
+		this.jwtTokenService = jwtTokenProvider;
 	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		JwtTokenFilter customFilter = new JwtTokenFilter(jwtTokenService);
 		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
 		http.httpBasic()
 		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -54,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.anyRequest().authenticated()
 		.and().csrf().disable()
 		.headers().frameOptions().sameOrigin()
-		.and().apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+		.and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean

@@ -26,9 +26,9 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
-import ch.xxx.manager.usecase.service.PortfolioCalculationService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -38,15 +38,15 @@ public class CronJob {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronJob.class);
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
-	private final PortfolioCalculationService portfolioCalculationService;
 	private final CurrencyService currencyService;
+	private final AppUserService appUserService;
 
 	public CronJob(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
-			PortfolioCalculationService portfolioCalculationService, CurrencyService currencyService) {
+			CurrencyService currencyService, AppUserService appUserService) {
 		this.symbolImportService = symbolImportService;
-		this.portfolioCalculationService = portfolioCalculationService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
+		this.appUserService = appUserService;
 	}
 
 	@PostConstruct
@@ -54,6 +54,13 @@ public class CronJob {
 		LOGGER.info("init called");
 	}
 
+	@Scheduled(fixedRate = 120000)
+	@SchedulerLock(name = "LoggedOutUsers_scheduledTask", lockAtLeastFor = "PT1M", lockAtMostFor = "PT100s")
+	public void updateLoggedOutUsers() {
+		LOGGER.info("Update logged out users.");
+		this.appUserService.updateLoggedOutUsers();
+	}	
+	
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterSymbols() {

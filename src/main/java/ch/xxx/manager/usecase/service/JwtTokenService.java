@@ -14,7 +14,9 @@ package ch.xxx.manager.usecase.service;
 
 import java.security.Key;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +36,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
@@ -46,13 +49,14 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtTokenService {
+	private static volatile List<String> loggedOutUsernames = Collections.unmodifiableList(new ArrayList<>());
 
 	@Value("${security.jwt.token.secret-key}")
 	private String secretKey;
 
 	@Value("${security.jwt.token.expire-length}")
 	private long validityInMilliseconds; // 1 min
-	
+
 	private Key jwtTokenKey;
 
 	@PostConstruct
@@ -60,10 +64,15 @@ public class JwtTokenService {
 		this.jwtTokenKey = Keys.hmacShaKeyFor(secretKey.getBytes());
 	}
 
-	public TokenSubjectRole getTokenUserRoles(Map<String,String> headers) {
+	public void updateLoggedOutUsers(List<AppUser> users) {
+		JwtTokenService.loggedOutUsernames = users.stream().map(myUser -> myUser.getUserName())
+				.collect(Collectors.toUnmodifiableList());
+	}
+
+	public TokenSubjectRole getTokenUserRoles(Map<String, String> headers) {
 		return JwtUtils.getTokenUserRoles(headers, this.jwtTokenKey);
 	}
-	
+
 	public String createToken(String username, List<Role> roles, Optional<Date> issuedAtOpt) {
 		Claims claims = Jwts.claims();
 		claims.setSubject(username);
@@ -75,45 +84,45 @@ public class JwtTokenService {
 		Date validity = new Date(issuedAt.getTime() + validityInMilliseconds);
 		claims.setExpiration(validity);
 
-		return Jwts.builder().setClaims(claims)
-				.signWith(this.jwtTokenKey, SignatureAlgorithm.HS256).compact();
+		return Jwts.builder().setClaims(claims).signWith(this.jwtTokenKey, SignatureAlgorithm.HS256).compact();
 	}
 
 	public String refreshToken(String token) {
 		validateToken(token);
 		Optional<Jws<Claims>> claimsOpt = JwtUtils.getClaims(Optional.of(token), this.jwtTokenKey);
-		if(claimsOpt.isEmpty()) {
+		if (claimsOpt.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token claims");
 		}
 		Claims claims = claimsOpt.get().getBody();
 		claims.setIssuedAt(new Date());
 		claims.setExpiration(new Date(Instant.now().toEpochMilli() + validityInMilliseconds));
-		String newToken = Jwts.builder().setClaims(claims).signWith(this.jwtTokenKey, SignatureAlgorithm.HS256).compact();
+		String newToken = Jwts.builder().setClaims(claims).signWith(this.jwtTokenKey, SignatureAlgorithm.HS256)
+				.compact();
 		return newToken;
 	}
-	
-	public Authentication getAuthentication(String token) {		
-		if(this.getAuthorities(token).stream().filter(role -> role.equals(Role.GUEST)).count() > 0) {
+
+	public Authentication getAuthentication(String token) {
+		if (this.getAuthorities(token).stream().filter(role -> role.equals(Role.GUEST)).count() > 0) {
 			return new UsernamePasswordAuthenticationToken(this.getUsername(token), null);
 		}
 		return new UsernamePasswordAuthenticationToken(this.getUsername(token), "", this.getAuthorities(token));
 	}
 
 	public String getUsername(String token) {
-		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().getSubject();
+		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody()
+				.getSubject();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection<Role> getAuthorities(String token) {
 		Collection<Role> roles = new LinkedList<>();
-		for(Role role :Role.values()) {
+		for (Role role : Role.values()) {
 			roles.add(role);
 		}
-		Collection<Map<String,String>> rolestrs = (Collection<Map<String,String>>) Jwts.parserBuilder()
+		Collection<Map<String, String>> rolestrs = (Collection<Map<String, String>>) Jwts.parserBuilder()
 				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get("auth");
-		return rolestrs.stream()
-				.map(str -> roles.stream().filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, "")))
-						.findFirst().orElse(Role.GUEST))
+		return rolestrs.stream().map(str -> roles.stream()
+				.filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(Role.GUEST))
 				.collect(Collectors.toList());
 	}
 
@@ -129,13 +138,16 @@ public class JwtTokenService {
 		}
 		return Optional.empty();
 	}
-	
+
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token);
-			return true;
+			Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token);
+			String subject = Optional.ofNullable(claimsJws.getBody().getSubject())
+					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
+			return JwtTokenService.loggedOutUsernames.stream()
+					.noneMatch(myUserName -> subject.equalsIgnoreCase(myUserName));
 		} catch (JwtException | IllegalArgumentException e) {
-			throw new AuthenticationException("Expired or invalid JWT token",e);
+			throw new AuthenticationException("Expired or invalid JWT token", e);
 		}
 	}
 

@@ -76,6 +76,16 @@ public class AppUserService {
 		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfiles(), this.myService.getClassName());
 	}
 	
+	public void updateLoggedOutUsers() {
+		final List<AppUser> users = this.repository.findLoggedOut();
+		this.repository.saveAll(users.stream().filter(myUser -> myUser.getLastLogout() != null
+				&& myUser.getLastLogout().isBefore(LocalDateTime.now().minusMinutes(2L))).map(myUser -> {
+					myUser.setLastLogout(null);
+					return myUser;
+				}).toList());
+		this.jwtTokenService.updateLoggedOutUsers(this.repository.findLoggedOut());
+	}	
+	
 	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenService.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
