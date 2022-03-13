@@ -42,12 +42,13 @@ public class AppUser {
 	private boolean locked;
 	private boolean enabled;
 	private String uuid;
+	private LocalDateTime lastLogout;
 	@OneToMany(mappedBy = "appUser")
 	private Set<Portfolio> portfolios = new HashSet<>();
 	
 	
 	public AppUser(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
-			boolean locked, boolean enabled, String uuid, Set<Portfolio> portfolios) {
+			boolean locked, boolean enabled, String uuid, LocalDateTime lastLogout, Set<Portfolio> portfolios) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -58,6 +59,7 @@ public class AppUser {
 		this.locked = locked;
 		this.enabled = enabled;
 		this.uuid = uuid;
+		this.lastLogout = lastLogout;
 		this.portfolios = portfolios;
 	}
 
@@ -67,6 +69,14 @@ public class AppUser {
 	@PreUpdate
 	void init() {
 		this.updatedAt = LocalDateTime.now();
+	}
+	
+	public LocalDateTime getLastLogout() {
+		return lastLogout;
+	}
+
+	public void setLastLogout(LocalDateTime lastLogout) {
+		this.lastLogout = lastLogout;
 	}
 	
 	public String getEmailAddress() {

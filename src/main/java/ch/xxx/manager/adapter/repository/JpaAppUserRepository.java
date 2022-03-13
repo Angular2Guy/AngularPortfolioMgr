@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface JpaAppUserRepository extends JpaRepository<AppUser, Long> {
 		Optional<AppUser> findByUsername(@Param(value = "username") String username);
 		@Query("select au from AppUser au where au.uuid = :uuid")
 		Optional<AppUser> findByUuid(@Param(value = "uuid") String uuid);
+		@Query("select u from AppUser u where u.locked=false and u.enabled=true and u.lastLogout is not null")
+		List<AppUser> findLoggedOut();
 }

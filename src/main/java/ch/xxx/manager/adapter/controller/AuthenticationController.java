@@ -13,7 +13,6 @@
 package ch.xxx.manager.adapter.controller;
 
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -76,6 +75,11 @@ public class AuthenticationController {
 	@PostMapping("/login")
 	public AppUserDto postUserLogin(@RequestBody AppUserDto myUser) {
 		return this.appUserService.login(myUser);
+	}
+	
+	@PutMapping("/logout")
+	public Boolean putUserLogout(@RequestHeader(value =  HttpHeaders.AUTHORIZATION) String bearerStr) {
+		return this.appUserService.logout(bearerStr);
 	}
 	
 	@GetMapping("/refreshToken")

@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
@@ -48,7 +51,7 @@ public class AppUserService {
 	private final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
-	private final JwtTokenService jwtTokenProvider;
+	private final JwtTokenService jwtTokenService;
 	private final AppInfoService myService;
 
 	@Value("${spring.mail.username}")
@@ -63,7 +66,7 @@ public class AppUserService {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
-		this.jwtTokenProvider = jwtTokenProvider;
+		this.jwtTokenService = jwtTokenProvider;
 		this.appUserMapper = appUserMapper;
 		this.myService = myService;
 	}
@@ -74,11 +77,11 @@ public class AppUserService {
 	}
 	
 	public RefreshTokenDto refreshToken(String bearerToken) {
-		Optional<String> tokenOpt = this.jwtTokenProvider.resolveToken(bearerToken);
+		Optional<String> tokenOpt = this.jwtTokenService.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token");
 		}
-		String newToken = this.jwtTokenProvider.refreshToken(tokenOpt.get());
+		String newToken = this.jwtTokenService.refreshToken(tokenOpt.get());
 		LOGGER.info("Jwt Token refreshed.");
 		return new RefreshTokenDto(newToken);
 	}
@@ -132,13 +135,23 @@ public class AppUserService {
 		return this.loginHelp(this.repository.findByUsername(appUserDto.getUsername()), appUserDto.getPassword());
 	}
 
+	public Boolean logout(String bearerStr) {
+		String username = this.jwtTokenService.getUsername(this.jwtTokenService.resolveToken(bearerStr)
+				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
+		AppUser user1 = this.repository.findByUsername(username)
+				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));
+		user1.setLastLogout(LocalDateTime.now());
+		this.repository.save(user1);
+		return Boolean.TRUE;
+	}
+	
 	private AppUserDto loginHelp(Optional<AppUser> entityOpt, String passwd) {
 		AppUserDto user = this.appUserMapper.convert(entityOpt);
 		Optional<Role> myRole = Arrays.stream(Role.values()).filter(role1 -> role1.name().equals(user.getUserRole()))
 				.findAny();
 		if (user.getId() != null && myRole.isPresent() && entityOpt.isPresent() &&  entityOpt.get().isEnabled()) {
 			if (this.passwordEncoder.matches(passwd, user.getPassword())) {
-				String jwtToken = this.jwtTokenProvider.createToken(user.getUsername(), Arrays.asList(myRole.get()),
+				String jwtToken = this.jwtTokenService.createToken(user.getUsername(), Arrays.asList(myRole.get()),
 						Optional.empty());
 				user.setToken(jwtToken);
 				user.setPassword("XXX");
@@ -161,7 +174,7 @@ public class AppUserService {
 	}
 
 	public TokenSubjectRole getTokenRoles(Map<String, String> headers) {
-		return jwtTokenProvider.getTokenUserRoles(headers);
+		return jwtTokenService.getTokenUserRoles(headers);
 	}
 
 	public AppUserDto load(Long id) {
