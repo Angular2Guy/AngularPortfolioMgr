@@ -98,7 +98,7 @@ public class AppUserService {
 
 	public AppUserDto save(AppUserDto appUser) {
 		return this.appUserMapper.convert(Optional.of(
-				this.repository.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))));
+				this.repository.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))), 10L);
 	}
 
 	public Boolean signin(AppUserDto appUserDto) {
@@ -156,7 +156,7 @@ public class AppUserService {
 	}
 	
 	private AppUserDto loginHelp(Optional<AppUser> entityOpt, String passwd) {
-		AppUserDto user = this.appUserMapper.convert(entityOpt);
+		AppUserDto user = this.appUserMapper.convert(entityOpt, 0L);
 		Optional<Role> myRole = Arrays.stream(Role.values()).filter(role1 -> role1.name().equals(user.getUserRole()))
 				.findAny();
 		if (user.getId() != null && myRole.isPresent() && entityOpt.isPresent() &&  entityOpt.get().isEnabled()) {
@@ -188,12 +188,12 @@ public class AppUserService {
 	}
 
 	public AppUserDto load(Long id) {
-		return this.appUserMapper.convert(this.repository.findById(id));
+		return this.appUserMapper.convert(this.repository.findById(id), 10L);
 	}
 
 	public List<AppUserDto> loadAll() {
 		return this.repository.findAll().stream()
-				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity))))
+				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), 10L)))
 				.collect(Collectors.toList());
 	}
 }

@@ -35,9 +35,10 @@ public class AppUserDto implements UserDetails {
 	private boolean enabled;
 	private String uuid;
 	private String token;
+	private Long secUntilNexLogin;
 	
 	public AppUserDto(Long id, String userName, LocalDate birthdate, String password,
-			String emailAddress, String userRole, boolean locked, boolean enabled, String uuid) {
+			String emailAddress, String userRole, boolean locked, boolean enabled, String uuid, Long secUntilNexLogin) {
 		super();
 		this.id = id;	
 		this.username = userName;
@@ -48,11 +49,20 @@ public class AppUserDto implements UserDetails {
 		this.locked = locked;
 		this.enabled = enabled;
 		this.uuid = uuid;
+		this.secUntilNexLogin = secUntilNexLogin;
 	}
 
 	public AppUserDto() {		
 	}
 	
+	public Long getSecUntilNexLogin() {
+		return secUntilNexLogin;
+	}
+
+	public void setSecUntilNexLogin(Long secUntilNexLogin) {
+		this.secUntilNexLogin = secUntilNexLogin;
+	}
+
 	public Long getId() {
 		return id;
 	}

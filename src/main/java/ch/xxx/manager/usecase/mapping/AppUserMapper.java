@@ -21,10 +21,10 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 
 @Component
 public class AppUserMapper {
-	public AppUserDto convert(Optional<AppUser> entityOpt) {
+	public AppUserDto convert(Optional<AppUser> entityOpt, long untilNextLogin) {
 		AppUserDto dto = entityOpt.isEmpty() ? null : new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
 				entityOpt.get().getPassword(), entityOpt.get().getEmailAddress(), entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
-				entityOpt.get().isEnabled(), entityOpt.get().getUuid());
+				entityOpt.get().isEnabled(), entityOpt.get().getUuid(), untilNextLogin);
 		return dto;
 	}
 	
