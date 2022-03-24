@@ -14,15 +14,15 @@ package ch.xxx.manager.usecase.service;
 
 import java.security.Key;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -36,7 +36,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
-import ch.xxx.manager.domain.model.entity.AppUser;
+import ch.xxx.manager.domain.model.entity.RevokedToken;
 import ch.xxx.manager.domain.utils.JwtUtils;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
@@ -49,7 +49,10 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtTokenService {
-	private static volatile List<String> loggedOutUsernames = Collections.unmodifiableList(new ArrayList<>());
+	private static final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();
+
+	public record UserNameUuid(String userName, String uuid) {
+	}
 
 	@Value("${security.jwt.token.secret-key}")
 	private String secretKey;
@@ -64,9 +67,10 @@ public class JwtTokenService {
 		this.jwtTokenKey = Keys.hmacShaKeyFor(secretKey.getBytes());
 	}
 
-	public void updateLoggedOutUsers(List<AppUser> users) {
-		JwtTokenService.loggedOutUsernames = users.stream().map(myUser -> myUser.getUserName())
-				.collect(Collectors.toUnmodifiableList());
+	public void updateLoggedOutUsers(List<RevokedToken> users) {
+		JwtTokenService.loggedOutUsers.clear();
+		JwtTokenService.loggedOutUsers
+				.addAll(users.stream().map(myUser -> new UserNameUuid(myUser.getName(), myUser.getUuid())).toList());
 	}
 
 	public TokenSubjectRole getTokenUserRoles(Map<String, String> headers) {
@@ -79,6 +83,7 @@ public class JwtTokenService {
 		claims.put(JwtUtils.TOKENAUTHKEY, roles.stream().map(s -> new SimpleGrantedAuthority(s.getAuthority()))
 				.filter(Objects::nonNull).collect(Collectors.toList()));
 		claims.put(JwtUtils.TOKENLASTMSGKEY, new Date().getTime());
+		claims.put(JwtUtils.UUID, UUID.randomUUID().toString());
 		Date issuedAt = issuedAtOpt.orElse(new Date());
 		claims.setIssuedAt(issuedAt);
 		Date validity = new Date(issuedAt.getTime() + validityInMilliseconds);
@@ -113,6 +118,11 @@ public class JwtTokenService {
 				.getSubject();
 	}
 
+	public String getUuid(String token) {
+		this.validateToken(token);
+		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.UUID, String.class);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Collection<Role> getAuthorities(String token) {
 		Collection<Role> roles = new LinkedList<>();
@@ -144,8 +154,10 @@ public class JwtTokenService {
 			Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token);
 			String subject = Optional.ofNullable(claimsJws.getBody().getSubject())
 					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
-			return JwtTokenService.loggedOutUsernames.stream()
-					.noneMatch(myUserName -> subject.equalsIgnoreCase(myUserName));
+			String uuid = Optional.ofNullable(claimsJws.getBody().get(JwtUtils.UUID, String.class)).orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
+			return JwtTokenService.loggedOutUsers.stream()
+					.noneMatch(myUserName -> 
+					subject.equalsIgnoreCase(myUserName.userName()) && uuid.equals(myUserName.uuid()));
 		} catch (JwtException | IllegalArgumentException e) {
 			throw new AuthenticationException("Expired or invalid JWT token", e);
 		}

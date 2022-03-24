@@ -31,6 +31,7 @@ public class JwtUtils {
 	public static final String TOKENLASTMSGKEY = "lastmsg";
 	public static final String BEARER = "Bearer ";
 	public static final String AUTHORITY = "authority";
+	public static final String UUID = "uuid";
 
 	public static Optional<String> extractToken(Map<String,String> headers) {
 		String authStr = headers.get(AUTHORIZATION);

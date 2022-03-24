@@ -12,10 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +40,8 @@ import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.RevokedToken;
+import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
@@ -50,13 +50,14 @@ import ch.xxx.manager.usecase.mapping.AppUserMapper;
 @Service
 public class AppUserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserService.class);
-	private static final long LOGIN_TIMEOUT = 245L;
+	private static final long LOGOUT_TIMEOUT = 185L;
 	private final AppUserRepository repository;
 	private final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenService jwtTokenService;
 	private final AppInfoService myService;
+	private final RevokedTokenRepository revokedTokenRepository;
 
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -66,6 +67,7 @@ public class AppUserService {
 	private String confirmUrl;
 
 	public AppUserService(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
+			RevokedTokenRepository revokedTokenRepository,
 			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
@@ -73,6 +75,7 @@ public class AppUserService {
 		this.jwtTokenService = jwtTokenProvider;
 		this.appUserMapper = appUserMapper;
 		this.myService = myService;
+		this.revokedTokenRepository = revokedTokenRepository;
 	}
 
 	@PostConstruct
@@ -81,16 +84,15 @@ public class AppUserService {
 	}
 
 	public void updateLoggedOutUsers() {
-		final List<AppUser> users = this.repository.findLoggedOut();
-		this.repository
-				.saveAll(users.stream()
-						.filter(myUser -> myUser.getLastLogout() != null
-								&& myUser.getLastLogout().isBefore(LocalDateTime.now().minusMinutes(2L)))
-						.map(myUser -> {
-							myUser.setLastLogout(null);
-							return myUser;
-						}).toList());
-		this.jwtTokenService.updateLoggedOutUsers(this.repository.findLoggedOut());
+		final List<RevokedToken> revokedTokens = new ArrayList<RevokedToken>(this.revokedTokenRepository.findAll());
+		this.revokedTokenRepository.deleteAll(revokedTokens.stream()
+				.filter(myRevokedToken -> myRevokedToken.getLastLogout() != null
+						&& myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
+				.toList());
+		this.jwtTokenService.updateLoggedOutUsers(revokedTokens.stream()
+				.filter(myRevokedToken -> myRevokedToken.getLastLogout() == null || 
+				!myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
+		.toList());
 	}
 
 	public RefreshTokenDto refreshToken(String bearerToken) {
@@ -156,10 +158,13 @@ public class AppUserService {
 	public Boolean logout(String bearerStr) {
 		String username = this.jwtTokenService.getUsername(this.jwtTokenService.resolveToken(bearerStr)
 				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
+		String uuid = this.jwtTokenService.getUuid(this.jwtTokenService.resolveToken(bearerStr)
+				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
 		AppUser user1 = this.repository.findByUsername(username)
-				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));
-		user1.setLastLogout(LocalDateTime.now());
+				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));		
 		this.repository.save(user1);
+		RevokedToken revokedToken = new RevokedToken(username, uuid, LocalDateTime.now());
+		this.revokedTokenRepository.save(revokedToken);
 		return Boolean.TRUE;
 	}
 
@@ -167,18 +172,11 @@ public class AppUserService {
 		AppUserDto user = new AppUserDto();
 		Optional<Role> myRole = entityOpt.stream().flatMap(myUser -> Arrays.stream(Role.values())
 				.filter(role1 -> role1.name().equalsIgnoreCase(myUser.getUserRole()))).findAny();
-		if (myRole.isPresent() && entityOpt.get().isEnabled()) {			
-			if (entityOpt.get().getLastLogout() == null && this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
-				String jwtToken = this.jwtTokenService.createToken(entityOpt.get().getUserName(), Arrays.asList(myRole.get()),
-						Optional.empty());
-				user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
-			} else if (this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
-				Instant now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
-				Instant lastLogout = entityOpt.get().getLastLogout() == null ? now.minusSeconds(LOGIN_TIMEOUT)
-						: entityOpt.get().getLastLogout().atZone(ZoneId.systemDefault()).toInstant();
-				Duration sinceLastLogout = Duration.between(lastLogout, now);
-				user.setSecUntilNexLogin(LOGIN_TIMEOUT - sinceLastLogout.getSeconds());
-			}
+		if (myRole.isPresent() && entityOpt.get().isEnabled()
+				&& this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
+			String jwtToken = this.jwtTokenService.createToken(entityOpt.get().getUserName(),
+					Arrays.asList(myRole.get()), Optional.empty());
+			user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
 		}
 		return user;
 	}
