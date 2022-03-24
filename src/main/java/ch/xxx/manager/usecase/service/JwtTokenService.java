@@ -158,7 +158,7 @@ public class JwtTokenService {
 			String subject = Optional.ofNullable(claimsJws.getBody().getSubject())
 					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
 			String uuid = Optional.ofNullable(claimsJws.getBody().get(JwtUtils.UUID, String.class)).orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
-			LOG.info("Subject: {}, Uuid: {}, LoggedOutUsers: {}", subject, uuid, JwtTokenService.loggedOutUsers.size());
+			// LOG.info("Subject: {}, Uuid: {}, LoggedOutUsers: {}", subject, uuid, JwtTokenService.loggedOutUsers.size());
 			return JwtTokenService.loggedOutUsers.stream()
 					.noneMatch(myUserName -> 
 					subject.equalsIgnoreCase(myUserName.userName()) && uuid.equals(myUserName.uuid()));
