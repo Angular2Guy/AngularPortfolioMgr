@@ -54,11 +54,6 @@ public class AppUserRepositoryBean implements AppUserRepository {
 	}
 
 	@Override
-	public List<AppUser> findLoggedOut() {
-		return this.jpaAppUserRepository.findLoggedOut();
-	}
-
-	@Override
 	public Iterable<AppUser> saveAll(Iterable<AppUser> users) {
 		return this.jpaAppUserRepository.saveAll(users);
 	}

@@ -14,10 +14,10 @@
 	<changeSet author="angular2guy" id="6">
 		<preConditions onFail="MARK_RAN">
 				<indexExists tableName="app_user"
-					indexName="ix_app_user_username_enabled_locked_last_logout" />
+					indexName="ix_app_user_enabled_locked_last_logout" />
 		</preConditions>
 		<dropIndex tableName="app_user"
-					indexName="ix_app_user_username_enabled_locked_last_logout" />
+					indexName="ix_app_user_enabled_locked_last_logout" />
 	</changeSet>
 	<changeSet author="angular2guy" id="7">
 		<dropColumn tableName="app_user" columnName="last_logout"/>

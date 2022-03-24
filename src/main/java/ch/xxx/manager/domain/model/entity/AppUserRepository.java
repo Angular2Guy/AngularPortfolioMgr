@@ -21,6 +21,5 @@ public interface AppUserRepository {
 	List<AppUser> findAll();
 	Optional<AppUser> findById(Long id);
 	AppUser save(AppUser appUser);
-	List<AppUser> findLoggedOut();
 	Iterable<AppUser> saveAll(Iterable<AppUser> users);
 }
