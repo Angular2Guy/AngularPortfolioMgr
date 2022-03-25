@@ -52,7 +52,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtTokenService {
 	private static final Logger LOG = LoggerFactory.getLogger(JwtTokenService.class);
-	private static final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();
+	private final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();
 
 	public record UserNameUuid(String userName, String uuid) {
 	}
@@ -71,8 +71,8 @@ public class JwtTokenService {
 	}
 
 	public void updateLoggedOutUsers(List<RevokedToken> users) {
-		JwtTokenService.loggedOutUsers.clear();
-		JwtTokenService.loggedOutUsers
+		this.loggedOutUsers.clear();
+		this.loggedOutUsers
 				.addAll(users.stream().map(myUser -> new UserNameUuid(myUser.getName(), myUser.getUuid())).toList());
 	}
 
@@ -159,7 +159,7 @@ public class JwtTokenService {
 					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
 			String uuid = Optional.ofNullable(claimsJws.getBody().get(JwtUtils.UUID, String.class)).orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
 			// LOG.info("Subject: {}, Uuid: {}, LoggedOutUsers: {}", subject, uuid, JwtTokenService.loggedOutUsers.size());
-			return JwtTokenService.loggedOutUsers.stream()
+			return this.loggedOutUsers.stream()
 					.noneMatch(myUserName -> 
 					subject.equalsIgnoreCase(myUserName.userName()) && uuid.equals(myUserName.uuid()));
 		} catch (JwtException | IllegalArgumentException e) {

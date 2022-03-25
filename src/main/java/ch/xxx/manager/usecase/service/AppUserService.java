@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +63,7 @@ public class AppUserService {
 	private final JwtTokenService jwtTokenService;
 	private final AppInfoService myService;
 	private final RevokedTokenRepository revokedTokenRepository;
+	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
 
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -174,9 +180,14 @@ public class AppUserService {
 				.filter(role1 -> role1.name().equalsIgnoreCase(myUser.getUserRole()))).findAny();
 		if (myRole.isPresent() && entityOpt.get().isEnabled()
 				&& this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
-			String jwtToken = this.jwtTokenService.createToken(entityOpt.get().getUserName(),
+			Callable<String> callableTask = () -> this.jwtTokenService.createToken(entityOpt.get().getUserName(),
 					Arrays.asList(myRole.get()), Optional.empty());
-			user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
+			try {
+				String jwtToken = executorService.schedule(callableTask, 3, TimeUnit.SECONDS).get();
+				user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
+			} catch (InterruptedException | ExecutionException e) {
+				LOGGER.error("Login failed",e);
+			}
 		}
 		return user;
 	}
