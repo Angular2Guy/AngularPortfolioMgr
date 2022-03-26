@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,8 +45,6 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-
-//import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })
 public class MyArchitectureTests {
@@ -118,7 +117,7 @@ public class MyArchitectureTests {
 	public void ruleCronJobMethodsAnnotations() {
 		ArchRule exceptionType = ArchRuleDefinition.methods().that().arePublic().and().areDeclaredInClassesThat()
 				.resideInAPackage("..adapter.cron..").should().beAnnotatedWith(Scheduled.class).andShould()
-				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class);
+				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class).orShould().beAnnotatedWith(Order.class);
 		exceptionType.check(this.importedClasses);
 	}
 
