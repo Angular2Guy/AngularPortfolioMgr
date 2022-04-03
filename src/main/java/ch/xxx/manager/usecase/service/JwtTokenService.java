@@ -133,7 +133,7 @@ public class JwtTokenService {
 			roles.add(role);
 		}
 		Collection<Map<String, String>> rolestrs = (Collection<Map<String, String>>) Jwts.parserBuilder()
-				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get("auth");
+				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.TOKENAUTHKEY);
 		return rolestrs.stream().map(str -> roles.stream()
 				.filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(Role.GUEST))
 				.collect(Collectors.toList());

@@ -73,8 +73,8 @@ public class AppUserService {
 	private String confirmUrl;
 
 	public AppUserService(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
-			RevokedTokenRepository revokedTokenRepository,
-			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
+			RevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
+			JwtTokenService jwtTokenProvider, AppInfoService myService) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
@@ -92,8 +92,8 @@ public class AppUserService {
 	public void updateLoggedOutUsers() {
 		final List<RevokedToken> revokedTokens = new ArrayList<RevokedToken>(this.revokedTokenRepository.findAll());
 		this.jwtTokenService.updateLoggedOutUsers(revokedTokens.stream()
-				.filter(myRevokedToken -> myRevokedToken.getLastLogout() == null || 
-				!myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
+				.filter(myRevokedToken -> myRevokedToken.getLastLogout() == null
+						|| !myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
 				.toList());
 		this.revokedTokenRepository.deleteAll(revokedTokens.stream()
 				.filter(myRevokedToken -> myRevokedToken.getLastLogout() != null
@@ -162,15 +162,23 @@ public class AppUserService {
 	}
 
 	public Boolean logout(String bearerStr) {
+		if (!this.jwtTokenService.validateToken(this.jwtTokenService.resolveToken(bearerStr).orElse(""))) {
+			throw new AuthenticationException("Invalid token.");
+		}
 		String username = this.jwtTokenService.getUsername(this.jwtTokenService.resolveToken(bearerStr)
 				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
 		String uuid = this.jwtTokenService.getUuid(this.jwtTokenService.resolveToken(bearerStr)
 				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
-		AppUser user1 = this.repository.findByUsername(username)
-				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));		
-		this.repository.save(user1);
-		RevokedToken revokedToken = new RevokedToken(username, uuid, LocalDateTime.now());
-		this.revokedTokenRepository.save(revokedToken);
+		this.repository.findByUsername(username)
+				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));
+		long revokedTokensForUuid = this.revokedTokenRepository.findAll().stream()
+				.filter(myRevokedToken -> myRevokedToken.getUuid().equals(uuid)
+						&& myRevokedToken.getName().equalsIgnoreCase(username))
+				.count();
+		if (revokedTokensForUuid == 0) {
+			RevokedToken revokedToken = new RevokedToken(username, uuid, LocalDateTime.now());
+			this.revokedTokenRepository.save(revokedToken);
+		}
 		return Boolean.TRUE;
 	}
 
@@ -186,7 +194,7 @@ public class AppUserService {
 				String jwtToken = executorService.schedule(callableTask, 3, TimeUnit.SECONDS).get();
 				user = this.appUserMapper.convert(entityOpt, jwtToken, 0L);
 			} catch (InterruptedException | ExecutionException e) {
-				LOGGER.error("Login failed",e);
+				LOGGER.error("Login failed", e);
 			}
 		}
 		return user;
