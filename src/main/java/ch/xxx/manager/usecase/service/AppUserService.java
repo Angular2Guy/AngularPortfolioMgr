@@ -174,10 +174,11 @@ public class AppUserService {
 		long revokedTokensForUuid = this.revokedTokenRepository.findAll().stream()
 				.filter(myRevokedToken -> myRevokedToken.getUuid().equals(uuid)
 						&& myRevokedToken.getName().equalsIgnoreCase(username))
-				.count();
+				.count();		
 		if (revokedTokensForUuid == 0) {
-			RevokedToken revokedToken = new RevokedToken(username, uuid, LocalDateTime.now());
-			this.revokedTokenRepository.save(revokedToken);
+			this.revokedTokenRepository.save(new RevokedToken(username, uuid, LocalDateTime.now()));
+		} else {
+			LOGGER.warn("Duplicate logout for user {}", username);
 		}
 		return Boolean.TRUE;
 	}
