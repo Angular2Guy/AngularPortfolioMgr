@@ -1,0 +1,32 @@
+webAppName: kafkaapp
+dbName: zookeeperserver
+webImageName: confluentinc/cp-kafka
+webImageVersion: latest
+dbImageName: confluentinc/cp-zookeeper
+dbImageVersion: latest
+volumeClaimName: postgres-pv-claim
+persistentVolumeName: task-pv-volume
+webServiceName: kafkaservice
+dbServiceName: zookeeperservice
+#for production use replace the jwtTokenSecrect value with a random alphanumeric string of the same length or longer
+jwtTokenSecrect: secret-key1234567890abcdefghijklmnopqrstuvpxyz
+
+secret:
+  nameApp: app-env-secret
+  nameDb: db-env-secret
+
+envDb:
+  normal: 
+    ZOOKEEPER_CLIENT_PORT: 2181      
+  secret:
+   ZOOKEEPER_TICK_TIME: 2000
+    
+envApp:
+  normal: 
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  secret:
+    KAFKA_BROKER_ID: 1
+    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181    
+    KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
