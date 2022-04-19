@@ -65,50 +65,6 @@ test {
 	useJUnitPlatform()
 }
 
-task cleanAngular {
-	if(project.hasProperty('withAngular')) {		
-		delete('src/angular/manager/node_modules')
-	}
-}
-
-task buildAngular {
-	if(project.hasProperty('withAngular')) {		
-		exec {
-			workingDir 'src/angular/manager'
-			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-				commandLine('npm.cmd', 'install')
-			} else {
-				commandLine('npm', 'install')
-			}
-		}
-		exec {
-			workingDir 'src/angular/manager'
-			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-				commandLine('npm.cmd', 'run', 'build')
-			} else {
-				commandLine('npm', 'run', 'build')
-			}		
-		}
-	}
-}
-
-task testAngular {
-	if(project.hasProperty('withAngular')) {		
-		exec {
-			workingDir 'src/angular/manager'
-			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-				commandLine('npm.cmd', 'run', 'test')
-			} else {
-				if(project.hasProperty("useChromium")) { 
-					commandLine('npm', 'run', 'test-chromium')
-				} else {
-					commandLine('npm', 'run', 'test')
-				}
-			}
-		}
-	}
-}
-
 task buildDockerImage {
 	if(project.hasProperty('buildDockerImage')) {	
 		bootBuildImage {
