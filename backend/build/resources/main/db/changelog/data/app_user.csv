@@ -1,2 +1,0 @@
-id,user_name,birth_date,updated_at,password,email_address,user_role,locked,enabled,uuid
-1,sven,2000-01-01,2021-01-01,pwd,sven@gmx.de,user,false,true,95fabc67-2ab6-470a-9df9-e500b540cbd0

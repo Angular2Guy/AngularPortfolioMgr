@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="ch.xxx.manager.MapTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-04-19T15:48:16" hostname="sven-N85-N87-HJ-HJ1-HK1" time="0.003">
-  <properties/>
-  <testcase name="hashMapTest()" classname="ch.xxx.manager.MapTest" time="0.003"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
