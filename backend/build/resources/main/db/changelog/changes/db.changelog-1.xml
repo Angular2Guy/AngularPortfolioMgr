@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Sven Loesekann Licensed under the Apache License, Version 
+	2.0 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+	<changeSet author="angular2guy" id="1">
+		<createSequence sequenceName="hibernate_sequence"
+			startValue="1000" incrementBy="50" />
+		<createTable tableName="app_user">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="user_name" type="varchar(255)" >
+				<constraints uniqueConstraintName="app_user_user_name_unique" unique="true" nullable="false" notNullConstraintName="app_user_user_name_not_null"/>
+			</column>
+			<column name="birth_date" type="date" />
+			<column name="updated_at" type="datetime" />
+			<column name="password" type="varchar(255)" >
+				<constraints nullable="false" notNullConstraintName="app_user_password_not_null"/>
+			</column>
+			<column name="email_address" type="varchar(255)">
+				<constraints nullable="false" notNullConstraintName="app_user_email_address_not_null"/>
+			</column>
+			<column name="user_role" type="varchar(50)">
+				<constraints nullable="false" notNullConstraintName="app_user_user_role_not_null"/>
+			</column>
+			<column name="locked" type="boolean"/>			
+			<column name="enabled" type="boolean"/>
+			<column name="uuid" type="varchar(64)"/>			
+		</createTable>
+		<createTable tableName="symbol">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="name" type="varchar(255)"/>
+			<column name="symbol" type="varchar(20)"/>
+			<column name="currency_key" type="varchar(10)"/>
+			<column name="quote_source" type="varchar(20)"/>			
+		</createTable>
+		<createTable tableName="currency">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="local_day" type="date" />
+			<column name="from_curr_key" type="varchar(10)" />
+			<column name="to_curr_key" type="varchar(10)" />
+			<column name="open" type="numeric(12,4)" />
+			<column name="high" type="numeric(12,4)" />
+			<column name="low" type="numeric(12,4)" />
+			<column name="close" type="numeric(12,4)" />			
+		</createTable>
+		<createTable tableName="daily_quote">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="symbol_key" type="varchar(20)"/>
+			<column name="open" type="numeric(12,4)" />
+			<column name="high" type="numeric(12,4)" />
+			<column name="low" type="numeric(12,4)" />
+			<column name="close" type="numeric(12,4)" />
+			<column name="volume" type="bigint"/>
+			<column name="local_day" type="date"/>
+			<column name="currency_key" type="varchar(10)"/>			
+			<column name="symbol_id" type="bigint">
+				<constraints nullable="false" notNullConstraintName="daily_quote_symbol_id_not_null"
+					foreignKeyName="fk_daily_quote_symbol_id1" references="symbol(id)" />
+			</column>
+		</createTable>
+		<createTable tableName="intra_day_quote">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="symbol_key" type="varchar(20)"/>
+			<column name="open" type="numeric(12,4)" />
+			<column name="high" type="numeric(12,4)" />
+			<column name="low" type="numeric(12,4)" />
+			<column name="close" type="numeric(12,4)" />
+			<column name="volume" type="bigint"/>
+			<column name="local_date_time" type="datetime"/>
+			<column name="currency_key" type="varchar(10)"/>			
+			<column name="symbol_id" type="bigint">
+				<constraints nullable="false" notNullConstraintName="intra_day_quote_symbol_id_not_null"
+					foreignKeyName="fk_intra_day_quote_symbol_id1" references="symbol(id)" />
+			</column>
+		</createTable>
+		<createTable tableName="portfolio">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="app_user_id" type="bigint">
+				<constraints nullable="false" notNullConstraintName="portfolio_app_user_id_not_null" 
+					foreignKeyName="fk_portfolio_app_user_id1" references="app_user(id)"/> 
+			</column>
+			<column name="name" type="varchar(255)">
+				<constraints nullable="false" notNullConstraintName="portfolio_name_not_null"/>
+			</column>
+			<column name="created_at" type="date"/>
+			<column name="month1" type="numeric(12,4)" />
+			<column name="month6" type="numeric(12,4)" />
+			<column name="year1" type="numeric(12,4)" />
+			<column name="year2" type="numeric(12,4)" />
+			<column name="year5" type="numeric(12,4)"/>
+			<column name="year10" type="numeric(12,4)"/>
+			<column name="currency_key" type="varchar(10)"/>
+		</createTable>
+		<createTable tableName="portfolio_to_symbol">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="portfolio_id" type="bigint">
+				<constraints nullable="false" notNullConstraintName="portfolio_to_symbol_portfolio_id_not_null" 
+					foreignKeyName="fk_portfolio_to_symbol_portfolio_id1" references="portfolio(id)"/> 
+			</column>
+			<column name="symbol_id" type="bigint">
+				<constraints nullable="false" notNullConstraintName="portfolio_to_symbol_symbol_id_not_null" 
+					foreignKeyName="fk_portfolio_to_symbol_symbol_id1" references="symbol(id)"/> 
+			</column>
+			<column name="weight" type="bigint"/>			
+			<column name="changed_at" type="date"/>
+			<column name="removed_at" type="date"/>			
+		</createTable>
+	</changeSet>
+</databaseChangeLog>
