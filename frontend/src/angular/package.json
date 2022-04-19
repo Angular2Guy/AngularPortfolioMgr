@@ -15,8 +15,8 @@
     "postinstall": "ngcc",
     "prebuild": "rimraf ./dist && mkdirp ./dist",
     "postbuild": "npm run deploy",
-    "predeploy": "rimraf ../../main/resources/static/*",
-    "deploy": "cpx 'base/*' dist/manager/ && cpx 'dist/manager/**' ../../main/resources/static/",
+    "predeploy": "rimraf ../../../src/main/resources/static/*",
+    "deploy": "cpx 'base/*' dist/manager/ && cpx 'dist/manager/**' ../../../backend/src/main/resources/static/",
     "prettier": "npx prettier --write 'src/**/*.{ts,html,scss,json}'"
   },
   "private": true,
