@@ -73,7 +73,7 @@ spec:
             memory: "768M"
             cpu: "0.5"
           requests:
-            memory: "1G"
+            memory: "512M"
             cpu: "0.5"
         env:
           {{- include "helpers.list-envDb-variables" . | indent 10 }}
