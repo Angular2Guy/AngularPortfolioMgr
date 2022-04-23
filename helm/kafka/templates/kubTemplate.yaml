@@ -44,7 +44,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   # storageClassName: local-storage
-  storageClassName: manual
+  storageClassName: manual  
   resources:
     requests:
       storage: 1Gi
@@ -109,6 +109,10 @@ spec:
       labels:
         app: {{ .Values.webAppName }}
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
       containers:
       - name: {{ .Values.webAppName }}
         image: "{{ .Values.webImageName }}:{{ .Values.webImageVersion }}" 
