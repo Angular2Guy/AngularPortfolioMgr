@@ -1,8 +1,8 @@
 webAppName: kafkaapp
 dbName: zookeeperserver
-webImageName: confluentinc/cp-kafka
+webImageName: bitnami/kafka
 webImageVersion: latest
-dbImageName: confluentinc/cp-zookeeper
+dbImageName: bitnami/zookeeper
 dbImageVersion: latest
 volumeClaimName: postgres-pv-claim
 persistentVolumeName: task-pv-volume
@@ -17,16 +17,15 @@ secret:
 
 envDb:
   normal: 
-    ZOOKEEPER_CLIENT_PORT: 2181      
+    ALLOW_ANONYMOUS_LOGIN: yes
   secret:
    ZOOKEEPER_TICK_TIME: 2000
     
 envApp:
   normal: 
-    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-  secret:
     KAFKA_BROKER_ID: 1
-    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181    
-    KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+    KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
+    KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+  secret:
+    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
