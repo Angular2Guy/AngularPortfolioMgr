@@ -20,7 +20,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.xxx.manager.adapter.config.KafkaConfig;
+import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 @Service
 @Transactional
@@ -29,11 +35,13 @@ public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 	
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
-	public void consumerForNewUserTopic(String message) {
+	public void consumerForNewUserTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumberForNewUserTopic [{}]", message);
+		new ObjectMapper().readValue(message, AppUserDto.class);
 	}
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
-	public void consumerForUserLogoutsTopic(String message) {
+	public void consumerForUserLogoutsTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);
+		new ObjectMapper().readValue(message, RevokedTokenDto.class);
 	}
 }

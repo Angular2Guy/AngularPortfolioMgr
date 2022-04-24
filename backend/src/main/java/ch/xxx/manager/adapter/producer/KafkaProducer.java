@@ -24,8 +24,13 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 @Service
 @Profile({"kafka","prod-kafka"})
@@ -37,25 +42,25 @@ public class KafkaProducer {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 	
-	public void sendLogoutMsg() {
-		String msg = "{}";
-		ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.USER_LOGOUT_TOPIC, msg);
+	public void sendLogoutMsg(RevokedTokenDto revokedTokenDto) {		
 		try {
+			String msg = new ObjectMapper().writeValueAsString(revokedTokenDto);
+			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.USER_LOGOUT_TOPIC, msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
 			throw new AuthenticationException("Logout failed.");
 		}
-		LOGGER.info("send logout msg: {}", msg);
+		LOGGER.info("send logout msg: {}", revokedTokenDto.toString());
 	}
 	
-	public void sendNewUserMsg() {
-		String msg = "{}";
-		ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.NEW_USER_TOPIC, msg);
+	public void sendNewUserMsg(AppUserDto appUserDto) {
 		try {
+			String msg = new ObjectMapper().writeValueAsString(appUserDto);
+			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.NEW_USER_TOPIC, msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
 			throw new AuthenticationException("User creation failed.");
 		}
-		LOGGER.info("send new user msg: {}", msg);
+		LOGGER.info("send new user msg: {}", appUserDto.toString());
 	}
 }
