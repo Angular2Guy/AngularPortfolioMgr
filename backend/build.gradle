@@ -33,6 +33,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.liquibase:liquibase-core'
+	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'com.google.guava:guava:31.0-jre'
 	implementation 'org.springdoc:springdoc-openapi-ui:1.5.12'
 	implementation 'org.springdoc:springdoc-openapi-data-rest:1.5.12'
