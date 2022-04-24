@@ -12,12 +12,14 @@
  */
 package ch.xxx.manager.adapter.config;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -27,5 +29,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<?> resourceNotFoundHandler(Exception ex, WebRequest request) {
 		super.logger.warn("Resource not found.", ex);
 		return ResponseEntity.notFound().build();
+	}
+	
+	@ExceptionHandler(AuthenticationException.class)
+	public ResponseEntity<?> authenticationHandler(Exception ex, WebRequest request) {
+		super.logger.warn("Authentication failed.", ex);
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}
 }
