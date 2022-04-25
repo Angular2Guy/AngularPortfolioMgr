@@ -56,7 +56,7 @@ public class MyArchitectureTests {
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
 			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
-			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..")
+			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..").adapter("messaging", "..adapter.messaging..")
 			.adapter("client", "..adapter.client..").adapter("config", "..adapter.config..").withOptionalLayers(true);
 
 	@ArchTest

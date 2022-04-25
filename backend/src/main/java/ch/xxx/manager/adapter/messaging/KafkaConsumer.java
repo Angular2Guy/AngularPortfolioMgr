@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.consumer;
+package ch.xxx.manager.adapter.messaging;
 
 import javax.transaction.Transactional;
 
