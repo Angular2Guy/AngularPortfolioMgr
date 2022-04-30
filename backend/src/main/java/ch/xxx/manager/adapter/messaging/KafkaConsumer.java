@@ -36,7 +36,7 @@ import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 @Service
 @Transactional
-@Profile({ "kafka", "prod-kafka" })
+@Profile("kafka | prod-kafka")
 public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 

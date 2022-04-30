@@ -33,7 +33,7 @@ import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 @Service
-@Profile({"kafka","prod-kafka"})
+@Profile("kafka | prod-kafka")
 public class KafkaProducer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
 	private final KafkaTemplate<String,String> kafkaTemplate;

@@ -39,7 +39,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 
 @Configuration
 @EnableKafka
-@Profile({"kafka","prod-kafka"})
+@Profile("kafka | prod-kafka")
 public class KafkaConfig {
 	public static final String NEW_USER_TOPIC = "new-user-topic";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
@@ -52,19 +52,18 @@ public class KafkaConfig {
 	@Bean
 	public ProducerFactory<String,String> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers);
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);        
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers);        
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         DefaultKafkaProducerFactory<String,String> defaultKafkaProducerFactory = new DefaultKafkaProducerFactory<>(configProps);
         defaultKafkaProducerFactory.setTransactionIdPrefix("tx-");
         return defaultKafkaProducerFactory;
 	}
 	
-	@Bean
-	public KafkaTemplate<String,String> createKafkaTemplate() {        
-		return new KafkaTemplate<String,String>(this.producerFactory());
-	}
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
 	
-
     @Bean
     public KafkaTransactionManager<String,String> kafkaTransactionManager() {
         KafkaTransactionManager<String,String> manager = new KafkaTransactionManager<>(producerFactory());
