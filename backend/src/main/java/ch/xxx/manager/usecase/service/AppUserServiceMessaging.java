@@ -23,7 +23,7 @@ import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
 
-@Profile({ "kafka", "prod-kafka" })
+@Profile("kafka | prod-kafka")
 @Transactional
 @Service
 public class AppUserServiceMessaging extends AppUserServiceBase implements AppUserService {

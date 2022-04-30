@@ -35,7 +35,7 @@ import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
 
-@Profile({ "!kafka", "!prod-kafka" })
+@Profile("!kafka & !prod-kafka")
 @Transactional
 @Service
 public class AppUserServiceDb extends AppUserServiceBase implements AppUserService {
