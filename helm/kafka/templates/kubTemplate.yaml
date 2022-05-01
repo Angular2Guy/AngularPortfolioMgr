@@ -128,13 +128,13 @@ spec:
           {{- include "helpers.list-envApp-variables" . | indent 10 }}
         ports:
         - containerPort: 9092
-        volumeMounts:
-        - name: hostvol
-          mountPath: /bitnami/kafka
-      volumes:
-      - name: hostvol
-        persistentVolumeClaim:
-          claimName: {{ .Values.volumeClaimName }}
+#        volumeMounts:
+#        - name: hostvol
+#          mountPath: /bitnami/kafka
+#      volumes:
+#      - name: hostvol
+#        persistentVolumeClaim:
+#          claimName: {{ .Values.volumeClaimName }}
 ---
 apiVersion: v1
 kind: Service
@@ -146,6 +146,7 @@ spec:
   type: NodePort
   ports:
   - port: 9092
+    nodePort: 9092
     protocol: TCP
   selector:
     app: {{ .Values.webAppName }}
