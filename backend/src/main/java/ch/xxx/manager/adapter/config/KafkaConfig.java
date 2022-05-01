@@ -52,7 +52,7 @@ public class KafkaConfig {
 	@Bean
 	public ProducerFactory<String,String> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers);        
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers); 
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         DefaultKafkaProducerFactory<String,String> defaultKafkaProducerFactory = new DefaultKafkaProducerFactory<>(configProps);
         defaultKafkaProducerFactory.setTransactionIdPrefix("tx-");
@@ -89,7 +89,7 @@ public class KafkaConfig {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void doOnStartup() {
-		this.newUserTopic();
-		this.userLogoutTopic();
+		// this.newUserTopic();
+		// this.userLogoutTopic();
 	}
 }
