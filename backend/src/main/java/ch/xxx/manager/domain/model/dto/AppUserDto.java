@@ -20,14 +20,18 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import ch.xxx.manager.domain.utils.Role;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppUserDto implements UserDetails {
 	private static final long serialVersionUID = 821118557600406928L;
 	private Long id;
 	private String username;
 	private LocalDate birthdate;
-	private LocalDateTime updatedAt = LocalDateTime.now();	
+	private LocalDateTime updatedAt = LocalDateTime.now();
 	private String password;
 	private String emailAddress;
 	private String userRole;
@@ -36,11 +40,11 @@ public class AppUserDto implements UserDetails {
 	private String uuid;
 	private String token;
 	private Long secUntilNexLogin;
-	
-	public AppUserDto(Long id, String userName, LocalDate birthdate, String password, String token,
-			String emailAddress, String userRole, boolean locked, boolean enabled, String uuid, Long secUntilNexLogin) {
+
+	public AppUserDto(Long id, String userName, LocalDate birthdate, String password, String token, String emailAddress,
+			String userRole, boolean locked, boolean enabled, String uuid, Long secUntilNexLogin) {
 		super();
-		this.id = id;	
+		this.id = id;
 		this.username = userName;
 		this.birthdate = birthdate;
 		this.password = password;
@@ -53,9 +57,9 @@ public class AppUserDto implements UserDetails {
 		this.token = token;
 	}
 
-	public AppUserDto() {		
+	public AppUserDto() {
 	}
-	
+
 	public Long getSecUntilNexLogin() {
 		return secUntilNexLogin;
 	}
@@ -67,19 +71,23 @@ public class AppUserDto implements UserDetails {
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
-	}	
+	}
+
 	public LocalDate getBirthdate() {
 		return birthdate;
 	}
+
 	public void setBirthdate(LocalDate birthdate) {
 		this.birthdate = birthdate;
 	}
 
+	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		GrantedAuthority auth = () -> this.userRole; 					
+		GrantedAuthority auth = () -> this.userRole;
 		return Arrays.asList(auth);
 	}
 
