@@ -12,8 +12,6 @@
  */
 package ch.xxx.manager.adapter.messaging;
 
-import javax.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -35,7 +33,6 @@ import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 @Service
-@Transactional
 @Profile("kafka | prod-kafka")
 public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
@@ -45,10 +42,10 @@ public class KafkaConsumer {
 		this.objectMapper = objectMapper;
 	}
 
-	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "false", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
+	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
 	public void consumerForNewUserTopic(String message) throws JsonMappingException, JsonProcessingException {
-		LOGGER.info("consumberForNewUserTopic [{}]", message);
+		LOGGER.info("consumerForNewUserTopic [{}]", message);
 		this.objectMapper.readValue(message, AppUserDto.class);
 	}
 
@@ -57,7 +54,7 @@ public class KafkaConsumer {
 		LOGGER.info(in + " from " + topic);
 	}
 
-	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "false", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
+	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
 	public void consumerForUserLogoutsTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);

@@ -37,6 +37,8 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
+import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
@@ -47,7 +49,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 public class KafkaConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConfig.class);
 	public static final String NEW_USER_TOPIC = "new-user-topic";
+	public static final String NEW_USER_DLT_TOPIC = "new-user-topic-retry";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
+	public static final String USER_LOGOUT_DLT_TOPIC = "user-logout-topic-retry";
 	private static final String GZIP = "gzip";
 	private static final String ZSTD = "zstd";
 
@@ -66,8 +70,9 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers); 
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         DefaultKafkaProducerFactory<String,String> defaultKafkaProducerFactory = new DefaultKafkaProducerFactory<>(configProps);
-        defaultKafkaProducerFactory.setTransactionIdPrefix("tx-");
+        defaultKafkaProducerFactory.setTransactionIdPrefix("tx-");        
         return defaultKafkaProducerFactory;
 	}
 	
@@ -75,7 +80,14 @@ public class KafkaConfig {
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-	
+
+    @Bean("kafkaRetryTemplate")
+    public KafkaTemplate<String, String> kafkaRetryTemplate() {
+        KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(producerFactory());
+        kafkaTemplate.setAllowNonTransactional(true);
+        return kafkaTemplate;
+    }
+    
     @Bean
     public KafkaTransactionManager<String,String> kafkaTransactionManager() {
         KafkaTransactionManager<String,String> manager = new KafkaTransactionManager<>(producerFactory());
