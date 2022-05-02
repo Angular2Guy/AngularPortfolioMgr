@@ -39,12 +39,17 @@ import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 @Profile("kafka | prod-kafka")
 public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
+	private final ObjectMapper objectMapper;
+	
+	public KafkaConsumer(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
 
 	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "false", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
 	public void consumerForNewUserTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumberForNewUserTopic [{}]", message);
-		new ObjectMapper().readValue(message, AppUserDto.class);
+		this.objectMapper.readValue(message, AppUserDto.class);
 	}
 
 	@DltHandler
@@ -56,6 +61,6 @@ public class KafkaConsumer {
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
 	public void consumerForUserLogoutsTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);
-		new ObjectMapper().readValue(message, RevokedTokenDto.class);
+		this.objectMapper.readValue(message, RevokedTokenDto.class);
 	}
 }

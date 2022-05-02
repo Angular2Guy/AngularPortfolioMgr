@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -34,21 +36,25 @@ import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.domain.producer.MessageProducer;
 
 @Service
+@Transactional
 @Profile("kafka | prod-kafka")
 public class KafkaProducer implements MessageProducer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
 	private final KafkaTemplate<String,String> kafkaTemplate;
+	private final ObjectMapper objectMapper;
 	
-	public KafkaProducer(KafkaTemplate<String,String> kafkaTemplate) {
+	public KafkaProducer(KafkaTemplate<String,String> kafkaTemplate, ObjectMapper objectMapper) {
 		this.kafkaTemplate = kafkaTemplate;
+		this.objectMapper = objectMapper;
 	}
 	
 	public void sendLogoutMsg(RevokedTokenDto revokedTokenDto) {		
 		try {
-			String msg = new ObjectMapper().writeValueAsString(revokedTokenDto);
-			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.USER_LOGOUT_TOPIC, msg);
+			String msg = this.objectMapper.writeValueAsString(revokedTokenDto);
+			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.USER_LOGOUT_TOPIC, revokedTokenDto.getUuid(), msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
+			LOGGER.error("sendLogoutMsg ", e);
 			throw new AuthenticationException("Logout failed.");
 		}
 		LOGGER.info("send logout msg: {}", revokedTokenDto.toString());
@@ -56,10 +62,11 @@ public class KafkaProducer implements MessageProducer {
 	
 	public void sendNewUserMsg(AppUserDto appUserDto) {
 		try {
-			String msg = new ObjectMapper().writeValueAsString(appUserDto);
-			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.NEW_USER_TOPIC, msg);
+			String msg = this.objectMapper.writeValueAsString(appUserDto);
+			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.NEW_USER_TOPIC, appUserDto.getUsername(), msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
+			LOGGER.error("SendNewUserMsg ", e);
 			throw new AuthenticationException("User creation failed.");
 		}
 		LOGGER.info("send new user msg: {}", appUserDto.toString());
