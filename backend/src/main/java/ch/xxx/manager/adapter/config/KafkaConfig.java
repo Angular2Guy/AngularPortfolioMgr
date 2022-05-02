@@ -15,12 +15,16 @@ package ch.xxx.manager.adapter.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.kafka.clients.DefaultHostResolver;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.TopicConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +45,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 @EnableKafka
 @Profile("kafka | prod-kafka")
 public class KafkaConfig {
+	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConfig.class);
 	public static final String NEW_USER_TOPIC = "new-user-topic";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
 	private static final String GZIP = "gzip";
@@ -48,6 +53,12 @@ public class KafkaConfig {
 
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
+	
+	@PostConstruct
+	public void init() {
+		DefaultHostResolver.IP_ADDRESS = this.bootstrapServers.split(":")[0];
+		LOGGER.info("Kafka Servername: {} Ip Address: {}", DefaultHostResolver.IP_ADDRESS, DefaultHostResolver.KAFKAAPP);
+	}
 	
 	@Bean
 	public ProducerFactory<String,String> producerFactory() {

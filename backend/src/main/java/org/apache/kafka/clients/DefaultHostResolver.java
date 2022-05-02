@@ -16,12 +16,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class DefaultHostResolver implements HostResolver {
+	public static volatile String IP_ADDRESS = "";
+	public static final String KAFKAAPP = "kafkaapp";
 
 	@Override
 	public InetAddress[] resolve(String host) throws UnknownHostException {
-		if(host.startsWith("kafkaapp")) {
+		if(host.startsWith(KAFKAAPP)) {
 			InetAddress[] addressArr = new InetAddress[1];
-			addressArr[0] = InetAddress.getByAddress(host, InetAddress.getByName("192.168.49.2").getAddress());
+			addressArr[0] = InetAddress.getByAddress(host, InetAddress.getByName(IP_ADDRESS).getAddress());
 			return addressArr;
 		}		
 		return InetAddress.getAllByName(host);
