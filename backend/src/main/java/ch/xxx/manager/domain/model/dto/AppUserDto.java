@@ -172,5 +172,12 @@ public class AppUserDto implements UserDetails {
 	public void setToken(String token) {
 		this.token = token;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "AppUserDto [id=" + id + ", username=" + username + ", birthdate=" + birthdate + ", updatedAt="
+				+ updatedAt + ", password=" + password + ", emailAddress=" + emailAddress + ", userRole=" + userRole
+				+ ", locked=" + locked + ", enabled=" + enabled + ", uuid=" + uuid + ", token=" + token
+				+ ", secUntilNexLogin=" + secUntilNexLogin + "]";
+	}
 }

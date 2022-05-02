@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.Optional;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,31 +21,48 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
+import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.RevokedToken;
 import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
+import ch.xxx.manager.domain.producer.MessageProducer;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
+import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 
 @Profile("kafka | prod-kafka")
 @Transactional
 @Service
 public class AppUserServiceMessaging extends AppUserServiceBase implements AppUserService {
-
-	public AppUserServiceMessaging(AppUserRepository repository, AppUserMapper appUserMapper,
-			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository,
+	private final MessageProducer messageProducer;
+	
+	public AppUserServiceMessaging(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
+			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository, MessageProducer messageProducer,
 			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
-		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService);
+		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);
+		this.messageProducer = messageProducer;
 	}
 
 	@Override
 	public Boolean signin(AppUserDto appUserDto) {
-		// TODO Auto-generated method stub
-		return Boolean.TRUE;
+		Optional<AppUser> appUserOpt = super.signin(appUserDto, false);
+		appUserOpt.ifPresent(myAppUser -> this.messageProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser)));
+		return appUserOpt.isPresent();
 	}
 
+	public Boolean signinMsg(AppUserDto appUserDto) {
+		return super.signin(appUserDto, true).isPresent();
+	}
+	
 	@Override
 	public Boolean logout(String bearerStr) {
-		// TODO Auto-generated method stub
-		return Boolean.TRUE;
+		Optional<RevokedToken> logoutTokenOpt = this.logoutToken(bearerStr);
+		logoutTokenOpt.ifPresent(revokedToken -> 
+			this.messageProducer.sendLogoutMsg(this.revokedTokenMapper.convert(revokedToken)));		
+		return logoutTokenOpt.isPresent();
 	}
 
+	public Boolean logoutMsg(RevokedTokenDto revokedTokenDto) {
+		return super.logout(revokedTokenDto);
+	}
 }

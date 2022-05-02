@@ -31,10 +31,11 @@ import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
+import ch.xxx.manager.domain.producer.MessageProducer;
 
 @Service
 @Profile("kafka | prod-kafka")
-public class KafkaProducer {
+public class KafkaProducer implements MessageProducer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
 	private final KafkaTemplate<String,String> kafkaTemplate;
 	

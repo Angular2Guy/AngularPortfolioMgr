@@ -13,6 +13,7 @@
 package ch.xxx.manager.usecase.mapping;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -22,12 +23,13 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 @Component
 public class AppUserMapper {
 	public AppUserDto convert(Optional<AppUser> entityOpt, String token, long untilNextLogin) {
-		AppUserDto dto = entityOpt.isEmpty() ? null : new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
-				"XXX", token, "YYY", entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
-				entityOpt.get().isEnabled(), "ZZZ", untilNextLogin);
+		AppUserDto dto = entityOpt.isEmpty() ? null
+				: new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
+						"XXX", token, "YYY", entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
+						entityOpt.get().isEnabled(), "ZZZ", untilNextLogin);
 		return dto;
 	}
-	
+
 	public AppUser convert(AppUserDto dto, Optional<AppUser> entityOpt) {
 		final AppUser myEntity = entityOpt.orElse(new AppUser());
 		myEntity.setBirthDate(dto.getBirthdate());
@@ -35,7 +37,18 @@ public class AppUserMapper {
 		myEntity.setPassword(dto.getPassword());
 		myEntity.setUserName(dto.getUsername());
 		myEntity.setUserRole(dto.getUserRole());
-		myEntity.setUuid(dto.getUuid());		
+		myEntity.setUuid(dto.getUuid());
 		return myEntity;
+	}
+
+	public AppUserDto convert(AppUser entity) {
+		return new AppUserDto(entity.getId(), entity.getUserName(), entity.getBirthDate(), entity.getPassword(), null,
+				entity.getEmailAddress(), entity.getUserRole(), entity.isLocked(), entity.isEnabled(), entity.getUuid(),
+				1000L);
+	}
+
+	public AppUser convert(AppUserDto dto) {
+		return new AppUser(dto.getId(), dto.getUsername(), dto.getBirthdate(), dto.getPassword(), dto.getEmailAddress(),
+				dto.getUserRole(), dto.isLocked(), dto.isEnabled(), dto.getUserRole(), Set.of());
 	}
 }

@@ -22,6 +22,15 @@ public class RevokedTokenDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime lastLogout;
 	
+	public RevokedTokenDto() {		
+	}
+	
+	public RevokedTokenDto(String name, String uuid, LocalDateTime lastLogout) {
+		super();
+		this.name = name;
+		this.uuid = uuid;
+		this.lastLogout = lastLogout;
+	}
 	public String getName() {
 		return name;
 	}
@@ -40,4 +49,9 @@ public class RevokedTokenDto {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+	
+	@Override
+	public String toString() {
+		return "RevokedTokenDto [name=" + name + ", uuid=" + uuid + ", lastLogout=" + lastLogout + "]";
+	}	
 }

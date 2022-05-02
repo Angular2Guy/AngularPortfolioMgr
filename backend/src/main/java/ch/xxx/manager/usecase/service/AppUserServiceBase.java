@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -36,8 +37,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
+import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
@@ -45,18 +49,19 @@ import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
-
+import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 
 public class AppUserServiceBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceBase.class);
 	private static final long LOGOUT_TIMEOUT = 185L;
-	protected final AppUserRepository repository;
+	private final AppUserRepository repository;
 	protected final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
-	protected final PasswordEncoder passwordEncoder;
-	protected final JwtTokenService jwtTokenService;
+	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenService jwtTokenService;
 	private final AppInfoService myService;
-	protected final RevokedTokenRepository revokedTokenRepository;
+	private final RevokedTokenRepository revokedTokenRepository;
+	protected final RevokedTokenMapper revokedTokenMapper;
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
 
 	@Value("${spring.mail.username}")
@@ -68,7 +73,7 @@ public class AppUserServiceBase {
 
 	public AppUserServiceBase(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
 			RevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
-			JwtTokenService jwtTokenProvider, AppInfoService myService) {
+			JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
 		this.passwordEncoder = passwordEncoder;
@@ -76,6 +81,7 @@ public class AppUserServiceBase {
 		this.appUserMapper = appUserMapper;
 		this.myService = myService;
 		this.revokedTokenRepository = revokedTokenRepository;
+		this.revokedTokenMapper = revokedTokenMapper;
 	}
 
 	@PostConstruct
@@ -148,7 +154,72 @@ public class AppUserServiceBase {
 		return user;
 	}
 
-	protected void sendConfirmMail(AppUser entity) {
+	public Boolean signin(AppUserDto appUserDto) {
+		return this.signin(appUserDto, true).isPresent();
+	}
+
+	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist) {
+		return appUserDto.getId() != null ? Optional.empty() : this
+				.checkSaveSignin(this.appUserMapper.convert(appUserDto,
+						this.repository.findByUsername(appUserDto.getUsername())))
+				.stream().map(myAppUser -> persist ? this.repository.save(myAppUser) : myAppUser).findAny();
+	}
+
+	private Optional<AppUser> checkSaveSignin(AppUser entity) {
+		Optional<AppUser> result = Optional.empty();
+		if (entity.getId() == null) {
+			String encryptedPassword = this.passwordEncoder.encode(entity.getPassword());
+			entity.setPassword(encryptedPassword);
+			UUID uuid = UUID.randomUUID();
+			entity.setUuid(uuid.toString());
+			entity.setLocked(false);
+			entity.setUserRole(Role.USERS.name());
+			boolean emailConfirmEnabled = this.confirmUrl != null && !this.confirmUrl.isBlank();
+			entity.setEnabled(!emailConfirmEnabled);
+			if (emailConfirmEnabled) {
+				this.sendConfirmMail(entity);
+			}
+			result = Optional.of(entity);
+		} else {
+			LOGGER.warn("Username multiple signin: {}", entity.getUserName());
+		}
+		return result;
+	}
+
+	public Boolean logout(String bearerStr) {
+		Optional<RevokedToken> revokedTokenOpt = this.logoutToken(bearerStr).stream()
+				.peek(revokedToken -> this.revokedTokenRepository.save(revokedToken)).findAny();
+		return revokedTokenOpt.isPresent();
+	}
+
+	public Boolean logout(RevokedTokenDto revokedTokenDto) {
+		this.revokedTokenRepository.save(this.revokedTokenMapper.convert(revokedTokenDto));
+		return Boolean.TRUE;
+	}
+
+	protected Optional<RevokedToken> logoutToken(String bearerStr) {
+		if (!this.jwtTokenService.validateToken(this.jwtTokenService.resolveToken(bearerStr).orElse(""))) {
+			throw new AuthenticationException("Invalid token.");
+		}
+		String username = this.jwtTokenService.getUsername(this.jwtTokenService.resolveToken(bearerStr)
+				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
+		String uuid = this.jwtTokenService.getUuid(this.jwtTokenService.resolveToken(bearerStr)
+				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
+		this.repository.findByUsername(username)
+				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));
+		long revokedTokensForUuid = this.revokedTokenRepository.findAll().stream()
+				.filter(myRevokedToken -> myRevokedToken.getUuid().equals(uuid)
+						&& myRevokedToken.getName().equalsIgnoreCase(username))
+				.count();
+		Optional<RevokedToken> result = Optional.empty();
+		if (revokedTokensForUuid == 0) {
+			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));
+			LOGGER.warn("Duplicate logout for user {}", username);
+		}
+		return result;
+	}
+
+	private void sendConfirmMail(AppUser entity) {
 		SimpleMailMessage msg = new SimpleMailMessage();
 		msg.setTo(entity.getEmailAddress());
 		msg.setSubject("AngularPortfolioMgr Account Confirmation Mail");
