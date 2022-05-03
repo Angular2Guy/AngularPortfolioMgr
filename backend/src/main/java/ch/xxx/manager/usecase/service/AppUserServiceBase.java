@@ -155,14 +155,17 @@ public class AppUserServiceBase {
 	}
 
 	public Boolean signin(AppUserDto appUserDto) {
-		return this.signin(appUserDto, true).isPresent();
+		return this.signin(appUserDto, true, true).isPresent();
 	}
 
-	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist) {
-		return appUserDto.getId() != null ? Optional.empty() : this
-				.checkSaveSignin(this.appUserMapper.convert(appUserDto,
-						this.repository.findByUsername(appUserDto.getUsername())))
-				.stream().map(myAppUser -> persist ? this.repository.save(myAppUser) : myAppUser).findAny();
+	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist, boolean check) {	
+		if(appUserDto.getId() != null) {
+			return Optional.empty();
+		}
+		Optional<AppUser> result = check ? this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
+				this.repository.findByUsername(appUserDto.getUsername()))) : Optional.of(this.appUserMapper.convert(appUserDto));
+		result = result.stream().map(myAppUser -> persist ? this.repository.save(myAppUser) : myAppUser).findAny();
+		return result;
 	}
 
 	private Optional<AppUser> checkSaveSignin(AppUser entity) {

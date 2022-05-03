@@ -45,13 +45,13 @@ public class AppUserServiceMessaging extends AppUserServiceBase implements AppUs
 
 	@Override
 	public Boolean signin(AppUserDto appUserDto) {
-		Optional<AppUser> appUserOpt = super.signin(appUserDto, false);
+		Optional<AppUser> appUserOpt = super.signin(appUserDto, false, true);
 		appUserOpt.ifPresent(myAppUser -> this.messageProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser)));
 		return appUserOpt.isPresent();
 	}
 
 	public Boolean signinMsg(AppUserDto appUserDto) {
-		return super.signin(appUserDto, true).isPresent();
+		return super.signin(appUserDto, true, false).isPresent();
 	}
 	
 	@Override

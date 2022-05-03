@@ -31,22 +31,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
+import ch.xxx.manager.usecase.service.AppUserServiceMessaging;
 
 @Service
 @Profile("kafka | prod-kafka")
 public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 	private final ObjectMapper objectMapper;
+	private final AppUserServiceMessaging appUserService;
 	
-	public KafkaConsumer(ObjectMapper objectMapper) {
+	public KafkaConsumer(ObjectMapper objectMapper, AppUserServiceMessaging appUserService) {
 		this.objectMapper = objectMapper;
+		this.appUserService = appUserService;
 	}
 
 	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
 	public void consumerForNewUserTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumerForNewUserTopic [{}]", message);
-		this.objectMapper.readValue(message, AppUserDto.class);
+		AppUserDto dto = this.objectMapper.readValue(message, AppUserDto.class);
+		this.appUserService.signinMsg(dto);
 	}
 
 	@DltHandler
@@ -58,6 +62,7 @@ public class KafkaConsumer {
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
 	public void consumerForUserLogoutsTopic(String message) throws JsonMappingException, JsonProcessingException {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);
-		this.objectMapper.readValue(message, RevokedTokenDto.class);
+		RevokedTokenDto dto = this.objectMapper.readValue(message, RevokedTokenDto.class);
+		this.appUserService.logoutMsg(dto);
 	}
 }
