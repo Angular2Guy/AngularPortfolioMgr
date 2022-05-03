@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,13 +42,15 @@ public class CronJob {
 	private final QuoteImportService quoteImportService;
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
+	private Environment environment;
 
 	public CronJob(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
-			CurrencyService currencyService, AppUserService appUserService) {
+			CurrencyService currencyService, AppUserService appUserService, Environment environment) {
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
+		this.environment = environment;
 	}
 
 	@PostConstruct
@@ -58,8 +61,10 @@ public class CronJob {
 	@Scheduled(fixedRate = 90000)
 	@Order(1)
 	public void updateLoggedOutUsers() {
-		LOGGER.info("Update logged out users.");
-		this.appUserService.updateLoggedOutUsers();
+		if(Stream.of(this.environment.getActiveProfiles()).noneMatch(myProfile -> myProfile.contains("kafka"))) {
+			LOGGER.info("Update logged out users.");
+			this.appUserService.updateLoggedOutUsers();
+		}
 	}	
 	
 	@Scheduled(cron = "0 0 1 * * ?")

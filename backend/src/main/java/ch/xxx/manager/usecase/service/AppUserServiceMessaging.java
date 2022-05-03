@@ -34,6 +34,7 @@ import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 @Transactional
 @Service
 public class AppUserServiceMessaging extends AppUserServiceBase implements AppUserService {
+	private static final long LOGOUT_TIMEOUT = 95L;
 	private final MessageProducer messageProducer;
 	
 	public AppUserServiceMessaging(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
@@ -43,6 +44,11 @@ public class AppUserServiceMessaging extends AppUserServiceBase implements AppUs
 		this.messageProducer = messageProducer;
 	}
 
+	@Override
+	public void updateLoggedOutUsers() {
+		this.updateLoggedOutUsers(LOGOUT_TIMEOUT);
+	}
+	
 	@Override
 	public Boolean signin(AppUserDto appUserDto) {
 		Optional<AppUser> appUserOpt = super.signin(appUserDto, false, true);
@@ -63,6 +69,8 @@ public class AppUserServiceMessaging extends AppUserServiceBase implements AppUs
 	}
 
 	public Boolean logoutMsg(RevokedTokenDto revokedTokenDto) {
-		return super.logout(revokedTokenDto);
+		Boolean result = super.logout(revokedTokenDto);
+		this.updateLoggedOutUsers();
+		return result;
 	}
 }

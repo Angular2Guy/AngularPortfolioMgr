@@ -90,17 +90,21 @@ public class AppUserServiceBase {
 	}
 
 	public void updateLoggedOutUsers() {
+		this.updateLoggedOutUsers(LOGOUT_TIMEOUT);
+	}
+
+	protected void updateLoggedOutUsers(Long timeout) {
 		final List<RevokedToken> revokedTokens = new ArrayList<RevokedToken>(this.revokedTokenRepository.findAll());
 		this.jwtTokenService.updateLoggedOutUsers(revokedTokens.stream()
 				.filter(myRevokedToken -> myRevokedToken.getLastLogout() == null
-						|| !myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
+						|| !myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(timeout)))
 				.toList());
 		this.revokedTokenRepository.deleteAll(revokedTokens.stream()
 				.filter(myRevokedToken -> myRevokedToken.getLastLogout() != null
-						&& myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(LOGOUT_TIMEOUT)))
+						&& myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(timeout)))
 				.toList());
 	}
-
+	
 	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenService.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
@@ -216,8 +220,9 @@ public class AppUserServiceBase {
 				.count();
 		Optional<RevokedToken> result = Optional.empty();
 		if (revokedTokensForUuid == 0) {
-			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));
-			LOGGER.warn("Duplicate logout for user {}", username);
+			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));			
+		} else {
+			LOGGER.warn("Duplicate logout for user {} logout: ", username, revokedTokensForUuid);
 		}
 		return result;
 	}
