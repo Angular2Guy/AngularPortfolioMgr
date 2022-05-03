@@ -222,7 +222,7 @@ public class AppUserServiceBase {
 		if (revokedTokensForUuid == 0) {
 			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));			
 		} else {
-			LOGGER.warn("Duplicate logout for user {} logout: ", username, revokedTokensForUuid);
+			LOGGER.warn("Duplicate logout for user {} logout: {}", username, revokedTokensForUuid);
 		}
 		return result;
 	}
