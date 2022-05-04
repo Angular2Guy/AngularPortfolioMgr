@@ -31,6 +31,7 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
 Create envApp values
 */}}
 {{- define "helpers.list-envApp-variables"}}
@@ -48,6 +49,7 @@ Create envApp values
 {{- end}}
 {{- end }}
 
+{{/*
 Create envDb values
 */}}
 {{- define "helpers.list-envDb-variables"}}
@@ -60,6 +62,42 @@ Create envDb values
       key: {{ $key }}
 {{- end}}
 {{- range $key, $val := .Values.envDb.normal }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end}}
+{{- end }}
+
+{{/*
+Create envKafka values
+*/}}
+{{- define "helpers.list-envKafka-variables"}}
+{{- $secretName := .Values.secret.nameKafka -}}
+{{- range $key, $val := .Values.envKafka.secret }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: {{ $key }}
+{{- end}}
+{{- range $key, $val := .Values.envKafka.normal }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end}}
+{{- end }}
+
+{{/*
+Create envZookeeper values
+*/}}
+{{- define "helpers.list-envZookeeper-variables"}}
+{{- $secretName := .Values.secret.nameZookeeper -}}
+{{- range $key, $val := .Values.envZookeeper.secret }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: {{ $key }}
+{{- end}}
+{{- range $key, $val := .Values.envZookeeper.normal }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end}}
