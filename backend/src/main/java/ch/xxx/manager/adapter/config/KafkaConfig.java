@@ -49,8 +49,6 @@ public class KafkaConfig {
 	private ProducerFactory<String, String> producerFactory;
 	@Value("${kafka.server.name}")
 	private String kafkaServerName;
-	@Value("${kafka.service.name}")
-	private String kafkaServiceName;
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
 	@Value("${spring.kafka.producer.transaction-id-prefix}")
@@ -67,7 +65,7 @@ public class KafkaConfig {
 		String bootstrap = this.bootstrapServers.split(":")[0].trim();
 		if (bootstrap.matches("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$")) {
 			DefaultHostResolver.IP_ADDRESS = bootstrap;
-		} else {
+		} else if(!bootstrap.isEmpty()) {
 			DefaultHostResolver.KAFKA_SERVICE_NAME = bootstrap;
 		}
 		LOGGER.info("Kafka Servername: {} Kafka Servicename: {} Ip Address: {}", DefaultHostResolver.KAFKA_SERVER_NAME,
