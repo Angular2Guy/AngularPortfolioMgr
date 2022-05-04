@@ -11,7 +11,7 @@ dbServiceName: postgresservice
 #for production use replace the jwtTokenSecrect value with a random alphanumeric string of the same length or longer
 jwtTokenSecrect: secret-key1234567890abcdefghijklmnopqrstuvpxyz
 
-kafkaAppName: kafkaapp
+kafkaName: kafkaapp
 zookeeperName: zookeeperserver
 kafkaImageName: bitnami/kafka
 kafkaImageVersion: latest
@@ -54,7 +54,8 @@ envApp:
   normal: 
     JPA_SHOW_SQL: true
     H2_CONSOLE: false
-  secret:
+  secret:    
+    KAFKA_BOOTSTRAP_SERVERS: kafkaapp:9092 
     JWTTOKEN_SECRET: secret-key1234567890abcdefghijklmnopqrstuvwxyz
     POSTGRES_USER: dbuser
     POSTGRES_PASSWORD: passwordtoreplace
