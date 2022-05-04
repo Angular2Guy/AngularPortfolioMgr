@@ -18,14 +18,17 @@ import java.net.UnknownHostException;
 public class DefaultHostResolver implements HostResolver {
 	public static volatile String IP_ADDRESS = "";
 	public static volatile String KAFKA_SERVER_NAME = "";
+	public static volatile String KAFKA_SERVICE_NAME = "";
 
 	@Override
 	public InetAddress[] resolve(String host) throws UnknownHostException {
-		if(host.startsWith(KAFKA_SERVER_NAME)) {
+		if(host.startsWith(KAFKA_SERVER_NAME) && !IP_ADDRESS.isBlank()) {
 			InetAddress[] addressArr = new InetAddress[1];
 			addressArr[0] = InetAddress.getByAddress(host, InetAddress.getByName(IP_ADDRESS).getAddress());
 			return addressArr;
-		}		
+		} else if(host.startsWith(KAFKA_SERVER_NAME) && !KAFKA_SERVICE_NAME.isBlank()) {
+			host = KAFKA_SERVICE_NAME;
+		}
 		return InetAddress.getAllByName(host);
 	}
 

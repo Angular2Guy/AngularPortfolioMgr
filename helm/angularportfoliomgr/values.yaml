@@ -56,6 +56,7 @@ envApp:
     H2_CONSOLE: false
   secret:    
     KAFKA_BOOTSTRAP_SERVERS: kafkaservice:9092 
+    KAFKA_SERVER_NAME: kafkaapp
     JWTTOKEN_SECRET: secret-key1234567890abcdefghijklmnopqrstuvwxyz
     POSTGRES_USER: dbuser
     POSTGRES_PASSWORD: passwordtoreplace

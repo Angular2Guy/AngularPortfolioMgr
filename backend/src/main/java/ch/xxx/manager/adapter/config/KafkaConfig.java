@@ -34,7 +34,6 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
-
 @Configuration
 @EnableKafka
 @Profile("kafka | prod-kafka")
@@ -47,64 +46,72 @@ public class KafkaConfig {
 	private static final String GZIP = "gzip";
 	private static final String ZSTD = "zstd";
 
-	private ProducerFactory<String,String> producerFactory;
+	private ProducerFactory<String, String> producerFactory;
 	@Value("${kafka.server.name}")
 	private String kafkaServerName;
+	@Value("${kafka.service.name}")
+	private String kafkaServiceName;
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
 	@Value("${spring.kafka.producer.transaction-id-prefix}")
 	private String transactionIdPrefix;
 	@Value("${spring.kafka.producer.compression-type}")
-	private String compressionType;	
+	private String compressionType;
 
-	public KafkaConfig(ProducerFactory<String,String> producerFactory) {
+	public KafkaConfig(ProducerFactory<String, String> producerFactory) {
 		this.producerFactory = producerFactory;
 	}
-	
+
 	@PostConstruct
 	public void init() {
-		DefaultHostResolver.IP_ADDRESS = this.bootstrapServers.split(":")[0];
-		DefaultHostResolver.KAFKA_SERVER_NAME = this.kafkaServerName;
-		LOGGER.info("Kafka Servername: {} Ip Address: {}", DefaultHostResolver.KAFKA_SERVER_NAME, DefaultHostResolver.IP_ADDRESS);
+		String bootstrap = this.bootstrapServers.split(":")[0].trim();
+		if (bootstrap.matches("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$")) {
+			DefaultHostResolver.IP_ADDRESS = bootstrap;
+		} else {
+			DefaultHostResolver.KAFKA_SERVICE_NAME = bootstrap;
+		}
+		LOGGER.info("Kafka Servername: {} Kafka Servicename: {} Ip Address: {}", DefaultHostResolver.KAFKA_SERVER_NAME,
+				DefaultHostResolver.KAFKA_SERVICE_NAME, DefaultHostResolver.IP_ADDRESS);
 	}
-	
-    @Bean
-    public KafkaTemplate<String, String> kafkaTemplate() {
-    	KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
-    	kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
-        return new KafkaTemplate<>(this.producerFactory);
-    }
 
-    @Bean("kafkaRetryTemplate")
-    public KafkaTemplate<String, String> kafkaRetryTemplate() {
-        KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
-        kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
-        kafkaTemplate.setAllowNonTransactional(true);
-        return kafkaTemplate;
-    }
-    
-    @Bean
-    public KafkaTransactionManager<String,String> kafkaTransactionManager() {
-        KafkaTransactionManager<String,String> manager = new KafkaTransactionManager<>(this.producerFactory);
-        return manager;
-    }
-       	    
-    
+	@Bean
+	public KafkaTemplate<String, String> kafkaTemplate() {
+		KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
+		kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
+		return new KafkaTemplate<>(this.producerFactory);
+	}
+
+	@Bean("kafkaRetryTemplate")
+	public KafkaTemplate<String, String> kafkaRetryTemplate() {
+		KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
+		kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
+		kafkaTemplate.setAllowNonTransactional(true);
+		return kafkaTemplate;
+	}
+
+	@Bean
+	public KafkaTransactionManager<String, String> kafkaTransactionManager() {
+		KafkaTransactionManager<String, String> manager = new KafkaTransactionManager<>(this.producerFactory);
+		return manager;
+	}
+
 	@Bean
 	public NewTopic newUserTopic() {
-		return TopicBuilder.name(KafkaConfig.NEW_USER_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
-	}
-	
-	@Bean
-	public NewTopic userLogoutTopic() {
-		return TopicBuilder.name(KafkaConfig.USER_LOGOUT_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
+		return TopicBuilder.name(KafkaConfig.NEW_USER_TOPIC)
+				.config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
 	}
 
-    @Bean
-    @Primary
-    public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
-    }
+	@Bean
+	public NewTopic userLogoutTopic() {
+		return TopicBuilder.name(KafkaConfig.USER_LOGOUT_TOPIC)
+				.config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
+	}
+
+	@Bean
+	@Primary
+	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+		return new JpaTransactionManager(entityManagerFactory);
+	}
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void doOnStartup() {
