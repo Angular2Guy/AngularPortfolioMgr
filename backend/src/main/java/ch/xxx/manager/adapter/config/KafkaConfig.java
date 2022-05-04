@@ -22,7 +22,6 @@ import org.apache.kafka.clients.DefaultHostResolver;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.TopicConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,8 +36,6 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
-import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
@@ -55,24 +52,42 @@ public class KafkaConfig {
 	private static final String GZIP = "gzip";
 	private static final String ZSTD = "zstd";
 
+	@Value("${kafka.server.name}")
+	private String kafkaServerName;
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
+	@Value("${spring.kafka.producer.key-serializer}")
+	private String keySerializer;
+	@Value("${spring.kafka.producer.value-serializer}")
+	private String valueSerializer;	
+	@Value("${spring.kafka.producer.enable.idempotence}")
+	private Boolean idempotence;
+	@Value("${spring.kafka.producer.transaction-id-prefix}")
+	private String transactionIdPrefix;
+	@Value("${spring.kafka.producer.compression-type}")
+	private String compressionType;	
 	
 	@PostConstruct
 	public void init() {
 		DefaultHostResolver.IP_ADDRESS = this.bootstrapServers.split(":")[0];
-		LOGGER.info("Kafka Servername: {} Ip Address: {}", DefaultHostResolver.IP_ADDRESS, DefaultHostResolver.KAFKAAPP);
+		DefaultHostResolver.KAFKA_SERVER_NAME = this.kafkaServerName;
+		LOGGER.info("Kafka Servername: {} Ip Address: {}", DefaultHostResolver.KAFKA_SERVER_NAME, DefaultHostResolver.IP_ADDRESS);
 	}
 	
 	@Bean
 	public ProducerFactory<String,String> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers); 
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        try {
+        	configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Class.forName(this.keySerializer));
+			configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Class.forName(this.valueSerializer));
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+        configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, this.compressionType);
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, this.idempotence);
         DefaultKafkaProducerFactory<String,String> defaultKafkaProducerFactory = new DefaultKafkaProducerFactory<>(configProps);
-        defaultKafkaProducerFactory.setTransactionIdPrefix("tx-");        
+        defaultKafkaProducerFactory.setTransactionIdPrefix(this.transactionIdPrefix);        
         return defaultKafkaProducerFactory;
 	}
 	
