@@ -12,15 +12,11 @@
  */
 package ch.xxx.manager.adapter.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.kafka.clients.DefaultHostResolver;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.TopicConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +29,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
@@ -52,20 +47,19 @@ public class KafkaConfig {
 	private static final String GZIP = "gzip";
 	private static final String ZSTD = "zstd";
 
+	private ProducerFactory<String,String> producerFactory;
 	@Value("${kafka.server.name}")
 	private String kafkaServerName;
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
-	@Value("${spring.kafka.producer.key-serializer}")
-	private String keySerializer;
-	@Value("${spring.kafka.producer.value-serializer}")
-	private String valueSerializer;	
-	@Value("${spring.kafka.producer.enable.idempotence}")
-	private Boolean idempotence;
 	@Value("${spring.kafka.producer.transaction-id-prefix}")
 	private String transactionIdPrefix;
 	@Value("${spring.kafka.producer.compression-type}")
 	private String compressionType;	
+
+	public KafkaConfig(ProducerFactory<String,String> producerFactory) {
+		this.producerFactory = producerFactory;
+	}
 	
 	@PostConstruct
 	public void init() {
@@ -74,50 +68,36 @@ public class KafkaConfig {
 		LOGGER.info("Kafka Servername: {} Ip Address: {}", DefaultHostResolver.KAFKA_SERVER_NAME, DefaultHostResolver.IP_ADDRESS);
 	}
 	
-	@Bean
-	public ProducerFactory<String,String> producerFactory() {
-		Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers); 
-        try {
-        	configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Class.forName(this.keySerializer));
-			configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Class.forName(this.valueSerializer));
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-        configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, this.compressionType);
-        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, this.idempotence);
-        DefaultKafkaProducerFactory<String,String> defaultKafkaProducerFactory = new DefaultKafkaProducerFactory<>(configProps);
-        defaultKafkaProducerFactory.setTransactionIdPrefix(this.transactionIdPrefix);        
-        return defaultKafkaProducerFactory;
-	}
-	
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    	KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
+    	kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
+        return new KafkaTemplate<>(this.producerFactory);
     }
 
     @Bean("kafkaRetryTemplate")
     public KafkaTemplate<String, String> kafkaRetryTemplate() {
-        KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(producerFactory());
+        KafkaTemplate<String,String> kafkaTemplate = new KafkaTemplate<>(this.producerFactory);
+        kafkaTemplate.setTransactionIdPrefix(this.transactionIdPrefix);
         kafkaTemplate.setAllowNonTransactional(true);
         return kafkaTemplate;
     }
     
     @Bean
     public KafkaTransactionManager<String,String> kafkaTransactionManager() {
-        KafkaTransactionManager<String,String> manager = new KafkaTransactionManager<>(producerFactory());
+        KafkaTransactionManager<String,String> manager = new KafkaTransactionManager<>(this.producerFactory);
         return manager;
     }
        	    
     
 	@Bean
 	public NewTopic newUserTopic() {
-		return TopicBuilder.name(KafkaConfig.NEW_USER_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, KafkaConfig.GZIP).compact().build();
+		return TopicBuilder.name(KafkaConfig.NEW_USER_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
 	}
 	
 	@Bean
 	public NewTopic userLogoutTopic() {
-		return TopicBuilder.name(KafkaConfig.USER_LOGOUT_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, KafkaConfig.GZIP).compact().build();
+		return TopicBuilder.name(KafkaConfig.USER_LOGOUT_TOPIC).config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
 	}
 
     @Bean
