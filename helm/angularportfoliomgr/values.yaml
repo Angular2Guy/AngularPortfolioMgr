@@ -60,3 +60,4 @@ envApp:
     POSTGRES_USER: dbuser
     POSTGRES_PASSWORD: passwordtoreplace
     POSTGRES_URL: "jdbc:postgresql://postgresservice:5432/portfolio"
+    APIKEY: replacewithAlphavatageApiKey

@@ -51,7 +51,7 @@ dependencies {
 	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '0.22.0'
 			
 	if(project.hasProperty('withAngular')) {
-		runtimeOnly 'org.postgresql:postgresql'
+		implementation 'org.postgresql:postgresql'
 		testImplementation 'com.h2database:h2'
 	} else {
 		runtimeOnly 'com.h2database:h2'
