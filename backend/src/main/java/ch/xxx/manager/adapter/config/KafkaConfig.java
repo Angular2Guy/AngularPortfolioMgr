@@ -40,9 +40,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 public class KafkaConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConfig.class);
 	public static final String NEW_USER_TOPIC = "new-user-topic";
-	public static final String NEW_USER_DLT_TOPIC = "new-user-topic-retry";
+	// private static final String NEW_USER_DLT_TOPIC = "new-user-topic-retry";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
-	public static final String USER_LOGOUT_DLT_TOPIC = "user-logout-topic-retry";
+	// private static final String USER_LOGOUT_DLT_TOPIC = "user-logout-topic-retry";
 	private static final String GZIP = "gzip";
 	private static final String ZSTD = "zstd";
 
