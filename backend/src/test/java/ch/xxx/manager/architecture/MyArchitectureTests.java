@@ -108,7 +108,7 @@ public class MyArchitectureTests {
 
 	@Test
 	public void ruleExceptionsType() {
-		ArchRule exceptionType = ArchRuleDefinition.classes().that().resideInAPackage("..domain.exceptions..").should()
+		ArchRule exceptionType = ArchRuleDefinition.classes().that().resideInAPackage("..domain.exception..").should()
 				.beAssignableTo(RuntimeException.class).orShould().beAssignableTo(DefaultErrorAttributes.class);
 		exceptionType.check(this.importedClasses);
 	}
