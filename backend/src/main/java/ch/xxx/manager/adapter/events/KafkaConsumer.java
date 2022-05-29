@@ -31,16 +31,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
-import ch.xxx.manager.usecase.service.AppUserServiceMessaging;
+import ch.xxx.manager.usecase.service.AppUserServiceEvents;
 
 @Service
 @Profile("kafka | prod-kafka")
 public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 	private final ObjectMapper objectMapper;
-	private final AppUserServiceMessaging appUserService;
+	private final AppUserServiceEvents appUserService;
 	
-	public KafkaConsumer(ObjectMapper objectMapper, AppUserServiceMessaging appUserService) {
+	public KafkaConsumer(ObjectMapper objectMapper, AppUserServiceEvents appUserService) {
 		this.objectMapper = objectMapper;
 		this.appUserService = appUserService;
 	}

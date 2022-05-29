@@ -26,19 +26,19 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
 import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
-import ch.xxx.manager.domain.producer.MessageProducer;
+import ch.xxx.manager.domain.producer.EventProducer;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
 import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 
 @Profile("kafka | prod-kafka")
 @Transactional
 @Service
-public class AppUserServiceMessaging extends AppUserServiceBase implements AppUserService {
+public class AppUserServiceEvents extends AppUserServiceBase implements AppUserService {
 	private static final long LOGOUT_TIMEOUT = 95L;
-	private final MessageProducer messageProducer;
+	private final EventProducer messageProducer;
 	
-	public AppUserServiceMessaging(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
-			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository, MessageProducer messageProducer,
+	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
+			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
 			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);
 		this.messageProducer = messageProducer;
