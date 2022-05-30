@@ -35,13 +35,13 @@ import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 @Service
 public class AppUserServiceEvents extends AppUserServiceBase implements AppUserService {
 	private static final long LOGOUT_TIMEOUT = 95L;
-	private final EventProducer messageProducer;
+	private final EventProducer eventProducer;
 	
 	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
 			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
 			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);
-		this.messageProducer = messageProducer;
+		this.eventProducer = messageProducer;
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 	@Override
 	public Boolean signin(AppUserDto appUserDto) {
 		Optional<AppUser> appUserOpt = super.signin(appUserDto, false, true);
-		appUserOpt.ifPresent(myAppUser -> this.messageProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser)));
+		appUserOpt.ifPresent(myAppUser -> this.eventProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser)));
 		return appUserOpt.isPresent();
 	}
 
@@ -64,7 +64,7 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 	public Boolean logout(String bearerStr) {
 		Optional<RevokedToken> logoutTokenOpt = this.logoutToken(bearerStr);
 		logoutTokenOpt.ifPresent(revokedToken -> 
-			this.messageProducer.sendLogoutMsg(this.revokedTokenMapper.convert(revokedToken)));		
+			this.eventProducer.sendLogoutMsg(this.revokedTokenMapper.convert(revokedToken)));		
 		return logoutTokenOpt.isPresent();
 	}
 
