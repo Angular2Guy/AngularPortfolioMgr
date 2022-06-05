@@ -44,30 +44,29 @@ import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
 
 
 @NgModule({
-	declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,  
-		 PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
-	imports: [
-		BaseModule,
-		MatListModule,
-		MatProgressSpinnerModule,
-		MatSidenavModule,
-		MatToolbarModule,
-		MatIconModule,
-		MatDatepickerModule,
-		MatFormFieldModule,
-		MatSelectModule,
-		MatAutocompleteModule,
-		MatTableModule,
-		MatButtonModule,
-		MatDialogModule,
-		MatLuxonDateModule,
-		MatInputModule,
-		MatRadioModule,
-		MatCheckboxModule,
-		NgxBarChartsModule,
-		PortfoliosRoutingModule
-	],
-	entryComponents: [NewPortfolioComponent],
-	providers: [DevAppInfoService, ProdAppInfoService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+    declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,
+        PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
+    imports: [
+        BaseModule,
+        MatListModule,
+        MatProgressSpinnerModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatAutocompleteModule,
+        MatTableModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatLuxonDateModule,
+        MatInputModule,
+        MatRadioModule,
+        MatCheckboxModule,
+        NgxBarChartsModule,
+        PortfoliosRoutingModule
+    ],
+    providers: [DevAppInfoService, ProdAppInfoService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
 })
 export class PortfoliosModule { }

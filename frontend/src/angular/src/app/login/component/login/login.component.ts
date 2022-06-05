@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MainComponent } from '../main/main.component';
 import { LoginService } from '../../service/login.service';
@@ -24,8 +24,8 @@ import { Login } from '../../model/login';
 	styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-	signinForm: FormGroup;
-	loginForm: FormGroup;
+	signinForm: UntypedFormGroup;
+	loginForm: UntypedFormGroup;
 	loginFailed = false;
 	signinFailed = false;
 	pwMatching = true;
@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private loginService: LoginService,
 		private tokenService: TokenService,
-		fb: FormBuilder) {
+		fb: UntypedFormBuilder) {
 		this.signinForm = fb.group({
 			username: ['', Validators.required],
 			password: ['', Validators.required],
@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
 		console.log(this.data);
 	}
 
-	validate(group: FormGroup) {
+	validate(group: UntypedFormGroup) {
 		if (group.get('password').touched || group.get('password2').touched) {
 			this.pwMatching = group.get('password').value === group.get('password2').value && group.get('password').value !== '';
 			if (!this.pwMatching) {

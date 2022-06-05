@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControlOptions, FormControl, Validators, ValidationErrors } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, AbstractControlOptions, FormControl, Validators, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
 import { PortfolioData } from '../../../model/portfolio-data';
@@ -31,7 +31,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 })
 export class AddSymbolComponent implements OnInit {
   private portfolio: Portfolio = null;
-  symbolForm: FormGroup;  
+  symbolForm: UntypedFormGroup;  
   selSymbol: Symbol = null;
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
@@ -43,7 +43,7 @@ export class AddSymbolComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private symbolService: SymbolService,
 		private quoteImportService: QuoteImportService,
-		private fb: FormBuilder) { 
+		private fb: UntypedFormBuilder) { 
 			this.symbolForm = fb.group({
 				symbolSymbol: '',	
 				symbolName: '',
@@ -119,7 +119,7 @@ export class AddSymbolComponent implements OnInit {
 	this.dialogRef.close();
   }
 
-  validate(formGroup: FormGroup): ValidationErrors {
+  validate(formGroup: UntypedFormGroup): ValidationErrors {
 /*	if (formGroup.get('portfolioName').touched) {
 		const myValue: string = formGroup.get('portfolioName').value;
 		if(myValue && myValue.trim().length > 4) {

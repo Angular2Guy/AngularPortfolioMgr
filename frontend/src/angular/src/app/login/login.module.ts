@@ -25,18 +25,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
-  declarations: [LoginComponent, MainComponent],
-  imports: [
-    BaseModule,
-	MatToolbarModule,
-	MatFormFieldModule,
-	MatTabsModule,
-	MatDialogModule,
-	MatButtonModule,
-	MatInputModule,
-    LoginRoutingModule
-  ],
-  entryComponents: [LoginComponent],
-  providers: [LoginService]
+    declarations: [LoginComponent, MainComponent],
+    imports: [
+        BaseModule,
+        MatToolbarModule,
+        MatFormFieldModule,
+        MatTabsModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatInputModule,
+        LoginRoutingModule
+    ],
+    providers: [LoginService]
 })
 export class LoginModule { }

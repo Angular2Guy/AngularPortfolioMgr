@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, Validators, UntypedFormBuilder } from '@angular/forms';
 import { OverviewComponent } from '../overview/overview.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Portfolio } from '../../../model/portfolio';
@@ -25,13 +25,13 @@ import { DateTime } from 'luxon';
   styleUrls: ['./new-portfolio.component.scss']
 })
 export class NewPortfolioComponent {
-  portfolioForm: FormGroup;
+  portfolioForm: UntypedFormGroup;
   formValid = true;
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private tokenService: TokenService,
-		private fb: FormBuilder) { 
+		private fb: UntypedFormBuilder) { 
 		this.portfolioForm = this.fb.group({
 			portfolioName: ['', Validators.required],
 			createdAt: [DateTime.fromISO(this.data.portfolio.createdAt), Validators.required]
@@ -53,7 +53,7 @@ export class NewPortfolioComponent {
 	this.dialogRef.close();
   }
 
-  validate(formGroup: FormGroup) {
+  validate(formGroup: UntypedFormGroup) {
 	if (formGroup.get('portfolioName').touched) {
 		const myValue: string = formGroup.get('portfolioName').value;
 		if(myValue && myValue.trim().length > 4) {
