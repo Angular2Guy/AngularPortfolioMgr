@@ -18,6 +18,13 @@ import { LoginService } from '../../service/login.service';
 import { TokenService } from '../../../service/token.service';
 import { Login } from '../../model/login';
 
+enum FormFields {
+	Username = 'username',
+	Password = 'password',
+	Password2 = 'password2',
+	Email = 'email'
+}
+
 @Component({
 	selector: 'app-login',
 	templateUrl: './login.component.html',
@@ -29,6 +36,7 @@ export class LoginComponent implements OnInit {
 	loginFailed = false;
 	signinFailed = false;
 	pwMatching = true;
+	FormFields = FormFields;
 
 	constructor(public dialogRef: MatDialogRef<MainComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -36,16 +44,16 @@ export class LoginComponent implements OnInit {
 		private tokenService: TokenService,
 		fb: FormBuilder) {
 		this.signinForm = fb.group({
-			username: ['', Validators.required],
-			password: ['', Validators.required],
-			password2: ['', Validators.required],
-			email: ['', Validators.required]
+			[FormFields.Username]: ['', Validators.required],
+			[FormFields.Password]: ['', Validators.required],
+			[FormFields.Password2]: ['', Validators.required],
+			[FormFields.Email]: ['', Validators.required]
 		}, {
 				validator: this.validate.bind(this)
 			});
 		this.loginForm = fb.group({
-			username: ['', Validators.required],
-			password: ['', Validators.required]
+			[FormFields.Username]: ['', Validators.required],
+		    [FormFields.Password]: ['', Validators.required]
 		});
 	}
 
@@ -54,14 +62,14 @@ export class LoginComponent implements OnInit {
 	}
 
 	validate(group: FormGroup) {
-		if (group.get('password').touched || group.get('password2').touched) {
-			this.pwMatching = group.get('password').value === group.get('password2').value && group.get('password').value !== '';
+		if (group.get(FormFields.Password).touched || group.get(FormFields.Password2).touched) {
+			this.pwMatching = group.get(FormFields.Password).value === group.get(FormFields.Password2).value && group.get(FormFields.Password).value !== '';
 			if (!this.pwMatching) {
-				group.get('password').setErrors({ MatchPassword: true });
-				group.get('password2').setErrors({ MatchPassword: true });
+				group.get(FormFields.Password).setErrors({ MatchPassword: true });
+				group.get(FormFields.Password2).setErrors({ MatchPassword: true });
 			} else {
-				group.get('password').setErrors(null);
-				group.get('password2').setErrors(null);
+				group.get(FormFields.Password).setErrors(null);
+				group.get(FormFields.Password2).setErrors(null);
 			}
 		}
 		return this.pwMatching;
@@ -69,16 +77,16 @@ export class LoginComponent implements OnInit {
 
 	onSigninClick(): void {
 		const login: Login = { emailAddress: null, token: null, password: null, username: null };
-		login.username = this.signinForm.get('username').value;
-		login.password = this.signinForm.get('password').value;
-		login.emailAddress = this.signinForm.get('email').value;
+		login.username = this.signinForm.get(FormFields.Username).value;
+		login.password = this.signinForm.get(FormFields.Password).value;
+		login.emailAddress = this.signinForm.get(FormFields.Email).value;
 		this.loginService.postSignin(login).subscribe(res => this.signin(res), err => console.log(err));
 	}
 
 	onLoginClick(): void {
 		const login: Login = {emailAddress: null, token: null, password: null, username: null}; 
-		login.username = this.loginForm.get('username').value;
-		login.password = this.loginForm.get('password').value;
+		login.username = this.loginForm.get(FormFields.Username).value;
+		login.password = this.loginForm.get(FormFields.Password).value;
 		this.loginService.postLogin(login).subscribe(res => this.login(res), err => console.log(err));		
 	}
 
