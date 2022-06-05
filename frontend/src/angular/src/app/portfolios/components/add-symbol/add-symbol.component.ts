@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, Inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, AbstractControlOptions, FormControl, Validators, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
 import { PortfolioData } from '../../../model/portfolio-data';
@@ -24,6 +24,13 @@ import { QuoteImportService } from '../../../service/quote-import.service';
 import { DateTime } from 'luxon';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
+enum FormFields {
+	SymbolSymbol = 'symbolSymbol',
+	SymbolName = 'symbolName',
+	SymbolWeight = 'symbolWeight',
+	CreatedAt = 'createdAt'
+}
+
 @Component({
   selector: 'app-add-symbol',
   templateUrl: './add-symbol.component.html',
@@ -31,19 +38,20 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 })
 export class AddSymbolComponent implements OnInit {
   private portfolio: Portfolio = null;
-  symbolForm: UntypedFormGroup;  
+  symbolForm: FormGroup;  
   selSymbol: Symbol = null;
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
   loading = false;
   importingQuotes = false;
   formValid = true;  
+  FormFields = FormFields;
 
   constructor(public dialogRef: MatDialogRef<OverviewComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: PortfolioData,
 		private symbolService: SymbolService,
 		private quoteImportService: QuoteImportService,
-		private fb: UntypedFormBuilder) { 
+		private fb: FormBuilder) { 
 			this.symbolForm = fb.group({
 				symbolSymbol: '',	
 				symbolName: '',
@@ -56,7 +64,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   ngOnInit() {	
-	this.symbolsName = this.symbolForm.get('symbolName').valueChanges.pipe(
+	this.symbolsName = this.symbolForm.get(FormFields.SymbolName).valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
@@ -64,7 +72,7 @@ export class AddSymbolComponent implements OnInit {
 			.pipe(map(localSymbols => this.filterPortfolioSymbols(localSymbols))) : this.clearSymbol()),
         tap(() => this.loading = false )
 	);
-	this.symbolsSymbol = this.symbolForm.get('symbolSymbol').valueChanges.pipe(
+	this.symbolsSymbol = this.symbolForm.get(FormFields.SymbolSymbol).valueChanges.pipe(
 		debounceTime( 400 ),
         distinctUntilChanged(),
         tap(() => this.loading = true ),
@@ -86,22 +94,22 @@ export class AddSymbolComponent implements OnInit {
   symbolSelected(event: MatAutocompleteSelectedEvent): void {
 	//console.log(event.option.value);
 	this.selSymbol = event.option.value;
-	this.symbolForm.controls['symbolSymbol'].patchValue(this.selSymbol.symbol);
-	this.symbolForm.controls['symbolName'].patchValue(this.selSymbol.name);
+	this.symbolForm.controls[FormFields.SymbolSymbol].patchValue(this.selSymbol.symbol);
+	this.symbolForm.controls[FormFields.SymbolName].patchValue(this.selSymbol.name);
 	this.updateSymbolWeight();	
   }
 
   updateSymbolWeight() {
 	if(this.selSymbol) {
-		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
+		this.selSymbol.weight = this.symbolForm.controls[FormFields.SymbolWeight].value;
 	}
   }
 
   onAddClick(): void {
 	if(this.selSymbol) {
 		this.importingQuotes = true;
-		this.selSymbol.weight = this.symbolForm.controls['symbolWeight'].value;
-		const changedAt = this.symbolForm.controls['createdAt'].value as DateTime;
+		this.selSymbol.weight = this.symbolForm.controls[FormFields.SymbolWeight].value;
+		const changedAt = this.symbolForm.controls[FormFields.CreatedAt].value as DateTime;
 		//changedAt.setMinutes(changedAt.getMinutes() - changedAt.getTimezoneOffset());
 		this.selSymbol.changedAt = new Date(changedAt.toMillis()).toISOString();
 		forkJoin(
@@ -119,7 +127,7 @@ export class AddSymbolComponent implements OnInit {
 	this.dialogRef.close();
   }
 
-  validate(formGroup: UntypedFormGroup): ValidationErrors {
+  validate(formGroup: FormGroup): ValidationErrors {
 /*	if (formGroup.get('portfolioName').touched) {
 		const myValue: string = formGroup.get('portfolioName').value;
 		if(myValue && myValue.trim().length > 4) {
