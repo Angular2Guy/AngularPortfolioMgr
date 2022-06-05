@@ -4,13 +4,13 @@
 				<li>
 					<mat-form-field> 
 						<input matInput
-							i18n-placeholder placeholder="Portfolioname" tabindex="1" formControlName="portfolioName"> 
+							i18n-placeholder placeholder="Portfolioname" tabindex="1" formControlName="{{FormFields.PortfolioName}}"> 
 					</mat-form-field>
 				</li>
 				<li>
 					<mat-form-field> 
 						<mat-label i18n>Creation date</mat-label>
-  						<input matInput [matDatepicker]="picker1" formControlName="createdAt">
+  						<input matInput [matDatepicker]="picker1" formControlName="{{FormFields.CreatedAt}}">
   						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
   						<mat-datepicker #picker1></mat-datepicker>
 					</mat-form-field>
