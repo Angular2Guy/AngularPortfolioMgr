@@ -54,6 +54,7 @@ envApp:
   normal: 
     JPA_SHOW_SQL: true
     H2_CONSOLE: false
+    SHUTDOWN_PHASE: 10s
   secret:    
     KAFKA_BOOTSTRAP_SERVERS: kafkaservice:9092 
     KAFKA_SERVER_NAME: kafkaapp
