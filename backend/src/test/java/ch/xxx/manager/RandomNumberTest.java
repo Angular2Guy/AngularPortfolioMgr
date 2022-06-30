@@ -38,6 +38,6 @@ public class RandomNumberTest {
 		String encoded = Base64.getEncoder().encodeToString(buffer.array());
 		Assertions.assertFalse(encoded.isBlank());
 		Assertions.assertArrayEquals(buffer.array(), Base64.getDecoder().decode(encoded));
-		System.out.println(encoded);
+		// System.out.println(encoded);
 	}
 }
