@@ -12,7 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collection;
@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -64,11 +65,11 @@ public class JwtTokenService {
 	@Value("${security.jwt.token.expire-length}")
 	private long validityInMilliseconds; // 1 min
 
-	private Key jwtTokenKey;
+	private SecretKey jwtTokenKey;
 
 	@PostConstruct
 	public void init() {
-		this.jwtTokenKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
+		this.jwtTokenKey = Keys.hmacShaKeyFor(Base64.getUrlDecoder().decode(secretKey.getBytes(StandardCharsets.ISO_8859_1)));;
 	}
 
 	public void updateLoggedOutUsers(List<RevokedToken> users) {
