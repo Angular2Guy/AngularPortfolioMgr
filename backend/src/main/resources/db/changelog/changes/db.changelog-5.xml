@@ -15,6 +15,7 @@
 		<addColumn tableName="portfolio">
 			<column name="portfolio_type" type="int" />
 			<column name="portfolio_id" type="bigint" />
+			<column name="symbol" type="varchar(20)" />
 		</addColumn>
 	</changeSet>
 	<changeSet author="angular2guy" id="10">

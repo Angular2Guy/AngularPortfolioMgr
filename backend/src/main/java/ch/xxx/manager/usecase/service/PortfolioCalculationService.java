@@ -150,15 +150,19 @@ public class PortfolioCalculationService {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesMap(portfolioToSymbols);
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.filter(pts -> pts.getRemovedAt() == null)
 				.map(pts -> pts.getSymbol().getId()).flatMap(symbolId -> Stream.of(dailyQuotesMap.get(symbolId)))
-				.flatMap(myDailyQuotes -> Stream.of(this.createPortfolioElement(portfolio, myDailyQuotes))).toList();
-
+				.flatMap(myDailyQuotes -> Stream.of(this.upsertPortfolioElement(portfolio, myDailyQuotes))).toList();
 		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements);
 		return result;
 	}
 
-	private PortfolioElement createPortfolioElement(final Portfolio portfolio, List<DailyQuote> dailyQuotes) {
-		PortfolioElement portfolioElement = new PortfolioElement();
+	private PortfolioElement upsertPortfolioElement(final Portfolio portfolio, List<DailyQuote> dailyQuotes) {
+		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
+				.filter(myPortfolioElement -> dailyQuotes.stream().anyMatch(
+						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
+				.findFirst().orElse(new PortfolioElement());
+		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
 		portfolioElement.setPortfolio(portfolio);
 		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
 		portfolioElement.setMonth1(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(1L)));
@@ -166,23 +170,25 @@ public class PortfolioCalculationService {
 		portfolioElement.setYear1(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(1L)));
 		portfolioElement.setYear2(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(2L)));
 		portfolioElement.setYear5(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(5L)));
-		portfolioElement.setYear10(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L)));		
-		return new PortfolioElement();
+		portfolioElement.setYear10(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L)));
+		if(!portfolio.getPortfolioElements().contains(portfolioElement)) {
+			portfolio.getPortfolioElements().add(portfolioElement);
+		}
+		return portfolioElement;
 	}
 
-	private BigDecimal symbolValueAtDate(final Portfolio portfolio, List<DailyQuote> dailyQuotes, LocalDate cutOffDate) {
-		return dailyQuotes.stream()
-				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isBefore(cutOffDate))
+	private BigDecimal symbolValueAtDate(final Portfolio portfolio, List<DailyQuote> dailyQuotes,
+			LocalDate cutOffDate) {
+		return dailyQuotes.stream().filter(myDailyQuote -> myDailyQuote.getLocalDay().isBefore(cutOffDate))
 				.max(Comparator.comparing(DailyQuote::getLocalDay))
-				.map(myDailyQuote ->  this.calcValue(Currency::getClose, createCurrencyValue(portfolio, myDailyQuote), 
+				.map(myDailyQuote -> this.calcValue(Currency::getClose, createCurrencyValue(portfolio, myDailyQuote),
 						DailyQuote::getClose, myDailyQuote, portfolio))
 				.orElse(BigDecimal.ZERO);
 	}
 
 	private Currency createCurrencyValue(final Portfolio portfolio, DailyQuote myDailyQuote) {
-		return this.currencyService
-				.getCurrencyQuote(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey())
-				.orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(), 
+		return this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey())
+				.orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
 						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
 	}
 
@@ -290,14 +296,14 @@ public class PortfolioCalculationService {
 	private BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, final BigDecimal portfolioClose) {
-		BigDecimal calcValue = calcValue(currExtractor, currencyQuote, quoteExtractor, dailyQuote, portfolioToSymbol.getPortfolio());
+		BigDecimal calcValue = calcValue(currExtractor, currencyQuote, quoteExtractor, dailyQuote,
+				portfolioToSymbol.getPortfolio());
 		return Optional.ofNullable(portfolioClose).orElse(BigDecimal.ZERO).add(calcValue)
 				.multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight()));
 	}
 
 	private BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
-			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote,
-			final Portfolio portfolio) {
+			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, final Portfolio portfolio) {
 		final BigDecimal currValue = currExtractor.apply(currencyQuote);
 		final BigDecimal quoteValue = quoteExtractor.apply(dailyQuote);
 		BigDecimal calcValue = BigDecimal.ZERO;

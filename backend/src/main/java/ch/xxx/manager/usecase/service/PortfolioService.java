@@ -16,10 +16,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +33,17 @@ import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.PortfolioElement;
+import ch.xxx.manager.domain.model.entity.PortfolioElementRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
@@ -46,6 +51,7 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 public class PortfolioService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioService.class);
 	private final PortfolioRepository portfolioRepository;
+	private final PortfolioElementRepository portfolioElementRepository;
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
 	private final AppUserRepository appUserRepository;
@@ -53,6 +59,7 @@ public class PortfolioService {
 	private final PortfolioToIndexService portfolioToIndexService;
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
+			PortfolioElementRepository portfolioElementRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
 			PortfolioCalculationService portfolioCalculationService, PortfolioToIndexService portfolioToIndexService) {
 		this.portfolioRepository = portfolioRepository;
@@ -61,6 +68,7 @@ public class PortfolioService {
 		this.portfolioCalculationService = portfolioCalculationService;
 		this.appUserRepository = appUserRepository;
 		this.portfolioToIndexService = portfolioToIndexService;
+		this.portfolioElementRepository = portfolioElementRepository;
 	}
 
 	public List<Portfolio> getPortfoliosByUserId(Long userId) {
@@ -72,16 +80,17 @@ public class PortfolioService {
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 	}
 
-	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start, List<ComparisonIndex> compIndexes) {
+	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start,
+			List<ComparisonIndex> compIndexes) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 		List<PortfolioCalculationService.ComparisonIndexQuotes> comparisonQuotes = compIndexes.stream()
-				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci,
-						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start.minus(1, ChronoUnit.MONTHS), LocalDate.now())))
+				.map(ci -> new PortfolioCalculationService.ComparisonIndexQuotes(ci, this.portfolioToIndexService
+						.calculateIndexComparison(portfolioId, ci, start.minus(1, ChronoUnit.MONTHS), LocalDate.now())))
 				.toList();
-		//LOGGER.info("" + comparisonQuotes.size());
-		List<CalcPortfolioElement> portfolioBars = this.portfolioCalculationService
-				.calculatePortfolioBars(portfolio, start, comparisonQuotes);
+		// LOGGER.info("" + comparisonQuotes.size());
+		List<CalcPortfolioElement> portfolioBars = this.portfolioCalculationService.calculatePortfolioBars(portfolio,
+				start, comparisonQuotes);
 		return new PortfolioBarsWrapper(portfolio, start, portfolioBars);
 	}
 
@@ -92,9 +101,19 @@ public class PortfolioService {
 		return portfolio;
 	}
 
-	public PortfolioWithElements addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
-		return this.portfolioCalculationService.calculatePortfolio(this.portfolioToSymbolRepository
-				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
+	public PortfolioWithElements addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight,
+			LocalDateTime changedAt) {
+		PortfolioWithElements portfolioWithElements = this.portfolioCalculationService
+				.calculatePortfolio(this.portfolioToSymbolRepository
+						.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
+		return updatePortfolioElements(portfolioWithElements);
+	}
+
+	private PortfolioWithElements updatePortfolioElements(PortfolioWithElements portfolioWithElements) {
+		List<PortfolioElement> portfolioElements = StreamSupport.stream(
+				this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()).spliterator(), false)
+				.collect(Collectors.toList());
+		return new PortfolioWithElements(portfolioWithElements.portfolio(), portfolioElements);
 	}
 
 	public PortfolioWithElements updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
@@ -102,8 +121,10 @@ public class PortfolioService {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
-				.flatMap(newEntity -> Stream.of(this.portfolioToSymbolRepository.save(newEntity)))
-				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
+				.map(newEntity -> this.portfolioToSymbolRepository.save(newEntity))
+				
+				.map(newEntity -> this.updatePortfolioElements(
+						this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
@@ -112,11 +133,22 @@ public class PortfolioService {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
+				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
 
+	private PortfolioToSymbol removePortfolioElement(PortfolioToSymbol portfolioToSymbol) {
+		List<PortfolioElement> toRemove = portfolioToSymbol.getPortfolio().getPortfolioElements().stream().filter(myPortfolioElement -> myPortfolioElement.getSymbol().equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol())).toList();
+		portfolioToSymbol.getPortfolio().getPortfolioElements().removeAll(toRemove);
+		toRemove.forEach(myPortfolioElement -> {
+			myPortfolioElement.setPortfolio(null);
+			this.portfolioElementRepository.delete(myPortfolioElement);
+		});
+		return portfolioToSymbol;
+	}
+	
 	private PortfolioToSymbol updatePtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate changedAt,
 			Optional<LocalDate> removedAtOpt) {
 		weightOpt.ifPresent(weight -> entity.setWeight(weight));

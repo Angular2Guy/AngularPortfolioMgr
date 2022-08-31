@@ -28,6 +28,7 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 @DiscriminatorValue("2")
 public class PortfolioElement extends PortfolioBase {
 	private String name;
+	private String symbol;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 	private LocalDate createdAt;
@@ -104,5 +105,13 @@ public class PortfolioElement extends PortfolioBase {
 	}
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 }
