@@ -77,8 +77,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
 				this.dialogSubscription.unsubscribe();
 			}
 			const portfolio: Portfolio = {
-				id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [],
-				userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null
+				id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [], currencyKey: null,
+				portfolioElements: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null
 			};
 			const newPortfolioData: PortfolioData = { portfolio: portfolio };
 			this.dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
