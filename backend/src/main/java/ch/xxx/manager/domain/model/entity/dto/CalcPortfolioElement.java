@@ -15,4 +15,4 @@ package ch.xxx.manager.domain.model.entity.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record PortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value, String symbolName, Long weight) {}
+public record CalcPortfolioElement(Long symbolId, LocalDate localDate, BigDecimal value, String symbolName, Long weight) {}

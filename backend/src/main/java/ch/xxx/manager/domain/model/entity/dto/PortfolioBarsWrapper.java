@@ -17,4 +17,4 @@ import java.util.List;
 
 import ch.xxx.manager.domain.model.entity.Portfolio;
 
-public record PortfolioBarsWrapper(Portfolio portfolio, LocalDate start, List<PortfolioElement> portfolioElements) {}
+public record PortfolioBarsWrapper(Portfolio portfolio, LocalDate start, List<CalcPortfolioElement> portfolioElements) {}

@@ -37,7 +37,8 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
-import ch.xxx.manager.domain.model.entity.dto.PortfolioElement;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Service
@@ -79,7 +80,7 @@ public class PortfolioService {
 						this.portfolioToIndexService.calculateIndexComparison(portfolioId, ci, start.minus(1, ChronoUnit.MONTHS), LocalDate.now())))
 				.toList();
 		//LOGGER.info("" + comparisonQuotes.size());
-		List<PortfolioElement> portfolioBars = this.portfolioCalculationService
+		List<CalcPortfolioElement> portfolioBars = this.portfolioCalculationService
 				.calculatePortfolioBars(portfolio, start, comparisonQuotes);
 		return new PortfolioBarsWrapper(portfolio, start, portfolioBars);
 	}
@@ -91,12 +92,12 @@ public class PortfolioService {
 		return portfolio;
 	}
 
-	public Portfolio addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
+	public PortfolioWithElements addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
 		return this.portfolioCalculationService.calculatePortfolio(this.portfolioToSymbolRepository
 				.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
 	}
 
-	public Portfolio updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
+	public PortfolioWithElements updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
 				.flatMap(myEntity -> Stream.of(
@@ -107,7 +108,7 @@ public class PortfolioService {
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
 
-	public Portfolio removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
+	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
