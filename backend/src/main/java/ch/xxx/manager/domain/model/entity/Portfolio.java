@@ -21,6 +21,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -44,6 +45,8 @@ public class Portfolio extends PortfolioBase {
 	private BigDecimal year10;
 	@OneToMany(mappedBy = "portfolio")
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
+	@OneToMany(mappedBy = "portfolio", orphanRemoval = true)
+	private Set<PortfolioElement> portfolioElements = new HashSet<>();
 
 	@PrePersist
 	void init() {
@@ -139,6 +142,14 @@ public class Portfolio extends PortfolioBase {
 
 	public void setCurrencyKey(CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
+	}
+
+	public Set<PortfolioElement> getPortfolioElements() {
+		return portfolioElements;
+	}
+
+	public void setPortfolioElements(Set<PortfolioElement> portfolioElements) {
+		this.portfolioElements = portfolioElements;
 	}
 
 }

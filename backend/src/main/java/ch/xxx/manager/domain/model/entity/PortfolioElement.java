@@ -19,6 +19,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
@@ -35,13 +37,19 @@ public class PortfolioElement extends PortfolioBase {
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;
-	private Long portfolioId;
+	@ManyToOne
+	private Portfolio portfolio;
 	
-	public Long getPortfolioId() {
-		return portfolioId;
+	@PrePersist
+	void init() {
+		this.createdAt = LocalDate.now();
 	}
-	public void setPortfolioId(Long portfolioId) {
-		this.portfolioId = portfolioId;
+	
+	public Portfolio getPortfolio() {
+		return portfolio;
+	}
+	public void setPortfolio(Portfolio portfolio) {
+		this.portfolio = portfolio;
 	}
 	public String getName() {
 		return name;
