@@ -25,8 +25,10 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
+import ch.xxx.manager.domain.model.dto.PortfolioElementDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
@@ -55,9 +57,13 @@ public class PortfolioMapper {
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
+		dto.getPortfolioElements()
+				.addAll(Optional.ofNullable(portfolio.getPortfolioElements()).orElse(Set.of()).stream()
+						.flatMap(myPortfolioElement -> Stream.of(this.toPortfolioElementDto(myPortfolioElement)))
+						.toList());
 		return dto;
 	}
-	
+
 	public Portfolio toEntity(PortfolioDto dto, AppUser appUser) {
 		Portfolio entity = new Portfolio();
 		entity.setId(dto.getId());
@@ -66,11 +72,19 @@ public class PortfolioMapper {
 		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
 		return entity;
 	}
-	
-	public PortfolioBarsDto toBarsDto(PortfolioBarsWrapper portfolioBarsWrapper) {
-		List<PortfolioBarDto> portfolioBars = portfolioBarsWrapper.portfolioElements()
-			.stream().map(pe -> new PortfolioBarDto(pe.value(), pe.symbolName(), BigDecimal.valueOf(pe.weight()))).toList();
-		return new PortfolioBarsDto(portfolioBarsWrapper.portfolio().getName(), portfolioBarsWrapper.start(), portfolioBars);
+
+	public PortfolioElementDto toPortfolioElementDto(PortfolioElement portfolioElement) {
+		return new PortfolioElementDto(portfolioElement.getId(), portfolioElement.getName(),
+				portfolioElement.getSymbol(), portfolioElement.getCurrencyKey(), portfolioElement.getCreatedAt(),
+				portfolioElement.getMonth1(), portfolioElement.getMonth6(), portfolioElement.getYear1(),
+				portfolioElement.getYear2(), portfolioElement.getYear5(), portfolioElement.getYear10());
 	}
-	
+
+	public PortfolioBarsDto toBarsDto(PortfolioBarsWrapper portfolioBarsWrapper) {
+		List<PortfolioBarDto> portfolioBars = portfolioBarsWrapper.portfolioElements().stream()
+				.map(pe -> new PortfolioBarDto(pe.value(), pe.symbolName(), BigDecimal.valueOf(pe.weight()))).toList();
+		return new PortfolioBarsDto(portfolioBarsWrapper.portfolio().getName(), portfolioBarsWrapper.start(),
+				portfolioBars);
+	}
+
 }

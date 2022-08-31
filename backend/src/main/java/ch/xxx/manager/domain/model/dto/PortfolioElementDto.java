@@ -13,39 +13,41 @@
 package ch.xxx.manager.domain.model.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
-public class PortfolioDto {
+public class PortfolioElementDto {
 	private Long id;
-	private Long userId;
 	private String name;
+	private String symbol;
+	@Enumerated(EnumType.STRING)
+	private CurrencyKey currencyKey;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-	private LocalDateTime createdAt;
+	private LocalDate createdAt;
 	private BigDecimal month1;
 	private BigDecimal month6;
 	private BigDecimal year1;
 	private BigDecimal year2;
 	private BigDecimal year5;
-	private BigDecimal year10;	
-	private CurrencyKey currencyKey;
-	private List<SymbolDto> symbols = new ArrayList<>();
-	private List<PortfolioElementDto> portfolioElements = new ArrayList<>();
-
-	public PortfolioDto() {
+	private BigDecimal year10;
+	
+	public PortfolioElementDto() {		
 	}
-
-	public PortfolioDto(Long id, Long userId, String name, LocalDateTime createdAt, BigDecimal month1,
-			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10, CurrencyKey currencyKey) {
+	
+	public PortfolioElementDto(Long id, String name, String symbol, CurrencyKey currencyKey, LocalDate createdAt,
+			BigDecimal month1, BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5,
+			BigDecimal year10) {
 		super();
 		this.id = id;
-		this.userId = userId;
 		this.name = name;
+		this.symbol = symbol;
+		this.currencyKey = currencyKey;
 		this.createdAt = createdAt;
 		this.month1 = month1;
 		this.month6 = month6;
@@ -53,102 +55,72 @@ public class PortfolioDto {
 		this.year2 = year2;
 		this.year5 = year5;
 		this.year10 = year10;
-		this.currencyKey = currencyKey;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
 	}
 
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public BigDecimal getMonth1() {
-		return month1;
+	public String getSymbol() {
+		return symbol;
 	}
-
-	public void setMonth1(BigDecimal month1) {
-		this.month1 = month1;
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
-
-	public BigDecimal getMonth6() {
-		return month6;
-	}
-
-	public void setMonth6(BigDecimal month6) {
-		this.month6 = month6;
-	}
-
-	public BigDecimal getYear1() {
-		return year1;
-	}
-
-	public void setYear1(BigDecimal year1) {
-		this.year1 = year1;
-	}
-
-	public BigDecimal getYear2() {
-		return year2;
-	}
-
-	public void setYear2(BigDecimal year2) {
-		this.year2 = year2;
-	}
-
-	public BigDecimal getYear5() {
-		return year5;
-	}
-
-	public void setYear5(BigDecimal year5) {
-		this.year5 = year5;
-	}
-
-	public BigDecimal getYear10() {
-		return year10;
-	}
-
-	public void setYear10(BigDecimal year10) {
-		this.year10 = year10;
-	}
-
-	public List<SymbolDto> getSymbols() {
-		return symbols;
-	}
-
 	public CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
-
 	public void setCurrencyKey(CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
-
-	public List<PortfolioElementDto> getPortfolioElements() {
-		return portfolioElements;
+	public LocalDate getCreatedAt() {
+		return createdAt;
 	}
+	public void setCreatedAt(LocalDate createdAt) {
+		this.createdAt = createdAt;
+	}
+	public BigDecimal getMonth1() {
+		return month1;
+	}
+	public void setMonth1(BigDecimal month1) {
+		this.month1 = month1;
+	}
+	public BigDecimal getMonth6() {
+		return month6;
+	}
+	public void setMonth6(BigDecimal month6) {
+		this.month6 = month6;
+	}
+	public BigDecimal getYear1() {
+		return year1;
+	}
+	public void setYear1(BigDecimal year1) {
+		this.year1 = year1;
+	}
+	public BigDecimal getYear2() {
+		return year2;
+	}
+	public void setYear2(BigDecimal year2) {
+		this.year2 = year2;
+	}
+	public BigDecimal getYear5() {
+		return year5;
+	}
+	public void setYear5(BigDecimal year5) {
+		this.year5 = year5;
+	}
+	public BigDecimal getYear10() {
+		return year10;
+	}
+	public void setYear10(BigDecimal year10) {
+		this.year10 = year10;
+	}	
 }
