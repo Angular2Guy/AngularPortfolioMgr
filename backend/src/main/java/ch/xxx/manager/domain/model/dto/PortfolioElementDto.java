@@ -13,7 +13,7 @@
 package ch.xxx.manager.domain.model.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -29,7 +29,7 @@ public class PortfolioElementDto {
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
 	private BigDecimal month1;
 	private BigDecimal month6;
 	private BigDecimal year1;
@@ -40,7 +40,7 @@ public class PortfolioElementDto {
 	public PortfolioElementDto() {		
 	}
 	
-	public PortfolioElementDto(Long id, String name, String symbol, CurrencyKey currencyKey, LocalDate createdAt,
+	public PortfolioElementDto(Long id, String name, String symbol, CurrencyKey currencyKey, LocalDateTime createdAt,
 			BigDecimal month1, BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5,
 			BigDecimal year10) {
 		super();
@@ -81,10 +81,10 @@ public class PortfolioElementDto {
 	public void setCurrencyKey(CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
-	public LocalDate getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(LocalDate createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 	public BigDecimal getMonth1() {
