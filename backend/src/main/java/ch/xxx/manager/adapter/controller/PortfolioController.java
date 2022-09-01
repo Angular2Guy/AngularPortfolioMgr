@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class PortfolioController {
 	@GetMapping("/userid/{userId}")
 	public List<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
 		return this.portfolioService.getPortfoliosByUserId(userId).stream()
-				.map(entity -> this.portfolioMapper.toDto(entity)).toList();
+				.map(entity -> this.portfolioMapper.toDto(entity)).collect(Collectors.toList());
 	}
 
 	@GetMapping("/id/{portfolioId}")
