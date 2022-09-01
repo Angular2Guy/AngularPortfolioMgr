@@ -85,7 +85,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			this.dialogSubscription = this.dialogRef.afterClosed().subscribe(result => {
 				if (result) {
 					this.portfolioService.postPortfolio(result)
-						.subscribe(myPortfolio => this.portfolios = [...this.portfolios, myPortfolio]);
+						.subscribe(myPortfolio => {
+							this.portfolios = [...this.portfolios, myPortfolio];
+							return this.myPortfolio = myPortfolio;
+						});
 				}
 				this.dialogRef = null;
 			});
@@ -102,6 +105,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
 			myPortfolios.forEach(port => port.symbols = !port.symbols ? [] : port.symbols);
 			this.portfolios = myPortfolios;
+			this.myPortfolio = myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
 		});
 	}
 
@@ -119,7 +123,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 						if (result) {
 							const filteredPortfolios = this.portfolios.filter(port => port.id !== result.id);
 							this.portfolios = [...filteredPortfolios, result];
-							//this.refreshPortfolios();
+							this.myPortfolio = result;
 						}
 					});
 			}

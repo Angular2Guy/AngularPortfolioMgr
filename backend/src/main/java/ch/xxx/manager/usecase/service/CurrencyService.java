@@ -101,28 +101,6 @@ public class CurrencyService {
 
 	public Optional<Currency> getCurrencyQuote(LocalDate day, PortfolioToSymbol portfolioToSymbol) {
 		return getCurrencyQuote(day, portfolioToSymbol.getPortfolio().getCurrencyKey(), portfolioToSymbol.getSymbol().getCurrencyKey());
-//		return LongStream.range(0, 7).boxed()
-//				.map(minusDays -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
-////						.peek(myCurrency -> LOG.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: "
-////								+ myCurrency.getToCurrKey() + " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey()
-////								+ " symCur: " + portfolioToSymbol.getSymbol().getCurrencyKey()))
-//						.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
-//								.equals(myCurrency.getFromCurrKey())
-//								&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getToCurrKey()))
-//						.findFirst()
-//						.or(() -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
-////								.peek(myCurrency -> LOG
-////										.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: " + myCurrency.getToCurrKey()
-////												+ " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey() + " symCur: "
-////												+ portfolioToSymbol.getSymbol().getCurrencyKey()))
-//								.filter(myCurrency -> portfolioToSymbol.getPortfolio().getCurrencyKey()
-//										.equals(myCurrency.getToCurrKey())
-//										&& portfolioToSymbol.getSymbol().getCurrencyKey().equals(myCurrency.getFromCurrKey()))
-//								.map(myCurr -> new Currency(myCurr.getLocalDay(), myCurr.getToCurrKey(),
-//										myCurr.getFromCurrKey(), BigDecimal.ONE.divide(myCurr.getOpen()),
-//										BigDecimal.ONE.divide(myCurr.getHigh()), BigDecimal.ONE.divide(myCurr.getLow()),
-//										BigDecimal.ONE.divide(myCurr.getClose())))
-//								.findFirst())).filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
 
 	public Optional<Currency> getCurrencyQuote(LocalDate day, CurrencyKey portfolioCurrencyKey, CurrencyKey symbolCurrencyKey) {

@@ -9,3 +9,11 @@
 table {
   width: 100%;
 }
+
+.symbol-name {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 15vw;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+}

@@ -12,7 +12,7 @@
  */
 import { Component, OnInit, Input } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Portfolio } from '../../../model/portfolio';
+import { Portfolio, CommonValues } from '../../../model/portfolio';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,7 +21,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./portfolio-table.component.scss']
 })
 export class PortfolioTableComponent implements OnInit {
-  portfolios = new MatTableDataSource<Portfolio>([]);
+  private myLocalPortfolio: Portfolio = null;
+  portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];  
 
   constructor(private router: Router) { }
@@ -30,16 +31,23 @@ export class PortfolioTableComponent implements OnInit {
 	const x = 1 + 1;
   }
 
-  selPortfolio(portfolio: Portfolio) {
-	this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);	
+  selPortfolio(commonValues: CommonValues) {
+	console.log(commonValues.id);
+	this.router.navigate(['/portfolios/portfolio-detail/portfolio', this.myLocalPortfolio.id]);	
   }
 
   @Input()
-  set localPortfolios(localPortfolios: Portfolio[]) {
-	this.portfolios.connect().next(localPortfolios);  	
+  set localPortfolio(localPortfolio: Portfolio) {
+	this.myLocalPortfolio = localPortfolio;
+	const myPortfolioElements: CommonValues[] = [];
+	if(localPortfolio) {
+	   myPortfolioElements.push(localPortfolio)
+	   myPortfolioElements.push(...localPortfolio?.portfolioElements);
+	}
+	this.portfolioElements.connect().next(myPortfolioElements);  	
   }
 
-  get localPortfolios(): Portfolio[] {
-	return this.portfolios.data;
-}
+  get localPortfolio(): Portfolio {
+	return this.myLocalPortfolio;
+  }
 }
