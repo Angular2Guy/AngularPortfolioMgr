@@ -150,19 +150,25 @@ public class PortfolioCalculationService {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesMap(portfolioToSymbols);
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(pts -> pts.getRemovedAt() == null)
-				.map(pts -> pts.getSymbol().getId()).flatMap(symbolId -> Stream.of(dailyQuotesMap.get(symbolId)))
-				.flatMap(myDailyQuotes -> Stream.of(this.upsertPortfolioElement(portfolio, myDailyQuotes))).toList();
+				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getId())
+				.flatMap(symbolId -> Stream.of(dailyQuotesMap.get(symbolId))).flatMap(myDailyQuotes -> Stream
+						.of(this.upsertPortfolioElement(portfolio, myDailyQuotes, portfolioToSymbols)))
+				.toList();
 		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements);
 		return result;
 	}
 
-	private PortfolioElement upsertPortfolioElement(final Portfolio portfolio, List<DailyQuote> dailyQuotes) {
+	private PortfolioElement upsertPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
+			final List<PortfolioToSymbol> portfolioToSymbols) {
 		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
 				.filter(myPortfolioElement -> dailyQuotes.stream().anyMatch(
 						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
 				.findFirst().orElse(new PortfolioElement());
 		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
+		String ptsName = portfolioToSymbols.stream()
+				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
+				.map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
+		portfolioElement.setName(ptsName);
 		portfolioElement.setPortfolio(portfolio);
 		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
 		portfolioElement.setMonth1(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(1L)));
@@ -171,7 +177,7 @@ public class PortfolioCalculationService {
 		portfolioElement.setYear2(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(2L)));
 		portfolioElement.setYear5(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(5L)));
 		portfolioElement.setYear10(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L)));
-		if(!portfolio.getPortfolioElements().contains(portfolioElement)) {
+		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
 			portfolio.getPortfolioElements().add(portfolioElement);
 		}
 		return portfolioElement;

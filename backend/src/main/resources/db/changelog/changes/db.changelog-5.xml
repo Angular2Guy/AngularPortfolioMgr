@@ -30,4 +30,7 @@
 			<column name="portfolio_id" />
 		</createIndex>
 	</changeSet>
+	<changeSet author="angular2guy" id="11">
+		<dropNotNullConstraint tableName="portfolio" columnName="app_user_id"/>
+	</changeSet>
 </databaseChangeLog>

@@ -57,10 +57,12 @@ public class PortfolioMapper {
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
-		dto.getPortfolioElements()
-				.addAll(Optional.ofNullable(portfolio.getPortfolioElements()).orElse(Set.of()).stream()
-						.flatMap(myPortfolioElement -> Stream.of(this.toPortfolioElementDto(myPortfolioElement)))
-						.toList());
+		List<PortfolioElementDto> portfolioElements = Optional.ofNullable(portfolio.getPortfolioElements())
+				.orElse(Set.of()).stream()
+				.flatMap(myPortfolioElement -> Stream.of(this.toPortfolioElementDto(myPortfolioElement))).toList();
+		if (!portfolioElements.isEmpty()) {
+			dto.getPortfolioElements().addAll(portfolioElements);
+		}
 		return dto;
 	}
 
