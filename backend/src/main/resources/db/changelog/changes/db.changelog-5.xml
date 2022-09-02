@@ -33,4 +33,13 @@
 	<changeSet author="angular2guy" id="11">
 		<dropNotNullConstraint tableName="portfolio" columnName="app_user_id"/>
 	</changeSet>
+	<changeSet author="angular2guy" id="12">
+		<addColumn tableName="symbol">
+			<column name="sector" type="varchar(100)" />
+			<column name="industry" type="varchar(255)" />
+			<column name="description" type="clob" />
+			<column name="address" type="varchar(1024)" />
+			<column name="country" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

@@ -102,7 +102,9 @@ public class QuoteImportService {
 
 	public Long importDailyQuoteHistory(String symbol) {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
+
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
+//				.map(mySymbolEntity -> this.overviewImport(symbol, mySymbolEntity, Duration.ofSeconds(1L)))
 				.flatMap(symbolEntity -> Stream.of(
 						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity, List.of(), null))
 						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
@@ -157,10 +159,22 @@ public class QuoteImportService {
 	}
 
 	private Symbol updateSymbol(RapidOverviewImportDto dto, Symbol symbol) {
+		symbol.setAddress(String.format("s% s% s%", dto.getAssetProfile().getAddress1(),
+				 dto.getAssetProfile().getAddress2(),
+				 dto.getAssetProfile().getCity()));
+		symbol.setCountry(dto.getAssetProfile().getCountry());
+		symbol.setDescription(dto.getAssetProfile().getLongBusinessSummary());
+		symbol.setIndustry(dto.getAssetProfile().getIndustry());
+		symbol.setSector(dto.getAssetProfile().getSector());
 		return symbol;
 	}
 
 	private Symbol updateSymbol(AlphaOverviewImportDto dto, Symbol symbol) {
+		symbol.setAddress(symbol.getAddress());
+		symbol.setCountry(dto.getCountry());
+		symbol.setDescription(dto.getDescription());
+		symbol.setIndustry(dto.getIndustry());
+		symbol.setSector(dto.getSector());
 		return symbol;
 	}
 

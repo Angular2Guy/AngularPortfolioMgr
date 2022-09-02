@@ -16,9 +16,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
@@ -31,6 +33,13 @@ public class Symbol extends EntityBase {
 
 	private String symbol;
 	private String name;
+	private String sector;
+	private String industry;
+	@Lob
+	@Column(columnDefinition = "text")
+	private String description;
+	private String address;
+	private String country;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 	@Enumerated(EnumType.STRING)
@@ -132,12 +141,51 @@ public class Symbol extends EntityBase {
 		return Objects.equals(this.getId(), other.getId());
 	}
 
-	@Override
-	public String toString() {
-		return "Symbol [id=" + this.getId() + ", symbol=" + symbol + ", name=" + name + ", currencyKey=" + currencyKey
-				+ ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes=" + intraDayQuotes
-				+ ", portfolioToSymbols=" + portfolioToSymbols + "]";
+	public String getSector() {
+		return sector;
 	}
 
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
 
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	@Override
+	public String toString() {
+		return "Symbol [symbol=" + symbol + ", name=" + name + ", sector=" + sector + ", industry=" + industry
+				+ ", description=" + description + ", address=" + address + ", country=" + country + ", currencyKey="
+				+ currencyKey + ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes="
+				+ intraDayQuotes + ", portfolioToSymbols=" + portfolioToSymbols + "]";
+	}
 }
