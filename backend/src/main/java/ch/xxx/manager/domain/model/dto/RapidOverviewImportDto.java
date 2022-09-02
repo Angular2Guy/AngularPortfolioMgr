@@ -18,4 +18,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class RapidOverviewImportDto {
 	private String symbol;
 	private RapidQuoteType quoteType = new RapidQuoteType();
+	public String getSymbol() {
+		return symbol;
+	}
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+	public RapidQuoteType getQuoteType() {
+		return quoteType;
+	}
+	public void setQuoteType(RapidQuoteType quoteType) {
+		this.quoteType = quoteType;
+	}
+	
+	@Override
+	public String toString() {
+		return "RapidOverviewImportDto [symbol=" + symbol + ", quoteType=" + quoteType + "]";
+	}
 }
