@@ -47,7 +47,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 	}
 
 	@Override
-	public Mono<AlphaOverviewImportDto> getOverView(String symbol) {
+	public Mono<AlphaOverviewImportDto> importCompanyProfile(String symbol) {
 		return Mono.just(new AlphaOverviewImportDto());
 	}
 	
