@@ -12,35 +12,49 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AlphaOverviewImportDto {
+	@JsonProperty("Symbol")
 	private String symbol;
+	@JsonProperty("AssetType")
 	private String assetType;
+	@JsonProperty("Name")
 	private String name;
+	@JsonProperty("Description")
 	private String description;
-	private String CIK;
+	@JsonProperty("CIK")
+	private String cik;
+	@JsonProperty("Exchange")
 	private String exchange;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currency;
+	@JsonProperty("Country")
 	private String country;
+	@JsonProperty("Sector")
 	private String sector;
+	@JsonProperty("Industry")
 	private String industry;
+	@JsonProperty("Address")
 	private String address;
-	private Long shareOutstanding;
+	@JsonProperty("SharesOutstanding")
+	private Long sharesOutstanding;
+	@JsonProperty("DividendDate")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDateTime dividendDate;
+	private LocalDate dividendDate;
+	@JsonProperty("ExDividendDate")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDateTime exDividentDate;
+	private LocalDate exDividendDate;
 	
 	public String getSymbol() {
 		return symbol;
@@ -102,37 +116,36 @@ public class AlphaOverviewImportDto {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public Long getShareOutstanding() {
-		return shareOutstanding;
-	}
-	public void setShareOutstanding(Long shareOutstanding) {
-		this.shareOutstanding = shareOutstanding;
-	}
-	public LocalDateTime getDividendDate() {
+	public LocalDate getDividendDate() {
 		return dividendDate;
 	}
-	public void setDividendDate(LocalDateTime dividendDate) {
+	public void setDividendDate(LocalDate dividendDate) {
 		this.dividendDate = dividendDate;
 	}
-	public LocalDateTime getExDividentDate() {
-		return exDividentDate;
+	public String getCik() {
+		return cik;
 	}
-	public void setExDividentDate(LocalDateTime exDividentDate) {
-		this.exDividentDate = exDividentDate;
+	public void setCik(String cik) {
+		this.cik = cik;
 	}
-	
+	public Long getSharesOutstanding() {
+		return sharesOutstanding;
+	}
+	public void setSharesOutstanding(Long sharesOutstanding) {
+		this.sharesOutstanding = sharesOutstanding;
+	}
+	public LocalDate getExDividendDate() {
+		return exDividendDate;
+	}
+	public void setExDividendDate(LocalDate exDividendDate) {
+		this.exDividendDate = exDividendDate;
+	}
 	@Override
 	public String toString() {
 		return "AlphaOverviewImportDto [symbol=" + symbol + ", assetType=" + assetType + ", name=" + name
-				+ ", description=" + description + ", CIK=" + CIK + ", exchange=" + exchange + ", currency=" + currency
+				+ ", description=" + description + ", cik=" + cik + ", exchange=" + exchange + ", currency=" + currency
 				+ ", country=" + country + ", sector=" + sector + ", industry=" + industry + ", address=" + address
-				+ ", shareOutstanding=" + shareOutstanding + ", dividendDate=" + dividendDate + ", exDividentDate="
-				+ exDividentDate + "]";
-	}
-	public String getCIK() {
-		return CIK;
-	}
-	public void setCIK(String cIK) {
-		CIK = cIK;
+				+ ", sharesOutstanding=" + sharesOutstanding + ", dividendDate=" + dividendDate + ", exDividendDate="
+				+ exDividendDate + "]";
 	}
 }

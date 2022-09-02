@@ -38,7 +38,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 	private String apiKey;
 	@Value("${show.api.key}")
 	private String showApiKey;
-
+	
 	@PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
@@ -48,9 +48,18 @@ public class AlphavatageConnector implements AlphavatageClient {
 
 	@Override
 	public Mono<AlphaOverviewImportDto> importCompanyProfile(String symbol) {
-		return Mono.just(new AlphaOverviewImportDto());
+		try {
+			final String myUrl = String.format(
+					"https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s", symbol, this.apiKey);
+			LOGGER.info(myUrl);
+			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
+					.get().uri(new URI(myUrl)).retrieve().bodyToMono(AlphaOverviewImportDto.class);
+		} catch (URISyntaxException e) {
+			LOGGER.error("importCompanyProfile failed.", e);
+		}
+		return Mono.empty();
 	}
-	
+
 	@Override
 	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
 		try {
@@ -71,8 +80,8 @@ public class AlphavatageConnector implements AlphavatageClient {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s",
-					symbol, fullSeriesStr, this.apiKey);
+					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s", symbol,
+					fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
 					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
