@@ -15,7 +15,7 @@ package ch.xxx.manager.domain.model.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RapidAssetProfile {
+public class RapidAssetProfileDto {
 	private String sector;
 	private String industry;
 	private Long fullTimeEmployees;

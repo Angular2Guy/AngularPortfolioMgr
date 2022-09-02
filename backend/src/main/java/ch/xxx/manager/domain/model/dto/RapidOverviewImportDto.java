@@ -17,8 +17,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RapidOverviewImportDto {
 	private String symbol;
-	private RapidQuoteType quoteType = new RapidQuoteType();
-	private RapidAssetProfile assetProfile;
+	private RapidQuoteTypeDto quoteType = new RapidQuoteTypeDto();
+	private RapidAssetProfileDto assetProfile = new RapidAssetProfileDto();
 	
 	public String getSymbol() {
 		return symbol;
@@ -26,21 +26,21 @@ public class RapidOverviewImportDto {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public RapidQuoteType getQuoteType() {
+	public RapidQuoteTypeDto getQuoteType() {
 		return quoteType;
 	}
-	public void setQuoteType(RapidQuoteType quoteType) {
+	public void setQuoteType(RapidQuoteTypeDto quoteType) {
 		this.quoteType = quoteType;
-	}
-	
-	@Override
-	public String toString() {
-		return "RapidOverviewImportDto [symbol=" + symbol + ", quoteType=" + quoteType + "]";
-	}
-	public RapidAssetProfile getAssetProfile() {
+	}	
+	public RapidAssetProfileDto getAssetProfile() {
 		return assetProfile;
 	}
-	public void setAssetProfile(RapidAssetProfile assetProfile) {
+	public void setAssetProfile(RapidAssetProfileDto assetProfile) {
 		this.assetProfile = assetProfile;
+	}
+	@Override
+	public String toString() {
+		return "RapidOverviewImportDto [symbol=" + symbol + ", quoteType=" + quoteType + ", assetProfile="
+				+ assetProfile + "]";
 	}
 }

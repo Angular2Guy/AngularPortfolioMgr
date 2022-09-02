@@ -160,7 +160,7 @@ public class QuoteImportService {
 
 	private Symbol updateSymbol(RapidOverviewImportDto dto, Symbol symbol) {
 		LOGGER.info("RapidOverviewImportDto {}", dto);
-		symbol.setAddress(String.format("s% s% s%", dto.getAssetProfile().getAddress1(),
+		symbol.setAddress(String.format("%s %s %s", dto.getAssetProfile().getAddress1(),
 				 dto.getAssetProfile().getAddress2(),
 				 dto.getAssetProfile().getCity()));
 		symbol.setCountry(dto.getAssetProfile().getCountry());

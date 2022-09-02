@@ -15,7 +15,7 @@ package ch.xxx.manager.domain.model.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RapidQuoteType {
+public class RapidQuoteTypeDto {
 	private String exchange;
 	private String shortName;
 	private String longName;
