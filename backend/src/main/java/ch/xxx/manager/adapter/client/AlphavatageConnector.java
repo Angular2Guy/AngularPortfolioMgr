@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
@@ -45,6 +46,12 @@ public class AlphavatageConnector implements AlphavatageClient {
 		}
 	}
 
+	@Override
+	public Mono<AlphaOverviewImportDto> getOverView(String symbol) {
+		return Mono.just(new AlphaOverviewImportDto());
+	}
+	
+	@Override
 	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
 		try {
 			final String myUrl = String.format(
@@ -59,6 +66,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		return Mono.empty();
 	}
 
+	@Override
 	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
@@ -74,6 +82,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		return Mono.empty();
 	}
 
+	@Override
 	public Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
 		try {
 			final String from_currency = CurrencyKey.EUR.toString();
