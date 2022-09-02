@@ -42,7 +42,6 @@ public class AlphaOverviewImportDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDateTime exDividentDate;
 	
-	
 	public String getSymbol() {
 		return symbol;
 	}
@@ -126,5 +125,14 @@ public class AlphaOverviewImportDto {
 	}
 	public void setExDividentDate(LocalDateTime exDividentDate) {
 		this.exDividentDate = exDividentDate;
+	}
+	
+	@Override
+	public String toString() {
+		return "AlphaOverviewImportDto [symbol=" + symbol + ", assetType=" + assetType + ", name=" + name
+				+ ", description=" + description + ", cIK=" + cIK + ", exchange=" + exchange + ", currency=" + currency
+				+ ", country=" + country + ", sector=" + sector + ", industry=" + industry + ", address=" + address
+				+ ", shareOutstanding=" + shareOutstanding + ", dividendDate=" + dividendDate + ", exDividentDate="
+				+ exDividentDate + "]";
 	}
 }
