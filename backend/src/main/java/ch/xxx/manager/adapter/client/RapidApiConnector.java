@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 import ch.xxx.manager.usecase.service.RapidApiClient;
 import reactor.core.publisher.Mono;
 
@@ -42,7 +43,7 @@ public class RapidApiConnector implements RapidApiClient {
 	}
 
 	@Override
-	public Mono<String> importCompanyProfile(String symbol) {
+	public Mono<RapidOverviewImportDto> importCompanyProfile(String symbol) {
 		try {
 			final String myUrl = String.format("https://yh-finance.p.rapidapi.com/stock/v2/get-profile?symbol=%s", symbol);
 			LOGGER.info(myUrl);
@@ -50,7 +51,7 @@ public class RapidApiConnector implements RapidApiClient {
 					.get().uri(new URI(myUrl))
 					.header("X-RapidAPI-Key", this.apiKey)
 					.header("X-RapidAPI-Host", "yh-finance.p.rapidapi.com")
-					.retrieve().bodyToMono(String.class);
+					.retrieve().bodyToMono(RapidOverviewImportDto.class);
 		} catch (URISyntaxException e) {
 			LOGGER.info("importCompanyProfile failed.", e);
 		}

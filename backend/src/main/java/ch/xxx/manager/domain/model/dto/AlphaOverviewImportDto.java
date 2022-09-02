@@ -28,7 +28,7 @@ public class AlphaOverviewImportDto {
 	private String assetType;
 	private String name;
 	private String description;
-	private String cIK;
+	private String CIK;
 	private String exchange;
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currency;
@@ -65,12 +65,6 @@ public class AlphaOverviewImportDto {
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public String getcIK() {
-		return cIK;
-	}
-	public void setcIK(String cIK) {
-		this.cIK = cIK;
 	}
 	public String getExchange() {
 		return exchange;
@@ -130,9 +124,15 @@ public class AlphaOverviewImportDto {
 	@Override
 	public String toString() {
 		return "AlphaOverviewImportDto [symbol=" + symbol + ", assetType=" + assetType + ", name=" + name
-				+ ", description=" + description + ", cIK=" + cIK + ", exchange=" + exchange + ", currency=" + currency
+				+ ", description=" + description + ", CIK=" + CIK + ", exchange=" + exchange + ", currency=" + currency
 				+ ", country=" + country + ", sector=" + sector + ", industry=" + industry + ", address=" + address
 				+ ", shareOutstanding=" + shareOutstanding + ", dividendDate=" + dividendDate + ", exDividentDate="
 				+ exDividentDate + "]";
+	}
+	public String getCIK() {
+		return CIK;
+	}
+	public void setCIK(String cIK) {
+		CIK = cIK;
 	}
 }

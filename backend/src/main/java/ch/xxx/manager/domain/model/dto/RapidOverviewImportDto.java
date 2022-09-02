@@ -10,11 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.domain.model.dto;
 
-import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public interface RapidApiClient {
-	Mono<RapidOverviewImportDto> importCompanyProfile(String symbol);
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RapidOverviewImportDto {
+	private String symbol;
+	private RapidQuoteType quoteType = new RapidQuoteType();
 }
