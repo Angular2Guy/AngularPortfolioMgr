@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import javax.persistence.Column;
+import javax.persistence.Lob;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
@@ -31,12 +34,19 @@ public class SymbolDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime removedAt;
 	private CurrencyKey currencyKey;
-	
+	private String sector;
+	private String industry;
+	private String description;
+	private String address;
+	private String country;
+
 	public SymbolDto() {
-		
+
 	}
-	
-	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source, Long weight, CurrencyKey currencyKey) {
+
+	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source,
+			Long weight, CurrencyKey currencyKey, String sector, String industry, String description, String address,
+			String country) {
 		super();
 		this.id = id;
 		this.symbol = symbol;
@@ -46,8 +56,13 @@ public class SymbolDto {
 		this.changedAt = changedAt == null ? null : LocalDateTime.of(changedAt, LocalTime.now());
 		this.removedAt = removedAt == null ? null : LocalDateTime.of(removedAt, LocalTime.now());
 		this.currencyKey = currencyKey;
+		this.sector = sector;
+		this.industry = industry;
+		this.description = description;
+		this.address = address;
+		this.country = country;
 	}
-	
+
 	public LocalDateTime getChangedAt() {
 		return changedAt;
 	}
@@ -67,18 +82,23 @@ public class SymbolDto {
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getSymbol() {
 		return symbol;
 	}
+
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
@@ -106,5 +126,45 @@ public class SymbolDto {
 	public void setCurrencyKey(CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
-	
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
+
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
 }
