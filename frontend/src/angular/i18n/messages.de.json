@@ -14,6 +14,7 @@
     "5947880671711400443": "Portfolio Manager_de",
     "3797778920049399855": "Logout",
     "onlineAgainMsg": "Your token is expired. To reconnect please logout and login again.",
+    "symbolId": "SymbolId",
     "2131483310689963123": "symbolName",
     "2182882890136113634": " Symbol: {$INTERPOLATION} Name: {$INTERPOLATION_1} ",
     "8109023045911893457": "symbol",
@@ -60,7 +61,13 @@
     "3591505830709732358": "Portfolio {$INTERPOLATION}",
     "2849064100927111571": "loading...",
     "8890553633144307762": "Back",
-    "7250916978911474312": "Symbol: {$INTERPOLATION} Name: {$INTERPOLATION_1}",
+    "5021063261180291058": "Changed at: {$INTERPOLATION}",
+    "3560441197067907289": "Currency: {$INTERPOLATION}",
+    "5583652278295195945": "Sector: {$INTERPOLATION}",
+    "5066170900683702829": "Industry: {$INTERPOLATION}",
+    "9014435997703025963": "Address: {$INTERPOLATION}",
+    "8985537790514514521": "Country: {$INTERPOLATION}",
+    "6276545049878546664": "Description: {$INTERPOLATION}",
     "1211932677134347164": "Start Date: {$INTERPOLATION}",
     "7271664981483258786": "End Date: {$INTERPOLATION}",
     "1520841753557847971": "Open: {$INTERPOLATION}",
@@ -72,6 +79,6 @@
     "493170218385935127": "Median Close: {$INTERPOLATION}",
     "3175230076568977146": "Volatility Close: {$INTERPOLATION}%",
     "intraDay": "IntraDay",
-    "7132810695222123633": "Welcome to AngularPortfolioManager"
+    "7132810695222123633": "Willkommen im AngularPortfolioManager"
   }
 }

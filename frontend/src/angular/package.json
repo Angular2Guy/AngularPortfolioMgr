@@ -17,7 +17,8 @@
     "postbuild": "npm run deploy",
     "predeploy": "rimraf ../../../src/main/resources/static/*",
     "deploy": "cpx 'base/*' dist/manager/ && cpx 'dist/manager/**' ../../../backend/src/main/resources/static/",
-    "prettier": "npx prettier --write 'src/**/*.{ts,html,scss,json}'"
+    "prettier": "npx prettier --write 'src/**/*.{ts,html,scss,json}'",
+    "extract-i18n": "ng extract-i18n --format=json"
   },
   "private": true,
   "dependencies": {
