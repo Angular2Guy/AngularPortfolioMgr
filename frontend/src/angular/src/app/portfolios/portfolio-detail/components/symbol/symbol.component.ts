@@ -86,10 +86,6 @@ export class SymbolComponent implements OnInit {
 		this.selQuotePeriod = this.quotePeriods[0];
 	}
 
-	replacePortfolioSymbol(symbolStr: string): string {
-		return ServiceUtils.isPortfolioSymbol(symbolStr) ? 'SymbolId' : symbolStr;
-	}
-
 	quotePeriodChanged() {
 		this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
 		//console.log(this.selQuotePeriod);

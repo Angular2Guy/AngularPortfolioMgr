@@ -18,4 +18,10 @@ export interface Symbol {
 	changedAt: string;
 	removedAt?: string;
 	source: string;
+    currencyKey: string;
+	sector?: string;
+	industry?: string;
+	description?: string;
+	address?: string;
+	country?: string;
 }

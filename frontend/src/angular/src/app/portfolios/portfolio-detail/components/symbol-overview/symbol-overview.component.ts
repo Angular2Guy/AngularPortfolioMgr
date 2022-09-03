@@ -25,6 +25,7 @@ export class SymbolOverviewComponent implements OnInit {
   portfolioSymbol = '';
   portfolioName = '';
   private localSymbol: Symbol;
+  serviceUtils = ServiceUtils;
   
   constructor() { }
 

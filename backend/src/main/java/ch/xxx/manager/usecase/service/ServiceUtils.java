@@ -15,9 +15,9 @@ package ch.xxx.manager.usecase.service;
 import java.util.Random;
 
 public class ServiceUtils {
-	public final static String PORTFOLIO_MARKER = "äüè";
+	public final static String PORTFOLIO_MARKER = "V8yXhrg";
 
-	private final static int SYMBOL_LENGTH = 15;
+	private final static int SYMBOL_LENGTH = 18;
 
 	public static String generateRandomPortfolioSymbol() {
 		return generateRandomString(SYMBOL_LENGTH - PORTFOLIO_MARKER.length()) + PORTFOLIO_MARKER;

@@ -30,13 +30,13 @@ export class QuoteService {
   }
 
   getIntraDayQuotes(symbol: string): Observable<Quote[]> {
-	return this.http.get<Quote[]>(`/rest/quote/intraday/symbol/${symbol}`);
+	return this.http.get<Quote[]>(`/rest/quote/intraday/symbol/${encodeURI(symbol)}`);
   }
 
   getDailyQuotesFromStartToEnd(symbol: string, start: Date, end: Date): Observable<Quote[]> {
 	const startStr = start.toISOString().split('T')[0];
 	const endStr = end.toISOString().split('T')[0];
-	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${symbol}/start/${startStr}/end/${endStr}`);
+	return this.http.get<Quote[]>(`/rest/quote/daily/symbol/${encodeURI(symbol)}/start/${startStr}/end/${endStr}`);
   }
 
   getDailyQuotesForComparisonIndexFromStartToEnd(portfolioId: number, comparisonIndex: ComparisonIndex, start: Date, end: Date): Observable<Quote[]> {

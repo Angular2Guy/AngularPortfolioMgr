@@ -1,6 +1,9 @@
 <div class="base-container">
 <div>
-	<div class="text-container" i18n>Symbol: {{!symbol ? 'none' : replacePortfolioSymbol(symbol.symbol)}} Name: {{!symbol ? 'none' : symbol.name}}</div>
+	<div class="text-container">
+	   <span class="symbol-data" i18n>Symbol: {{!symbol ? 'none' : serviceUtils.replacePortfolioSymbol(symbol?.symbol)}}</span>
+	   <span class="symbol-data" i18n>Name: {{!symbol ? 'none' : symbol?.name}}</span>
+	</div>
 	<div class="text-container">
 		<span class="symbol-data" i18n>Start Date: {{symbolData?.start | date:'mediumDate' }}</span>
 		<span class="symbol-data" i18n>End Date: {{symbolData?.end | date:'mediumDate' }}</span>
@@ -10,6 +13,7 @@
 		<span class="symbol-data" i18n>Close: {{symbolData?.close | number:'1.2-2'}}</span>		
 	</div>
 	<div class="text-container">
+	    <span class="symbol-data" i18n>Currency: {{ symbol?.currencyKey }}</span>
 		<span class="symbol-data" i18n>Average Volume: {{symbolData?.avgVolume | number:'1.0-0' }}</span>
 		<span class="symbol-data" i18n>Average Close: {{symbolData?.avgClose | number:'1.2-2'}}</span>
 		<span class="symbol-data" i18n>Median Close: {{symbolData?.medianClose | number:'1.2-2'}}</span>
