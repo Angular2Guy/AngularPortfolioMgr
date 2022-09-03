@@ -18,8 +18,9 @@ export class ServiceUtils {
 	public static readonly PORTFOLIO_MARKER = "äüè";
 	public static readonly QuoteSource = QuoteSource;
 	
-	public static isPortfolioSymbol(symbolStr: string): boolean {
-		return symbolStr.includes(ServiceUtils.PORTFOLIO_MARKER);
+	public static isPortfolioSymbol(symbol: string | Symbol): boolean {		
+		return (typeof symbol === 'string') ?  symbol.includes(ServiceUtils.PORTFOLIO_MARKER) 
+		  : symbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER);
 	}
 	
 	public static isIntraDayDataAvailiable(symbol: Symbol): boolean {

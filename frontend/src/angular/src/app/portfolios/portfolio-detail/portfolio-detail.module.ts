@@ -26,10 +26,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { NgxLineChartsModule } from 'ngx-simple-charts/line';
 import { PortfolioDetailRoutingModule } from './portfolio-detail-routing.module';
+import { SymbolOverviewComponent } from './components/symbol-overview/symbol-overview.component';
 
 
 @NgModule({
-	declarations: [PortfolioComponent,	SymbolComponent],
+	declarations: [PortfolioComponent,	SymbolComponent, SymbolOverviewComponent],
 	imports: [
 		BaseModule,
 		NgxSimpleChartsModule,

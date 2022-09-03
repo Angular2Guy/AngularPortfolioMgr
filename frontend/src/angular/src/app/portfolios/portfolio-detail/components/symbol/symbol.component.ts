@@ -69,6 +69,7 @@ export class SymbolComponent implements OnInit {
 	chartPoints: ChartPoints[] = [{ chartPointList: [], name: '', xScaleHeight: 20, yScaleWidth: 50 } as ChartPoints];
 	portfolioName: string = null;
 	portfolioSymbol: string = null;
+	serviceUtils = ServiceUtils;
 
 	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document,
 		@Inject(LOCALE_ID) private locale: string) { }
@@ -97,10 +98,6 @@ export class SymbolComponent implements OnInit {
 	isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
 		//console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
 		return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
-	}
-
-	isPortfolioSymbol(mySymbol: Symbol): boolean {
-		return !mySymbol ? false : ServiceUtils.isPortfolioSymbol(mySymbol.symbol);
 	}
 
 	compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
@@ -245,8 +242,8 @@ export class SymbolComponent implements OnInit {
 		if (mySymbol) {
 			this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol) && this.selQuotePeriod === this.quotePeriods[0] ? this.quotePeriods[1] : this.selQuotePeriod;
 			this.localSymbol = mySymbol;
-			this.portfolioName = this.isPortfolioSymbol(mySymbol) ? mySymbol.name : null;
-			this.portfolioSymbol = this.isPortfolioSymbol(mySymbol) ? mySymbol.symbol : null;
+			this.portfolioName = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.name : null;
+			this.portfolioSymbol = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.symbol : null;
 			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
 		}
 	}
