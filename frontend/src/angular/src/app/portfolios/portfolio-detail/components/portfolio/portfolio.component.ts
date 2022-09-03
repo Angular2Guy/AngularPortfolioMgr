@@ -31,6 +31,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   portfolioName = '';
   selSymbol: Symbol = null;
   portfolioId: number = null;
+  showSymbol = true;
   private routeParamSubscription: Subscription;
 
   constructor(private route: ActivatedRoute, private tokenService: TokenService, 
@@ -46,6 +47,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
 		tap(() => this.reloadData = false))		
 		.subscribe(myPortfolio => {
 			this.symbols = myPortfolio.symbols;
+			this.selSymbol = myPortfolio?.symbols.length > 0 ? myPortfolio.symbols[0] : this.selSymbol; 
 			this.portfolioName = myPortfolio.name;});
   }
 
@@ -60,8 +62,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   selectSymbol(symbol: Symbol): void {
+	this.showSymbol = this?.selSymbol?.symbol === symbol?.symbol ? !this.showSymbol : this.showSymbol;
 	this.selSymbol = symbol;
-	//console.log(symbol);
   }
 
   back(): void {

@@ -21,6 +21,7 @@
 		</mat-action-list>	
 	</mat-sidenav>
 	<mat-sidenav-content opened mode="side">
-		<app-symbol [portfolioId]="portfolioId" [symbol]="selSymbol" (loadingData)="updateReloadData($event)"></app-symbol>
+		<app-symbol *ngIf="showSymbol" [portfolioId]="portfolioId" [symbol]="selSymbol" [showSymbol]="showSymbol" (loadingData)="updateReloadData($event)"></app-symbol>
+		<app-symbol-overview *ngIf="!showSymbol" [portfolioId]="portfolioId" [symbol]="selSymbol"></app-symbol-overview>
 	</mat-sidenav-content>
 </mat-sidenav-container>

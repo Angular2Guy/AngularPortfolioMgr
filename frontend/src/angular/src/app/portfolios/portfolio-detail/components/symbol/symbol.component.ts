@@ -48,7 +48,8 @@ export class SymbolComponent implements OnInit {
 	private readonly dayInMs = 24 * 60 * 60 * 1000;
 	private readonly hourInMs = 1 * 60 * 60 * 1000;
 	@Input()
-	portfolioId: number;
+	portfolioId: number;	
+	private localShowSymbol: boolean;
 	quotePeriods: QuotePeriod[] = [];
 	selQuotePeriod: QuotePeriod = null;
 	private localSymbol: Symbol;
@@ -246,5 +247,17 @@ export class SymbolComponent implements OnInit {
 
 	get symbol(): Symbol {
 		return this.localSymbol;
+	}
+	
+	@Input()
+	set showSymbol(showSymbol: boolean) {
+		if(!this.quotesLoading && !!showSymbol && this.localShowSymbol !== showSymbol) {
+			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
+		}
+		this.localShowSymbol = showSymbol;
+	}
+	
+	get showSymbol(): boolean {
+		return this.showSymbol;
 	}
 }
