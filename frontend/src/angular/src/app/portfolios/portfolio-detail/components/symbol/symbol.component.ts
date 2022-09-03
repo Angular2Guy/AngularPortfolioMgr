@@ -73,18 +73,19 @@ export class SymbolComponent implements OnInit {
 	serviceUtils = ServiceUtils;
 
 	constructor(private quoteService: QuoteService, @Inject(DOCUMENT) private document: Document,
-		@Inject(LOCALE_ID) private locale: string) { }
+		@Inject(LOCALE_ID) private locale: string) { 
+			this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: $localize`:@@intraDay:IntraDay` },
+		       { quotePeriodKey: QuotePeriodKey.Month, periodText: $localize`:@@oneMonth:1 Month` },
+		       { quotePeriodKey: QuotePeriodKey.Months3, periodText: $localize`:@@threeMonths:3 Months` },
+		       { quotePeriodKey: QuotePeriodKey.Months6, periodText: $localize`:@@sixMonths:6 Months` },
+		       { quotePeriodKey: QuotePeriodKey.Year, periodText: $localize`:@@oneYear:1 Year` },
+		       { quotePeriodKey: QuotePeriodKey.Year3, periodText: $localize`:@@threeYears:3 Years` },
+		       { quotePeriodKey: QuotePeriodKey.Year5, periodText: $localize`:@@fiveYears:5 Years` },
+		       { quotePeriodKey: QuotePeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years` }];
+		}
 
-	ngOnInit(): void {
-		this.quotePeriods = [{ quotePeriodKey: QuotePeriodKey.Day, periodText: $localize`:@@intraDay:IntraDay` },
-		{ quotePeriodKey: QuotePeriodKey.Month, periodText: $localize`:@@oneMonth:1 Month` },
-		{ quotePeriodKey: QuotePeriodKey.Months3, periodText: $localize`:@@threeMonths:3 Months` },
-		{ quotePeriodKey: QuotePeriodKey.Months6, periodText: $localize`:@@sixMonths:6 Months` },
-		{ quotePeriodKey: QuotePeriodKey.Year, periodText: $localize`:@@oneYear:1 Year` },
-		{ quotePeriodKey: QuotePeriodKey.Year3, periodText: $localize`:@@threeYears:3 Years` },
-		{ quotePeriodKey: QuotePeriodKey.Year5, periodText: $localize`:@@fiveYears:5 Years` },
-		{ quotePeriodKey: QuotePeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years` }];
-		this.selQuotePeriod = this.quotePeriods[0];
+	ngOnInit(): void {		
+		console.log(this.selQuotePeriod);
 	}
 
 	quotePeriodChanged() {
@@ -236,12 +237,12 @@ export class SymbolComponent implements OnInit {
 
 	@Input()
 	set symbol(mySymbol: Symbol) {
-		if (mySymbol) {
-			this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol) && this.selQuotePeriod === this.quotePeriods[0] ? this.quotePeriods[1] : this.selQuotePeriod;
+		if (!!mySymbol) {
+			this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol) ? this.quotePeriods[1] : this.quotePeriods[0];
 			this.localSymbol = mySymbol;
 			this.portfolioName = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.name : null;
 			this.portfolioSymbol = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.symbol : null;
-			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
+			this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
 		}
 	}
 
@@ -251,8 +252,10 @@ export class SymbolComponent implements OnInit {
 	
 	@Input()
 	set showSymbol(showSymbol: boolean) {
-		if(!this.quotesLoading && !!showSymbol && this.localShowSymbol !== showSymbol) {
-			this.updateQuotes(!this.selQuotePeriod ? QuotePeriodKey.Day : this.selQuotePeriod.quotePeriodKey);
+		if(!this.quotesLoading && !!showSymbol && this.localShowSymbol !== showSymbol) {			
+			this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(this.symbol) ? 
+			   this.quotePeriods[1] : this.quotePeriods[0];
+			this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
 		}
 		this.localShowSymbol = showSymbol;
 	}

@@ -13,6 +13,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ServiceUtils } from '../../../../model/service-utils';
 import { Symbol } from '../../../../model/symbol';
+import { Portfolio } from '../../../../model/portfolio';
 
 @Component({
   selector: 'app-symbol-overview',
@@ -21,9 +22,7 @@ import { Symbol } from '../../../../model/symbol';
 })
 export class SymbolOverviewComponent implements OnInit {
   @Input()
-  portfolioId: number;
-  portfolioSymbol = '';
-  portfolioName = '';
+  portfolio: Portfolio;
   private localSymbol: Symbol;
   serviceUtils = ServiceUtils;
   
@@ -34,10 +33,9 @@ export class SymbolOverviewComponent implements OnInit {
 
 	@Input()
 	set symbol(mySymbol: Symbol) {
-		if (mySymbol) {
+		if (!!mySymbol) {
 			this.localSymbol = mySymbol;
-			this.portfolioName = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.name : null;
-			this.portfolioSymbol = ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.symbol : null;
+			console.log(this.localSymbol);
 		}
 	}
 

@@ -14,6 +14,7 @@ import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef } from '@
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { Symbol } from '../../../../model/symbol';
+import { Portfolio } from '../../../../model/portfolio';
 import { TokenService } from '../../../../service/token.service';
 import { PortfolioService } from '../../../../service/portfolio.service';
 import { Subscription, Subject } from 'rxjs';
@@ -28,9 +29,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   symbols: Symbol[] = [];
   reloadData = false;
   windowHeight = 0;
-  portfolioName = '';
+  portfolio: Portfolio;
   selSymbol: Symbol = null;
-  portfolioId: number = null;
   showSymbol = true;
   private routeParamSubscription: Subscription;
 
@@ -42,13 +42,14 @@ export class PortfolioComponent implements OnInit, OnDestroy {
 	this.windowHeight = window.innerHeight - 84;
 	this.routeParamSubscription = this.route.paramMap.pipe(
 		tap(() => this.reloadData = true),
-		tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
+		//tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
 		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
 		tap(() => this.reloadData = false))		
 		.subscribe(myPortfolio => {
 			this.symbols = myPortfolio.symbols;
 			this.selSymbol = myPortfolio?.symbols.length > 0 ? myPortfolio.symbols[0] : this.selSymbol; 
-			this.portfolioName = myPortfolio.name;});
+			this.portfolio = myPortfolio;
+		});
   }
 
   ngOnDestroy(): void {

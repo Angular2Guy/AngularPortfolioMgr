@@ -1,7 +1,15 @@
 <div>
-   <div>
-      <span i18n>Symbol: {{serviceUtils.replacePortfolioSymbol(symbol?.symbol)}}</span>
-      <span i18n>Name: {{symbol?.name}}</span>
+   <div class="text-container">
+      <span class="symbol-data" i18n>Symbol: {{serviceUtils.replacePortfolioSymbol(symbol?.symbol)}}</span>
+      <span class="symbol-data" i18n>Name: {{symbol?.name}}</span>
    </div>
-   <div></div>
+   <div class="text-container">
+      <span class="symbol-data" i18n>Weight: {{symbol?.weight | number:'1.0-0' }}</span>
+      <span class="symbol-data" i18n>Changed at: {{symbol?.changedAt | date:'mediumDate' }}</span>
+      <span class="symbol-data" i18n>Currency: {{symbol?.currencyKey }}</span>
+   </div>
+   <div class="text-container">
+      <span class="symbol-data" i18n>Sector: {{ symbol?.sector ? symbol?.sector : symbol?.name }}</span>
+      <span class="symbol-data" i18n>Industry: {{ symbol?.industry ? symbol?.industry : symbol?.name }}</span>
+   </div>
 </div>
