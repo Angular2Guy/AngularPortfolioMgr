@@ -13,7 +13,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ServiceUtils } from '../../../../model/service-utils';
 import { Symbol } from '../../../../model/symbol';
-import { Portfolio } from '../../../../model/portfolio';
+import { Portfolio, CommonValues } from '../../../../model/portfolio';
 
 @Component({
   selector: 'app-symbol-overview',
@@ -31,11 +31,16 @@ export class SymbolOverviewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  getPortfolioElement(): CommonValues {
+	return ServiceUtils.isPortfolioSymbol(this.symbol) ? this.portfolio 
+	   : this.portfolio.portfolioElements.filter(value => value.symbol === this.symbol.symbol)[0];
+  }
+
 	@Input()
 	set symbol(mySymbol: Symbol) {
 		if (!!mySymbol) {
 			this.localSymbol = mySymbol;
-			console.log(this.localSymbol);
+			//console.log(this.localSymbol);
 		}
 	}
 
