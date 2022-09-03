@@ -16,9 +16,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import javax.persistence.Column;
-import javax.persistence.Lob;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
