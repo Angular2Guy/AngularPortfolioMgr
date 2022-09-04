@@ -1,13 +1,13 @@
 <div mat-dialog-content>
 	<div class="my-header">
-		<h2><span i18n>Dev Config Values</span></h2>
+		<h2><span i18n="@@devConfigValues">Dev Config Values</span></h2>
 	</div>
 	<ul>
 		<li>
-			<mat-label i18n>Classname: </mat-label><span>{{classNameObs | async}}</span>
+			<mat-label i18n="@@classname">Classname: </mat-label><span>{{classNameObs | async}}</span>
 		</li>		
 	</ul>
 	<div class="my-button">
-		<button mat-button (click)="closeDialog()" i18n>Close</button>
+		<button mat-button (click)="closeDialog()" i18n="@@close">Close</button>
 	</div>
 </div>

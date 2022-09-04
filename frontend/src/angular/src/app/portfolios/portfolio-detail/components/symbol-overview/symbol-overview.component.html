@@ -1,22 +1,22 @@
 <div>
    <div class="text-container">
-      <span class="symbol-data" i18n>Symbol: {{serviceUtils.replacePortfolioSymbol(symbol?.symbol)}}</span>
-      <span class="symbol-data" i18n>Name: {{symbol?.name}}</span>
+      <span class="symbol-data" i18n="@@symbol">Symbol: {{serviceUtils.replacePortfolioSymbol(symbol?.symbol)}}</span>
+      <span class="symbol-data" i18n="@@name">Name: {{symbol?.name}}</span>
    </div>
    <div class="text-container">
-      <span class="symbol-data" i18n>Weight: {{symbol?.weight | number:'1.0-0' }}</span>
-      <span class="symbol-data" i18n>Changed at: {{getPortfolioElement()?.createdAt | date:'mediumDate' }}</span>
-      <span class="symbol-data" i18n>Currency: {{symbol?.currencyKey }}</span>
+      <span class="symbol-data" i18n="@@weight">Weight: {{symbol?.weight | number:'1.0-0' }}</span>
+      <span class="symbol-data" i18n="@@symboOverviewChangedAt">Changed at: {{getPortfolioElement()?.createdAt | date:'mediumDate' }}</span>
+      <span class="symbol-data" i18n="@@currency">Currency: {{symbol?.currencyKey }}</span>
    </div>
    <div class="text-container">
-      <span class="symbol-data" i18n>Sector: {{ symbol?.sector ? symbol?.sector : symbol?.name }}</span>
-      <span class="symbol-data" i18n>Industry: {{ symbol?.industry ? symbol?.industry : symbol?.name }}</span>
+      <span class="symbol-data" i18n="@@symbolOverivewSector">Sector: {{ symbol?.sector ? symbol?.sector : symbol?.name }}</span>
+      <span class="symbol-data" i18n="@@symbolOverivewIndustry">Industry: {{ symbol?.industry ? symbol?.industry : symbol?.name }}</span>
    </div>
    <div class="text-container">
-   	  <span class="symbol-data" i18n>Address: {{!symbol?.address ? '--' : symbol?.address }}</span>
-   	  <span class="symbol-data" i18n>Country: {{!symbol?.country ? '--' : symbol?.country }}</span>
+   	  <span class="symbol-data" i18n="@@symbolOverivewAddress">Address: {{!symbol?.address ? '--' : symbol?.address }}</span>
+   	  <span class="symbol-data" i18n="@@symbolOverivewCountry">Country: {{!symbol?.country ? '--' : symbol?.country }}</span>
    </div>
    <div class="text-container">
-   	  <span class="symbol-data" i18n>Description: {{!symbol?.description ? '--' : symbol?.description }}</span>
+   	  <span class="symbol-data" i18n="@@symbolOverivewDescription">Description: {{!symbol?.description ? '--' : symbol?.description }}</span>
    </div>
 </div>

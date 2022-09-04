@@ -4,10 +4,10 @@
 				<li>
 					<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="autoName" formControlName="{{FormFields.SymbolName}}"
-							i18n-placeholder placeholder="symbolName" tabindex="1">
+							i18n-placeholder="@@addSymbolSymbolName" placeholder="SymbolName" tabindex="1">
 						<mat-autocomplete autoActiveFirstOption #autoName="matAutocomplete" (optionSelected)="symbolSelected($event)">
       						<mat-option *ngFor="let symbol of symbolsName | async" [value]="symbol" 
-      						  	class="symbol-text" i18n>
+      						  	class="symbol-text" i18n="@@addSymbolSymbolAndName">
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
@@ -19,7 +19,7 @@
 							i18n-placeholder placeholder="symbol" tabindex="2">
 						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete" (optionSelected)="symbolSelected($event)">
       						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol" 
-      						    class="symbol-text" i18n>
+      						    class="symbol-text" i18n="@@addSymbolSymbolAndName">
         						Symbol: {{symbol.symbol}} Name: {{symbol.name}}
       						</mat-option>
     					</mat-autocomplete> 
@@ -28,37 +28,37 @@
 				<li>
 					<mat-form-field class="form-field"> 
 						<input matInput type="text" formControlName="{{FormFields.SymbolWeight}}" (keyup)="updateSymbolWeight()" 
-							i18n-placeholder placeholder="weight" tabindex="3">
+							i18n-placeholder="@@addSymbolWeight" placeholder="weight" tabindex="3">
 					</mat-form-field>
 				</li>
 				<li>
 					<mat-form-field> 
-						<mat-label i18n>Add date</mat-label>
+						<mat-label i18n="@@addSymbolAddDate">Add date</mat-label>
   						<input matInput [matDatepicker]="picker1" formControlName="{{FormFields.CreatedAt}}">
   						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
   						<mat-datepicker #picker1></mat-datepicker>
 					</mat-form-field>
 				</li>
-				<li *ngIf="!selSymbol && !loading" i18n>
+				<li *ngIf="!selSymbol && !loading" i18n="@@addSymbolNoSymbol">
 					No Symbol selected.
 				</li>
-				<li *ngIf="loading" i18n>
+				<li *ngIf="loading" i18n="@@loading">
 					Loading...
 				</li>
 				<li *ngIf="selSymbol && !loading">
-					<div class="symbol-element" i18n>Symbol: {{selSymbol.symbol}}</div>
-					<div class="symbol-element" i18n>Name: {{selSymbol.name}}</div>
-					<div class="symbol-element" i18n>Weight: {{selSymbol.weight}}</div>
+					<div class="symbol-element" i18n="@@symbol">Symbol: {{selSymbol.symbol}}</div>
+					<div class="symbol-element" i18n="@@name">Name: {{selSymbol.name}}</div>
+					<div class="symbol-element" i18n="@@weight">Weight: {{selSymbol.weight}}</div>
 				</li>
 				<li>
-					<button mat-button (click)="onAddClick()" [disabled]="!selSymbol" tabindex="-1" i18n>Ok</button>
-					<button mat-button (click)="onCancelClick()" tabindex="-1" i18n>Cancel</button>
+					<button mat-button (click)="onAddClick()" [disabled]="!selSymbol" tabindex="-1" i18n="@@ok">Ok</button>
+					<button mat-button (click)="onCancelClick()" tabindex="-1" i18n="@@cancel">Cancel</button>
 				</li>
 			</ul>
 	</form>
 	<div *ngIf="importingQuotes">
 		<div class="container">
-			<div i18n>Importing Quotes...</div>							
+			<div i18n="@@addSymbolImportingQuotes">Importing Quotes...</div>							
 		</div>
 		<div class="container">
 			<div class="content">
