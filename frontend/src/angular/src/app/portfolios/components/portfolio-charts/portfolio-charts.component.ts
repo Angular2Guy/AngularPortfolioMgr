@@ -48,13 +48,13 @@ export class PortfolioChartsComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) { }
 
   ngOnInit(): void {
-	this.chartPeriods = [{ chartPeriodKey: ChartPeriodKey.Month, periodText: $localize`:@@oneMonth:1 Month`, periodDuration:  {months: 1} },
-		{ chartPeriodKey: ChartPeriodKey.Months3, periodText: $localize`:@@threeMonths:3 Months`, periodDuration:  {months: 3} },
-		{ chartPeriodKey: ChartPeriodKey.Months6, periodText: $localize`:@@sixMonths:6 Months`, periodDuration:  {months: 6} },
-		{ chartPeriodKey: ChartPeriodKey.Year, periodText: $localize`:@@oneYear:1 Year`, periodDuration:  {years: 1} },
-		{ chartPeriodKey: ChartPeriodKey.Year3, periodText: $localize`:@@threeYears:3 Years`, periodDuration:  {years: 3} },
-		{ chartPeriodKey: ChartPeriodKey.Year5, periodText: $localize`:@@fiveYears:5 Years`, periodDuration:  {years: 5} },
-		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@tenYears:10 Years`, periodDuration:  {years: 10} }];
+	this.chartPeriods = [{ chartPeriodKey: ChartPeriodKey.Month, periodText: $localize`:@@month1:1 Month`, periodDuration:  {months: 1} },
+		{ chartPeriodKey: ChartPeriodKey.Months3, periodText: $localize`:@@month3:3 Months`, periodDuration:  {months: 3} },
+		{ chartPeriodKey: ChartPeriodKey.Months6, periodText: $localize`:@@month6:6 Months`, periodDuration:  {months: 6} },
+		{ chartPeriodKey: ChartPeriodKey.Year, periodText: $localize`:@@year1:1 Year`, periodDuration:  {years: 1} },
+		{ chartPeriodKey: ChartPeriodKey.Year3, periodText: $localize`:@@year3:3 Years`, periodDuration:  {years: 3} },
+		{ chartPeriodKey: ChartPeriodKey.Year5, periodText: $localize`:@@year5:5 Years`, periodDuration:  {years: 5} },
+		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@year10:10 Years`, periodDuration:  {years: 10} }];
 		this.selChartPeriod = this.chartPeriods[0];	
 	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
 	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));
