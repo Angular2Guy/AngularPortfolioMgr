@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
@@ -33,7 +34,9 @@ public class Symbol extends EntityBase {
 
 	private String symbol;
 	private String name;
-	private String sector;
+	private String sectorStr;
+	@ManyToOne
+	private Sector sector;
 	private String industry;
 	@Lob
 	@Column(columnDefinition = "text")
@@ -141,11 +144,11 @@ public class Symbol extends EntityBase {
 		return Objects.equals(this.getId(), other.getId());
 	}
 
-	public String getSector() {
+	public Sector getSector() {
 		return sector;
 	}
 
-	public void setSector(String sector) {
+	public void setSector(Sector sector) {
 		this.sector = sector;
 	}
 
@@ -181,11 +184,20 @@ public class Symbol extends EntityBase {
 		this.country = country;
 	}
 
+	public String getSectorStr() {
+		return sectorStr;
+	}
+
+	public void setSectorStr(String sectorStr) {
+		this.sectorStr = sectorStr;
+	}
+
 	@Override
 	public String toString() {
-		return "Symbol [symbol=" + symbol + ", name=" + name + ", sector=" + sector + ", industry=" + industry
-				+ ", description=" + description + ", address=" + address + ", country=" + country + ", currencyKey="
-				+ currencyKey + ", quoteSource=" + quoteSource + ", dailyQuotes=" + dailyQuotes + ", intraDayQuotes="
-				+ intraDayQuotes + ", portfolioToSymbols=" + portfolioToSymbols + "]";
-	}
+		return "Symbol [symbol=" + symbol + ", name=" + name + ", sectorStr=" + sectorStr + ", sector=" + sector
+				+ ", industry=" + industry + ", description=" + description + ", address=" + address + ", country="
+				+ country + ", currencyKey=" + currencyKey + ", quoteSource=" + quoteSource + ", dailyQuotes="
+				+ dailyQuotes + ", intraDayQuotes=" + intraDayQuotes + ", portfolioToSymbols=" + portfolioToSymbols
+				+ "]";
+	}	
 }

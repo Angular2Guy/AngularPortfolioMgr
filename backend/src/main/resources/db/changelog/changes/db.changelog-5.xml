@@ -25,13 +25,14 @@
 					indexName="ix_portfolio_portfolio_id" />
 			</not>
 		</preConditions>
-		<createIndex indexName="ix_portfolio_portfolio_id" 
+		<createIndex indexName="ix_portfolio_portfolio_id"
 			tableName="portfolio">
 			<column name="portfolio_id" />
 		</createIndex>
 	</changeSet>
 	<changeSet author="angular2guy" id="11">
-		<dropNotNullConstraint tableName="portfolio" columnName="app_user_id"/>
+		<dropNotNullConstraint tableName="portfolio"
+			columnName="app_user_id" />
 	</changeSet>
 	<changeSet author="angular2guy" id="12">
 		<addColumn tableName="symbol">
@@ -40,6 +41,23 @@
 			<column name="description" type="clob" />
 			<column name="address" type="varchar(1024)" />
 			<column name="country" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="angular2guy" id="13">
+		<renameColumn tableName="symbol" oldColumnName="sector"
+			newColumnName="sector_str" columnDataType="varchar(100)" />
+		<createTable tableName="sector">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="alphavantage_name" type="varchar(100)" />
+			<column name="yahoo_name" type="varchar(100)" />
+		</createTable>
+		<addColumn tableName="symbol">
+			<column name="sector_id" type="bigint">
+				<constraints foreignKeyName="fk_symbol_sector_id1"
+					references="sector(id)" />
+			</column>
 		</addColumn>
 	</changeSet>
 </databaseChangeLog>

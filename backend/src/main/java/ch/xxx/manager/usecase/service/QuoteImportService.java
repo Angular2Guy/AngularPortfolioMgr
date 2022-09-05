@@ -46,6 +46,8 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.IntraDayQuote;
 import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
+import ch.xxx.manager.domain.model.entity.Sector;
+import ch.xxx.manager.domain.model.entity.SectorRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
@@ -61,10 +63,11 @@ public class QuoteImportService {
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final SymbolRepository symbolRepository;
 	private final CurrencyService currencyService;
+	private final SectorRepository sectorRepository;
 
 	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
 			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
-			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient) {
+			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient, SectorRepository sectorRepository) {
 		this.alphavatageClient = alphavatageConnector;
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
@@ -72,6 +75,7 @@ public class QuoteImportService {
 		this.symbolRepository = symbolRepository;
 		this.currencyService = currencyService;
 		this.rapidApiClient = rapidApiClient;
+		this.sectorRepository = sectorRepository;
 	}
 
 	public Long importIntraDayQuotes(String symbol) {
@@ -166,7 +170,12 @@ public class QuoteImportService {
 		symbol.setCountry(dto.getAssetProfile().getCountry());
 		symbol.setDescription(dto.getAssetProfile().getLongBusinessSummary());
 		symbol.setIndustry(dto.getAssetProfile().getIndustry());
-		symbol.setSector(dto.getAssetProfile().getSector());
+		symbol.setSectorStr(dto.getAssetProfile().getSector());
+		Sector sector = new Sector();
+		sector.setYahooName(dto.getAssetProfile().getSector());		
+		sector.getSymbols().add(symbol);
+		sector = this.sectorRepository.save(sector);
+		symbol.setSector(sector);
 		return symbol;
 	}
 
@@ -176,7 +185,12 @@ public class QuoteImportService {
 		symbol.setCountry(dto.getCountry());
 		symbol.setDescription(dto.getDescription());
 		symbol.setIndustry(dto.getIndustry());
-		symbol.setSector(dto.getSector());
+		symbol.setSectorStr(dto.getSector());
+		Sector sector = new Sector();
+		sector.setAlphavantageName(dto.getSector());		
+		sector.getSymbols().add(symbol);
+		sector = this.sectorRepository.save(sector);
+		symbol.setSector(sector);
 		return symbol;
 	}
 
