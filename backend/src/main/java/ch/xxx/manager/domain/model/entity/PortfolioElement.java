@@ -38,6 +38,8 @@ public class PortfolioElement extends PortfolioBase {
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;
+	private Long weight;
+	private String sector;
 	@ManyToOne
 	private Portfolio portfolio;
 	
@@ -113,5 +115,21 @@ public class PortfolioElement extends PortfolioBase {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+
+	public Long getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Long weight) {
+		this.weight = weight;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
 	}
 }

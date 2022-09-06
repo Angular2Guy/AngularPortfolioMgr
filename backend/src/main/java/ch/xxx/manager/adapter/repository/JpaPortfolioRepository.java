@@ -22,7 +22,7 @@ import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto;
 
 public interface JpaPortfolioRepository extends JpaRepository<Portfolio, Long> {
-	@Query("select p from Portfolio p where p.appUser.id = :userId")
+	@Query("select p from Portfolio p inner join p.portfolioToSymbols where p.appUser.id = :userId")
 	List<Portfolio> findByUserId(@Param(value = "userId") Long userId);
 	@Query("select new ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto(p.id, au.id, p.name, p.createdAt, pts.weight, pts.changedAt, "
 			+ "pts.removedAt, s.id, s.symbol, s.name, s.currencyKey) "

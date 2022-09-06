@@ -12,10 +12,14 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.Optional;
 import java.util.Random;
+
+import ch.xxx.manager.domain.model.entity.Symbol;
 
 public class ServiceUtils {
 	public final static String PORTFOLIO_MARKER = "V8yXhrg";
+	public static final String SECTOR_PORTFOLIO = "Portfolio";
 
 	private final static int SYMBOL_LENGTH = 18;
 
@@ -32,4 +36,20 @@ public class ServiceUtils {
 				.toString();
 	}
 
+	public static String findSectorName(Symbol entity) {
+		return Optional.ofNullable(entity.getSector()).stream().map(myEntity -> {
+			String result = myEntity.getYahooName() != null && !myEntity.getYahooName().isBlank()
+					? myEntity.getYahooName()
+					: switch (entity.getQuoteSource()) {
+					case ALPHAVANTAGE -> myEntity.getAlphavantageName();
+					case YAHOO -> myEntity.getYahooName();
+					default -> SECTOR_PORTFOLIO;
+					};
+			return result;
+		}).findFirst().orElse(SECTOR_PORTFOLIO);
+	}
+
+	public static String findSectorName(Optional<Symbol> entityOpt) {
+		return entityOpt.stream().map(ServiceUtils::findSectorName).findFirst().orElse(SECTOR_PORTFOLIO);
+	}
 }

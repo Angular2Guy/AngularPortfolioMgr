@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Comparator;
@@ -165,13 +164,17 @@ public class PortfolioCalculationService {
 				.filter(myPortfolioElement -> dailyQuotes.stream().anyMatch(
 						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
 				.findFirst().orElse(new PortfolioElement());
+		Optional<PortfolioToSymbol> ptsOpt = portfolioToSymbols.stream()
+		.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol())).findFirst();
 		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
-		String ptsName = portfolioToSymbols.stream()
-				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
-				.map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
-		Optional<CurrencyKey> symbolCurKeyOpt = portfolioToSymbols.stream()
-				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
+		String ptsName = ptsOpt.stream().map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
+		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream()
 				.map(pts -> pts.getSymbol().getCurrencyKey()).findFirst();
+		String sectorName = ServiceUtils.findSectorName(ptsOpt.stream()
+				.map(PortfolioToSymbol::getSymbol)
+				.findFirst());
+		portfolioElement.setSector(sectorName);
+		portfolioElement.setWeight(ptsOpt.stream().map(myPts -> myPts.getWeight()).findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);
 		portfolioElement.setPortfolio(portfolio);
 		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());

@@ -60,4 +60,10 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet id="14" author="angular2guy">
+		<addColumn tableName="portfolio">
+			<column name="weight" type="bigint"/>
+			<column name="sector" type="varchar(100)"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

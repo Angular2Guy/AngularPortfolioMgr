@@ -19,9 +19,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Sector extends EntityBase {
-	public static final String SECTOR_PORTFOLIO = "Portfolio";
-	
+public class Sector extends EntityBase {		
 	private String alphavantageName;
 	private String yahooName;
 	@OneToMany(mappedBy = "sector", orphanRemoval = true)
