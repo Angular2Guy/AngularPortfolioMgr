@@ -77,9 +77,11 @@ public class PortfolioMapper {
 
 	public PortfolioElementDto toPortfolioElementDto(PortfolioElement portfolioElement) {
 		return new PortfolioElementDto(portfolioElement.getId(), portfolioElement.getName(),
-				portfolioElement.getSymbol(), portfolioElement.getCurrencyKey(), portfolioElement.getCreatedAt().atStartOfDay(),
+				portfolioElement.getSymbol(), portfolioElement.getCurrencyKey(),
+				portfolioElement.getCreatedAt().atStartOfDay(), portfolioElement.getLastClose(),
 				portfolioElement.getMonth1(), portfolioElement.getMonth6(), portfolioElement.getYear1(),
-				portfolioElement.getYear2(), portfolioElement.getYear5(), portfolioElement.getYear10());
+				portfolioElement.getYear2(), portfolioElement.getYear5(), portfolioElement.getYear10(),
+				portfolioElement.getWeight(), portfolioElement.getSector());
 	}
 
 	public PortfolioBarsDto toBarsDto(PortfolioBarsWrapper portfolioBarsWrapper) {

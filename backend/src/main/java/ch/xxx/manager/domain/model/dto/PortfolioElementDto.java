@@ -30,31 +30,37 @@ public class PortfolioElementDto {
 	private CurrencyKey currencyKey;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime createdAt;
+	private BigDecimal lastClose;
 	private BigDecimal month1;
 	private BigDecimal month6;
 	private BigDecimal year1;
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;
+	private Long weight;
+	private String sector;
 	
 	public PortfolioElementDto() {		
 	}
 	
 	public PortfolioElementDto(Long id, String name, String symbol, CurrencyKey currencyKey, LocalDateTime createdAt,
-			BigDecimal month1, BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5,
-			BigDecimal year10) {
+			BigDecimal lastClose, BigDecimal month1, BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5,
+			BigDecimal year10, Long weight, String sector) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.symbol = symbol;
 		this.currencyKey = currencyKey;
 		this.createdAt = createdAt;
+		this.lastClose = lastClose;
 		this.month1 = month1;
 		this.month6 = month6;
 		this.year1 = year1;
 		this.year2 = year2;
 		this.year5 = year5;
 		this.year10 = year10;
+		this.weight = weight;
+		this.sector = sector;
 	}
 
 	public Long getId() {
@@ -122,5 +128,29 @@ public class PortfolioElementDto {
 	}
 	public void setYear10(BigDecimal year10) {
 		this.year10 = year10;
+	}
+
+	public BigDecimal getLastClose() {
+		return lastClose;
+	}
+
+	public void setLastClose(BigDecimal lastClose) {
+		this.lastClose = lastClose;
+	}
+
+	public Long getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Long weight) {
+		this.weight = weight;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
 	}	
 }

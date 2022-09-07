@@ -165,19 +165,19 @@ public class PortfolioCalculationService {
 						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
 				.findFirst().orElse(new PortfolioElement());
 		Optional<PortfolioToSymbol> ptsOpt = portfolioToSymbols.stream()
-		.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol())).findFirst();
+				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
+				.findFirst();
 		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
 		String ptsName = ptsOpt.stream().map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
-		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream()
-				.map(pts -> pts.getSymbol().getCurrencyKey()).findFirst();
-		String sectorName = ServiceUtils.findSectorName(ptsOpt.stream()
-				.map(PortfolioToSymbol::getSymbol)
-				.findFirst());
+		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream().map(pts -> pts.getSymbol().getCurrencyKey())
+				.findFirst();
+		String sectorName = ServiceUtils.findSectorName(ptsOpt.stream().map(PortfolioToSymbol::getSymbol).findFirst());
 		portfolioElement.setSector(sectorName);
 		portfolioElement.setWeight(ptsOpt.stream().map(myPts -> myPts.getWeight()).findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);
 		portfolioElement.setPortfolio(portfolio);
 		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
+		portfolioElement.setLastClose(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now(), symbolCurKeyOpt));
 		portfolioElement.setMonth1(
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(1L), symbolCurKeyOpt));
 		portfolioElement.setMonth6(
@@ -208,9 +208,11 @@ public class PortfolioCalculationService {
 
 	private Currency getCurrencyValue(final Portfolio portfolio, DailyQuote myDailyQuote,
 			Optional<CurrencyKey> symbolCurrencyKeyOpt) {
-		return symbolCurrencyKeyOpt.stream().map(symbolCurrencyKey -> 
-			this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), symbolCurrencyKey))
-				.filter(Optional::isPresent).map(Optional::get).findFirst().orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
+		return symbolCurrencyKeyOpt.stream()
+				.map(symbolCurrencyKey -> this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(),
+						portfolio.getCurrencyKey(), symbolCurrencyKey))
+				.filter(Optional::isPresent).map(Optional::get).findFirst()
+				.orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
 						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
 	}
 

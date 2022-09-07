@@ -32,6 +32,7 @@ public class PortfolioElement extends PortfolioBase {
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 	private LocalDate createdAt;
+	private BigDecimal lastClose;
 	private BigDecimal month1;
 	private BigDecimal month6;
 	private BigDecimal year1;
@@ -131,5 +132,13 @@ public class PortfolioElement extends PortfolioBase {
 
 	public void setSector(String sector) {
 		this.sector = sector;
+	}
+
+	public BigDecimal getLastClose() {
+		return lastClose;
+	}
+
+	public void setLastClose(BigDecimal lastClose) {
+		this.lastClose = lastClose;
 	}
 }

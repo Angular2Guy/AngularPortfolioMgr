@@ -66,4 +66,9 @@
 			<column name="sector" type="varchar(100)"/>
 		</addColumn>
 	</changeSet>
+	<changeSet id="15" author="angular2guy">
+		<addColumn tableName="portfolio">
+			<column name="last_close" type="numeric(12,4)"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
