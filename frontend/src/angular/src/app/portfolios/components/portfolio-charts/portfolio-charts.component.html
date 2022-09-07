@@ -1,33 +1,10 @@
 <div class="my-container">
-<div class="text-container">
-	<span class="my-span" i18n="@@portfolioChartsName">Portfolio: {{selPortfolio.name}}</span> 
-	<span class="my-span" i18n="@@portfolioChartsStartDate">Start Date: {{startDate | date:'d.M.yyyy'}}</span>
-</div>
-<div class="text-container">
-	<label id="my-radio-group-label" i18n="@@pickTimeframe">Pick your timeframe:</label>
-	<mat-radio-group
-	  aria-labelledby="my-radio-group-label"
-	  class="my-radio-group" (change)="chartPeriodChanged()"
-	  [(ngModel)]="selChartPeriod">
-	  <mat-radio-button class="my-radio-button" *ngFor="let myChartPeriod of chartPeriods" [value]="myChartPeriod" [disabled]="chartsLoading">
-	    {{myChartPeriod.periodText}}
-	  </mat-radio-button>
-	</mat-radio-group>
-</div>
-<div class="text-container">
-	<label id="my-checkbox-group-label" i18n="@@pickCompIndex">Pick your comparison index:</label>
-	<span>
-		<mat-checkbox class="my-checkbox" [(ngModel)]="showES50" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)" i18n="@@es50">EuroStoxx 50</mat-checkbox>
-		<mat-checkbox class="my-checkbox" [(ngModel)]="showMsciCH" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)" i18n="@@msciChina">Msci China</mat-checkbox>
-		<mat-checkbox class="my-checkbox" [(ngModel)]="showSP500" [disabled]="chartsLoading" (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)" i18n="@@sAndP500">S&P 500</mat-checkbox>
-	</span>
-</div>
-<div *ngIf="chartsLoading" class="center-div">
-	<mat-progress-spinner			
-			mode="indeterminate"
-			color="primary"></mat-progress-spinner>
-</div>
-<div *ngIf="!chartsLoading" class="chart-container">
-	<sc-bar-chart [chartBars]="chartBars"></sc-bar-chart>
-</div>
+<mat-tab-group dynamicHeight>
+  <mat-tab i18-label="@@portfolioChartsComparison" label="Portfolio Comparison">
+    <app-portfolio-comparison [selPortfolio]="selPortfolio"></app-portfolio-comparison>
+  </mat-tab>
+  <mat-tab i18n-label="@@portfolioChartsSectors" label="Portfolio Sectors">
+    <app-portfolio-sectors></app-portfolio-sectors>
+  </mat-tab>
+</mat-tab-group>
 </div>

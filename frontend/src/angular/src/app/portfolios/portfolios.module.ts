@@ -40,12 +40,15 @@ import { ProdConfigComponent } from './components/prod-config/prod-config.compon
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatTabsModule} from '@angular/material/tabs'; 
 import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
+import { PortfolioComparisonComponent } from './components/portfolio-comparison/portfolio-comparison.component';
+import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfolio-sectors.component';
 
 
 @NgModule({
     declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,
-        PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent],
+        PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent, PortfolioComparisonComponent, PortfolioSectorsComponent],
     imports: [
         BaseModule,
         MatListModule,
@@ -64,6 +67,7 @@ import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
         MatInputModule,
         MatRadioModule,
         MatCheckboxModule,
+        MatTabsModule,
         NgxBarChartsModule,
         PortfoliosRoutingModule
     ],

@@ -15,11 +15,41 @@
 	height: 100%;
 	width: 100%;
 }
-
-.mat-tab-group {
-	height: 100%;
+.my-span {
+	margin-right: 10px;
 }
-
-::ng-deep .mat-tab-body-wrapper {
-	height: 100%;
+.my-radio-group {
+	margin: 0 10px;
+}
+.my-radio-button {
+	margin: 0 10px;
+}
+.my-checkbox {
+	margin-left: 10px;
+}
+.text-container {
+	margin-bottom: 10px;
+}
+.center-div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: calc(100% - 94px);
+}
+.example-margin {
+  margin: 0 10px;
+}
+.chart-container {
+	height: calc(100% - 94px);
+	width: 100%;
+}
+::ng-deep .bar-sxrt {
+    fill: #7CFC00 !important;
+}
+::ng-deep .bar-icga {
+    fill: #eff542 !important;
+}
+::ng-deep .bar-ivv {
+    fill: #ff0000 !important;
 }

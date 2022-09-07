@@ -55,7 +55,8 @@ public class PortfolioController {
 	@GetMapping("/userid/{userId}")
 	public List<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
 		return this.portfolioService.getPortfoliosByUserId(userId).stream()
-				.map(entity -> this.portfolioMapper.toDto(entity)).collect(Collectors.toList());
+				.map(entity -> this.portfolioMapper.toDto(entity))
+				.filter(StreamHelpers.distinctByKey(PortfolioDto::getId)).collect(Collectors.toList());
 	}
 
 	@GetMapping("/id/{portfolioId}")
@@ -65,14 +66,18 @@ public class PortfolioController {
 
 	@GetMapping("/id/{portfolioId}/start/{start}")
 	public PortfolioBarsDto getPortfolioBarsByIdAndStart(@PathVariable("portfolioId") Long portfolioId,
-			@PathVariable("start") String isodateStart, @RequestParam(name = "compSymbols", required = false) List<String> compSymbols) {
-		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);		
+			@PathVariable("start") String isodateStart,
+			@RequestParam(name = "compSymbols", required = false) List<String> compSymbols) {
+		LocalDate start = LocalDate.parse(isodateStart, DateTimeFormatter.ISO_DATE);
 		List<ComparisonIndex> compIndexes = StreamHelpers.toStream(compSymbols)
-		.filter(cSym -> StreamHelpers.toStream(ComparisonIndex.values()).anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
-			.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values()).filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr))
-					.findFirst()).flatMap(StreamHelpers::unboxOptionals).toList();
+				.filter(cSym -> StreamHelpers.toStream(ComparisonIndex.values())
+						.anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
+				.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values())
+						.filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr)).findFirst())
+				.flatMap(StreamHelpers::unboxOptionals).toList();
 //		LOGGER.info(compIndexes.stream().map(value -> value.getSymbol()).collect(Collectors.joining(",")));
-		return this.portfolioMapper.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));
+		return this.portfolioMapper
+				.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));
 	}
 
 	@PostMapping
@@ -84,22 +89,24 @@ public class PortfolioController {
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService.addSymbolToPortfolio(dto, symbolId, weight,
-				this.isoDateTimeToLocalDateTime(changedAt)).portfolio());
+		return this.portfolioMapper.toDto(this.portfolioService
+				.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt)).portfolio());
 	}
 
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService.updatePortfolioSymbolWeight(dto, symbolId, weight,
-				this.isoDateTimeToLocalDateTime(changedAt)).portfolio());
+		return this.portfolioMapper.toDto(this.portfolioService
+				.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt))
+				.portfolio());
 	}
 
 	@DeleteMapping("/{id}/symbol/{symbolId}")
 	public PortfolioDto deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
 			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService.removeSymbolFromPortfolio(portfolioId, symbolId,
-				this.isoDateTimeToLocalDateTime(removedAt)).portfolio());
+		return this.portfolioMapper.toDto(this.portfolioService
+				.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt))
+				.portfolio());
 	}
 
 	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {
