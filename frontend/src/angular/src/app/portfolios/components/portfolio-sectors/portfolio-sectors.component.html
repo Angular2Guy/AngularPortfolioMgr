@@ -1,1 +1,10 @@
-<p>portfolio-sectors works!</p>
+<div class="my-container">
+<div *ngIf="chartsLoading" class="center-div">
+	<mat-progress-spinner			
+			mode="indeterminate"
+			color="primary"></mat-progress-spinner>
+</div>
+<div *ngIf="!chartsLoading" class="chart-container">
+	<sc-donut-chart [chartSlices]="chartSlices"></sc-donut-chart>
+</div>
+</div>

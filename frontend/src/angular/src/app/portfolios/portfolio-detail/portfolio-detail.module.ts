@@ -14,7 +14,6 @@ import { NgModule } from '@angular/core';
 import { BaseModule } from '../../base/base.module';
 import { PortfolioComponent } from './components/portfolio/portfolio.component';
 import { SymbolComponent } from './components/symbol/symbol.component';
-import { NgxSimpleChartsModule } from 'ngx-simple-charts';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatListModule } from '@angular/material/list';
@@ -33,7 +32,6 @@ import { SymbolOverviewComponent } from './components/symbol-overview/symbol-ove
 	declarations: [PortfolioComponent,	SymbolComponent, SymbolOverviewComponent],
 	imports: [
 		BaseModule,
-		NgxSimpleChartsModule,
 		NgxLineChartsModule,
 		MatCheckboxModule,
 		MatRadioModule,

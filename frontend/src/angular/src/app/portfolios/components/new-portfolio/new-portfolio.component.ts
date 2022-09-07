@@ -52,7 +52,18 @@ export class NewPortfolioComponent {
 	const portfolio: Portfolio = {id: null,createdAt: new Date(createdAt.toMillis()).toISOString(),
 		 month1: null, month6: null, name: this.portfolioForm.get(FormFields.PortfolioName).value, currencyKey: null,
 		symbols: [], portfolioElements: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null }; 		
-	this.dialogRef.close(portfolio);		
+	this.dialogRef.close(portfolio);
+	/*
+	private BigDecimal month1;
+	private BigDecimal month6;
+	private BigDecimal year1;
+	private BigDecimal year2;
+	private BigDecimal year5;
+	private BigDecimal year10;	
+	private CurrencyKey currencyKey;
+	private List<SymbolDto> symbols = new ArrayList<>();
+	private List<PortfolioElementDto> portfolioElements = new ArrayList<>();
+	*/		
   }
 
   onCancelClick(): void {

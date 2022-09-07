@@ -14,4 +14,7 @@ import { CommonValues } from './portfolio';
  
 export interface PortfolioElement extends CommonValues {
 	symbol: string;
+	weight: number;
+	sector: string;
+	lastClose: number;
 }

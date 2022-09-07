@@ -1,4 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+/**
+ *    Copyright 2019 Sven Loesekann
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
+import { Component, Input, OnInit } from '@angular/core';
+import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
+import { Portfolio } from 'src/app/model/portfolio';
 
 @Component({
   selector: 'app-portfolio-sectors',
@@ -6,10 +20,18 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./portfolio-sectors.component.scss']
 })
 export class PortfolioSectorsComponent implements OnInit {
-
+  @Input()
+  selPortfolio: Portfolio;
+  chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
+  chartsLoading = true;
+  
   constructor() { }
 
   ngOnInit(): void {
+	this.chartSlices.title = this.selPortfolio.name;
+	this.chartSlices.chartSlices = this.selPortfolio.portfolioElements.map(pe => ({name: pe.name, value: (pe.lastClose * pe.weight)} as ChartSlice));
+	console.log(this.chartSlices.chartSlices);
+	this.chartsLoading = false;
   }
 
 }
