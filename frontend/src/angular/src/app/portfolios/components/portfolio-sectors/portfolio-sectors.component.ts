@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, Input, OnInit } from '@angular/core';
-//import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
+import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
 import { Portfolio } from 'src/app/model/portfolio';
 
 @Component({
@@ -22,15 +22,15 @@ import { Portfolio } from 'src/app/model/portfolio';
 export class PortfolioSectorsComponent implements OnInit {
   @Input()
   selPortfolio: Portfolio;
-  //chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
+  chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
   chartsLoading = true;
   
   constructor() { }
 
   ngOnInit(): void {
-	//this.chartSlices.title = this.selPortfolio.name;
-	//this.chartSlices.chartSlices = this.selPortfolio.portfolioElements.map(pe => ({name: pe.name, value: (pe.lastClose * pe.weight)} as ChartSlice));
-	//console.log(this.chartSlices.chartSlices);
+	this.chartSlices.title = this.selPortfolio.name;
+	this.chartSlices.chartSlices = this.selPortfolio.portfolioElements.map(pe => ({name: pe.name, value: (pe.lastClose * pe.weight)} as ChartSlice));
+	console.log(this.chartSlices.chartSlices);
 	this.chartsLoading = false;
   }
 
