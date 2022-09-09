@@ -46,6 +46,7 @@ import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
+import ch.xxx.manager.usecase.mapping.MappingUtils;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -171,7 +172,7 @@ public class PortfolioCalculationService {
 		String ptsName = ptsOpt.stream().map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
 		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream().map(pts -> pts.getSymbol().getCurrencyKey())
 				.findFirst();
-		String sectorName = ServiceUtils.findSectorName(ptsOpt.stream().map(PortfolioToSymbol::getSymbol).findFirst());
+		String sectorName = MappingUtils.findSectorName(ptsOpt.stream().map(PortfolioToSymbol::getSymbol).findFirst());
 		portfolioElement.setSector(sectorName);
 		portfolioElement.setWeight(ptsOpt.stream().map(myPts -> myPts.getWeight()).findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);

@@ -17,20 +17,19 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
-import ch.xxx.manager.usecase.service.ServiceUtils;
 
 @Component
 public class SymbolMapper {
 	public SymbolDto convert(Symbol entity) {
 		return new SymbolDto(entity.getId(), entity.getSymbol(), entity.getName(), null, null,
-				entity.getQuoteSource().toString(), null, entity.getCurrencyKey(), ServiceUtils.findSectorName(entity),
+				entity.getQuoteSource().toString(), null, entity.getCurrencyKey(), MappingUtils.findSectorName(entity),
 				entity.getIndustry(), entity.getDescription(), entity.getAddress(), entity.getCountry());
 	}
 
 	public SymbolDto convert(Symbol symbol, PortfolioToSymbol portfolioToSymbol) {
 		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), null, null,
 				symbol.getQuoteSource().toString(), portfolioToSymbol.getWeight(), symbol.getCurrencyKey(),
-				ServiceUtils.findSectorName(symbol), symbol.getIndustry(), symbol.getDescription(), symbol.getAddress(),
+				MappingUtils.findSectorName(symbol), symbol.getIndustry(), symbol.getDescription(), symbol.getAddress(),
 				symbol.getCountry());
 	}
 }
