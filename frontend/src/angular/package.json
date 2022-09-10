@@ -34,7 +34,7 @@
     "@angular/platform-browser": "^14.0.0",
     "@angular/platform-browser-dynamic": "^14.0.0",
     "@angular/router": "^14.0.0",
-    "ngx-simple-charts": "^14.0.0",
+    "ngx-simple-charts": "^14.1.2",
     "core-js": "^3.19.1",
     "material-design-icons": "3.0.1",
     "rxjs": "~7.4.0",
@@ -77,19 +77,6 @@
     "rimraf": "^3.0.2",
     "ts-node": "~10.4.0",
     "typescript": "~4.7.3",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "d3-array": "^3.0.0",
-    "d3-ease": "^3.0.0",
-    "d3-axis": "^3.0.0",
-    "d3-brush": "^3.0.0",
-    "d3-color": "^3.0.0",
-    "d3-format": "^3.0.0",
-    "d3-interpolate": "^3.0.0",
-    "d3-scale": "^4.0.0",
-    "d3-selection": "^3.0.0",
-    "d3-shape": "^3.0.0",
-    "d3-time-format": "^4.0.0",
-    "d3-transition": "^3.0.0",
-    "d3-scale-chromatic": "^3.0.0"
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }
