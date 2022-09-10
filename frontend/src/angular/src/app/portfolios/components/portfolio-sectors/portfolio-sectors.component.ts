@@ -14,6 +14,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
 import { Portfolio } from 'src/app/model/portfolio';
 
+interface CalcPortfolioElement {
+	name: string;
+	sector: string; 
+	value: number;
+}
+
 @Component({
   selector: 'app-portfolio-sectors',
   templateUrl: './portfolio-sectors.component.html',
@@ -29,8 +35,18 @@ export class PortfolioSectorsComponent implements OnInit {
 
   ngOnInit(): void {
 	this.chartSlices.title = this.selPortfolio.name;
-	this.chartSlices.chartSlices = this.selPortfolio.portfolioElements.map(pe => ({name: pe.name, value: (pe.lastClose * pe.weight)} as ChartSlice));
-	console.log(this.chartSlices.chartSlices);
+	this.chartSlices.chartSlices = [];
+	const valueMap = this.selPortfolio.portfolioElements
+	  .map(pe => ({name: pe.name, sector: pe.sector, value: (pe.lastClose * pe.weight)} as CalcPortfolioElement))
+	  .reduce((myMap, cpe) => {
+		let myValue = myMap.get(cpe.sector);
+		myValue = !myValue ? 0 : myValue;
+		myMap.set(cpe.sector, myValue + cpe.value);
+		return myMap;  
+	},new Map<string,number>());
+	//valueMap.forEach((myValue, myKey) => console.log(myValue,myKey));
+	valueMap.forEach((myValue, myKey) => this.chartSlices.chartSlices.push({name: myKey, value: myValue} as ChartSlice));
+	//console.log(this.chartSlices.chartSlices);
 	this.chartsLoading = false;
   }
 
