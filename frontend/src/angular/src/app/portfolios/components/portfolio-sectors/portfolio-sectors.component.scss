@@ -10,6 +10,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+@use '@angular/material' as mat;
+
+.hide-me {	
+	visibility: hidden;
+	
+}
+ 
+.my-content {
+	$red: mat.get-color-from-palette(mat.$red-palette, 200);
+	$purple: mat.get-color-from-palette(mat.$purple-palette, 200);
+    $blue: mat.get-color-from-palette(mat.$blue-palette, 200);
+    $cyan: mat.get-color-from-palette(mat.$cyan-palette, 200);
+    $green: mat.get-color-from-palette(mat.$green-palette, 200);
+    $lime: mat.get-color-from-palette(mat.$lime-palette, 200);
+    $orange: mat.get-color-from-palette(mat.$orange-palette, 200);
+    $gray: mat.get-color-from-palette(mat.$gray-palette, 200);
+    @debug "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";
+	&::before {
+		content: "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";
+	}
+} 
+ 
 .center-div {
 	display: flex;
 	align-items: center;

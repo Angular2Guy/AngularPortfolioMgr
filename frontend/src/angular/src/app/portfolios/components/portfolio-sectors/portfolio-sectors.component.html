@@ -5,6 +5,7 @@
 			color="primary"></mat-progress-spinner>
 </div>
 <div *ngIf="!chartsLoading" class="chart-container">
+    <div class="hide-me"><span #hideMe class="my-content"></span></div>
 	<sc-donut-chart [chartSlices]="chartSlices"></sc-donut-chart>
 </div>
 </div>

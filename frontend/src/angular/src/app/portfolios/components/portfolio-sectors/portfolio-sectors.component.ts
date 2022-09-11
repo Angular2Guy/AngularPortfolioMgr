@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
 import { Portfolio } from 'src/app/model/portfolio';
 
@@ -25,17 +25,28 @@ interface CalcPortfolioElement {
   templateUrl: './portfolio-sectors.component.html',
   styleUrls: ['./portfolio-sectors.component.scss']
 })
-export class PortfolioSectorsComponent implements OnInit {
+export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   @Input()
   selPortfolio: Portfolio;
   chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
   chartsLoading = true;
+  @ViewChild('hideMe') 
+  divHideMe: ElementRef;
+   
+  private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
   
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit(): void {	
 	this.chartSlices.title = this.selPortfolio.name;
 	this.chartSlices.chartSlices = [];
+	this.chartsLoading = false;
+  }
+
+  ngAfterViewInit(): void {
+	const sliceColors = window.getComputedStyle(this.divHideMe.nativeElement,':before')['content']
+	   .replace('"', '').replace('\"','').split(',');
+	//console.log(sliceColors);	
 	const valueMap = this.selPortfolio.portfolioElements
 	  .map(pe => ({name: pe.name, sector: pe.sector, value: (pe.lastClose * pe.weight)} as CalcPortfolioElement))
 	  .reduce((myMap, cpe) => {
@@ -44,10 +55,14 @@ export class PortfolioSectorsComponent implements OnInit {
 		myMap.set(cpe.sector, myValue + cpe.value);
 		return myMap;  
 	},new Map<string,number>());
-	//valueMap.forEach((myValue, myKey) => console.log(myValue,myKey));
-	valueMap.forEach((myValue, myKey) => this.chartSlices.chartSlices.push({name: myKey, value: myValue} as ChartSlice));
+	let calcColors = [];
+	while(calcColors.length < valueMap.size) {
+		calcColors = calcColors.concat(sliceColors);
+	}
+	let i = 0;
+	valueMap.forEach((myValue, myKey) => { i = i + 1;
+		this.chartSlices.chartSlices.push({name: myKey, value: myValue, color: calcColors[i]} as ChartSlice);
+		});
 	//console.log(this.chartSlices.chartSlices);
-	this.chartsLoading = false;
   }
-
 }
