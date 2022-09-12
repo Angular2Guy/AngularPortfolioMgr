@@ -22,7 +22,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
 
 @NgModule({
     declarations: [LoginComponent, MainComponent],
@@ -35,7 +34,6 @@ import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-serv
         MatButtonModule,
         MatInputModule,
         LoginRoutingModule,
-        NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
     ],
     providers: [LoginService]
 })

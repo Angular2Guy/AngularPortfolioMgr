@@ -35,6 +35,7 @@ import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-serv
 	BrowserAnimationsModule,
 	NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
   ],  
+  
   bootstrap: [AppComponent]
 })
 export class AppModule { }

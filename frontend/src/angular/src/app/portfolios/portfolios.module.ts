@@ -44,7 +44,6 @@ import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
 import { NgxDonutChartsModule } from 'ngx-simple-charts/donut';
 import { PortfolioComparisonComponent } from './components/portfolio-comparison/portfolio-comparison.component';
 import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfolio-sectors.component';
-import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
 
 @NgModule({
     declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,
@@ -71,7 +70,6 @@ import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-serv
         NgxBarChartsModule,
         NgxDonutChartsModule,
         PortfoliosRoutingModule,
-        NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
     ],
     providers: [DevAppInfoService, ProdAppInfoService]
 })

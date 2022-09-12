@@ -26,7 +26,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgxLineChartsModule } from 'ngx-simple-charts/line';
 import { PortfolioDetailRoutingModule } from './portfolio-detail-routing.module';
 import { SymbolOverviewComponent } from './components/symbol-overview/symbol-overview.component';
-import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
 
 @NgModule({
 	declarations: [PortfolioComponent,	SymbolComponent, SymbolOverviewComponent],
@@ -43,7 +42,6 @@ import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-serv
 		MatFormFieldModule,
 		MatButtonModule,
 		PortfolioDetailRoutingModule,
-		NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
 	],
 })
 export class PortfolioDetailModule { }
