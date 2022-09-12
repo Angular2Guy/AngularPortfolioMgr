@@ -16,8 +16,8 @@ import { OverviewComponent } from '../overview/overview.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Portfolio } from '../../../model/portfolio';
 import { PortfolioData } from '../../../model/portfolio-data';
-import { TokenService } from '../../../service/token.service';
 import { DateTime } from 'luxon';
+import { TokenService } from 'ngx-simple-charts/base-service';
 
 enum FormFields {
 	PortfolioName = 'portfolioName',

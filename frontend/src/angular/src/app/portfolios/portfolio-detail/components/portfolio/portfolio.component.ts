@@ -15,7 +15,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { Symbol } from '../../../../model/symbol';
 import { Portfolio } from '../../../../model/portfolio';
-import { TokenService } from '../../../../service/token.service';
+import { TokenService } from 'ngx-simple-charts/base-service';
 import { PortfolioService } from '../../../../service/portfolio.service';
 import { Subscription, Subject } from 'rxjs';
 

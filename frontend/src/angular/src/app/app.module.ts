@@ -19,7 +19,8 @@ import { SpinnerComponent } from './spinner/spinner.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
-import { TokenInterceptor } from './service/token.interceptor';
+import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
+
 
 @NgModule({
   declarations: [
@@ -31,10 +32,9 @@ import { TokenInterceptor } from './service/token.interceptor';
     HttpClientModule,
     AppRoutingModule,
 	MatProgressSpinnerModule,
-	BrowserAnimationsModule
+	BrowserAnimationsModule,
+	NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
   ],  
-  providers: [
-		{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

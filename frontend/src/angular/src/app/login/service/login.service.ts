@@ -15,7 +15,7 @@ import { Login } from '../model/login';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TokenService } from '../../service/token.service';
+import { TokenService } from 'ngx-simple-charts/base-service';
 
 @Injectable()
 export class LoginService {

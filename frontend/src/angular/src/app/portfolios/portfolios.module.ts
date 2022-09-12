@@ -16,7 +16,6 @@ import { BaseModule } from '../base/base.module';
 import { OverviewComponent } from './components/overview/overview.component';
 import { NewPortfolioComponent } from './components/new-portfolio/new-portfolio.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { TokenInterceptor } from '../service/token.interceptor';
 import { AddSymbolComponent } from './components/add-symbol/add-symbol.component';
 import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
 import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
@@ -45,7 +44,7 @@ import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
 import { NgxDonutChartsModule } from 'ngx-simple-charts/donut';
 import { PortfolioComparisonComponent } from './components/portfolio-comparison/portfolio-comparison.component';
 import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfolio-sectors.component';
-
+import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
 
 @NgModule({
     declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,
@@ -71,8 +70,9 @@ import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfo
         MatTabsModule,
         NgxBarChartsModule,
         NgxDonutChartsModule,
-        PortfoliosRoutingModule
+        PortfoliosRoutingModule,
+        NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
     ],
-    providers: [DevAppInfoService, ProdAppInfoService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
+    providers: [DevAppInfoService, ProdAppInfoService]
 })
 export class PortfoliosModule { }

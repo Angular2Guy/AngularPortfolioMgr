@@ -13,7 +13,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { TokenService } from './token.service';
+import { TokenService } from 'ngx-simple-charts/base-service';
 
 @Injectable({
     providedIn: 'root'

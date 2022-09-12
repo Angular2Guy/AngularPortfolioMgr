@@ -15,8 +15,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MainComponent } from '../main/main.component';
 import { LoginService } from '../../service/login.service';
-import { TokenService } from '../../../service/token.service';
 import { Login } from '../../model/login';
+import { TokenService } from 'ngx-simple-charts/base-service';
 
 enum FormFields {
 	Username = 'username',

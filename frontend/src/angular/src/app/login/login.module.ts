@@ -11,7 +11,6 @@
    limitations under the License.
  */
 import { NgModule } from '@angular/core';
-
 import { LoginRoutingModule } from './login-routing.module';
 import { LoginComponent } from './component/login/login.component';
 import { BaseModule } from '../base/base.module';
@@ -23,6 +22,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
 
 @NgModule({
     declarations: [LoginComponent, MainComponent],
@@ -34,7 +34,8 @@ import { MatInputModule } from '@angular/material/input';
         MatDialogModule,
         MatButtonModule,
         MatInputModule,
-        LoginRoutingModule
+        LoginRoutingModule,
+        NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
     ],
     providers: [LoginService]
 })

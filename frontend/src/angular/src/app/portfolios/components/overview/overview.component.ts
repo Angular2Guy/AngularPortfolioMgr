@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, OnInit, HostListener } from '@angular/core';
-import { TokenService } from '../../../service/token.service';
+import { TokenService } from 'ngx-simple-charts/base-service';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../../service/portfolio.service';
 import { Portfolio } from '../../../model/portfolio';

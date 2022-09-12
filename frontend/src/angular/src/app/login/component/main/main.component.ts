@@ -14,7 +14,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Login } from '../../model/login';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
-import { TokenService } from '../../../service/token.service';
+import { TokenService } from 'ngx-simple-charts/base-service';
 import { Router } from '@angular/router';
 
 @Component({
