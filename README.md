@@ -29,4 +29,4 @@ The Spring Actuator interface with Prometheus interface can be used as it is des
 To test the setup the application has to be started and the Docker Images for Prometheus and Grafana have to be started and configured. The scripts 'runGraphana.sh' and 'runPrometheus.sh' can be used as a starting point.
 
 ## R2DBC Implementation
-A retired R2DBC backend implementation can be found in the 'R2DBC-Implementation' branch.
+A retired R2DBC backend implementation can be found in the [R2DBC-Implementation branch](https://github.com/Angular2Guy/AngularPortfolioMgr/tree/R2DBC-Implementation).
