@@ -78,7 +78,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			}
 			const portfolio: Portfolio = {
 				id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [], currencyKey: null,
-				portfolioElements: [], userId: this.tokenService.userId, year1: null, year10: null, year2: null, year5: null
+				portfolioElements: [], userId: (this.tokenService.userId as number), year1: null, year10: null, year2: null, year5: null
 			};
 			const newPortfolioData: PortfolioData = { portfolio: portfolio };
 			this.dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
@@ -102,7 +102,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	private refreshPortfolios() {
-		this.portfolioService.getPortfolioByUserId(this.tokenService.userId).subscribe(myPortfolios => {
+		this.portfolioService.getPortfolioByUserId((this.tokenService.userId as number)).subscribe(myPortfolios => {
 			myPortfolios.forEach(port => port.symbols = !port.symbols ? [] : port.symbols);
 			this.portfolios = myPortfolios;
 			this.myPortfolio = myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
