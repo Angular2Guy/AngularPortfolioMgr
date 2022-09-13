@@ -42,6 +42,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs'; 
 import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
 import { NgxDonutChartsModule } from 'ngx-simple-charts/donut';
+import { TokenInterceptor } from 'ngx-simple-charts/base-service';
 import { PortfolioComparisonComponent } from './components/portfolio-comparison/portfolio-comparison.component';
 import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfolio-sectors.component';
 
@@ -71,6 +72,7 @@ import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfo
         NgxDonutChartsModule,
         PortfoliosRoutingModule,
     ],
-    providers: [DevAppInfoService, ProdAppInfoService]
+    providers: [DevAppInfoService, ProdAppInfoService, 
+       { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
 })
 export class PortfoliosModule { }
