@@ -15,7 +15,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Portfolio, CommonValues } from '../../../model/portfolio';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap, tap, filter } from 'rxjs/operators';
 import { PortfolioService } from '../../../service/portfolio.service'
 
 @Component({
@@ -33,7 +33,8 @@ export class PortfolioTableComponent implements OnInit,OnDestroy {
   constructor(private router: Router, private route: ActivatedRoute, private portfolioService: PortfolioService) { }
 
   ngOnInit(): void {
-	this.dataSubscription = this.route.paramMap.pipe(tap(() => this.reloadData = true),
+	this.dataSubscription = this.route.paramMap.pipe(filter((params: ParamMap) => parseInt(params.get('portfolioId')) >= 0),
+		tap(() => this.reloadData = true),
 		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
 		tap(() => this.reloadData = false))
 		.subscribe(myData => this.localPortfolio = myData);
