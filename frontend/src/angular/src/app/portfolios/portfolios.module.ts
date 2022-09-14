@@ -18,7 +18,6 @@ import { NewPortfolioComponent } from './components/new-portfolio/new-portfolio.
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AddSymbolComponent } from './components/add-symbol/add-symbol.component';
 import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
-import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -37,18 +36,11 @@ import { DevAppInfoService } from './service/dev-app-info.service';
 import { ProdAppInfoService } from './service/prod-app-info.service';
 import { ProdConfigComponent } from './components/prod-config/prod-config.component';
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatTabsModule } from '@angular/material/tabs'; 
-import { NgxBarChartsModule } from 'ngx-simple-charts/bar';
-import { NgxDonutChartsModule } from 'ngx-simple-charts/donut';
 import { TokenInterceptor } from 'ngx-simple-charts/base-service';
-import { PortfolioComparisonComponent } from './components/portfolio-comparison/portfolio-comparison.component';
-import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfolio-sectors.component';
 
 @NgModule({
     declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent,
-        PortfolioTableComponent, PortfolioChartsComponent, ProdConfigComponent, DevConfigComponent, PortfolioComparisonComponent, PortfolioSectorsComponent],
+        PortfolioTableComponent, ProdConfigComponent, DevConfigComponent],
     imports: [
         BaseModule,
         MatListModule,
@@ -65,11 +57,6 @@ import { PortfolioSectorsComponent } from './components/portfolio-sectors/portfo
         MatDialogModule,
         MatLuxonDateModule,
         MatInputModule,
-        MatRadioModule,
-        MatCheckboxModule,
-        MatTabsModule,
-        NgxBarChartsModule,
-        NgxDonutChartsModule,
         PortfoliosRoutingModule,
     ],
     providers: [DevAppInfoService, ProdAppInfoService, 

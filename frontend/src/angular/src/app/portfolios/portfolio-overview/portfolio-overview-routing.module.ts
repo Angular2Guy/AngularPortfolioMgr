@@ -12,27 +12,15 @@
  */
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { OverviewComponent } from './components/overview/overview.component';
-import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
+import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
 
 const routes: Routes = [
-	{ path: 'overview', component: OverviewComponent, children: [
-        {
-           path: 'table',
-           component: PortfolioTableComponent
-        },
-        {
-           path: 'portfolio-overview',
-           loadChildren: () => import('./portfolio-overview/portfolio-overview.module').then(m => m.PortfolioOverviewModule)
-        },
-        {  path: '**', redirectTo: 'table'}
-    ] },	
-	{ path: 'portfolio-detail', loadChildren: () => import('./portfolio-detail/portfolio-detail.module').then(m => m.PortfolioDetailModule) },
-	{ path: '**', redirectTo: 'overview' }
+	{ path: 'portfolio-charts', component: PortfolioChartsComponent},	
+	{ path: '**', redirectTo: 'portfolio-charts' }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class PortfoliosRoutingModule { }
+export class PortfoliosOverviewRoutingModule { }
