@@ -10,15 +10,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-charts',
   templateUrl: './portfolio-charts.component.html',
   styleUrls: ['./portfolio-charts.component.scss']
 })
-export class PortfolioChartsComponent {
-  @Input()
+export class PortfolioChartsComponent implements OnInit, OnDestroy {  
   selPortfolio: Portfolio;
+  private dataSubscription: Subscription;
+  
+  constructor(private route: ActivatedRoute) {}
+  
+  ngOnInit(): void {
+	this.dataSubscription = this.route.data.subscribe(myData => this.selPortfolio = myData as Portfolio);
+  }
+  
+  ngOnDestroy(): void {
+	this.dataSubscription.unsubscribe();
+  }
 }

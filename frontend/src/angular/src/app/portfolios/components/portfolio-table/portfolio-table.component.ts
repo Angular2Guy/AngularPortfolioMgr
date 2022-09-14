@@ -10,25 +10,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Portfolio, CommonValues } from '../../../model/portfolio';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-table',
   templateUrl: './portfolio-table.component.html',
   styleUrls: ['./portfolio-table.component.scss']
 })
-export class PortfolioTableComponent implements OnInit {
+export class PortfolioTableComponent implements OnInit,OnDestroy {
   private myLocalPortfolio: Portfolio = null;
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];  
+  private dataSubscription: Subscription;
 
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-	this.route.data.subscribe(myData => this.localPortfolio = myData as Portfolio);
+	this.dataSubscription = this.route.data.subscribe(myData => this.localPortfolio = myData as Portfolio);
+  }
+  
+  ngOnDestroy(): void {
+	this.dataSubscription.unsubscribe();
   }
 
   selPortfolio(commonValues: CommonValues) {
