@@ -20,13 +20,14 @@ import { PortfolioChartsComponent } from './components/portfolio-charts/portfoli
 import { MatTabsModule } from '@angular/material/tabs'; 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { PortfoliosOverviewRoutingModule } from './portfolio-overview-routing.module';
 
 @NgModule({
   declarations: [PortfolioChartsComponent, PortfolioComparisonComponent, PortfolioSectorsComponent],
   imports: [
-    BaseModule, NgxBarChartsModule, NgxDonutChartsModule, MatTabsModule, 
+    BaseModule, NgxBarChartsModule, NgxDonutChartsModule, MatTabsModule,MatIconModule,  
     MatProgressSpinnerModule, MatRadioModule, MatCheckboxModule, PortfoliosOverviewRoutingModule
   ]
 })

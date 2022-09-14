@@ -100,7 +100,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.myPortfolio = portfolio;
 		this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
 		const myPath = !this.showPortfolioTable ? 'portfolio-overview/portfolio-charts' : 'table';  
-		console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
+		//console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
 		//the -1 portfolioId is filtered out and forces a update of the route
 		if(showPortTab) {
 		   this.router.navigate([`/portfolios/overview/${myPath}`, -1])

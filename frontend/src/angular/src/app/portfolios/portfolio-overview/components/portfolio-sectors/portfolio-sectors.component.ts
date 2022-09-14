@@ -32,6 +32,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   @ViewChild('hideMe') 
   divHideMe: ElementRef;
   afterViewInitDone = false;
+  slicesSum = 1;
    
   private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
   
@@ -68,9 +69,12 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 		calcColors = calcColors.concat(sliceColors);
 	}
 	let i = 0;
-	valueMap.forEach((myValue, myKey) => { i = i + 1;
+	valueMap.forEach((myValue, myKey) => { 
+		i = i + 1;
 		this.chartSlices.chartSlices.push({name: myKey, value: myValue, color: calcColors[i]} as ChartSlice);
-		});
+	});
+	this.slicesSum = this.chartSlices.chartSlices.reduce((acc, mySlice) => acc = acc + mySlice.value, 0);
+	this.chartSlices.chartSlices = this.chartSlices.chartSlices.sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value).reverse();
 	//console.log(this.chartSlices.chartSlices);
   }
   

@@ -1,10 +1,19 @@
 <div class="my-container">
 <div *ngIf="chartsLoading" class="center-div">
-	<mat-progress-spinner			
+	<mat-progress-spinner			  
 			mode="indeterminate"
 			color="primary"></mat-progress-spinner>
 </div>
 <div *ngIf="!chartsLoading" class="chart-container">
+    <div class="chart-legend">
+       <ol type="1">
+       	 <li *ngFor="let chartSlice of chartSlices.chartSlices">
+       	    <span class="my-span">{{chartSlice.name}}: </span>
+       	    <span>{{(chartSlice.value / slicesSum * 100) | number: '1.0-2'}} %</span>
+       	    <span><mat-icon class="my-icon" [ngStyle]="{'color': chartSlice.color, 'padding-left': '10px'}">check_circle</mat-icon></span>
+       	 </li>
+       </ol>
+    </div>
     <div class="hide-me"><span #hideMe class="my-content"></span></div>
 	<sc-donut-chart [chartSlices]="chartSlices"></sc-donut-chart>
 </div>

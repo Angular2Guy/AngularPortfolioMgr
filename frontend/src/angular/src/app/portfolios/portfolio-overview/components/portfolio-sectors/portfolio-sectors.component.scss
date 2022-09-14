@@ -48,6 +48,16 @@
 }
 
 .chart-container {
-	height: calc(100% - 94px);
+	display: flex;
+	height: 100%;
 	width: 100%;
+}
+
+.my-span {
+	display: inline-block;
+	width: 200px;
+}
+
+.my-icon {
+	line-height: initial;
 }
