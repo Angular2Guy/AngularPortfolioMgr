@@ -39,11 +39,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	myPortfolio!: Portfolio;
 	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 	importingSymbols = false;
-	showPortfolioTable = true;
 	private timeoutId = -1;
 	dialogRef: MatDialogRef<unknown, any> = null;
 	dialogSubscription: Subscription;
 	private profiles: string = null;
+	private showPortfolioTable = true;
 
 	constructor(private tokenService: TokenService, private configService: ConfigService,
 		private router: Router,
@@ -98,7 +98,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	selPortfolio(portfolio: Portfolio) {
 		this.myPortfolio = portfolio;
 		this.showPortfolioTable = !this.showPortfolioTable;
-		//this.router.navigate(['/portfolios/portfolio-detail/portfolio', portfolio.id]);
+		const myPath = !this.showPortfolioTable ? 'portfolio-overview/portfolio-charts' : 'table';  
+		this.router.navigate([`/portfolios/overview/${myPath}`, {state: portfolio}]);
 	}
 
 	private refreshPortfolios() {
@@ -106,6 +107,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			myPortfolios.forEach(port => port.symbols = !port.symbols ? [] : port.symbols);
 			this.portfolios = myPortfolios;
 			this.myPortfolio = myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
+			if(!!this.myPortfolio) {
+				this.selPortfolio(this.myPortfolio);
+			}
 		});
 	}
 

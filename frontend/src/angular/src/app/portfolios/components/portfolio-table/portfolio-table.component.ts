@@ -13,7 +13,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Portfolio, CommonValues } from '../../../model/portfolio';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-portfolio-table',
@@ -25,10 +25,10 @@ export class PortfolioTableComponent implements OnInit {
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];  
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-	const x = 1 + 1;
+	this.route.data.subscribe(myData => this.localPortfolio = myData as Portfolio);
   }
 
   selPortfolio(commonValues: CommonValues) {
@@ -36,7 +36,6 @@ export class PortfolioTableComponent implements OnInit {
 	this.router.navigate(['/portfolios/portfolio-detail/portfolio', this.myLocalPortfolio.id]);	
   }
 
-  @Input()
   set localPortfolio(localPortfolio: Portfolio) {
 	this.myLocalPortfolio = localPortfolio;
 	const myPortfolioElements: CommonValues[] = [];
