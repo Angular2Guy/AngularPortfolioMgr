@@ -32,8 +32,7 @@ interface ChartPeriod {
   styleUrls: ['./portfolio-comparison.component.scss']
 })
 export class PortfolioComparisonComponent implements OnInit {
-  @Input()
-  selPortfolio: Portfolio;
+  localSelPortfolio: Portfolio;
   startDate: Date;
   chartPeriods: ChartPeriod[] = [];
   chartsLoading = true;
@@ -57,16 +56,28 @@ export class PortfolioComparisonComponent implements OnInit {
 		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@year10:10 Years`, periodDuration:  {years: 10} }];
 		this.selChartPeriod = this.chartPeriods[0];	
 	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));
+	this.chartPeriodChanged();
+  }
+
+  get selPortfolio(): Portfolio {
+	return this.localSelPortfolio;
+  }
+  
+  @Input()
+  set selPortfolio(myPortfolio: Portfolio) {
+	this.localSelPortfolio = myPortfolio;
+	this.chartPeriodChanged();
   }
 
   chartPeriodChanged(): void {
-	this.chartsLoading = true;
-	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));	
+	if(!!this.selPortfolio?.id && !!this.selChartPeriod?.periodDuration) {
+	   this.chartsLoading = true;
+	   this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
+	   this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));
+	}	
   }
 
-  private updateChartData(portfolioBars: PortfolioBars): void {
+  private updateChartData(portfolioBars: PortfolioBars) {
 	this.chartsLoading = false;
 	//console.log(portfolioBars);	
 	const chartBars = portfolioBars.portfolioBars.map(value => ({x: value.name, y: value.value} as ChartBar));

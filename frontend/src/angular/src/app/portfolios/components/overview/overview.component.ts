@@ -98,8 +98,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
 	selPortfolio(portfolio: Portfolio, showPortTab = false) {
 		this.myPortfolio = portfolio;
-		this.showPortfolioTable = showPortTab? true : !this.showPortfolioTable;
+		this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
 		const myPath = !this.showPortfolioTable ? 'portfolio-overview/portfolio-charts' : 'table';  
+		console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
 		this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
 	}
 

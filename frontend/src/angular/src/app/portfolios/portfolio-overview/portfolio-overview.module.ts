@@ -21,11 +21,13 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { PortfoliosOverviewRoutingModule } from './portfolio-overview-routing.module';
 
 @NgModule({
   declarations: [PortfolioChartsComponent, PortfolioComparisonComponent, PortfolioSectorsComponent],
   imports: [
-    BaseModule, NgxBarChartsModule, NgxDonutChartsModule, MatTabsModule, MatProgressSpinnerModule, MatRadioModule, MatCheckboxModule
+    BaseModule, NgxBarChartsModule, NgxDonutChartsModule, MatTabsModule, 
+    MatProgressSpinnerModule, MatRadioModule, MatCheckboxModule, PortfoliosOverviewRoutingModule
   ]
 })
 export class PortfolioOverviewModule { }

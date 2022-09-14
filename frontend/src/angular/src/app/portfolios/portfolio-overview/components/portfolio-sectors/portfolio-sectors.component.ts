@@ -26,12 +26,12 @@ interface CalcPortfolioElement {
   styleUrls: ['./portfolio-sectors.component.scss']
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
-  @Input()
-  selPortfolio: Portfolio;
+  localSelPortfolio: Portfolio;
   chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
   chartsLoading = true;
   @ViewChild('hideMe') 
   divHideMe: ElementRef;
+  afterViewInitDone = false;
    
   private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
   
@@ -44,6 +44,14 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+	this.afterViewInitDone = true;
+	this.drawDonut();
+  }
+  
+  private drawDonut(): void {
+	if(!this.afterViewInitDone || !this.selPortfolio?.id) {
+		return;
+	}
 	const sliceColors = window.getComputedStyle(this.divHideMe.nativeElement,':before')['content']
 	   .replace('"', '').replace('\"','').split(',');
 	//console.log(sliceColors);	
@@ -64,5 +72,15 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 		this.chartSlices.chartSlices.push({name: myKey, value: myValue, color: calcColors[i]} as ChartSlice);
 		});
 	//console.log(this.chartSlices.chartSlices);
+  }
+  
+  get selPortfolio(): Portfolio {
+	return this.localSelPortfolio;
+  }
+  
+  @Input()
+  set selPortfolio(myPortfolio: Portfolio) {
+	this.localSelPortfolio = myPortfolio;
+	this.drawDonut();
   }
 }
