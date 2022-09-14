@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { Portfolio } from '../model/portfolio';
 import { PortfolioBars } from '../model/portfolio-bars';
 import { HttpClient } from '@angular/common/http';
@@ -23,11 +23,11 @@ export class PortfolioService {
   constructor(private http: HttpClient) { }
 
   	getPortfolioByUserId(userId: number): Observable<Portfolio[]> {
-		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`);
+		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`).pipe(shareReplay(1));
 	}
 	
 	getPortfolioById(portfolioId: number): Observable<Portfolio> {
-		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`);
+		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`).pipe(shareReplay(1));
 	}
 	
 	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date, compSyms: ComparisonIndex[]): Observable<PortfolioBars> {

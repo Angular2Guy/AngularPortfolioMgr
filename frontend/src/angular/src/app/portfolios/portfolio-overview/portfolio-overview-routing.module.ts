@@ -15,7 +15,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
 
 const routes: Routes = [
-	{ path: 'portfolio-charts', component: PortfolioChartsComponent},	
+	{ path: 'portfolio-charts/:portfolioId', component: PortfolioChartsComponent},	
 	{ path: '**', redirectTo: 'portfolio-charts' }
 ];
 

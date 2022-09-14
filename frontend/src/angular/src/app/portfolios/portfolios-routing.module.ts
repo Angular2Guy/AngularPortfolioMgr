@@ -18,7 +18,7 @@ import { PortfolioTableComponent } from './components/portfolio-table/portfolio-
 const routes: Routes = [
 	{ path: 'overview', component: OverviewComponent, children: [
         {
-           path: 'table',
+           path: 'table/:portfolioId',
            component: PortfolioTableComponent
         },
         {

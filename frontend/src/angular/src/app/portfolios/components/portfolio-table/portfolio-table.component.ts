@@ -13,8 +13,10 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Portfolio, CommonValues } from '../../../model/portfolio';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { PortfolioService } from '../../../service/portfolio.service'
 
 @Component({
   selector: 'app-portfolio-table',
@@ -26,11 +28,15 @@ export class PortfolioTableComponent implements OnInit,OnDestroy {
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];  
   private dataSubscription: Subscription;
+  reloadData = false;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(private router: Router, private route: ActivatedRoute, private portfolioService: PortfolioService) { }
 
   ngOnInit(): void {
-	this.dataSubscription = this.route.data.subscribe(myData => this.localPortfolio = myData as Portfolio);
+	this.dataSubscription = this.route.paramMap.pipe(tap(() => this.reloadData = true),
+		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
+		tap(() => this.reloadData = false))
+		.subscribe(myData => this.localPortfolio = myData);
   }
   
   ngOnDestroy(): void {
@@ -45,7 +51,7 @@ export class PortfolioTableComponent implements OnInit,OnDestroy {
   set localPortfolio(localPortfolio: Portfolio) {
 	this.myLocalPortfolio = localPortfolio;
 	const myPortfolioElements: CommonValues[] = [];
-	if(localPortfolio) {
+	if(!!localPortfolio?.portfolioElements) {
 	   myPortfolioElements.push(localPortfolio)
 	   myPortfolioElements.push(...localPortfolio?.portfolioElements);
 	}

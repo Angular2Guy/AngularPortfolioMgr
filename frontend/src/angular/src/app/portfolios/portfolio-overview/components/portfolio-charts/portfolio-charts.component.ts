@@ -12,8 +12,10 @@
  */
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { PortfolioService } from '../../../../service/portfolio.service'
 
 @Component({
   selector: 'app-portfolio-charts',
@@ -23,11 +25,15 @@ import { Subscription } from 'rxjs';
 export class PortfolioChartsComponent implements OnInit, OnDestroy {  
   selPortfolio: Portfolio;
   private dataSubscription: Subscription;
+  reloadData = false;
   
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private portfolioService: PortfolioService) {}
   
   ngOnInit(): void {
-	this.dataSubscription = this.route.data.subscribe(myData => this.selPortfolio = myData as Portfolio);
+	this.dataSubscription = this.route.paramMap.pipe(tap(() => this.reloadData = true),
+		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
+		tap(() => this.reloadData = false))
+		.subscribe(myData => this.selPortfolio = myData);
   }
   
   ngOnDestroy(): void {

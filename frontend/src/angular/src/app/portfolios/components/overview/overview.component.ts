@@ -87,7 +87,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
 					this.portfolioService.postPortfolio(result)
 						.subscribe(myPortfolio => {
 							this.portfolios = [...this.portfolios, myPortfolio];
-							return this.myPortfolio = myPortfolio;
+							this.myPortfolio = myPortfolio;
+							this.selPortfolio(myPortfolio, true);
 						});
 				}
 				this.dialogRef = null;
@@ -95,11 +96,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	selPortfolio(portfolio: Portfolio) {
+	selPortfolio(portfolio: Portfolio, showPortTab = false) {
 		this.myPortfolio = portfolio;
-		this.showPortfolioTable = !this.showPortfolioTable;
+		this.showPortfolioTable = showPortTab? true : !this.showPortfolioTable;
 		const myPath = !this.showPortfolioTable ? 'portfolio-overview/portfolio-charts' : 'table';  
-		this.router.navigate([`/portfolios/overview/${myPath}`, {state: portfolio}]);
+		this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
 	}
 
 	private refreshPortfolios() {
@@ -108,7 +109,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			this.portfolios = myPortfolios;
 			this.myPortfolio = myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
 			if(!!this.myPortfolio) {
-				this.selPortfolio(this.myPortfolio);
+				this.selPortfolio(this.myPortfolio, true);
 			}
 		});
 	}
@@ -128,6 +129,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 							const filteredPortfolios = this.portfolios.filter(port => port.id !== result.id);
 							this.portfolios = [...filteredPortfolios, result];
 							this.myPortfolio = result;
+							this.selPortfolio(result, true);
 						}
 					});
 			}
