@@ -71,4 +71,32 @@
 			<column name="last_close" type="numeric(12,4)"/>
 		</addColumn>
 	</changeSet>
+	<changeSet id="16" author="angular2guy">
+		<addColumn tableName="portfolio">
+			<column name="year1correlation_sp500" type="double"/>
+			<column name="year1correlation_msci_china" type="double"/>
+			<column name="year1correlation_euro_stoxx50" type="double"/>
+			<column name="year1beta_sp500" type="double"/>
+			<column name="year1beta_msci_china" type="double"/>
+			<column name="year1beta_euro_stoxx50" type="double"/>
+			<column name="year2correlation_sp500" type="double"/>
+			<column name="year2correlation_msci_china" type="double"/>
+			<column name="year2correlation_euro_stoxx50" type="double"/>
+			<column name="year2beta_sp500" type="double"/>
+			<column name="year2beta_msci_china" type="double"/>
+			<column name="year2beta_euro_stoxx50" type="double"/>
+			<column name="year5correlation_sp500" type="double"/>
+			<column name="year5correlation_msci_china" type="double"/>
+			<column name="year5correlation_euro_stoxx50" type="double"/>
+			<column name="year5beta_sp500" type="double"/>
+			<column name="year5beta_msci_china" type="double"/>
+			<column name="year5beta_euro_stoxx50" type="double"/>	
+			<column name="year10correlation_sp500" type="double"/>
+			<column name="year10correlation_msci_china" type="double"/>
+			<column name="year10correlation_euro_stoxx50" type="double"/>
+			<column name="year10beta_sp500" type="double"/>
+			<column name="year10beta_msci_china" type="double"/>
+			<column name="year10beta_euro_stoxx50" type="double"/>					
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

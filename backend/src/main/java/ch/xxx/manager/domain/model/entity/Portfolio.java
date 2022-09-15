@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,12 +35,6 @@ public class Portfolio extends PortfolioBase {
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 	private LocalDate createdAt;
-	private BigDecimal month1;
-	private BigDecimal month6;
-	private BigDecimal year1;
-	private BigDecimal year2;
-	private BigDecimal year5;
-	private BigDecimal year10;
 	@OneToMany(mappedBy = "portfolio")
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
 	@OneToMany(mappedBy = "portfolio", orphanRemoval = true)
@@ -64,54 +57,6 @@ public class Portfolio extends PortfolioBase {
 		this.name = name;
 	}
 
-	public BigDecimal getMonth1() {
-		return month1;
-	}
-
-	public void setMonth1(BigDecimal month1) {
-		this.month1 = month1;
-	}
-
-	public BigDecimal getMonth6() {
-		return month6;
-	}
-
-	public void setMonth6(BigDecimal month6) {
-		this.month6 = month6;
-	}
-
-	public BigDecimal getYear1() {
-		return year1;
-	}
-
-	public void setYear1(BigDecimal year1) {
-		this.year1 = year1;
-	}
-
-	public BigDecimal getYear2() {
-		return year2;
-	}
-
-	public void setYear2(BigDecimal year2) {
-		this.year2 = year2;
-	}
-
-	public BigDecimal getYear5() {
-		return year5;
-	}
-
-	public void setYear5(BigDecimal year5) {
-		this.year5 = year5;
-	}
-
-	public BigDecimal getYear10() {
-		return year10;
-	}
-
-	public void setYear10(BigDecimal year10) {
-		this.year10 = year10;
-	}
-
 	public AppUser getAppUser() {
 		return appUser;
 	}
@@ -126,13 +71,6 @@ public class Portfolio extends PortfolioBase {
 
 	public void setPortfolioToSymbols(Set<PortfolioToSymbol> portfolioToSymbols) {
 		this.portfolioToSymbols = portfolioToSymbols;
-	}
-
-	@Override
-	public String toString() {
-		return "Portfolio [id=" + this.getId() + ", appUser=" + appUser + ", name=" + name + ", createdAt=" + createdAt
-				+ ", month1=" + month1 + ", month6=" + month6 + ", year1=" + year1 + ", year2=" + year2 + ", year5="
-				+ year5 + ", year10=" + year10 + ", portfolioToSymbols=" + portfolioToSymbols + "]";
 	}
 
 	public CurrencyKey getCurrencyKey() {
@@ -151,4 +89,10 @@ public class Portfolio extends PortfolioBase {
 		this.portfolioElements = portfolioElements;
 	}
 
+	@Override
+	public String toString() {
+		return "Portfolio [appUser=" + appUser + ", name=" + name + ", currencyKey=" + currencyKey + ", createdAt="
+				+ createdAt + ", portfolioToSymbols=" + portfolioToSymbols + ", portfolioElements=" + portfolioElements
+				+ "]";
+	}
 }
