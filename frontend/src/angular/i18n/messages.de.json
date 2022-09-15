@@ -79,6 +79,7 @@
     "portfolioChartsSectors": "Portfolio Sectors",
     "portfolioChartsName": "Portfolio: {$INTERPOLATION}",
     "portfolioChartsStartDate": "Start Date: {$INTERPOLATION}",
+    "portfolioSectorsLegendTitle": "Portfolio sector distribution",
     "spinnerWelcome": "Welcome to AngularPortfolioManager_de"
   }
 }
