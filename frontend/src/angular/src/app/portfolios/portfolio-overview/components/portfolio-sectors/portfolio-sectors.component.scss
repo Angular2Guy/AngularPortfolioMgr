@@ -41,15 +41,16 @@
 	height: calc(100% - 94px);
 }
 
-.my-container{
+.my-container {
 	background: #ffffff;
 	height: 100%;
 	width: 100%;
 }
 
-.myheader {
+.my-header {
 	text-align: center;
     margin: 0;
+    color: rgba(0, 0, 0, 0.87);
 }
 
 .chart-container {
@@ -65,4 +66,8 @@
 
 .my-icon {
 	line-height: initial;
+}
+
+.chart-legend {
+	width: 350px;
 }

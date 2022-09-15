@@ -6,7 +6,7 @@
 </div>
 <div *ngIf="!chartsLoading" class="chart-container">
     <div class="chart-legend">
-       <h2 class="myheader" i18n="@@portfolioSectorsLegendTitle">Portfolio sector distribution</h2>
+       <h2 class="my-header" i18n="@@portfolioSectorsLegendTitle">Portfolio sector distribution</h2>
        <ol type="1">
        	 <li *ngFor="let chartSlice of chartSlices.chartSlices">
        	    <span class="my-span">{{chartSlice.name}}: </span>
