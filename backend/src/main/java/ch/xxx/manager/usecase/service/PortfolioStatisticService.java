@@ -1,0 +1,118 @@
+/**
+ *    Copyright 2019 Sven Loesekann
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
+package ch.xxx.manager.usecase.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import ch.xxx.manager.domain.model.entity.Currency;
+import ch.xxx.manager.domain.model.entity.DailyQuote;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.PortfolioElement;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.usecase.mapping.MappingUtils;
+
+@Service
+@Transactional
+public class PortfolioStatisticService extends PortfolioCalculcationBase {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioStatisticService.class);
+
+	public PortfolioStatisticService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
+		super(dailyQuoteRepository, currencyService);
+	}
+
+	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
+			List<PortfolioToSymbol> portfolioToSymbols) {
+		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesMap(portfolioToSymbols);
+		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getId())
+				.flatMap(symbolId -> Stream.of(dailyQuotesMap.get(symbolId))).flatMap(myDailyQuotes -> Stream
+						.of(this.createPortfolioElement(portfolio, myDailyQuotes, portfolioToSymbols)))
+				.toList();
+		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements);
+		return result;
+	}
+
+	private PortfolioElement createPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
+			final List<PortfolioToSymbol> portfolioToSymbols) {
+		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
+				.filter(myPortfolioElement -> dailyQuotes.stream().anyMatch(
+						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
+				.findFirst().orElse(new PortfolioElement());
+		Optional<PortfolioToSymbol> ptsOpt = portfolioToSymbols.stream()
+				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
+				.findFirst();
+		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
+		String ptsName = ptsOpt.stream().map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unkown");
+		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream().map(pts -> pts.getSymbol().getCurrencyKey())
+				.findFirst();
+		String sectorName = MappingUtils.findSectorName(ptsOpt.stream().map(PortfolioToSymbol::getSymbol).findFirst());
+		portfolioElement.setSector(sectorName);
+		portfolioElement.setWeight(ptsOpt.stream().map(myPts -> myPts.getWeight()).findFirst().orElse(0L));
+		portfolioElement.setName(ptsName);
+		portfolioElement.setPortfolio(portfolio);
+		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
+		portfolioElement.setLastClose(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now(), symbolCurKeyOpt));
+		portfolioElement.setMonth1(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(1L), symbolCurKeyOpt));
+		portfolioElement.setMonth6(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(6L), symbolCurKeyOpt));
+		portfolioElement.setYear1(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(1L), symbolCurKeyOpt));
+		portfolioElement.setYear2(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(2L), symbolCurKeyOpt));
+		portfolioElement.setYear5(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(5L), symbolCurKeyOpt));
+		portfolioElement.setYear10(
+				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L), symbolCurKeyOpt));
+		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
+			portfolio.getPortfolioElements().add(portfolioElement);
+		}
+		return portfolioElement;
+	}
+
+	private BigDecimal symbolValueAtDate(final Portfolio portfolio, List<DailyQuote> dailyQuotes, LocalDate cutOffDate,
+			Optional<CurrencyKey> symbolCurrencyKeyOpt) {
+		return dailyQuotes.stream().filter(myDailyQuote -> myDailyQuote.getLocalDay().isBefore(cutOffDate))
+				.max(Comparator.comparing(DailyQuote::getLocalDay))
+				.map(myDailyQuote -> this.calcValue(Currency::getClose,
+						this.getCurrencyValue(portfolio, myDailyQuote, symbolCurrencyKeyOpt), DailyQuote::getClose,
+						myDailyQuote, portfolio))
+				.orElse(BigDecimal.ZERO);
+	}
+
+	private Currency getCurrencyValue(final Portfolio portfolio, DailyQuote myDailyQuote,
+			Optional<CurrencyKey> symbolCurrencyKeyOpt) {
+		return symbolCurrencyKeyOpt.stream()
+				.map(symbolCurrencyKey -> this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(),
+						portfolio.getCurrencyKey(), symbolCurrencyKey))
+				.filter(Optional::isPresent).map(Optional::get).findFirst()
+				.orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
+						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
+	}
+}

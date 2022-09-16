@@ -16,13 +16,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +43,7 @@ import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
 @Transactional
@@ -110,8 +109,8 @@ public class PortfolioService {
 	}
 
 	private PortfolioWithElements updatePortfolioElements(PortfolioWithElements portfolioWithElements) {
-		List<PortfolioElement> portfolioElements = StreamSupport.stream(
-				this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()).spliterator(), false)
+		List<PortfolioElement> portfolioElements = StreamHelpers
+				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))
 				.collect(Collectors.toList());
 		return new PortfolioWithElements(portfolioWithElements.portfolio(), portfolioElements);
 	}
@@ -122,7 +121,7 @@ public class PortfolioService {
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.map(newEntity -> this.portfolioToSymbolRepository.save(newEntity))
-				
+
 				.map(newEntity -> this.updatePortfolioElements(
 						this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
@@ -140,7 +139,10 @@ public class PortfolioService {
 	}
 
 	private PortfolioToSymbol removePortfolioElement(PortfolioToSymbol portfolioToSymbol) {
-		List<PortfolioElement> toRemove = portfolioToSymbol.getPortfolio().getPortfolioElements().stream().filter(myPortfolioElement -> myPortfolioElement.getSymbol().equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol())).toList();
+		List<PortfolioElement> toRemove = portfolioToSymbol.getPortfolio().getPortfolioElements().stream()
+				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
+						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
+				.toList();
 		portfolioToSymbol.getPortfolio().getPortfolioElements().removeAll(toRemove);
 		toRemove.forEach(myPortfolioElement -> {
 			myPortfolioElement.setPortfolio(null);
@@ -148,7 +150,7 @@ public class PortfolioService {
 		});
 		return portfolioToSymbol;
 	}
-	
+
 	private PortfolioToSymbol updatePtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate changedAt,
 			Optional<LocalDate> removedAtOpt) {
 		weightOpt.ifPresent(weight -> entity.setWeight(weight));

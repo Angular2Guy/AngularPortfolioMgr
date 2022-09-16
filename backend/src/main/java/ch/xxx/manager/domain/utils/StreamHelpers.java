@@ -20,31 +20,36 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class StreamHelpers {
-	public static <T> Predicate<T> distinctByKey(
-		    Function<? super T, ?> keyExtractor) {
-		  
-		    Map<Object, Boolean> seen = new ConcurrentHashMap<>(); 
-		    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null; 
-		}
-	
+	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+
+		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
 	public static <T> Stream<T> toStream(Collection<T> collection) {
 		return Optional.ofNullable(collection).stream().flatMap(myList -> myList.stream());
 	}
-	
+
 	public static <T> Stream<T> toStream(T[] array) {
 		return Optional.ofNullable(array).stream().flatMap(myArray -> List.of(array).stream());
 	}
-	
+
+	public static <T> Stream<T> toStream(Iterable<T> iterable) {
+		return Optional.ofNullable(iterable).stream()
+				.flatMap(myIterable -> StreamSupport.stream(myIterable.spliterator(), false));
+	}
+
 	public static <T> Stream<T> toStream(T object) {
 		return Optional.ofNullable(object).stream();
 	}
-	
+
 	public static <T> Stream<T> unboxOptionals(Stream<Optional<T>> optSteam) {
 		return optSteam.filter(Optional::isPresent).map(Optional::get);
 	}
-	
+
 	public static <T> Stream<T> unboxOptionals(Optional<T> opt) {
 		return opt.stream();
 	}
