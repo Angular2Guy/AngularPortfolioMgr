@@ -143,7 +143,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	}
 
 	private PortfolioData calculatePortfolioData(List<PortfolioToSymbol> portfolioToSymbols) {
-		Map<Long, List<DailyQuote>> dailyQuotesMap = createDailyQuotesMap(portfolioToSymbols);
+		Map<Long, List<DailyQuote>> dailyQuotesMap = createDailyQuotesIdMap(portfolioToSymbols);
 		PortfolioSymbolWithDailyQuotes portfolioQuotes = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.peek(pts -> LOG.info(pts.getSymbol().getSymbol() + " " + pts.getSymbol().getId()))

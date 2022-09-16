@@ -34,7 +34,7 @@ public abstract class PortfolioCalculcationBase {
 		this.currencyService = currencyService;
 	}
 
-	protected Map<Long, List<DailyQuote>> createDailyQuotesMap(List<PortfolioToSymbol> portfolioToSymbols) {
+	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
 						.collect(Collectors.toList()))
@@ -42,6 +42,13 @@ public abstract class PortfolioCalculcationBase {
 		return dailyQuotesMap;
 	}
 
+	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
+				.findBySymbolKeys(symbolStrs)
+				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
+		return dailyQuotesMap;
+}
+	
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, final Portfolio portfolio) {
 		final BigDecimal currValue = currExtractor.apply(currencyQuote);

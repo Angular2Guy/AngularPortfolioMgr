@@ -15,9 +15,11 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
@@ -47,7 +49,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
 			List<PortfolioToSymbol> portfolioToSymbols) {
-		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesMap(portfolioToSymbols);
+		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbols);
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getId())

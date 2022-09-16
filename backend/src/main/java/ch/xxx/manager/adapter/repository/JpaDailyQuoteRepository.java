@@ -35,6 +35,9 @@ public interface JpaDailyQuoteRepository extends JpaRepository<DailyQuote, Long>
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol.id in(:symbolIds) order by dq.localDay asc")
 	List<DailyQuote> findBySymbolIds(@Param(value = "symbolIds") List<Long> symbolIds);
 
+	@Query("select dq from DailyQuote dq where dq.symbolKey in(:symbolKeys) order by dq.localDay asc")
+	List<DailyQuote> findBySymbolKeys(@Param(value = "symbolKeys") List<String> symbolKeys);
+	
 	@Query("select dq from DailyQuote dq where dq.symbol.symbol = :symbol and dq.localDay between :start and :end order by dq.localDay asc")
 	List<DailyQuote> findBySymbolAndDayBetween(@Param(value = "symbol") String symbol,
 			@Param(value = "start") LocalDate start, @Param(value = "end") LocalDate end);

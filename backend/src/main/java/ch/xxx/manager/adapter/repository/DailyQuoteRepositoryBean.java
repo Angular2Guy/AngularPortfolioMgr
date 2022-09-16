@@ -62,4 +62,9 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	public List<DailyQuote> findBySymbolId(Long symbolId, LocalDate start, LocalDate end) {
 		return this.jpaDailyQuoteRepository.findBySymbolId(symbolId, start, end);
 	}
+
+	@Override
+	public List<DailyQuote> findBySymbolKeys(List<String> symbolKeys) {
+		return this.jpaDailyQuoteRepository.findBySymbolKeys(symbolKeys);
+	}
 }

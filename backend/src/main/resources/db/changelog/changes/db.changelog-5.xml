@@ -99,4 +99,28 @@
 			<column name="year10beta_euro_stoxx50" type="double"/>					
 		</addColumn>
 	</changeSet>
+	<changeSet author="angular2guy" id="17">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="daily_quote"
+					indexName="ix_daily_quote_symbol_key" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_daily_quote_symbol_key"
+			tableName="daily_quote">
+			<column name="symbol_key" />
+		</createIndex>				
+	</changeSet>	
+	<changeSet author="angular2guy" id="18">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="intra_day_quote"
+					indexName="ix_intra_day_quote_symbol_key" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_intra_day_quote_symbol_key"
+			tableName="intra_day_quote">
+			<column name="symbol_key" />
+		</createIndex>				
+	</changeSet>
 </databaseChangeLog>
