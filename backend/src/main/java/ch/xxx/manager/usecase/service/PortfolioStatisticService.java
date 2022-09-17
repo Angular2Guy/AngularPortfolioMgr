@@ -157,28 +157,31 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private boolean checkCurrencyQuotes(final Portfolio portfolio, Map<LocalDate, DailyQuote> dailyQuotesMap,
 			Map<LocalDate, DailyQuote> comparisonDailyQuotesMap, LocalDate myDate) {
 		return this.currencyService
-				.getCurrencyQuote(myDate, portfolio.getCurrencyKey(),
-						dailyQuotesMap.get(myDate).getCurrencyKey())
+				.getCurrencyQuote(myDate, portfolio.getCurrencyKey(), dailyQuotesMap.get(myDate).getCurrencyKey())
 				.isPresent()
 				&& this.currencyService.getCurrencyQuote(myDate, portfolio.getCurrencyKey(),
 						comparisonDailyQuotesMap.get(myDate).getCurrencyKey()).isPresent();
 	}
 
 	private double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {
-		BigDecimal meanDailyQuotes = calcValuesDays.stream().map(myValue -> myValue.quote).reduce(BigDecimal.ZERO,
-				BigDecimal::add);
-		BigDecimal meanCompQuotes = calcValuesDays.stream().map(myValue -> myValue.compQuote).reduce(BigDecimal.ZERO,
-				BigDecimal::add);
+		BigDecimal meanDailyQuotes = calcValuesDays.stream().map(myValue -> myValue.quote)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
+		BigDecimal meanCompQuotes = calcValuesDays.stream().map(myValue -> myValue.compQuote)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
 		record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 		}
 		BigDecimal sumMultQuotes = calcValuesDays.stream()
-				.map(myValue -> new BigDecimalValues(meanDailyQuotes.subtract(myValue.quote),
-						meanCompQuotes.subtract(myValue.compQuote)))
-				.map(myRecord -> myRecord.daily.multiply(myRecord.comp)).reduce(BigDecimal.ZERO, BigDecimal::add);
+				.map(myValue -> new BigDecimalValues(myValue.quote.subtract(meanDailyQuotes),
+						myValue.compQuote.subtract(meanCompQuotes)))
+				.map(myRecord -> myRecord.daily.multiply(myRecord.comp)).reduce(BigDecimal.ZERO, BigDecimal::add).abs();
 		BigDecimal squaredMeanDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
-				.map(myValue -> meanDailyQuotes.subtract(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add);
+				.map(myValue -> myValue.subtract(meanDailyQuotes)).map(myValue -> myValue.multiply(myValue))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal squaredMeanCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
-				.map(myValue -> meanCompQuotes.subtract(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add);
+				.map(myValue -> myValue.subtract(meanCompQuotes)).map(myValue -> myValue.multiply(myValue))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal devisor = squaredMeanCompQuotes.multiply(squaredMeanDailyQuotes).sqrt(MathContext.DECIMAL128);
 		double correlation = sumMultQuotes.divide(devisor, 25, RoundingMode.HALF_EVEN).doubleValue();
 		return correlation;
