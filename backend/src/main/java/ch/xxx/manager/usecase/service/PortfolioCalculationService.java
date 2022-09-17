@@ -238,7 +238,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, final BigDecimal portfolioClose) {
-		BigDecimal calcValue = calcValue(currExtractor, currencyQuote, quoteExtractor, dailyQuote,
+		BigDecimal calcValue = this.calcValue(currExtractor, currencyQuote, quoteExtractor, dailyQuote,
 				portfolioToSymbol.getPortfolio());
 		return Optional.ofNullable(portfolioClose).orElse(BigDecimal.ZERO).add(calcValue)
 				.multiply(BigDecimal.valueOf(portfolioToSymbol.getWeight()));

@@ -13,9 +13,10 @@
 package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,12 +37,21 @@ import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.mapping.MappingUtils;
 
 @Service
 @Transactional
 public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioStatisticService.class);
+
+	private record StatisticValuesByDay(int years, Optional<Double> portCorrelationOpt, Double es50Correlation,
+			Double sp500Correlation, Double msciChina, Double portBeta, Double es50Beta, Double sp500Beta,
+			Double msciBeta) {
+	};
+
+	private record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
+	}
 
 	public PortfolioStatisticService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
 		super(dailyQuoteRepository, currencyService);
@@ -50,6 +60,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
 			List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbols);
+		Map<String, List<DailyQuote>> comparisonDailyQuotesMap = this.createDailyQuotesSymbolKeyMap(StreamHelpers
+				.toStream(ComparisonIndex.values()).toList().stream().map(ComparisonIndex::getSymbol).toList());
+
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getId())
@@ -92,10 +105,63 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(5L), symbolCurKeyOpt));
 		portfolioElement.setYear10(
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L), symbolCurKeyOpt));
+		portfolioElement.setYear10CorrelationEuroStoxx50(null);
 		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
 			portfolio.getPortfolioElements().add(portfolioElement);
 		}
 		return portfolioElement;
+	}
+
+	private Double calcCorrelation(final Portfolio portfolio, LocalDate cutOffDate, List<DailyQuote> dailyQuotes,
+			List<DailyQuote> comparisonDailyQuotes) {
+		Map<LocalDate, DailyQuote> dailyQuotesMap = dailyQuotes.stream()
+				.collect(Collectors.toMap(DailyQuote::getLocalDay, dq -> dq));
+		Map<LocalDate, DailyQuote> comparisonDailyQuotesMap = comparisonDailyQuotes.stream()
+				.collect(Collectors.toMap(DailyQuote::getLocalDay, dq -> dq));
+		List<CalcValuesDay> calcValuesDays = dailyQuotesMap.keySet().stream()
+				.filter(myDate -> Optional.ofNullable(comparisonDailyQuotesMap.get(myDate)).isPresent())
+				.filter(myDate -> this.currencyService
+						.getCurrencyQuote(myDate, dailyQuotesMap.get(myDate).getCurrencyKey(),
+								comparisonDailyQuotesMap.get(myDate).getCurrencyKey())
+						.isPresent())
+				.map(myDate -> this.createCalcValuesDay(myDate, dailyQuotesMap.get(myDate),
+						comparisonDailyQuotesMap.get(myDate), portfolio))
+				.toList();
+		double correlation = calculateCorrelation(calcValuesDays);
+		return correlation;
+	}
+
+	private double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {
+		BigDecimal meanDailyQuotes = calcValuesDays.stream().map(myValue -> myValue.quote).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		BigDecimal meanCompQuotes = calcValuesDays.stream().map(myValue -> myValue.compQuote).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
+		}
+		BigDecimal sumMultQuotes = calcValuesDays.stream()
+				.map(myValue -> new BigDecimalValues(meanDailyQuotes.subtract(myValue.quote),
+						meanCompQuotes.subtract(myValue.compQuote)))
+				.map(myRecord -> myRecord.daily.multiply(myRecord.comp)).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal squaredMeanDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
+				.map(myValue -> meanDailyQuotes.subtract(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal squaredMeanCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
+				.map(myValue -> meanCompQuotes.subtract(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal devisor = squaredMeanCompQuotes.multiply(squaredMeanDailyQuotes).sqrt(MathContext.DECIMAL128);
+		double correlation = sumMultQuotes.divide(devisor, 25, RoundingMode.HALF_EVEN).doubleValue();
+		return correlation;
+	}
+
+	private CalcValuesDay createCalcValuesDay(LocalDate day, DailyQuote dailyQuote, DailyQuote comparisonQuote,
+			Portfolio portfolio) {
+		Currency comparisonCurrency = this.currencyService
+				.getCurrencyQuote(day, portfolio.getCurrencyKey(), comparisonQuote.getCurrencyKey()).get();
+		Currency dailyQuoteCurrency = this.currencyService
+				.getCurrencyQuote(day, portfolio.getCurrencyKey(), dailyQuote.getCurrencyKey()).get();
+		BigDecimal comparisonValue = this.calcValue(Currency::getClose, comparisonCurrency, DailyQuote::getClose,
+				comparisonQuote, portfolio);
+		BigDecimal dailyQuoteValue = this.calcValue(Currency::getClose, dailyQuoteCurrency, DailyQuote::getClose,
+				dailyQuote, portfolio);
+		return new CalcValuesDay(LocalDate.now(), dailyQuoteValue, comparisonValue);
 	}
 
 	private BigDecimal symbolValueAtDate(final Portfolio portfolio, List<DailyQuote> dailyQuotes, LocalDate cutOffDate,

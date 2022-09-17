@@ -14,6 +14,7 @@ package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,19 +37,19 @@ public abstract class PortfolioCalculcationBase {
 
 	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
-				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId())
-						.collect(Collectors.toList()))
-				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
+				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId()).toList())
+				.stream().sorted(Comparator.comparing(DailyQuote::getLocalDay))
+				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
 		return dailyQuotesMap;
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
-				.findBySymbolKeys(symbolStrs)
-				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
+				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
+				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
 		return dailyQuotesMap;
-}
-	
+	}
+
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, final Portfolio portfolio) {
 		final BigDecimal currValue = currExtractor.apply(currencyQuote);
