@@ -71,10 +71,4 @@ public class PortfolioToSymbol extends EntityBase {
 	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
 	}
-	
-	@Override
-	public String toString() {
-		return "PortfolioToSymbol [id=" + this.getId() + ", portfolio=" + portfolio + ", symbol=" + symbol + ", weight=" + weight
-				+ ", changedAt=" + changedAt + ", removedAt=" + removedAt + "]";
-	}
 }

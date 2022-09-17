@@ -104,11 +104,4 @@ public class Currency extends EntityBase {
 	public void setToCurrKey(CurrencyKey toCurrKey) {
 		this.toCurrKey = toCurrKey;
 	}
-
-	@Override
-	public String toString() {
-		return "Currency [id=" + this.getId() + ", localDay=" + localDay + ", fromCurrKey=" + fromCurrKey + ", toCurrKey="
-				+ toCurrKey + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + "]";
-	}
-
 }

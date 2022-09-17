@@ -15,6 +15,7 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,6 +26,7 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 
 public abstract class PortfolioCalculcationBase {
 	protected final DailyQuoteRepository dailyQuoteRepository;
@@ -44,10 +46,12 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()				
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
 				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
-		return dailyQuotesMap;
+		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = new HashMap<>();
+		dailyQuotesMap.forEach((key, values) -> filteredDailyQuotesMap.put(key, values.stream().filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay)).toList()));
+		return filteredDailyQuotesMap;
 	}
 
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,

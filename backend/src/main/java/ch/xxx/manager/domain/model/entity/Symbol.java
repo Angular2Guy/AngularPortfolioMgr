@@ -191,13 +191,4 @@ public class Symbol extends EntityBase {
 	public void setSectorStr(String sectorStr) {
 		this.sectorStr = sectorStr;
 	}
-
-	@Override
-	public String toString() {
-		return "Symbol [symbol=" + symbol + ", name=" + name + ", sectorStr=" + sectorStr + ", sector=" + sector
-				+ ", industry=" + industry + ", description=" + description + ", address=" + address + ", country="
-				+ country + ", currencyKey=" + currencyKey + ", quoteSource=" + quoteSource + ", dailyQuotes="
-				+ dailyQuotes + ", intraDayQuotes=" + intraDayQuotes + ", portfolioToSymbols=" + portfolioToSymbols
-				+ "]";
-	}	
 }

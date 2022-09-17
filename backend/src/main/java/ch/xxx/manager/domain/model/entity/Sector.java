@@ -43,10 +43,4 @@ public class Sector extends EntityBase {
 	public void setSymbols(Set<Symbol> symbols) {
 		this.symbols = symbols;
 	}
-	
-	@Override
-	public String toString() {
-		return "Sector [alphavantageName=" + alphavantageName + ", yahooName=" + yahooName + ", symbols=" + symbols
-				+ "]";
-	}
 }

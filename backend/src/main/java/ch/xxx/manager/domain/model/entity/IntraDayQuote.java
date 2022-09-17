@@ -103,12 +103,4 @@ public class IntraDayQuote extends EntityBase {
 	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
 	}
-
-	@Override
-	public String toString() {
-		return "IntraDayQuote [id=" + this.getId() + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
-				+ low + ", close=" + close + ", volume=" + volume + ", localDateTime=" + localDateTime + ", symbol="
-				+ symbol + "]";
-	}
-
 }

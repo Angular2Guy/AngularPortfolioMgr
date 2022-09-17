@@ -129,12 +129,4 @@ public class DailyQuote extends EntityBase {
 	public void setCurrencyKey(CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
-
-	@Override
-	public String toString() {
-		return "DailyQuote [id=" + this.getId() + ", symbolKey=" + symbolKey + ", open=" + open + ", high=" + high + ", low="
-				+ low + ", close=" + close + ", volume=" + volume + ", localDay=" + localDay + ", symbol=" + symbol
-				+ ", currencyKey=" + currencyKey + "]";
-	}
-
 }

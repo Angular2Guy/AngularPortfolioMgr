@@ -113,6 +113,24 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
 		portfolioElement.setYear10CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(10L),
 				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
+		portfolioElement.setYear5CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
+		portfolioElement.setYear5CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
+		portfolioElement.setYear5CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
+		portfolioElement.setYear2CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
+		portfolioElement.setYear2CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
+		portfolioElement.setYear2CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
+		portfolioElement.setYear1CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
+		portfolioElement.setYear1CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
+		portfolioElement.setYear1CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
+				dailyQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
 		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
 			portfolio.getPortfolioElements().add(portfolioElement);
 		}
@@ -129,14 +147,21 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.collect(Collectors.toMap(DailyQuote::getLocalDay, dq -> dq));
 		List<CalcValuesDay> calcValuesDays = dailyQuotesMap.keySet().stream()
 				.filter(myDate -> Optional.ofNullable(comparisonDailyQuotesMap.get(myDate)).isPresent())
-				.filter(myDate -> this.currencyService
-						.getCurrencyQuote(myDate, dailyQuotesMap.get(myDate).getCurrencyKey(),
-								comparisonDailyQuotesMap.get(myDate).getCurrencyKey())
-						.isPresent())
+				.filter(myDate -> checkCurrencyQuotes(portfolio, dailyQuotesMap, comparisonDailyQuotesMap, myDate))
 				.map(myDate -> this.createCalcValuesDay(myDate, dailyQuotesMap.get(myDate),
 						comparisonDailyQuotesMap.get(myDate), portfolio))
 				.toList();
 		return calculateCorrelation(calcValuesDays);
+	}
+
+	private boolean checkCurrencyQuotes(final Portfolio portfolio, Map<LocalDate, DailyQuote> dailyQuotesMap,
+			Map<LocalDate, DailyQuote> comparisonDailyQuotesMap, LocalDate myDate) {
+		return this.currencyService
+				.getCurrencyQuote(myDate, portfolio.getCurrencyKey(),
+						dailyQuotesMap.get(myDate).getCurrencyKey())
+				.isPresent()
+				&& this.currencyService.getCurrencyQuote(myDate, portfolio.getCurrencyKey(),
+						comparisonDailyQuotesMap.get(myDate).getCurrencyKey()).isPresent();
 	}
 
 	private double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {

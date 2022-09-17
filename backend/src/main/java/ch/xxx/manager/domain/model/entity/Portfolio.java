@@ -88,11 +88,4 @@ public class Portfolio extends PortfolioBase {
 	public void setPortfolioElements(Set<PortfolioElement> portfolioElements) {
 		this.portfolioElements = portfolioElements;
 	}
-
-	@Override
-	public String toString() {
-		return "Portfolio [appUser=" + appUser + ", name=" + name + ", currencyKey=" + currencyKey + ", createdAt="
-				+ createdAt + ", portfolioToSymbols=" + portfolioToSymbols + ", portfolioElements=" + portfolioElements
-				+ "]";
-	}
 }

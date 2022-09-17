@@ -151,12 +151,4 @@ public class AppUser {
 	public void setPortfolios(Set<Portfolio> portfolios) {
 		this.portfolios = portfolios;
 	}
-
-	@Override
-	public String toString() {
-		return "AppUser [id=" + id + ", userName=" + userName + ", birthDate=" + birthDate + ", updatedAt=" + updatedAt
-				+ ", password=" + password + ", emailAddress=" + emailAddress + ", userRole=" + userRole + ", locked="
-				+ locked + ", enabled=" + enabled + ", uuid=" + uuid + ", portfolios=" + portfolios + "]";
-	}
-	
 }
