@@ -51,11 +51,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 	}
 
-	private record LinearRegressionResults(BigDecimal multiplierDaily, BigDecimal adderDaily, BigDecimal multiplierComp,
+	record LinearRegressionResults(BigDecimal multiplierDaily, BigDecimal adderDaily, BigDecimal multiplierComp,
 			BigDecimal adderComp) {
 	}
 
-	private record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
+	record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
 	}
 
 	public PortfolioStatisticService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
@@ -206,7 +206,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return regressionResults.multiplierDaily().subtract(regressionResults.multiplierComp).doubleValue();
 	}
 
-	private LinearRegressionResults calcLinRegReturn(List<CalcValuesDay> calcValuesDays) {
+	LinearRegressionResults calcLinRegReturn(List<CalcValuesDay> calcValuesDays) {
 		BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
 		BigDecimal yMean = BigDecimal.valueOf(IntStream.range(0, calcValuesDays.size()).sum())
 				.divide(BigDecimal.valueOf(calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
@@ -281,7 +281,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return new BigDecimalValues(meanDailyQuotes, meanCompQuotes);
 	}
 
-	private double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {
+	double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {
 		BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
 		BigDecimal sumMultQuotes = calcValuesDays.stream()
 				.map(myValue -> new BigDecimalValues(myValue.quote.subtract(meanValues.daily),
