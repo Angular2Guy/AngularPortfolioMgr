@@ -138,7 +138,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
 		portfolio.setYear10(
 				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
-		PortfolioWithElements result = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio, portfolioToSymbols);
+		PortfolioWithElements result = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
+				myPortfolioData.portfolioQuotes.dailyQuotes);
 		return result;
 	}
 
