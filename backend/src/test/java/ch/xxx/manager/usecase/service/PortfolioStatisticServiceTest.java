@@ -98,4 +98,25 @@ public class PortfolioStatisticServiceTest {
 		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
 				calcLinRegReturn.multiplierDaily().setScale(25, RoundingMode.HALF_EVEN));
 	}
+
+	@Test
+	public void calcCorrelationOne() {
+		Double correlation = this.service.calculateCorrelation(List.of(this.calcValuesDays.get(0)));
+		Assertions.assertEquals(BigDecimal.valueOf(correlation).setScale(25, RoundingMode.HALF_EVEN),
+				BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN));
+	}
+	
+	@Test
+	public void calcLinRegReturnOne() {
+		LinearRegressionResults calcLinRegReturn = this.service.calcLinRegReturn(List.of(this.calcValuesDays.get(0)));
+		Assertions.assertNotNull(calcLinRegReturn);
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderComp().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderDaily().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierComp().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierDaily().setScale(25, RoundingMode.HALF_EVEN));
+	}
 }
