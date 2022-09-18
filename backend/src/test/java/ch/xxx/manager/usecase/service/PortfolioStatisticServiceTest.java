@@ -12,7 +12,14 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +27,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
+import ch.xxx.manager.usecase.service.PortfolioStatisticService.CalcValuesDay;
+import ch.xxx.manager.usecase.service.PortfolioStatisticService.LinearRegressionResults;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioStatisticServiceTest {
@@ -27,12 +36,45 @@ public class PortfolioStatisticServiceTest {
 	DailyQuoteRepository dailyQuoteRepository;
 	@Mock
 	CurrencyService currencyService;
-	
+
 	@InjectMocks
-	PortfolioStatisticService service; 
-	
+	PortfolioStatisticService service;
+
+	private List<CalcValuesDay> calcValuesDays = new ArrayList<>();
+
+	@BeforeEach
+	public void createTestData() {
+		this.calcValuesDays
+				.add(new CalcValuesDay(LocalDate.now().minusDays(5L), BigDecimal.valueOf(1L), BigDecimal.valueOf(2L)));
+		this.calcValuesDays
+				.add(new CalcValuesDay(LocalDate.now().minusDays(4L), BigDecimal.valueOf(3L), BigDecimal.valueOf(4L)));
+		this.calcValuesDays
+				.add(new CalcValuesDay(LocalDate.now().minusDays(3L), BigDecimal.valueOf(5L), BigDecimal.valueOf(6L)));
+		this.calcValuesDays
+				.add(new CalcValuesDay(LocalDate.now().minusDays(2L), BigDecimal.valueOf(7L), BigDecimal.valueOf(8L)));
+		this.calcValuesDays
+				.add(new CalcValuesDay(LocalDate.now().minusDays(1L), BigDecimal.valueOf(9L), BigDecimal.valueOf(10L)));
+		this.calcValuesDays.add(new CalcValuesDay(LocalDate.now(), BigDecimal.valueOf(11L), BigDecimal.valueOf(12L)));
+	}
+
 	@Test
 	public void calcCorrelationTest() {
-		Assertions.assertNotNull(this.service);
+		Double correlation = this.service.calculateCorrelation(this.calcValuesDays);
+		Assertions.assertEquals(BigDecimal.valueOf(correlation).setScale(25, RoundingMode.HALF_EVEN),
+				BigDecimal.valueOf(1.0D).setScale(25, RoundingMode.HALF_EVEN));
+	}
+
+	@Test
+	public void calcLinRegReturnTest() {
+		LinearRegressionResults calcLinRegReturn = this.service.calcLinRegReturn(this.calcValuesDays);
+		Assertions.assertNotNull(calcLinRegReturn);
+		Assertions.assertEquals(BigDecimal.valueOf(-1L).setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderComp().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.valueOf(-0.5D).setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderDaily().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.valueOf(0.5D).setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierDaily().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.valueOf(0.5D).setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierComp().setScale(25, RoundingMode.HALF_EVEN));
 	}
 }
