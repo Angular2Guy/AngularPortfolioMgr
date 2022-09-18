@@ -16,11 +16,13 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
@@ -49,6 +51,10 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 	}
 
+	private record LinearRegressionResults(BigDecimal multiplierDaily, BigDecimal adderDaily, BigDecimal multiplierComp,
+			BigDecimal adderComp) {
+	}
+
 	private record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
 	}
 
@@ -74,36 +80,36 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 						portfolioToSymbols, comparisonDailyQuotesMap)))
 				.toList();
 		updateCorrelations(portfolio, portfolio, comparisonDailyQuotesMap, portfolioQuotes);
-		updateBetas(portfolio, portfolio, comparisonDailyQuotesMap, portfolioQuotes);
+		updateLinRegReturns(portfolio, portfolio, comparisonDailyQuotesMap, portfolioQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements);
 		return result;
 	}
 
-	private void updateBetas(final Portfolio portfolio, final PortfolioBase portfolioBase,
+	private void updateLinRegReturns(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Map<String, List<DailyQuote>> comparisonDailyQuotesMap, List<DailyQuote> portfolioQuotes) {
-		portfolioBase.setYear10BetaEuroStoxx50(this.calcBeta(portfolio, LocalDate.now().minusYears(10L),
+		portfolioBase.setYear10LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
-		portfolioBase.setYear10BetaMsciChina(this.calcBeta(portfolio, LocalDate.now().minusYears(10L),
+		portfolioBase.setYear10LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
-		portfolioBase.setYear10BetaSp500(this.calcBeta(portfolio, LocalDate.now().minusYears(10L),
+		portfolioBase.setYear10LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
-		portfolioBase.setYear5BetaEuroStoxx50(this.calcBeta(portfolio, LocalDate.now().minusYears(5L),
+		portfolioBase.setYear5LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
-		portfolioBase.setYear5BetaMsciChina(this.calcBeta(portfolio, LocalDate.now().minusYears(5L),
+		portfolioBase.setYear5LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
-		portfolioBase.setYear5BetaSp500(this.calcBeta(portfolio, LocalDate.now().minusYears(5L),
+		portfolioBase.setYear5LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
-		portfolioBase.setYear2BetaEuroStoxx50(this.calcBeta(portfolio, LocalDate.now().minusYears(2L),
+		portfolioBase.setYear2LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
-		portfolioBase.setYear2BetaMsciChina(this.calcBeta(portfolio, LocalDate.now().minusYears(2L),
+		portfolioBase.setYear2LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
-		portfolioBase.setYear2BetaSp500(this.calcBeta(portfolio, LocalDate.now().minusYears(2L),
+		portfolioBase.setYear2LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
-		portfolioBase.setYear1BetaEuroStoxx50(this.calcBeta(portfolio, LocalDate.now().minusYears(1L),
+		portfolioBase.setYear1LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.EUROSTOXX50.getSymbol())));
-		portfolioBase.setYear1BetaMsciChina(this.calcBeta(portfolio, LocalDate.now().minusYears(1L),
+		portfolioBase.setYear1LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.MSCI_CHINA.getSymbol())));
-		portfolioBase.setYear1BetaSp500(this.calcBeta(portfolio, LocalDate.now().minusYears(1L),
+		portfolioBase.setYear1LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
 				portfolioQuotes, comparisonDailyQuotesMap.get(ComparisonIndex.SP500.getSymbol())));
 	}
 
@@ -168,48 +174,71 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		portfolioElement.setYear10(
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L), symbolCurKeyOpt));
 		this.updateCorrelations(portfolio, portfolioElement, comparisonDailyQuotesMap, dailyQuotes);
-		this.updateBetas(portfolio, portfolioElement, comparisonDailyQuotesMap, dailyQuotes);
+		this.updateLinRegReturns(portfolio, portfolioElement, comparisonDailyQuotesMap, dailyQuotes);
 		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
 			portfolio.getPortfolioElements().add(portfolioElement);
 		}
 		return portfolioElement;
 	}
 
-	private Double calcBeta(final Portfolio portfolio, LocalDate cutOffDate, List<DailyQuote> dailyQuotes,
+	private Double calcLinRegReturn(final Portfolio portfolio, LocalDate cutOffDate, List<DailyQuote> dailyQuotes,
 			List<DailyQuote> comparisonDailyQuotes) {
-		List<CalcValuesDay> calcValuesDays = createCalcValuesDay(portfolio, cutOffDate, dailyQuotes,
-				comparisonDailyQuotes);
-		return this.calcBeta(calcValuesDays);
+		List<CalcValuesDay> calcValuesDays = this
+				.createCalcValuesDay(portfolio, cutOffDate, dailyQuotes, comparisonDailyQuotes).stream()
+				.sorted((calcValues1, calcValues2) -> calcValues1.day().compareTo(calcValues2.day())).toList();
+//		List<CalcValuesDay> divValuesDays = new ArrayList<>();
+//		CalcValuesDay prevValues = null;
+//		for (int i = 0; i < calcValuesDays.size(); i++) {
+//			if (prevValues != null) {
+//				BigDecimal quoteReturn = calcValuesDays.get(i).quote()
+//						.divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
+//						.multiply(BigDecimal.valueOf(100L));
+//				BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote
+//						.divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
+//						.multiply(BigDecimal.valueOf(100L));
+//				CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
+//						compQuoteReturn);
+//				divValuesDays.add(myCalcValuesDay);
+//			}
+//			prevValues = calcValuesDays.get(i);
+//		}
+		LinearRegressionResults regressionResults = this.calcLinRegReturn(calcValuesDays);		
+		return regressionResults.multiplierDaily().subtract(regressionResults.multiplierComp).doubleValue();
 	}
 
-	private Double calcBeta(List<CalcValuesDay> calcValuesDays) {
+	private LinearRegressionResults calcLinRegReturn(List<CalcValuesDay> calcValuesDays) {
 		BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
-		BigDecimal varianceDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
-				.map(myValue -> myValue.subtract(meanValues.daily)).map(myValue -> myValue.multiply(myValue))
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
-				.divide(BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25,
-						RoundingMode.HALF_EVEN);
-		BigDecimal varianceCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
-				.map(myValue -> myValue.subtract(meanValues.comp)).map(myValue -> myValue.multiply(myValue))
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
-				.divide(BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25,
-						RoundingMode.HALF_EVEN);
-		BigDecimal covarianceQuotes = calcValuesDays.stream()
-				.map(calcValues -> new BigDecimalValues(calcValues.quote.subtract(varianceDailyQuotes),
-						calcValues.compQuote.subtract(varianceCompQuotes)))
-				.map(calcValues -> calcValues.daily().multiply(calcValues.comp))
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
-				.divide(BigDecimal.valueOf(calcValuesDays.size() < 2 ? 1 : calcValuesDays.size() - 1), 25,
-						RoundingMode.HALF_EVEN);
-		return covarianceQuotes
-				.divide((varianceDailyQuotes.compareTo(BigDecimal.ZERO) <= 0 ? BigDecimal.ONE : varianceDailyQuotes),
-						25, RoundingMode.HALF_EVEN)
-				.doubleValue();
+		BigDecimal yMean = BigDecimal.valueOf(IntStream.range(0, calcValuesDays.size()).sum())
+				.divide(BigDecimal.valueOf(calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
+		final int[] yValue = new int[1];
+		yValue[0] = 0;
+		BigDecimal crossDiviationDailyQuotes = calcValuesDays.stream()
+				.map(myValue -> myValue.quote().multiply(BigDecimal.valueOf(yValue[0])))
+				.peek(myValue -> yValue[0] = ++yValue[0]).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.daily()).multiply(yMean));
+		yValue[0] = 0;
+		BigDecimal crossDiviationCompDailyQuotes = calcValuesDays.stream()
+				.map(myValue -> myValue.compQuote().multiply(BigDecimal.valueOf(yValue[0])))
+				.peek(myValue -> yValue[0] = yValue[0]++).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.comp()).multiply(yMean));
+		BigDecimal diviationDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
+				.map(myValue -> myValue.multiply(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal
+						.valueOf(calcValuesDays.size()).multiply(meanValues.daily()).multiply(meanValues.daily()));
+		BigDecimal diviationCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
+				.map(myValue -> myValue.multiply(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal
+						.valueOf(calcValuesDays.size()).multiply(meanValues.comp()).multiply(meanValues.comp()));
+		BigDecimal multiplierDailyQuotes = crossDiviationDailyQuotes.divide(diviationDailyQuotes, 25,
+				RoundingMode.HALF_EVEN);
+		BigDecimal multiplierCompQuotes = crossDiviationCompDailyQuotes.divide(diviationCompQuotes, 25,
+				RoundingMode.HALF_EVEN);
+		BigDecimal adderDailyQuotes = yMean.subtract(multiplierDailyQuotes.multiply(meanValues.daily()));
+		BigDecimal adderCompQuotes = yMean.subtract(multiplierCompQuotes.multiply(meanValues.comp()));
+		return new LinearRegressionResults(multiplierDailyQuotes, adderDailyQuotes, multiplierCompQuotes, adderCompQuotes);
 	}
 
 	private Double calcCorrelation(final Portfolio portfolio, LocalDate cutOffDate, List<DailyQuote> dailyQuotes,
 			List<DailyQuote> comparisonDailyQuotes) {
-		List<CalcValuesDay> calcValuesDays = createCalcValuesDay(portfolio, cutOffDate, dailyQuotes,
+		List<CalcValuesDay> calcValuesDays = this.createCalcValuesDay(portfolio, cutOffDate, dailyQuotes,
 				comparisonDailyQuotes);
 		return this.calculateCorrelation(calcValuesDays);
 	}
@@ -280,7 +309,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				comparisonQuote, portfolio);
 		BigDecimal dailyQuoteValue = this.calcValue(Currency::getClose, dailyQuoteCurrency, DailyQuote::getClose,
 				dailyQuote, portfolio);
-		return new CalcValuesDay(LocalDate.now(), dailyQuoteValue, comparisonValue);
+		return new CalcValuesDay(day, dailyQuoteValue, comparisonValue);
 	}
 
 	private BigDecimal symbolValueAtDate(final Portfolio portfolio, List<DailyQuote> dailyQuotes, LocalDate cutOffDate,

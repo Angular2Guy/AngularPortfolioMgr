@@ -123,4 +123,18 @@
 			<column name="symbol_key" />
 		</createIndex>				
 	</changeSet>
+	<changeSet id="19" author="angular2guy">
+		<renameColumn tableName="portfolio" oldColumnName="year10beta_euro_stoxx50" newColumnName="year10lin_reg_return_euro_stoxx50" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year10beta_msci_china" newColumnName="year10lin_reg_return_msci_china" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year10beta_sp500" newColumnName="year10lin_reg_return_sp500" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year5beta_euro_stoxx50" newColumnName="year5lin_reg_return_euro_stoxx50" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year5beta_msci_china" newColumnName="year5lin_reg_return_msci_china" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year5beta_sp500" newColumnName="year5lin_reg_return_sp500" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year2beta_euro_stoxx50" newColumnName="year2lin_reg_return_euro_stoxx50" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year2beta_msci_china" newColumnName="year2lin_reg_return_msci_china" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year2beta_sp500" newColumnName="year2lin_reg_return_sp500" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year1beta_euro_stoxx50" newColumnName="year1lin_reg_return_euro_stoxx50" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year1beta_msci_china" newColumnName="year1lin_reg_return_msci_china" type="double"/>
+		<renameColumn tableName="portfolio" oldColumnName="year1beta_sp500" newColumnName="year1lin_reg_return_sp500" type="double"/>
+	</changeSet>
 </databaseChangeLog>

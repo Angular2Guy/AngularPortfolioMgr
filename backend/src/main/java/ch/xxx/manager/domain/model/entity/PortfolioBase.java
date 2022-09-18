@@ -42,27 +42,27 @@ public class PortfolioBase {
 	private Double year1CorrelationSp500;
 	private Double year1CorrelationMsciChina;
 	private Double year1CorrelationEuroStoxx50;
-	private Double year1BetaSp500;
-	private Double year1BetaMsciChina;
-	private Double year1BetaEuroStoxx50;
+	private Double year1LinRegReturnSp500;
+	private Double year1LinRegReturnMsciChina;
+	private Double year1LinRegReturnEuroStoxx50;
 	private Double year2CorrelationSp500;
 	private Double year2CorrelationMsciChina;
 	private Double year2CorrelationEuroStoxx50;
-	private Double year2BetaSp500;
-	private Double year2BetaMsciChina;
-	private Double year2BetaEuroStoxx50;
+	private Double year2LinRegReturnSp500;
+	private Double year2LinRegReturnMsciChina;
+	private Double year2LinRegReturnEuroStoxx50;
 	private Double year5CorrelationSp500;
 	private Double year5CorrelationMsciChina;
 	private Double year5CorrelationEuroStoxx50;
-	private Double year5BetaSp500;
-	private Double year5BetaMsciChina;
-	private Double year5BetaEuroStoxx50;
+	private Double year5LinRegReturnSp500;
+	private Double year5LinRegReturnMsciChina;
+	private Double year5LinRegReturnEuroStoxx50;
 	private Double year10CorrelationSp500;
 	private Double year10CorrelationMsciChina;
 	private Double year10CorrelationEuroStoxx50;
-	private Double year10BetaSp500;
-	private Double year10BetaMsciChina;
-	private Double year10BetaEuroStoxx50;
+	private Double year10LinRegReturnSp500;
+	private Double year10LinRegReturnMsciChina;
+	private Double year10LinRegReturnEuroStoxx50;
 	
 	public Long getId() {
 		return id;
@@ -144,30 +144,6 @@ public class PortfolioBase {
 		this.year1CorrelationEuroStoxx50 = year1CorrelationEuroStoxx50;
 	}
 
-	public Double getYear1BetaSp500() {
-		return year1BetaSp500;
-	}
-
-	public void setYear1BetaSp500(Double year1BetaSp500) {
-		this.year1BetaSp500 = year1BetaSp500;
-	}
-
-	public Double getYear1BetaMsciChina() {
-		return year1BetaMsciChina;
-	}
-
-	public void setYear1BetaMsciChina(Double year1BetaMsciChina) {
-		this.year1BetaMsciChina = year1BetaMsciChina;
-	}
-
-	public Double getYear1BetaEuroStoxx50() {
-		return year1BetaEuroStoxx50;
-	}
-
-	public void setYear1BetaEuroStoxx50(Double year1BetaEuroStoxx50) {
-		this.year1BetaEuroStoxx50 = year1BetaEuroStoxx50;
-	}
-
 	public Double getYear2CorrelationSp500() {
 		return year2CorrelationSp500;
 	}
@@ -190,30 +166,6 @@ public class PortfolioBase {
 
 	public void setYear2CorrelationEuroStoxx50(Double year2CorrelationEuroStoxx50) {
 		this.year2CorrelationEuroStoxx50 = year2CorrelationEuroStoxx50;
-	}
-
-	public Double getYear2BetaSp500() {
-		return year2BetaSp500;
-	}
-
-	public void setYear2BetaSp500(Double year2BetaSp500) {
-		this.year2BetaSp500 = year2BetaSp500;
-	}
-
-	public Double getYear2BetaMsciChina() {
-		return year2BetaMsciChina;
-	}
-
-	public void setYear2BetaMsciChina(Double year2BetaMsciChina) {
-		this.year2BetaMsciChina = year2BetaMsciChina;
-	}
-
-	public Double getYear2BetaEuroStoxx50() {
-		return year2BetaEuroStoxx50;
-	}
-
-	public void setYear2BetaEuroStoxx50(Double year2BetaEuroStoxx50) {
-		this.year2BetaEuroStoxx50 = year2BetaEuroStoxx50;
 	}
 
 	public Double getYear5CorrelationSp500() {
@@ -240,30 +192,6 @@ public class PortfolioBase {
 		this.year5CorrelationEuroStoxx50 = year5CorrelationEuroStoxx50;
 	}
 
-	public Double getYear5BetaSp500() {
-		return year5BetaSp500;
-	}
-
-	public void setYear5BetaSp500(Double year5BetaSp500) {
-		this.year5BetaSp500 = year5BetaSp500;
-	}
-
-	public Double getYear5BetaMsciChina() {
-		return year5BetaMsciChina;
-	}
-
-	public void setYear5BetaMsciChina(Double year5BetaMsciChina) {
-		this.year5BetaMsciChina = year5BetaMsciChina;
-	}
-
-	public Double getYear5BetaEuroStoxx50() {
-		return year5BetaEuroStoxx50;
-	}
-
-	public void setYear5BetaEuroStoxx50(Double year5BetaEuroStoxx50) {
-		this.year5BetaEuroStoxx50 = year5BetaEuroStoxx50;
-	}
-
 	public Double getYear10CorrelationSp500() {
 		return year10CorrelationSp500;
 	}
@@ -288,28 +216,99 @@ public class PortfolioBase {
 		this.year10CorrelationEuroStoxx50 = year10CorrelationEuroStoxx50;
 	}
 
-	public Double getYear10BetaSp500() {
-		return year10BetaSp500;
+	public Double getYear1LinRegReturnSp500() {
+		return year1LinRegReturnSp500;
 	}
 
-	public void setYear10BetaSp500(Double year10BetaSp500) {
-		this.year10BetaSp500 = year10BetaSp500;
+	public void setYear1LinRegReturnSp500(Double year1LinRegReturnSp500) {
+		this.year1LinRegReturnSp500 = year1LinRegReturnSp500;
 	}
 
-	public Double getYear10BetaMsciChina() {
-		return year10BetaMsciChina;
+	public Double getYear1LinRegReturnMsciChina() {
+		return year1LinRegReturnMsciChina;
 	}
 
-	public void setYear10BetaMsciChina(Double year10BetaMsciChina) {
-		this.year10BetaMsciChina = year10BetaMsciChina;
+	public void setYear1LinRegReturnMsciChina(Double year1LinRegReturnMsciChina) {
+		this.year1LinRegReturnMsciChina = year1LinRegReturnMsciChina;
 	}
 
-	public Double getYear10BetaEuroStoxx50() {
-		return year10BetaEuroStoxx50;
+	public Double getYear1LinRegReturnEuroStoxx50() {
+		return year1LinRegReturnEuroStoxx50;
 	}
 
-	public void setYear10BetaEuroStoxx50(Double year10BetaEuroStoxx50) {
-		this.year10BetaEuroStoxx50 = year10BetaEuroStoxx50;
+	public void setYear1LinRegReturnEuroStoxx50(Double year1LinRegReturnEuroStoxx50) {
+		this.year1LinRegReturnEuroStoxx50 = year1LinRegReturnEuroStoxx50;
 	}
 
+	public Double getYear2LinRegReturnSp500() {
+		return year2LinRegReturnSp500;
+	}
+
+	public void setYear2LinRegReturnSp500(Double year2LinRegReturnSp500) {
+		this.year2LinRegReturnSp500 = year2LinRegReturnSp500;
+	}
+
+	public Double getYear2LinRegReturnMsciChina() {
+		return year2LinRegReturnMsciChina;
+	}
+
+	public void setYear2LinRegReturnMsciChina(Double year2LinRegReturnMsciChina) {
+		this.year2LinRegReturnMsciChina = year2LinRegReturnMsciChina;
+	}
+
+	public Double getYear2LinRegReturnEuroStoxx50() {
+		return year2LinRegReturnEuroStoxx50;
+	}
+
+	public void setYear2LinRegReturnEuroStoxx50(Double year2LinRegReturnEuroStoxx50) {
+		this.year2LinRegReturnEuroStoxx50 = year2LinRegReturnEuroStoxx50;
+	}
+
+	public Double getYear5LinRegReturnSp500() {
+		return year5LinRegReturnSp500;
+	}
+
+	public void setYear5LinRegReturnSp500(Double year5LinRegReturnSp500) {
+		this.year5LinRegReturnSp500 = year5LinRegReturnSp500;
+	}
+
+	public Double getYear5LinRegReturnMsciChina() {
+		return year5LinRegReturnMsciChina;
+	}
+
+	public void setYear5LinRegReturnMsciChina(Double year5LinRegReturnMsciChina) {
+		this.year5LinRegReturnMsciChina = year5LinRegReturnMsciChina;
+	}
+
+	public Double getYear5LinRegReturnEuroStoxx50() {
+		return year5LinRegReturnEuroStoxx50;
+	}
+
+	public void setYear5LinRegReturnEuroStoxx50(Double year5LinRegReturnEuroStoxx50) {
+		this.year5LinRegReturnEuroStoxx50 = year5LinRegReturnEuroStoxx50;
+	}
+
+	public Double getYear10LinRegReturnSp500() {
+		return year10LinRegReturnSp500;
+	}
+
+	public void setYear10LinRegReturnSp500(Double year10LinRegReturnSp500) {
+		this.year10LinRegReturnSp500 = year10LinRegReturnSp500;
+	}
+
+	public Double getYear10LinRegReturnMsciChina() {
+		return year10LinRegReturnMsciChina;
+	}
+
+	public void setYear10LinRegReturnMsciChina(Double year10LinRegReturnMsciChina) {
+		this.year10LinRegReturnMsciChina = year10LinRegReturnMsciChina;
+	}
+
+	public Double getYear10LinRegReturnEuroStoxx50() {
+		return year10LinRegReturnEuroStoxx50;
+	}
+
+	public void setYear10LinRegReturnEuroStoxx50(Double year10LinRegReturnEuroStoxx50) {
+		this.year10LinRegReturnEuroStoxx50 = year10LinRegReturnEuroStoxx50;
+	}
 }
