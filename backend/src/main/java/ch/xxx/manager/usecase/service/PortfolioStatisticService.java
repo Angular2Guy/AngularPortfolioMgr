@@ -186,23 +186,23 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<CalcValuesDay> calcValuesDays = this
 				.createCalcValuesDay(portfolio, cutOffDate, dailyQuotes, comparisonDailyQuotes).stream()
 				.sorted((calcValues1, calcValues2) -> calcValues1.day().compareTo(calcValues2.day())).toList();
-//		List<CalcValuesDay> divValuesDays = new ArrayList<>();
-//		CalcValuesDay prevValues = null;
-//		for (int i = 0; i < calcValuesDays.size(); i++) {
-//			if (prevValues != null) {
-//				BigDecimal quoteReturn = calcValuesDays.get(i).quote()
-//						.divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
-//						.multiply(BigDecimal.valueOf(100L));
-//				BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote
-//						.divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
-//						.multiply(BigDecimal.valueOf(100L));
-//				CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
-//						compQuoteReturn);
-//				divValuesDays.add(myCalcValuesDay);
-//			}
-//			prevValues = calcValuesDays.get(i);
-//		}
-		LinearRegressionResults regressionResults = this.calcLinRegReturn(calcValuesDays);		
+		List<CalcValuesDay> divValuesDays = new ArrayList<>();
+		CalcValuesDay prevValues = null;
+		for (int i = 0; i < calcValuesDays.size(); i++) {
+			if (prevValues != null) {
+				BigDecimal quoteReturn = calcValuesDays.get(i).quote()
+						.divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
+						.multiply(BigDecimal.valueOf(100L));
+				BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote
+						.divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
+						.multiply(BigDecimal.valueOf(100L));
+				CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
+						compQuoteReturn);
+				divValuesDays.add(myCalcValuesDay);
+			}
+			prevValues = calcValuesDays.get(i);
+		}
+		LinearRegressionResults regressionResults = this.calcLinRegReturn(divValuesDays);		
 		return regressionResults.multiplierDaily().subtract(regressionResults.multiplierComp).doubleValue();
 	}
 
@@ -214,12 +214,12 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		yValue[0] = 0;
 		BigDecimal crossDiviationDailyQuotes = calcValuesDays.stream()
 				.map(myValue -> myValue.quote().multiply(BigDecimal.valueOf(yValue[0])))
-				.peek(myValue -> yValue[0] = ++yValue[0]).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.peek(myValue -> {yValue[0] = yValue[0] + 1;}).reduce(BigDecimal.ZERO, BigDecimal::add)
 				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.daily()).multiply(yMean));
 		yValue[0] = 0;
 		BigDecimal crossDiviationCompDailyQuotes = calcValuesDays.stream()
 				.map(myValue -> myValue.compQuote().multiply(BigDecimal.valueOf(yValue[0])))
-				.peek(myValue -> yValue[0] = yValue[0]++).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.peek(myValue -> {yValue[0] = yValue[0] + 1;}).reduce(BigDecimal.ZERO, BigDecimal::add)
 				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.comp()).multiply(yMean));
 		BigDecimal diviationDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
 				.map(myValue -> myValue.multiply(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal
