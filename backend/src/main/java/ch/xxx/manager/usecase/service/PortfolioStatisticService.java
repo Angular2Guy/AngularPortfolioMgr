@@ -202,24 +202,26 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 			}
 			prevValues = calcValuesDays.get(i);
 		}
-		LinearRegressionResults regressionResults = this.calcLinRegReturn(divValuesDays);		
+		LinearRegressionResults regressionResults = this.calcLinRegReturn(divValuesDays);
 		return regressionResults.multiplierDaily().subtract(regressionResults.multiplierComp).doubleValue();
 	}
 
 	LinearRegressionResults calcLinRegReturn(List<CalcValuesDay> calcValuesDays) {
 		BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
-		BigDecimal yMean = BigDecimal.valueOf(IntStream.range(0, calcValuesDays.size()).sum())
-				.divide(BigDecimal.valueOf(calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
+		BigDecimal yMean = BigDecimal.valueOf(IntStream.range(0, calcValuesDays.size()).sum()).divide(
+				BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
 		final int[] yValue = new int[1];
 		yValue[0] = 0;
 		BigDecimal crossDiviationDailyQuotes = calcValuesDays.stream()
-				.map(myValue -> myValue.quote().multiply(BigDecimal.valueOf(yValue[0])))
-				.peek(myValue -> {yValue[0] = yValue[0] + 1;}).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.map(myValue -> myValue.quote().multiply(BigDecimal.valueOf(yValue[0]))).peek(myValue -> {
+					yValue[0] = yValue[0] + 1;
+				}).reduce(BigDecimal.ZERO, BigDecimal::add)
 				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.daily()).multiply(yMean));
 		yValue[0] = 0;
 		BigDecimal crossDiviationCompDailyQuotes = calcValuesDays.stream()
-				.map(myValue -> myValue.compQuote().multiply(BigDecimal.valueOf(yValue[0])))
-				.peek(myValue -> {yValue[0] = yValue[0] + 1;}).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.map(myValue -> myValue.compQuote().multiply(BigDecimal.valueOf(yValue[0]))).peek(myValue -> {
+					yValue[0] = yValue[0] + 1;
+				}).reduce(BigDecimal.ZERO, BigDecimal::add)
 				.subtract(BigDecimal.valueOf(calcValuesDays.size()).multiply(meanValues.comp()).multiply(yMean));
 		BigDecimal diviationDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
 				.map(myValue -> myValue.multiply(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal
@@ -227,13 +229,15 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		BigDecimal diviationCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
 				.map(myValue -> myValue.multiply(myValue)).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal
 						.valueOf(calcValuesDays.size()).multiply(meanValues.comp()).multiply(meanValues.comp()));
-		BigDecimal multiplierDailyQuotes = crossDiviationDailyQuotes.divide(diviationDailyQuotes, 25,
+		BigDecimal multiplierDailyQuotes = crossDiviationDailyQuotes.divide((diviationDailyQuotes.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ONE : diviationDailyQuotes), 25,
 				RoundingMode.HALF_EVEN);
-		BigDecimal multiplierCompQuotes = crossDiviationCompDailyQuotes.divide(diviationCompQuotes, 25,
+		BigDecimal multiplierCompQuotes = crossDiviationCompDailyQuotes.divide(
+				(diviationCompQuotes.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ONE : diviationCompQuotes), 25,
 				RoundingMode.HALF_EVEN);
 		BigDecimal adderDailyQuotes = yMean.subtract(multiplierDailyQuotes.multiply(meanValues.daily()));
 		BigDecimal adderCompQuotes = yMean.subtract(multiplierCompQuotes.multiply(meanValues.comp()));
-		return new LinearRegressionResults(multiplierDailyQuotes, adderDailyQuotes, multiplierCompQuotes, adderCompQuotes);
+		return new LinearRegressionResults(multiplierDailyQuotes, adderDailyQuotes, multiplierCompQuotes,
+				adderCompQuotes);
 	}
 
 	private Double calcCorrelation(final Portfolio portfolio, LocalDate cutOffDate, List<DailyQuote> dailyQuotes,

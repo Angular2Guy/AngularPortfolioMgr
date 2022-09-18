@@ -58,14 +58,14 @@ public class PortfolioStatisticServiceTest {
 	}
 
 	@Test
-	public void calcCorrelationTest() {
+	public void calcCorrelationValues() {
 		Double correlation = this.service.calculateCorrelation(this.calcValuesDays);
 		Assertions.assertEquals(BigDecimal.valueOf(correlation).setScale(25, RoundingMode.HALF_EVEN),
 				BigDecimal.valueOf(1.0D).setScale(25, RoundingMode.HALF_EVEN));
 	}
 
 	@Test
-	public void calcLinRegReturnTest() {
+	public void calcLinRegReturnValues() {
 		LinearRegressionResults calcLinRegReturn = this.service.calcLinRegReturn(this.calcValuesDays);
 		Assertions.assertNotNull(calcLinRegReturn);
 		Assertions.assertEquals(BigDecimal.valueOf(-1L).setScale(25, RoundingMode.HALF_EVEN),
@@ -76,5 +76,26 @@ public class PortfolioStatisticServiceTest {
 				calcLinRegReturn.multiplierDaily().setScale(25, RoundingMode.HALF_EVEN));
 		Assertions.assertEquals(BigDecimal.valueOf(0.5D).setScale(25, RoundingMode.HALF_EVEN),
 				calcLinRegReturn.multiplierComp().setScale(25, RoundingMode.HALF_EVEN));
+	}
+
+	@Test
+	public void calcCorrelationEmpty() {
+		Double correlation = this.service.calculateCorrelation(List.of());
+		Assertions.assertEquals(BigDecimal.valueOf(correlation).setScale(25, RoundingMode.HALF_EVEN),
+				BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN));
+	}
+
+	@Test
+	public void calcLinRegReturnEmpty() {
+		LinearRegressionResults calcLinRegReturn = this.service.calcLinRegReturn(List.of());
+		Assertions.assertNotNull(calcLinRegReturn);
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderComp().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.adderDaily().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierComp().setScale(25, RoundingMode.HALF_EVEN));
+		Assertions.assertEquals(BigDecimal.ZERO.setScale(25, RoundingMode.HALF_EVEN),
+				calcLinRegReturn.multiplierDaily().setScale(25, RoundingMode.HALF_EVEN));
 	}
 }
