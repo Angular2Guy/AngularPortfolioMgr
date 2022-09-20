@@ -15,7 +15,6 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,19 +37,29 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(List<PortfolioToSymbol> portfolioToSymbols) {
-		Map<Long, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository
+		Map<Long, List<DailyQuote>> myDailyQuotesMap = this.dailyQuoteRepository
 				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId()).toList())
-				.stream().sorted(Comparator.comparing(DailyQuote::getLocalDay))
-				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-		return dailyQuotesMap;
+				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
+		final record MyKeyValue(Long id, List<DailyQuote> quotes) {
+		}
+		Map<Long, List<DailyQuote>> sortedDailyQuotesMap = myDailyQuotesMap.keySet().stream()
+				.map(myId -> new MyKeyValue(myId, myDailyQuotesMap.get(myId).stream()
+						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).toList()))
+				.collect(Collectors.toMap(MyKeyValue::id, MyKeyValue::quotes));
+		return sortedDailyQuotesMap;
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()				
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
 				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
-		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = new HashMap<>();
-		dailyQuotesMap.forEach((key, values) -> filteredDailyQuotesMap.put(key, values.stream().filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay)).toList()));
+		final record MyKeyValue(String key, List<DailyQuote> quotes) {
+		}
+		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
+				.map(myKey -> new MyKeyValue(myKey, dailyQuotesMap.get(myKey).stream()
+						.filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay))
+						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).toList()))
+				.collect(Collectors.toMap(MyKeyValue::key, MyKeyValue::quotes));
 		return filteredDailyQuotesMap;
 	}
 
