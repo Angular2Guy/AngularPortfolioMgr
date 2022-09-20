@@ -14,9 +14,11 @@ package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,5 +78,17 @@ public abstract class PortfolioCalculcationBase {
 			calcValue = quoteValue.divide(currValue, 10, RoundingMode.HALF_UP);
 		}
 		return calcValue;
+	}
+	
+	protected List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesIdMap) {
+		final Set<LocalDate> quoteDates = dailyQuotesIdMap.keySet().stream().map(myId -> dailyQuotesIdMap.get(myId))
+				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
+		final List<LocalDate> commonQuoteDates = quoteDates.stream()
+				.filter(myLocalDate -> dailyQuotesIdMap.keySet().stream()
+						.map(myId -> 
+						dailyQuotesIdMap.get(myId).stream().anyMatch(myQuote -> myQuote.getLocalDay().equals(myQuote.getLocalDay())))
+						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
+				.collect(Collectors.toSet()).stream().sorted().toList();
+		return commonQuoteDates;
 	}
 }

@@ -164,18 +164,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements);
 	}
 
-	private List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesMap) {
-		final Set<LocalDate> quoteDates = dailyQuotesMap.keySet().stream().map(myId -> dailyQuotesMap.get(myId))
-				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
-		final List<LocalDate> commonQuoteDates = quoteDates.stream()
-				.filter(myLocalDate -> dailyQuotesMap.keySet().stream()
-						.map(myId -> 
-						dailyQuotesMap.get(myId).stream().anyMatch(myQuote -> myQuote.getLocalDay().equals(myQuote.getLocalDay())))
-						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
-				.collect(Collectors.toSet()).stream().sorted().toList();
-		return commonQuoteDates;
-	}
-
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
 		myDailyQuote.setClose(BigDecimal.ZERO);
 		myDailyQuote.setHigh(BigDecimal.ZERO);
