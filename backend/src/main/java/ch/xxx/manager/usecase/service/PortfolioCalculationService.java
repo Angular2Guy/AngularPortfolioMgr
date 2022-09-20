@@ -19,10 +19,12 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -160,6 +162,18 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.flatMap(Collection::stream).sorted(Comparator.comparing(CalcPortfolioElement::localDate))
 				.collect(Collectors.toList());
 		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements);
+	}
+
+	private List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesMap) {
+		final Set<LocalDate> quoteDates = dailyQuotesMap.keySet().stream().map(myId -> dailyQuotesMap.get(myId))
+				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
+		final List<LocalDate> commonQuoteDates = quoteDates.stream()
+				.filter(myLocalDate -> dailyQuotesMap.keySet().stream()
+						.map(myId -> 
+						dailyQuotesMap.get(myId).stream().anyMatch(myQuote -> myQuote.getLocalDay().equals(myQuote.getLocalDay())))
+						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
+				.collect(Collectors.toSet()).stream().sorted().toList();
+		return commonQuoteDates;
 	}
 
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
