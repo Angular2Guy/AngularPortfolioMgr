@@ -22,7 +22,7 @@ import javax.persistence.SequenceGenerator;
 public abstract class EntityBase {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
+    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence", allocationSize=50)
 	private Long id;
 	
 	public Long getId() {

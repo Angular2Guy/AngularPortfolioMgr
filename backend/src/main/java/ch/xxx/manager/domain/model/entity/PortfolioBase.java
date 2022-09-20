@@ -24,14 +24,13 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 
-@Entity(name="portfolio")
+@Entity(name = "portfolio")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="portfolio_type", 
-  discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorColumn(name = "portfolio_type", discriminatorType = DiscriminatorType.INTEGER)
 public class PortfolioBase {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
+	@SequenceGenerator(name = "seq", sequenceName = "hibernate_sequence", allocationSize = 50)
 	private Long id;
 	private BigDecimal month1;
 	private BigDecimal month6;
@@ -63,11 +62,11 @@ public class PortfolioBase {
 	private Double year10LinRegReturnSp500;
 	private Double year10LinRegReturnMsciChina;
 	private Double year10LinRegReturnEuroStoxx50;
-	
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}

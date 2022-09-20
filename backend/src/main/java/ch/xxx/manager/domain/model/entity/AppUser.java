@@ -31,7 +31,7 @@ import javax.persistence.SequenceGenerator;
 public class AppUser {
 	@Id	
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence")
+    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence", allocationSize = 50)
 	private Long id;
 	private String userName;
 	private LocalDate birthDate;
