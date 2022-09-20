@@ -29,7 +29,7 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	}
 
 	@Override
-	public List<DailyQuote> findBySymbol(String symbol) {
+	public List<DailyQuote> findBySymbol(String symbol) {		
 		return this.jpaDailyQuoteRepository.findBySymbol(symbol);
 	}
 
@@ -44,7 +44,7 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	}
 
 	@Override
-	public List<DailyQuote> saveAll(List<DailyQuote> dailyquotes) {
+	public List<DailyQuote> saveAll(List<DailyQuote> dailyquotes) {		
 		return this.jpaDailyQuoteRepository.saveAll(dailyquotes);
 	}
 
@@ -66,5 +66,15 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	@Override
 	public List<DailyQuote> findBySymbolKeys(List<String> symbolKeys) {
 		return this.jpaDailyQuoteRepository.findBySymbolKeys(symbolKeys);
+	}
+
+	@Override
+	public void delete(DailyQuote dailyQuote) {
+		this.jpaDailyQuoteRepository.delete(dailyQuote);
+	}
+
+	@Override
+	public void deleteAll(Iterable<DailyQuote> dailyQuotes) {
+		this.jpaDailyQuoteRepository.deleteAll(dailyQuotes);
 	}
 }

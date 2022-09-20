@@ -26,4 +26,6 @@ public interface DailyQuoteRepository {
 	List<DailyQuote> findBySymbolAndDayBetween(String symbol, LocalDate start, LocalDate end);
 	List<DailyQuote> saveAll(List<DailyQuote> dailyquotes);
 	DailyQuote save(DailyQuote dailyQuote);
+	void delete(DailyQuote dailyQuote);
+	void deleteAll(Iterable<DailyQuote> dailyQuotes);
 }

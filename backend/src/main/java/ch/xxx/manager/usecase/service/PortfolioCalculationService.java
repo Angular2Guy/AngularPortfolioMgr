@@ -147,14 +147,24 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private PortfolioData calculatePortfolioData(List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = createDailyQuotesIdMap(portfolioToSymbols);
+		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
 		PortfolioSymbolWithDailyQuotes portfolioQuotes = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.peek(pts -> LOG.info(pts.getSymbol().getSymbol() + " " + pts.getSymbol().getId()))
-				.map(pts -> new PortfolioSymbolWithDailyQuotes(pts.getSymbol(),
-						Optional.ofNullable(dailyQuotesMap.get(pts.getSymbol().getId())).stream()
-								.flatMap(Collection::stream).map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
-								.collect(Collectors.toList())))
+				.map(pts -> new PortfolioSymbolWithDailyQuotes(pts.getSymbol(), Optional
+						.ofNullable(dailyQuotesMap.get(pts.getSymbol().getId())).stream().flatMap(Collection::stream)
+						.filter(myDailyQuote -> commonQuoteDates.stream()
+								.anyMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
+						.map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote)).collect(Collectors.toList())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
+		final Long portfolioSymbolId = portfolioToSymbols.stream()
+				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.map(pts -> pts.getSymbol().getId()).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
+		this.dailyQuoteRepository.deleteAll(dailyQuotesMap.get(portfolioSymbolId).stream()
+				.filter(myDailyQuote -> commonQuoteDates.stream()
+						.noneMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
+				.toList());
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
