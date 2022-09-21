@@ -165,11 +165,13 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.noneMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
 				.toList();
-		dailyQuotesMap.put(portfolioSymbolId,
-				dailyQuotesMap.getOrDefault(portfolioSymbolId, List.of()).stream()
-						.filter(myDailyQuote -> commonQuoteDates.stream()
-								.anyMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
-						.collect(Collectors.toList()));
+		toDelete.forEach(myDailyQuote -> {
+			Symbol mySymbol = myDailyQuote.getSymbol();
+			mySymbol.getDailyQuotes().remove(myDailyQuote);
+			myDailyQuote.setSymbol(null);
+//					LOG.info(""+myDailyQuote.getLocalDay().toString());
+		});
+		dailyQuotesMap.get(portfolioSymbolId).removeAll(toDelete);
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
