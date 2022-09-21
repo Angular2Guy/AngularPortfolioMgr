@@ -52,7 +52,7 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()				
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
 				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
 		final record MyKeyValue(String key, List<DailyQuote> quotes) {
@@ -86,7 +86,7 @@ public abstract class PortfolioCalculcationBase {
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
 				.filter(myLocalDate -> dailyQuotesIdMap.keySet().stream()
 						.map(myId -> 
-						dailyQuotesIdMap.get(myId).stream().anyMatch(myQuote -> myQuote.getLocalDay().equals(myQuote.getLocalDay())))
+						dailyQuotesIdMap.get(myId).stream().anyMatch(myQuote -> myLocalDate.equals(myQuote.getLocalDay())))
 						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
 				.collect(Collectors.toSet()).stream().sorted().toList();
 		return commonQuoteDates;

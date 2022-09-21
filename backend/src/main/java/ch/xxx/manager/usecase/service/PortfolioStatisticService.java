@@ -251,9 +251,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 			List<DailyQuote> dailyQuotes, List<DailyQuote> comparisonDailyQuotes) {
 		Map<LocalDate, DailyQuote> dailyQuotesMap = dailyQuotes.stream()
 				.filter(myQuote -> myQuote.getLocalDay().isAfter(cutOffDate))
+				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getLocalDay()))
 				.collect(Collectors.toMap(DailyQuote::getLocalDay, dq -> dq));
 		Map<LocalDate, DailyQuote> comparisonDailyQuotesMap = comparisonDailyQuotes.stream()
 				.filter(myQuote -> myQuote.getLocalDay().isAfter(cutOffDate))
+				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getLocalDay()))
 				.collect(Collectors.toMap(DailyQuote::getLocalDay, dq -> dq));
 		List<CalcValuesDay> calcValuesDays = dailyQuotesMap.keySet().stream()
 				.filter(myDate -> Optional.ofNullable(comparisonDailyQuotesMap.get(myDate)).isPresent())
