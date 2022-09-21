@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
@@ -45,7 +44,7 @@ import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
@@ -146,22 +145,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return result;
 	}
 
-	public boolean cleanupStaleDailyQuotes(List<DailyQuote> dailyQuotesToRemove) {
-		LOG.info("ToDelete: " + dailyQuotesToRemove.size());
-		if (dailyQuotesToRemove.isEmpty()) {
-			return true;
-		}
-		final List<DailyQuote> updatedQuotes = dailyQuotesToRemove.stream().map(myDailyQuote -> {
-			Symbol mySymbol = myDailyQuote.getSymbol();
-			mySymbol.getDailyQuotes().remove(myDailyQuote);
-			myDailyQuote.setSymbol(null);
-//					LOG.info(""+myDailyQuote.getLocalDay().toString());
-			return myDailyQuote;
-		}).collect(Collectors.toList());
-		this.dailyQuoteRepository.deleteAll(updatedQuotes);
-		return true;
-	}
-
 	private PortfolioData calculatePortfolioData(List<PortfolioToSymbol> portfolioToSymbols) {
 		Map<Long, List<DailyQuote>> dailyQuotesMap = createDailyQuotesIdMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
@@ -235,6 +218,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
+		portfolioToSymbol.getSymbol().getDailyQuotes().forEach(myDailyQuote -> myDailyQuote.setSymbol(null));
+		portfolioToSymbol.getSymbol().getDailyQuotes().clear();
 		return this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
@@ -262,11 +247,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		portfolioQuote.setSymbol(portfolioQuotes.symbol);
 		portfolioQuote.setSymbolKey(portfolioQuotes.symbol.getSymbol());
 		portfolioQuote.setVolume(1L);
-		if (Optional.ofNullable(portfolioQuote.getId()).isEmpty()) {
-			portfolioQuote = this.dailyQuoteRepository.save(portfolioQuote);
 			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
 			portfolioQuotes.dailyQuotes.add(portfolioQuote);
-		}
 		return portfolioQuote;
 	}
 
