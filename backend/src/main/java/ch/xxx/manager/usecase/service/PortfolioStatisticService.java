@@ -65,7 +65,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
 			List<DailyQuote> portfolioQuotes) {
 		List<PortfolioToSymbol> portfolioToSymbols = portfolio.getPortfolioToSymbols().stream().toList();
-		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbols);
+		List<PortfolioToSymbol> portfolioToSymbolsMap = portfolioToSymbols.stream()
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();
+		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbolsMap);
 		Map<String, List<DailyQuote>> comparisonDailyQuotesMap = this.createDailyQuotesSymbolKeyMap(StreamHelpers
 				.toStream(ComparisonIndex.values()).toList().stream().map(ComparisonIndex::getSymbol).toList());
 //		List<DailyQuote> portfolioQuotes = dailyQuotesMap.getOrDefault(portfolioToSymbols.stream()
@@ -81,7 +83,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.toList();
 		updateCorrelations(portfolio, portfolio, comparisonDailyQuotesMap, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisonDailyQuotesMap, portfolioQuotes);
-		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements);
+		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of());
 		return result;
 	}
 

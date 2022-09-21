@@ -14,9 +14,11 @@ package ch.xxx.manager.domain.model.entity.dto;
 
 import java.util.List;
 
+import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 
-public record PortfolioWithElements(Portfolio portfolio, List<PortfolioElement> portfolioElements) {
+public record PortfolioWithElements(Portfolio portfolio, List<PortfolioElement> portfolioElements,
+		List<DailyQuote> dailyQuotesToRemove) {
 
 }

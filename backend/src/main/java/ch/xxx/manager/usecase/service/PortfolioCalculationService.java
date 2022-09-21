@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
@@ -44,13 +45,14 @@ import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
 
 	private record PortfolioData(Map<Long, List<DailyQuote>> dailyQuotesMap,
-			PortfolioSymbolWithDailyQuotes portfolioQuotes, List<CalcPortfolioElement> portfolioElements) {
+			PortfolioSymbolWithDailyQuotes portfolioQuotes, List<CalcPortfolioElement> portfolioElements,
+			List<DailyQuote> dailyQuotesToRemove) {
 	};
 
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
@@ -137,9 +139,27 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
 		portfolio.setYear10(
 				this.portfolioValueAtDate(portfolioToSymbols, myPortfolioData.portfolioElements(), cutOffDate));
-		PortfolioWithElements result = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
+		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
 				myPortfolioData.portfolioQuotes.dailyQuotes);
+		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
+				myPortfolioData.dailyQuotesToRemove);
 		return result;
+	}
+
+	public boolean cleanupStaleDailyQuotes(List<DailyQuote> dailyQuotesToRemove) {
+		LOG.info("ToDelete: " + dailyQuotesToRemove.size());
+		if (dailyQuotesToRemove.isEmpty()) {
+			return true;
+		}
+		final List<DailyQuote> updatedQuotes = dailyQuotesToRemove.stream().map(myDailyQuote -> {
+			Symbol mySymbol = myDailyQuote.getSymbol();
+			mySymbol.getDailyQuotes().remove(myDailyQuote);
+			myDailyQuote.setSymbol(null);
+//					LOG.info(""+myDailyQuote.getLocalDay().toString());
+			return myDailyQuote;
+		}).collect(Collectors.toList());
+		this.dailyQuoteRepository.deleteAll(updatedQuotes);
+		return true;
 	}
 
 	private PortfolioData calculatePortfolioData(List<PortfolioToSymbol> portfolioToSymbols) {
@@ -162,14 +182,18 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.noneMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
 				.toList();
-		List.of(toDelete).stream().findFirst().ifPresent(myQuotes -> this.dailyQuoteRepository.deleteAll(myQuotes));
+		dailyQuotesMap.put(portfolioSymbolId,
+				dailyQuotesMap.getOrDefault(portfolioSymbolId, List.of()).stream()
+						.filter(myDailyQuote -> commonQuoteDates.stream()
+								.anyMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
+						.collect(Collectors.toList()));
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
 						portfolioQuotes))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(CalcPortfolioElement::localDate))
 				.collect(Collectors.toList());
-		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements);
+		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements, toDelete);
 	}
 
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
