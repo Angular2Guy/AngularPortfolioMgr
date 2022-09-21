@@ -19,19 +19,16 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
@@ -47,7 +44,7 @@ import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
@@ -161,10 +158,11 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> pts.getSymbol().getId()).findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
-		this.dailyQuoteRepository.deleteAll(dailyQuotesMap.get(portfolioSymbolId).stream()
+		List<DailyQuote> toDelete = dailyQuotesMap.getOrDefault(portfolioSymbolId, List.of()).stream()
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.noneMatch(myLocalDate -> myLocalDate.equals(myDailyQuote.getLocalDay())))
-				.toList());
+				.toList();
+		List.of(toDelete).stream().findFirst().ifPresent(myQuotes -> this.dailyQuoteRepository.deleteAll(myQuotes));
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
