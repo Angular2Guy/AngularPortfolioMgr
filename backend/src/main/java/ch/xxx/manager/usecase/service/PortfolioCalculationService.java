@@ -48,6 +48,8 @@ import ch.xxx.manager.domain.utils.StreamHelpers;
 @Service
 @Transactional
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
+	private final DailyQuoteRepository dailyQuoteRepository;
+	
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
 
@@ -65,8 +67,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
 			PortfolioStatisticService portfolioStatisticService) {
-		super(dailyQuoteRepository, currencyService);
+		super(currencyService);
 		this.portfolioStatisticService = portfolioStatisticService;
+		this.dailyQuoteRepository = dailyQuoteRepository;
 	}
 
 	public List<CalcPortfolioElement> calculatePortfolioBars(Portfolio portfolio, LocalDate cutOffDate,

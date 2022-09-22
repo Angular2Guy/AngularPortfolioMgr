@@ -24,17 +24,14 @@ import java.util.stream.Collectors;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
-import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
-import ch.xxx.manager.domain.utils.StreamHelpers;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 
 public abstract class PortfolioCalculcationBase {
-	protected final DailyQuoteRepository dailyQuoteRepository;
 	protected final CurrencyService currencyService;
 
-	public PortfolioCalculcationBase(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
-		this.dailyQuoteRepository = dailyQuoteRepository;
+	public PortfolioCalculcationBase(CurrencyService currencyService) {
 		this.currencyService = currencyService;
 	}
 
@@ -48,22 +45,6 @@ public abstract class PortfolioCalculcationBase {
 						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
 				.collect(Collectors.toMap(MyKeyValue::id, MyKeyValue::quotes));
 		return sortedDailyQuotesMap;
-	}
-
-	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
-				.sorted(Comparator.comparing(DailyQuote::getSymbolKey))
-				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getSymbolKey()))
-				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
-				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
-		final record MyKeyValue(String key, List<DailyQuote> quotes) {
-		}
-		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
-				.map(myKey -> new MyKeyValue(myKey, dailyQuotesMap.get(myKey).stream()
-						.filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay))
-						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
-				.collect(Collectors.toMap(MyKeyValue::key, MyKeyValue::quotes));
-		return filteredDailyQuotesMap;
 	}
 
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
