@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -65,9 +66,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
 			List<DailyQuote> portfolioQuotes) {
 		List<PortfolioToSymbol> portfolioToSymbols = portfolio.getPortfolioToSymbols().stream().toList();
-		List<PortfolioToSymbol> portfolioToSymbolsMap = portfolioToSymbols.stream()
-				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();
-		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbolsMap);
+		Set<PortfolioToSymbol> portfolioToSymbolsNoPort = portfolioToSymbols.stream()
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).collect(Collectors.toSet());
+		Map<Long, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesIdMap(portfolioToSymbolsNoPort);
 		Map<String, List<DailyQuote>> comparisonDailyQuotesMap = this.createDailyQuotesSymbolKeyMap(StreamHelpers
 				.toStream(ComparisonIndex.values()).toList().stream().map(ComparisonIndex::getSymbol).toList());
 //		List<DailyQuote> portfolioQuotes = dailyQuotesMap.getOrDefault(portfolioToSymbols.stream()

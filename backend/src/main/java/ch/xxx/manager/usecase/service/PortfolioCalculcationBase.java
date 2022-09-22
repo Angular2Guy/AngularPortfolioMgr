@@ -38,21 +38,22 @@ public abstract class PortfolioCalculcationBase {
 		this.currencyService = currencyService;
 	}
 
-	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(List<PortfolioToSymbol> portfolioToSymbols) {
-		Map<Long, List<DailyQuote>> myDailyQuotesMap = this.dailyQuoteRepository
-				.findBySymbolIds(portfolioToSymbols.stream().map(mySymbol -> mySymbol.getSymbol().getId()).toList())
-				.stream().collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
+	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(Set<PortfolioToSymbol> portfolioToSymbols) {
+		Map<Long, List<DailyQuote>> myDailyQuotesMap = portfolioToSymbols.stream().flatMap(pts -> pts.getSymbol().getDailyQuotes().stream())
+				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
 		final record MyKeyValue(Long id, List<DailyQuote> quotes) {
 		}
 		Map<Long, List<DailyQuote>> sortedDailyQuotesMap = myDailyQuotesMap.keySet().stream()
 				.map(myId -> new MyKeyValue(myId, myDailyQuotesMap.get(myId).stream()
-						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).toList()))
+						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
 				.collect(Collectors.toMap(MyKeyValue::id, MyKeyValue::quotes));
 		return sortedDailyQuotesMap;
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
-		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()				
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
+				.sorted(Comparator.comparing(DailyQuote::getSymbolKey))
+				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getSymbolKey()))
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
 				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
 		final record MyKeyValue(String key, List<DailyQuote> quotes) {
@@ -60,7 +61,7 @@ public abstract class PortfolioCalculcationBase {
 		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
 				.map(myKey -> new MyKeyValue(myKey, dailyQuotesMap.get(myKey).stream()
 						.filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay))
-						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).toList()))
+						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
 				.collect(Collectors.toMap(MyKeyValue::key, MyKeyValue::quotes));
 		return filteredDailyQuotesMap;
 	}

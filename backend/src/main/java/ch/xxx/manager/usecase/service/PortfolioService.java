@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.PortfolioElementRepository;
@@ -56,9 +57,10 @@ public class PortfolioService {
 	private final AppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
 	private final PortfolioToIndexService portfolioToIndexService;
+	private final DailyQuoteRepository dailyQuoteRepository;
 
 	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
-			PortfolioElementRepository portfolioElementRepository,
+			PortfolioElementRepository portfolioElementRepository, DailyQuoteRepository dailyQuoteRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
 			PortfolioCalculationService portfolioCalculationService, PortfolioToIndexService portfolioToIndexService) {
 		this.portfolioRepository = portfolioRepository;
@@ -68,6 +70,7 @@ public class PortfolioService {
 		this.appUserRepository = appUserRepository;
 		this.portfolioToIndexService = portfolioToIndexService;
 		this.portfolioElementRepository = portfolioElementRepository;
+		this.dailyQuoteRepository = dailyQuoteRepository;
 	}
 
 	public List<Portfolio> getPortfoliosByUserId(Long userId) {
@@ -111,6 +114,7 @@ public class PortfolioService {
 	private PortfolioWithElements updatePortfolioElements(final PortfolioWithElements portfolioWithElements) {
 		List<PortfolioElement> portfolioElements = StreamHelpers
 				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))	
+				.peek(pe -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
 				.collect(Collectors.toList());
 		
 		return new PortfolioWithElements(portfolioWithElements.portfolio(), portfolioElements, List.of());
@@ -135,6 +139,7 @@ public class PortfolioService {
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
+				.peek(portfolioWithElements -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
