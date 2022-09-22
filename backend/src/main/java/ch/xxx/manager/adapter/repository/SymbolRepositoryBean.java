@@ -23,31 +23,34 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 @Repository
 public class SymbolRepositoryBean implements SymbolRepository {
 	private final JpaSymbolRepository jpaSymbolRepository;
-	
+
 	public SymbolRepositoryBean(JpaSymbolRepository jpaSymbolRepository) {
 		this.jpaSymbolRepository = jpaSymbolRepository;
 	}
 
 	@Override
 	public List<Symbol> findBySymbol(String symbol) {
-		return this.jpaSymbolRepository.findBySymbol(symbol);
+		return symbol == null || symbol.isBlank() ? List.of()
+				: this.jpaSymbolRepository.findBySymbol(symbol.trim().toLowerCase());
 	}
 
 	@Override
 	public List<Symbol> findBySymbolSingle(String symbol) {
-		return this.jpaSymbolRepository.findBySymbolSingle(symbol);
+		return symbol == null || symbol.isBlank() ? List.of()
+				: this.jpaSymbolRepository.findBySymbolSingle(symbol.trim().toLowerCase());
 	}
 
 	@Override
 	public List<Symbol> findByName(String name) {
-		return this.jpaSymbolRepository.findByName(name);
+		return name == null || name.isBlank() ? List.of()
+				: this.jpaSymbolRepository.findByName(name.trim().toLowerCase());
 	}
 
 	@Override
 	public List<Symbol> findByPortfolioId(Long portfolioId) {
 		return this.jpaSymbolRepository.findByPortfolioId(portfolioId);
 	}
-	
+
 	@Override
 	public List<Symbol> findAll() {
 		return this.jpaSymbolRepository.findAll();
@@ -62,5 +65,5 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public Optional<Symbol> findById(Long id) {
 		return this.jpaSymbolRepository.findById(id);
 	}
-	
+
 }

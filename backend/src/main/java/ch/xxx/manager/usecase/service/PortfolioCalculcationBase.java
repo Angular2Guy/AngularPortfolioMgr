@@ -24,27 +24,49 @@ import java.util.stream.Collectors;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
-import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 
 public abstract class PortfolioCalculcationBase {
+	protected final DailyQuoteRepository dailyQuoteRepository;
 	protected final CurrencyService currencyService;
 
-	public PortfolioCalculcationBase(CurrencyService currencyService) {
+	public PortfolioCalculcationBase(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
+		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;
 	}
 
 	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(Set<PortfolioToSymbol> portfolioToSymbols) {
-		Map<Long, List<DailyQuote>> myDailyQuotesMap = portfolioToSymbols.stream().flatMap(pts -> pts.getSymbol().getDailyQuotes().stream())
+		List<DailyQuote> myDailyQuotes = this.dailyQuoteRepository
+				.findBySymbolIds(portfolioToSymbols.stream().map(pts -> pts.getSymbol().getId()).toList());
+		Map<Long, List<DailyQuote>> myDailyQuotesMap = myDailyQuotes.stream()
 				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
 		final record MyKeyValue(Long id, List<DailyQuote> quotes) {
 		}
 		Map<Long, List<DailyQuote>> sortedDailyQuotesMap = myDailyQuotesMap.keySet().stream()
-				.map(myId -> new MyKeyValue(myId, myDailyQuotesMap.get(myId).stream()
-						.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
+				.map(myId -> new MyKeyValue(myId,
+						myDailyQuotesMap.get(myId).stream().sorted(Comparator.comparing(DailyQuote::getLocalDay))
+								.collect(Collectors.toList())))
 				.collect(Collectors.toMap(MyKeyValue::id, MyKeyValue::quotes));
 		return sortedDailyQuotesMap;
+	}
+
+	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
+		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
+				.sorted(Comparator.comparing(DailyQuote::getSymbolKey))
+				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getSymbolKey()))
+				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
+				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
+		final record MyKeyValue(String key, List<DailyQuote> quotes) {
+		}
+		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
+				.map(myKey -> new MyKeyValue(myKey,
+						dailyQuotesMap.get(myKey).stream().filter(StreamHelpers.distinctByKey(DailyQuote::getLocalDay))
+								.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList())))
+				.collect(Collectors.toMap(MyKeyValue::key, MyKeyValue::quotes));
+		return filteredDailyQuotesMap;
 	}
 
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
@@ -61,14 +83,14 @@ public abstract class PortfolioCalculcationBase {
 		}
 		return calcValue;
 	}
-	
+
 	protected List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesIdMap) {
 		final Set<LocalDate> quoteDates = dailyQuotesIdMap.keySet().stream().map(myId -> dailyQuotesIdMap.get(myId))
 				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
 				.filter(myLocalDate -> dailyQuotesIdMap.keySet().stream()
-						.map(myId -> 
-						dailyQuotesIdMap.get(myId).stream().anyMatch(myQuote -> myLocalDate.equals(myQuote.getLocalDay())))
+						.map(myId -> dailyQuotesIdMap.get(myId).stream()
+								.anyMatch(myQuote -> myLocalDate.equals(myQuote.getLocalDay())))
 						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
 				.collect(Collectors.toSet()).stream().sorted().toList();
 		return commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();

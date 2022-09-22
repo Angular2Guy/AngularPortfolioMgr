@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioBase;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
@@ -62,8 +63,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
 	}
 
-	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService) {
-		super(currencyService);
+	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
+			DailyQuoteRepository dailyQuoteRepository) {
+		super(dailyQuoteRepository, currencyService);
 		this.symbolRepository = symbolRepository;
 	}
 
@@ -77,7 +79,8 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<Symbol> comparisionSymbols = StreamHelpers.toStream(ComparisonIndex.values()).toList().stream()
 				.map(ComparisonIndex::getSymbol)
 				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr).stream())
-				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol())).toList();
+//				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol()))
+				.toList();
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getId())
@@ -113,7 +116,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		portfolioBase.setYear2LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
 				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
 		portfolioBase.setYear2LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes,  msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
 		portfolioBase.setYear1LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
 				portfolioQuotes, es50Symbol.getDailyQuotes()));
 		portfolioBase.setYear1LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
@@ -124,8 +127,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private Symbol filterSymbol(ComparisonIndex comparisionIndex, Collection<Symbol> comparisonSymbols) {
 		return comparisonSymbols.stream()
-				.filter(mySymbol -> comparisionIndex.getSymbol().equalsIgnoreCase(mySymbol.getSymbol()))
-				.findFirst().orElseThrow(() -> new RuntimeException("Comparison Index Es50 not found."));
+				.filter(mySymbol -> comparisionIndex.getSymbol().equalsIgnoreCase(mySymbol.getSymbol())).findFirst()
+				.orElseThrow(() -> new RuntimeException(
+						String.format("Comparison Index %s not found.", comparisionIndex.getName())));
 	}
 
 	private void updateCorrelations(final Portfolio portfolio, final PortfolioBase portfolioBase,

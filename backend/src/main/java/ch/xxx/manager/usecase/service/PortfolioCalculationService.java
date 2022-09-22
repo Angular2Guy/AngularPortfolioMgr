@@ -48,8 +48,6 @@ import ch.xxx.manager.domain.utils.StreamHelpers;
 @Service
 @Transactional
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
-	private final DailyQuoteRepository dailyQuoteRepository;
-	
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
 
@@ -67,9 +65,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
 			PortfolioStatisticService portfolioStatisticService) {
-		super(currencyService);
+		super(dailyQuoteRepository, currencyService);
 		this.portfolioStatisticService = portfolioStatisticService;
-		this.dailyQuoteRepository = dailyQuoteRepository;
 	}
 
 	public List<CalcPortfolioElement> calculatePortfolioBars(Portfolio portfolio, LocalDate cutOffDate,
@@ -172,7 +169,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		dailyQuotesMap.getOrDefault(portfolioSymbolId, new LinkedList<>()).removeAll(toDelete);
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.get(pts.getSymbol().getId()),
+				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.getOrDefault(pts.getSymbol().getId(), List.of()),
 						portfolioQuotes))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(CalcPortfolioElement::localDate))
 				.collect(Collectors.toList());
@@ -218,8 +215,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
-		portfolioToSymbol.getSymbol().getDailyQuotes().forEach(myDailyQuote -> myDailyQuote.setSymbol(null));
-		portfolioToSymbol.getSymbol().getDailyQuotes().clear();
 		return this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
