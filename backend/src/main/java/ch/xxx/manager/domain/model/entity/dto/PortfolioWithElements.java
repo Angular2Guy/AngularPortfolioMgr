@@ -19,6 +19,6 @@ import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 
 public record PortfolioWithElements(Portfolio portfolio, List<PortfolioElement> portfolioElements,
-		List<DailyQuote> dailyQuotesToRemove) {
+		List<DailyQuote> dailyQuotesToRemove, List<DailyQuote> portfolioDailyQuotes) {
 
 }

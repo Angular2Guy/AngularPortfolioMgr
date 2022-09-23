@@ -90,7 +90,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.toList();
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
-		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of());
+		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of(), portfolioQuotes);
 		return result;
 	}
 

@@ -142,7 +142,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
 				myPortfolioData.portfolioQuotes.dailyQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
-				myPortfolioData.dailyQuotesToRemove);
+				myPortfolioData.dailyQuotesToRemove, myPortfolioData.portfolioQuotes.dailyQuotes);
 		return result;
 	}
 

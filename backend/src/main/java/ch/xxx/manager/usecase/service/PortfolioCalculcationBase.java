@@ -84,7 +84,7 @@ public abstract class PortfolioCalculcationBase {
 		return calcValue;
 	}
 
-	protected List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesIdMap) {
+	protected List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesIdMap) {		
 		final Set<LocalDate> quoteDates = dailyQuotesIdMap.keySet().stream().map(myId -> dailyQuotesIdMap.get(myId))
 				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
