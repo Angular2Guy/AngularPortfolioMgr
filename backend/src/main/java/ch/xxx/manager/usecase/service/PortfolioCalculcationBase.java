@@ -90,7 +90,7 @@ public abstract class PortfolioCalculcationBase {
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
 				.filter(myLocalDate -> dailyQuotesIdMap.keySet().stream()
 						.map(myId -> dailyQuotesIdMap.get(myId).stream()
-								.anyMatch(myQuote -> myLocalDate.equals(myQuote.getLocalDay())))
+								.anyMatch(myQuote -> myLocalDate.isEqual(myQuote.getLocalDay())))
 						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
 				.collect(Collectors.toSet()).stream().sorted().toList();
 		return commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();

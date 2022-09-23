@@ -113,11 +113,17 @@ public class PortfolioService {
 
 	private PortfolioWithElements updatePortfolioElements(final PortfolioWithElements portfolioWithElements) {
 		List<PortfolioElement> portfolioElements = StreamHelpers
-				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))	
-				.peek(pe -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
+				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))
+				.peek(pe -> portfolioWithElements.portfolioDailyQuotes().stream()
+						.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+						.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).toList())
 				.peek(pe -> this.dailyQuoteRepository.saveAll(portfolioWithElements.portfolioDailyQuotes()))
+				.peek(pe -> portfolioWithElements.dailyQuotesToRemove().stream()
+						.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+						.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).toList())
+				.peek(pe -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
 				.collect(Collectors.toList());
-		
+
 		return new PortfolioWithElements(portfolioWithElements.portfolio(), portfolioElements, List.of(), List.of());
 	}
 
@@ -140,8 +146,10 @@ public class PortfolioService {
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.peek(portfolioWithElements -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
-				.peek(portfolioWithElements -> this.dailyQuoteRepository.saveAll(portfolioWithElements.portfolioDailyQuotes()))
+				.peek(portfolioWithElements -> this.dailyQuoteRepository
+						.saveAll(portfolioWithElements.portfolioDailyQuotes()))
+				.peek(portfolioWithElements -> this.dailyQuoteRepository
+						.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
