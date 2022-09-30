@@ -83,14 +83,14 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.toList();
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(pts -> pts.getRemovedAt() == null).map(pts -> pts.getSymbol().getSymbol())
-				.flatMap(symbolKey -> Stream.of(dailyQuotesMap.get(symbolKey)))
-				.flatMap(myDailyQuotes -> Stream.of(
-						this.createPortfolioElement(portfolio, myDailyQuotes, portfolioToSymbols, comparisionSymbols)))
-				.toList();
+				.filter(pts -> pts.getRemovedAt() == null)
+				.flatMap(pts -> Stream.of(this.createPortfolioElement(portfolio,
+						dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts, comparisionSymbols)))
+				.collect(Collectors.toList());
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
-		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of(), portfolioQuotes);
+		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of(),
+				portfolioQuotes);
 		return result;
 	}
 
@@ -164,23 +164,20 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	}
 
 	private PortfolioElement createPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
-			final List<PortfolioToSymbol> portfolioToSymbols, List<Symbol> comparisonSymbols) {
+			final PortfolioToSymbol portfolioToSymbol, List<Symbol> comparisonSymbols) {
 		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
-				.filter(myPortfolioElement -> dailyQuotes.stream().anyMatch(
-						myDailyQuote -> myDailyQuote.getSymbolKey().equalsIgnoreCase(myPortfolioElement.getSymbol())))
+				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
+						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
 				.findFirst().orElse(new PortfolioElement());
-		Optional<PortfolioToSymbol> ptsOpt = portfolioToSymbols.stream()
-				.filter(pts -> dailyQuotes.get(0).getSymbolKey().equalsIgnoreCase(pts.getSymbol().getSymbol()))
-				.findFirst();
 		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
-		String ptsName = ptsOpt.stream().map(pts -> pts.getSymbol().getName()).findFirst().orElse("Unknown");
-		Optional<CurrencyKey> symbolCurKeyOpt = ptsOpt.stream().map(pts -> pts.getSymbol().getCurrencyKey())
-				.findFirst();
-		String sectorName = MappingUtils.findSectorName(ptsOpt.stream().map(PortfolioToSymbol::getSymbol).findFirst());
+		String ptsName = Optional.ofNullable(portfolioToSymbol.getSymbol().getName()).stream().findFirst()
+				.orElse("Unknown");
+		Optional<CurrencyKey> symbolCurKeyOpt = Optional.ofNullable(portfolioToSymbol.getSymbol().getCurrencyKey())
+				.stream().findFirst();
+		String sectorName = portfolioElement.getSymbol();
 		portfolioElement.setSector(sectorName);
-		portfolioElement.setWeight(ptsOpt.stream().map(myPts -> myPts.getWeight()).findFirst().orElse(0L));
+		portfolioElement.setWeight(Optional.ofNullable(portfolioToSymbol.getWeight()).stream().findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);
-		portfolioElement.setPortfolio(portfolio);
 		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
 		portfolioElement.setLastClose(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now(), symbolCurKeyOpt));
 		portfolioElement.setMonth1(
@@ -199,6 +196,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		this.updateLinRegReturns(portfolio, portfolioElement, comparisonSymbols, dailyQuotes);
 		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
 			portfolio.getPortfolioElements().add(portfolioElement);
+			portfolioElement.setPortfolio(portfolio);
 		}
 		return portfolioElement;
 	}
