@@ -166,15 +166,16 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private PortfolioElement createPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
 			final PortfolioToSymbol portfolioToSymbol, List<Symbol> comparisonSymbols) {
 		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
+				.filter(myPortfolioElement -> !myPortfolioElement.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
 						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
 				.findFirst().orElse(new PortfolioElement());
-		portfolioElement.setSymbol(dailyQuotes.get(0).getSymbolKey());
+		portfolioElement.setSymbol(portfolioToSymbol.getSymbol().getSymbol());
 		String ptsName = Optional.ofNullable(portfolioToSymbol.getSymbol().getName()).stream().findFirst()
 				.orElse("Unknown");
 		Optional<CurrencyKey> symbolCurKeyOpt = Optional.ofNullable(portfolioToSymbol.getSymbol().getCurrencyKey())
 				.stream().findFirst();
-		String sectorName = portfolioElement.getSymbol();
+		String sectorName = portfolioElement.getSector();
 		portfolioElement.setSector(sectorName);
 		portfolioElement.setWeight(Optional.ofNullable(portfolioToSymbol.getWeight()).stream().findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);

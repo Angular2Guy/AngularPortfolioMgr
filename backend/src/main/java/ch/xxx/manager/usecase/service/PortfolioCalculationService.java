@@ -150,6 +150,17 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
+		final String portfolioSymbolKey = portfolioToSymbols.stream()
+				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.map(pts -> pts.getSymbol().getSymbol()).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
+		List<DailyQuote> toDelete = dailyQuotesMap.getOrDefault(portfolioSymbolKey, List.of()).stream()
+				.filter(myDailyQuote -> commonQuoteDates.stream()
+						.noneMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
+				.toList();
+		List<DailyQuote> myQuotes = dailyQuotesMap.getOrDefault(portfolioSymbolKey, new LinkedList<>());
+		myQuotes.removeAll(toDelete);
+		dailyQuotesMap.put(portfolioSymbolKey, myQuotes);
 		PortfolioSymbolWithDailyQuotes portfolioQuotes = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.peek(pts -> LOG.info(pts.getSymbol().getSymbol() + " " + pts.getSymbol().getId()))
@@ -159,15 +170,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 								.anyMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
 						.map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote)).collect(Collectors.toList())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
-		final String portfolioSymbolKey = portfolioToSymbols.stream()
-				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.map(pts -> pts.getSymbol().getSymbol()).findFirst()
-				.orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
-		List<DailyQuote> toDelete = dailyQuotesMap.getOrDefault(portfolioSymbolKey, List.of()).stream()
-				.filter(myDailyQuote -> commonQuoteDates.stream()
-						.noneMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
-				.toList();
-		dailyQuotesMap.getOrDefault(portfolioSymbolKey, new LinkedList<>()).removeAll(toDelete);
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.getOrDefault(pts.getSymbol().getSymbol(), new LinkedList<>()),
