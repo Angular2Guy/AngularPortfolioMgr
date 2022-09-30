@@ -15,6 +15,7 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 public abstract class PortfolioCalculcationBase {
@@ -38,19 +40,9 @@ public abstract class PortfolioCalculcationBase {
 		this.currencyService = currencyService;
 	}
 
-	protected Map<Long, List<DailyQuote>> createDailyQuotesIdMap(Set<PortfolioToSymbol> portfolioToSymbols) {
-		List<DailyQuote> myDailyQuotes = this.dailyQuoteRepository
-				.findBySymbolIds(portfolioToSymbols.stream().map(pts -> pts.getSymbol().getId()).toList());
-		Map<Long, List<DailyQuote>> myDailyQuotesMap = myDailyQuotes.stream()
-				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbol().getId()));
-		final record MyKeyValue(Long id, List<DailyQuote> quotes) {
-		}
-		Map<Long, List<DailyQuote>> sortedDailyQuotesMap = myDailyQuotesMap.keySet().stream()
-				.map(myId -> new MyKeyValue(myId,
-						myDailyQuotesMap.get(myId).stream().sorted(Comparator.comparing(DailyQuote::getLocalDay))
-								.collect(Collectors.toList())))
-				.collect(Collectors.toMap(MyKeyValue::id, MyKeyValue::quotes));
-		return sortedDailyQuotesMap;
+	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
+		return portfolioToSymbols.stream().map(pts -> pts.getSymbol())
+				.collect(Collectors.toMap(Symbol::getSymbol, mySymbol -> new ArrayList<>(mySymbol.getDailyQuotes())));
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
@@ -84,15 +76,19 @@ public abstract class PortfolioCalculcationBase {
 		return calcValue;
 	}
 
-	protected List<LocalDate> filteredCommonQuoteDates(Map<Long, List<DailyQuote>> dailyQuotesIdMap) {		
-		final Set<LocalDate> quoteDates = dailyQuotesIdMap.keySet().stream().map(myId -> dailyQuotesIdMap.get(myId))
+	protected List<LocalDate> filteredCommonQuoteDates(Map<String, List<DailyQuote>> dailyQuotesKeyMap) {
+		final Set<LocalDate> quoteDates = dailyQuotesKeyMap.keySet().stream().map(myId -> dailyQuotesKeyMap.get(myId))
 				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
-				.filter(myLocalDate -> dailyQuotesIdMap.keySet().stream()
-						.map(myId -> dailyQuotesIdMap.get(myId).stream()
+				.filter(myLocalDate -> dailyQuotesKeyMap.keySet().stream()
+						.filter(myKey -> !myKey.contains(ServiceUtils.PORTFOLIO_MARKER))
+						.map(myId -> dailyQuotesKeyMap.get(myId).stream()
 								.anyMatch(myQuote -> myLocalDate.isEqual(myQuote.getLocalDay())))
 						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
 				.collect(Collectors.toSet()).stream().sorted().toList();
-		return commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
+		List<LocalDate> allDates = dailyQuotesKeyMap.values().stream().flatMap(List::stream)
+				.map(myQuote -> myQuote.getLocalDay()).toList();
+		return dailyQuotesKeyMap.keySet().size() == 1L ? allDates
+				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
 }

@@ -18,6 +18,6 @@ public interface PortfolioToSymbolRepository {
 	List<PortfolioToSymbol> findByPortfolioId(Long portfolioId);
 	List<PortfolioToSymbol> findBySymbolId(Long symbolId);
 	List<PortfolioToSymbol> findByPortfolioIdAndSymbolId(Long portfolioId, Long symbolId);
-	PortfolioToSymbol save(PortfolioToSymbol portfolioToSymbol);
+	PortfolioToSymbol saveAndFlush(PortfolioToSymbol portfolioToSymbol);
 	List<PortfolioToSymbol> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId);
 }

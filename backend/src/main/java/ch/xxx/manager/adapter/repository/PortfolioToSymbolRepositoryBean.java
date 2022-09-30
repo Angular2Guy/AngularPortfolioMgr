@@ -43,8 +43,8 @@ public class PortfolioToSymbolRepositoryBean implements PortfolioToSymbolReposit
 	}
 
 	@Override
-	public PortfolioToSymbol save(PortfolioToSymbol portfolioToSymbol) {
-		return this.jpaPortfolioToSymbolRepository.save(portfolioToSymbol);
+	public PortfolioToSymbol saveAndFlush(PortfolioToSymbol portfolioToSymbol) {
+		return this.jpaPortfolioToSymbolRepository.saveAndFlush(portfolioToSymbol);
 	}
 
 	@Override

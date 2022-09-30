@@ -105,12 +105,20 @@ public class PortfolioService {
 
 	public PortfolioWithElements addSymbolToPortfolio(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
+		Portfolio updatedPortfolio = this.portfolioToSymbolRepository
+		.saveAndFlush(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio();
 		PortfolioWithElements portfolioWithElements = this.portfolioCalculationService
-				.calculatePortfolio(this.portfolioToSymbolRepository
-						.save(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio());
+				.calculatePortfolio(updatedPortfolio);
 		return updatePortfolioElements(portfolioWithElements);
 	}
 
+	private Portfolio addDailyQuotes(Portfolio portfolio) {
+		portfolio.getPortfolioToSymbols().forEach(pts -> {
+			pts.getSymbol().getDailyQuotes().addAll(this.dailyQuoteRepository.findBySymbolId(pts.getSymbol().getId()));
+		});
+		return portfolio;
+	}
+	
 	private PortfolioWithElements updatePortfolioElements(final PortfolioWithElements portfolioWithElements) {
 		List<PortfolioElement> portfolioElements = StreamHelpers
 				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))
@@ -132,20 +140,20 @@ public class PortfolioService {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
-				.map(newEntity -> this.portfolioToSymbolRepository.save(newEntity))
+				.map(newEntity -> this.portfolioToSymbolRepository.saveAndFlush(newEntity))
 
 				.map(newEntity -> this.updatePortfolioElements(
-						this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio())))
+						this.portfolioCalculationService.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio()))))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
 
 	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
-				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.save(this.updatePtsEntity(entity,
+				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.saveAndFlush(this.updatePtsEntity(entity,
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
-				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
+				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio())))
 				.peek(portfolioWithElements -> this.dailyQuoteRepository
 						.saveAll(portfolioWithElements.portfolioDailyQuotes()))
 				.peek(portfolioWithElements -> this.dailyQuoteRepository
@@ -193,7 +201,7 @@ public class PortfolioService {
 		Symbol symbolEntity = new Symbol(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(),
 				CurrencyKey.EUR, QuoteSource.PORTFOLIO, Set.of(), Set.of(), new HashSet<PortfolioToSymbol>());
 		return this.portfolioToSymbolRepository
-				.save(this.createPtSEntity(portfolioEntity, this.symbolRepository.save(symbolEntity)));
+				.saveAndFlush(this.createPtSEntity(portfolioEntity, this.symbolRepository.save(symbolEntity)));
 	}
 
 	private PortfolioToSymbol createPtSEntity(Portfolio portfolioEntity, Symbol symbol) {
