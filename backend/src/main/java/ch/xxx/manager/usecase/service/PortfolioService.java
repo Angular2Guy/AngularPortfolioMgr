@@ -126,22 +126,30 @@ public class PortfolioService {
 		return portfolio;
 	}
 
+	private List<DailyQuote> filterDailyQuotes(List<DailyQuote> dailyQuotes, List<DailyQuote> dailyQuotesToRemove) {
+		return dailyQuotes.stream()
+				.filter(myDailyQuote -> dailyQuotesToRemove.stream()
+						.noneMatch(myRemoveQuote -> myDailyQuote.getLocalDay().isEqual(myRemoveQuote.getLocalDay())))
+				.collect(Collectors.toList());
+	}
+
 	private PortfolioWithElements updatePortfolioElements(final PortfolioWithElements portfolioWithElements) {
-		this.removeDailyQuotes(portfolioWithElements.portfolio(), portfolioWithElements.dailyQuotesToRemove());
+		Portfolio portfolio = this.removeDailyQuotes(portfolioWithElements.portfolio(),
+				portfolioWithElements.dailyQuotesToRemove());
+		List<DailyQuote> filteredDailyQuotes = this.filterDailyQuotes(portfolioWithElements.portfolioDailyQuotes(),
+				portfolioWithElements.dailyQuotesToRemove());
 		List<PortfolioElement> portfolioElements = StreamHelpers
 				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))
-				.peek(pe -> portfolioWithElements.portfolioDailyQuotes().stream()
-						.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
-						.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).toList())
-				.peek(pe -> this.dailyQuoteRepository.saveAll(portfolioWithElements.portfolioDailyQuotes()))
-				.peek(pe -> portfolioWithElements.dailyQuotesToRemove().stream()
-						.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
-						.peek(dq -> LOGGER.info("Porfolio remove: {} {}", dq.getId(), dq.getLocalDay().toString()))
-						.toList())
-				.peek(pe -> this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
 				.collect(Collectors.toList());
+		filteredDailyQuotes = this.dailyQuoteRepository.saveAll(filteredDailyQuotes.stream().filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+				.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).collect(Collectors.toList()));
 
-		return new PortfolioWithElements(portfolioWithElements.portfolio(), portfolioElements, List.of(), List.of());
+		this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove().stream()
+				.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+				.peek(dq -> LOGGER.info("Porfolio remove: {} {}", dq.getId(), dq.getLocalDay().toString()))
+				.collect(Collectors.toList()));
+
+		return new PortfolioWithElements(portfolio, portfolioElements, List.of(), List.of());
 	}
 
 	public PortfolioWithElements updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
@@ -150,7 +158,6 @@ public class PortfolioService {
 				.flatMap(myEntity -> Stream.of(
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.map(newEntity -> this.portfolioToSymbolRepository.saveAndFlush(newEntity))
-
 				.map(newEntity -> this.updatePortfolioElements(this.portfolioCalculationService
 						.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio()))))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
