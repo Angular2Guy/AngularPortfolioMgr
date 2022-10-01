@@ -60,6 +60,11 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public Symbol save(Symbol symbol) {
 		return this.jpaSymbolRepository.save(symbol);
 	}
+	
+	@Override
+	public List<Symbol> saveAll(Iterable<Symbol> symbols) {
+		return this.jpaSymbolRepository.saveAll(symbols);
+	}
 
 	@Override
 	public Optional<Symbol> findById(Long id) {

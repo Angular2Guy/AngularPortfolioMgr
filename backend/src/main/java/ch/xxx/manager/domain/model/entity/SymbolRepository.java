@@ -23,4 +23,5 @@ public interface SymbolRepository {
 	List<Symbol> findAll();
 	Optional<Symbol> findById(Long id);
 	Symbol save(Symbol symbol);
+	List<Symbol> saveAll(Iterable<Symbol> symbols);
 }

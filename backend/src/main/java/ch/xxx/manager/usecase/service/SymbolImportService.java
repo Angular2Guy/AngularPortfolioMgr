@@ -44,8 +44,7 @@ public class SymbolImportService {
 	private final HkexClient hkexClient;
 	private final SymbolRepository repository;
 	private final XetraClient xetraClient;
-	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(
-			new ArrayList<>());
+	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
 			XetraClient xetraClient) {
@@ -68,53 +67,60 @@ public class SymbolImportService {
 		return Collections.unmodifiableList(new ArrayList<Symbol>(this.allSymbolEntities.get()));
 	}
 
-	public String importUsSymbols() {		
-		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq))).block();
+	public String importUsSymbols() {
+		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq)))
+				.block();
 		return String.format("Nasdaq imported symbols: %d", symbolCount);
 	}
 
 	public Long importUsSymbols(List<String> nasdaq) {
 		this.refreshSymbolEntities();
 		LOGGER.info("importUsSymbols() called.");
-		return nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+		List<Symbol> result = this.repository.saveAll(nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
+				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+		return Long.valueOf(result.size());
 	}
 
-	public String importHkSymbols() {		
-		Long symbolCount = this.hkexClient.importSymbols().flatMap(hkex -> Mono.just(this.importHkSymbols(hkex))).block();
+	public String importHkSymbols() {
+		Long symbolCount = this.hkexClient.importSymbols().flatMap(hkex -> Mono.just(this.importHkSymbols(hkex)))
+				.block();
 		return String.format("Hkex imported symbols: %d", symbolCount);
 	}
 
 	public Long importHkSymbols(List<HkSymbolImportDto> hkex) {
 		this.refreshSymbolEntities();
 		LOGGER.info("importHkSymbols() called.");
-		return hkex.stream().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+		List<Symbol> result = this.repository
+				.saveAll(hkex.stream().filter(this::filter).flatMap(myDto -> this.convert(myDto))
+						.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+		return Long.valueOf(result.size());
 	}
 
 	public String importDeSymbols() {
-		Long symbolCount = this.xetraClient.importXetraSymbols().flatMap(xetra -> Mono.just(this.importDeSymbols(xetra))).block();
+		Long symbolCount = this.xetraClient.importXetraSymbols()
+				.flatMap(xetra -> Mono.just(this.importDeSymbols(xetra))).block();
 		return String.format("Xetra imported symbols: %d", symbolCount);
 	}
 
 	public Long importDeSymbols(List<String> xetra) {
 		this.refreshSymbolEntities();
 		LOGGER.info("importDeSymbols() called.");
-		return xetra.stream().filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
+		List<Symbol> result = this.repository.saveAll(xetra.stream().filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
 				.collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet().stream()
 				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
-				.flatMap(entity -> this.replaceEntity(entity)).count();
+				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+		return Long.valueOf(result.size());
 	}
 
 	public List<String> importReferenceIndexes(List<String> symbolStrs) {
 		LOGGER.info("importReferenceIndexes() called.");
 		final List<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
-		return localSymbolStrs.stream()				
-				.flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
-					symbolStrsToImport.add(entity.getSymbol());
-					return entity;
-				}).map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
+		List<Symbol> result = this.repository.saveAll(localSymbolStrs.stream().flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
+			symbolStrsToImport.add(entity.getSymbol());
+			return entity;
+		}).collect(Collectors.toList()));
+		return result.stream().map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
 	}
 
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol) {
@@ -129,7 +135,7 @@ public class SymbolImportService {
 	private Stream<Symbol> replaceEntity(Symbol entity) {
 		return this.updateEntity(this.allSymbolEntities.get().stream()
 				.filter(mySymbol -> mySymbol.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
-				.findFirst().orElse(this.repository.save(entity)), entity);
+				.findFirst().orElse(entity), entity);
 	}
 
 	private Stream<Symbol> updateEntity(Symbol dbEntity, Symbol importEntity) {
