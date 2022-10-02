@@ -50,7 +50,7 @@ import ch.xxx.manager.domain.utils.StreamHelpers;
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final PortfolioStatisticService portfolioStatisticService;
-	
+
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
 
@@ -58,7 +58,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			PortfolioSymbolWithDailyQuotes portfolioQuotes, List<CalcPortfolioElement> portfolioElements,
 			List<DailyQuote> dailyQuotesToRemove) {
 	};
-
 
 	public record ComparisonIndexQuotes(ComparisonIndex comparisonIndex,
 			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
@@ -123,23 +122,23 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
 		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolio.getPortfolioToSymbols());
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
-		portfolio.setMonth1(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setMonth1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
-		portfolio.setMonth6(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setMonth6(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
-		portfolio.setYear1(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setYear1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
-		portfolio.setYear2(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setYear2(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
-		portfolio.setYear5(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setYear5(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
-		portfolio.setYear10(
-				this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(), myPortfolioData.portfolioElements(), cutOffDate));
+		portfolio.setYear10(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+				myPortfolioData.portfolioElements(), cutOffDate));
 		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
 				myPortfolioData.portfolioQuotes.dailyQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
@@ -150,6 +149,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
+//		commonQuoteDates.stream().filter(myDate -> LocalDate.of(2022, 9, 1).isBefore(myDate))
+//				.peek(myDate -> LOG.info("CommonDates: {}", myDate.toString())).count();
 		final String portfolioSymbolKey = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.map(pts -> pts.getSymbol().getSymbol()).findFirst()
@@ -158,22 +159,27 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.noneMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
 				.toList();
+//		toDelete.stream().filter(myQuote -> LocalDate.of(2022, 9, 1).isBefore(myQuote.getLocalDay()))
+//				.peek(myQuote -> LOG.info("DeleteDates: {}", myQuote.getLocalDay().toString())).count();
 		List<DailyQuote> myQuotes = dailyQuotesMap.getOrDefault(portfolioSymbolKey, new LinkedList<>());
 		myQuotes.removeAll(toDelete);
 		dailyQuotesMap.put(portfolioSymbolKey, myQuotes);
 		PortfolioSymbolWithDailyQuotes portfolioQuotes = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.peek(pts -> LOG.info(pts.getSymbol().getSymbol() + " " + pts.getSymbol().getId()))
-				.map(pts -> new PortfolioSymbolWithDailyQuotes(pts.getSymbol(), Optional
-						.ofNullable(dailyQuotesMap.get(pts.getSymbol().getSymbol())).stream().flatMap(Collection::stream)
-						.filter(myDailyQuote -> commonQuoteDates.stream()
-								.anyMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
-						.map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote)).collect(Collectors.toList())))
+				.map(pts -> new PortfolioSymbolWithDailyQuotes(pts.getSymbol(),
+						Optional.ofNullable(dailyQuotesMap.get(pts.getSymbol().getSymbol())).stream()
+								.flatMap(Collection::stream)
+								.filter(myDailyQuote -> commonQuoteDates.stream()
+										.anyMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
+								.map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
+								.collect(Collectors.toList())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.map(pts -> this.calcPortfolioQuotesForSymbol(pts, dailyQuotesMap.getOrDefault(pts.getSymbol().getSymbol(), new LinkedList<>()),
-						portfolioQuotes))
+				.map(pts -> this.calcPortfolioQuotesForSymbol(pts,
+						dailyQuotesMap.getOrDefault(pts.getSymbol().getSymbol(), new LinkedList<>()), portfolioQuotes,
+						commonQuoteDates))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(CalcPortfolioElement::localDate))
 				.collect(Collectors.toList());
 		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements, toDelete);
@@ -206,12 +212,15 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	}
 
 	private Collection<CalcPortfolioElement> calcPortfolioQuotesForSymbol(PortfolioToSymbol portfolioToSymbol,
-			List<DailyQuote> dailyQuotes, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
+			List<DailyQuote> dailyQuotes, PortfolioSymbolWithDailyQuotes portfolioQuotes,
+			List<LocalDate> commonQuoteDates) {
 		return dailyQuotes.stream()
 				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
 						&& Optional.ofNullable(portfolioToSymbol.getRemovedAt()).stream()
 								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) >= 0).findAny()
 								.isEmpty())
+				.filter(myDailyQuote -> commonQuoteDates.stream()
+						.anyMatch(myCommonDate -> myCommonDate.isEqual(myDailyQuote.getLocalDay())))
 				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol, portfolioQuotes))
 				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
@@ -245,8 +254,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		portfolioQuote.setSymbol(portfolioQuotes.symbol);
 		portfolioQuote.setSymbolKey(portfolioQuotes.symbol.getSymbol());
 		portfolioQuote.setVolume(1L);
-			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
-			portfolioQuotes.dailyQuotes.add(portfolioQuote);
+		portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
+		portfolioQuotes.dailyQuotes.add(portfolioQuote);
 		return portfolioQuote;
 	}
 
