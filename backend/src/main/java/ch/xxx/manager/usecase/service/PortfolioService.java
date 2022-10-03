@@ -141,14 +141,15 @@ public class PortfolioService {
 		List<PortfolioElement> portfolioElements = StreamHelpers
 				.toStream(this.portfolioElementRepository.saveAll(portfolioWithElements.portfolioElements()))
 				.collect(Collectors.toList());
-		filteredDailyQuotes = this.dailyQuoteRepository.saveAll(filteredDailyQuotes.stream().filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
-				.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).collect(Collectors.toList()));
-
-		this.dailyQuoteRepository.deleteAll(portfolioWithElements.dailyQuotesToRemove().stream()
-				.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
-				.peek(dq -> LOGGER.info("Porfolio remove: {} {}", dq.getId(), dq.getLocalDay().toString()))
-				.collect(Collectors.toList()));
-
+//		filteredDailyQuotes.stream().filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+//				.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).count();
+		filteredDailyQuotes = this.dailyQuoteRepository
+				.saveAll(filteredDailyQuotes.stream().collect(Collectors.toList()));
+//		portfolioWithElements.dailyQuotesToRemove().stream()
+//				.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
+//				.peek(dq -> LOGGER.info("Porfolio remove: {} {}", dq.getId(), dq.getLocalDay().toString())).count();
+		this.dailyQuoteRepository
+				.deleteAll(portfolioWithElements.dailyQuotesToRemove().stream().collect(Collectors.toList()));
 		return new PortfolioWithElements(portfolio, portfolioElements, List.of(), List.of());
 	}
 
