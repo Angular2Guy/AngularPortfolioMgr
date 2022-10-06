@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,8 +57,9 @@ public class MyArchitectureTests {
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
 			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
-			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..").adapter("events", "..adapter.events..")
-			.adapter("client", "..adapter.client..").adapter("config", "..adapter.config..").withOptionalLayers(true);
+			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..")
+			.adapter("events", "..adapter.events..").adapter("client", "..adapter.client..")
+			.adapter("config", "..adapter.config..").withOptionalLayers(true);
 
 	@ArchTest
 	static final ArchRule devDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..dev..").should()
@@ -66,7 +68,7 @@ public class MyArchitectureTests {
 	@ArchTest
 	static final ArchRule prodDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..prod..").should()
 			.dependOnClassesThat().resideInAPackage("..dev..");
-	
+
 	@ArchTest
 	static final ArchRule cyclesDomain = SlicesRuleDefinition.slices().matching("..domain.(*)..").should()
 			.beFreeOfCycles();
@@ -117,7 +119,8 @@ public class MyArchitectureTests {
 	public void ruleCronJobMethodsAnnotations() {
 		ArchRule exceptionType = ArchRuleDefinition.methods().that().arePublic().and().areDeclaredInClassesThat()
 				.resideInAPackage("..adapter.cron..").should().beAnnotatedWith(Scheduled.class).andShould()
-				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class).orShould().beAnnotatedWith(Order.class);
+				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class).orShould()
+				.beAnnotatedWith(Order.class).orShould().beAnnotatedWith(EventListener.class);
 		exceptionType.check(this.importedClasses);
 	}
 

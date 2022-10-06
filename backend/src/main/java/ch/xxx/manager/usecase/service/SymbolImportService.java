@@ -23,8 +23,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,13 +50,7 @@ public class SymbolImportService {
 		this.hkexClient = hkexClient;
 		this.repository = repository;
 		this.xetraClient = xetraClient;
-	}
-
-	@EventListener
-	public void onApplicationEvent(ApplicationReadyEvent event) {
-		LOGGER.info("Refresh Symbols");
-		this.refreshSymbolEntities();
-	}
+	}	
 
 	public List<Symbol> refreshSymbolEntities() {
 		List<Symbol> symbolEnities = this.repository.findAll();

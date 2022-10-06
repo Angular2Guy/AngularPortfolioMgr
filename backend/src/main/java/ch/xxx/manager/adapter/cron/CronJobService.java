@@ -14,22 +14,16 @@ package ch.xxx.manager.adapter.cron;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -43,15 +37,15 @@ import ch.xxx.manager.usecase.service.SymbolImportService;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
-public class CronJob {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CronJob.class);
+public class CronJobService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CronJobService.class);
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
 	private Environment environment;
 
-	public CronJob(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
+	public CronJobService(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
 			CurrencyService currencyService, AppUserService appUserService, Environment environment) {
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
@@ -65,17 +59,6 @@ public class CronJob {
 		LOGGER.info("init called");
 	}
 
-	@Async
-	@EventListener(ApplicationReadyEvent.class)
-	public void startupDone() throws InterruptedException, ExecutionException {
-		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
-		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.importCurrencyQuotes())
-				.thenRunAsync(() -> this.scheduledImporterRefIndexes(), delayedExecutor)
-//				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor)
-				.thenRun(() -> LOGGER.info("startupDone() Done."));
-		myFuture.get();
-	}
-
 	@Scheduled(fixedRate = 90000)
 	@Order(1)
 	public void updateLoggedOutUsers() {
@@ -85,6 +68,7 @@ public class CronJob {
 		}
 	}
 
+	@Transactional
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterSymbols() {
@@ -103,6 +87,7 @@ public class CronJob {
 		this.currencyService.initCurrencyMap();
 	}
 
+	@Transactional
 	@Scheduled(cron = "0 10 1 * * ?")
 	@SchedulerLock(name = "CronJob_refIndexes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterRefIndexes() {
@@ -114,6 +99,7 @@ public class CronJob {
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 	}
 
+	@Transactional
 	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
