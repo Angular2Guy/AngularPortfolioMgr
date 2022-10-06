@@ -14,6 +14,10 @@ package ch.xxx.manager.adapter.cron;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,8 +25,11 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -58,27 +65,41 @@ public class CronJob {
 		LOGGER.info("init called");
 	}
 
+	@Async
+	@EventListener(ApplicationReadyEvent.class)
+	public void startupDone() throws InterruptedException, ExecutionException {
+//		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
+//		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.importCurrencyQuotes())
+//				.thenRunAsync(() -> this.scheduledImporterRefIndexes(), delayedExecutor)
+//				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor).thenRun(() -> LOGGER.info("startupDone() Done."));
+//		myFuture.get();
+	}
+
 	@Scheduled(fixedRate = 90000)
 	@Order(1)
 	public void updateLoggedOutUsers() {
-		if(Stream.of(this.environment.getActiveProfiles()).noneMatch(myProfile -> myProfile.contains("kafka"))) {
+		if (Stream.of(this.environment.getActiveProfiles()).noneMatch(myProfile -> myProfile.contains("kafka"))) {
 			LOGGER.info("Update logged out users.");
 			this.appUserService.updateLoggedOutUsers();
 		}
-	}	
-	
+	}
+
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterSymbols() {
+		importCurrencyQuotes();
+		LOGGER.info(this.symbolImportService.importDeSymbols());
+		LOGGER.info(this.symbolImportService.importHkSymbols());
+		LOGGER.info(this.symbolImportService.importUsSymbols());
+		this.symbolImportService.refreshSymbolEntities();
+	}
+
+	private void importCurrencyQuotes() {
 		LOGGER.info("Import of {} Hkd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
 		LOGGER.info("Import of {} Usd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
 		this.currencyService.initCurrencyMap();
-		LOGGER.info(this.symbolImportService.importDeSymbols());
-		LOGGER.info(this.symbolImportService.importHkSymbols());
-		LOGGER.info(this.symbolImportService.importUsSymbols());
-		this.symbolImportService.refreshSymbolEntities();
 	}
 
 	@Scheduled(cron = "0 10 1 * * ?")

@@ -153,9 +153,9 @@ public class QuoteImportService {
 		final Symbol mySymbolEntity = symbolEntity;
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
 		case ALPHAVANTAGE ->
-			this.alphavatageClient.importCompanyProfile(symbol).delayElement(myDelay).blockOptional(myTimeout).stream()
+			this.alphavatageClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout).stream()
 					.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
-		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).delayElement(myDelay).blockOptional(myTimeout)
+		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
 				.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
 		};
@@ -238,10 +238,10 @@ public class QuoteImportService {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		return entities.isEmpty()
-				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay)
+				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
 						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.orElse(List.of())
-				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay)
+				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay).retry(1)
 						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.orElse(List.of()).stream()
 						.filter(dto -> entities.stream()
