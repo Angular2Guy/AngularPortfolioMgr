@@ -68,11 +68,12 @@ public class CronJob {
 	@Async
 	@EventListener(ApplicationReadyEvent.class)
 	public void startupDone() throws InterruptedException, ExecutionException {
-//		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
-//		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.importCurrencyQuotes())
-//				.thenRunAsync(() -> this.scheduledImporterRefIndexes(), delayedExecutor)
-//				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor).thenRun(() -> LOGGER.info("startupDone() Done."));
-//		myFuture.get();
+		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
+		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.importCurrencyQuotes())
+				.thenRunAsync(() -> this.scheduledImporterRefIndexes(), delayedExecutor)
+//				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor)
+				.thenRun(() -> LOGGER.info("startupDone() Done."));
+		myFuture.get();
 	}
 
 	@Scheduled(fixedRate = 90000)
