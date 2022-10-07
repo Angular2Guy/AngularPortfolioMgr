@@ -80,14 +80,16 @@ public class CurrencyService {
 
 	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
 			Map<LocalDate, Collection<Currency>> myCurrencyMap) {
-		LOG.info("" + wrapperDto.getDailyQuotes().size());
-		return wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
+		LOG.info("Imported Fx Quotes: " + wrapperDto.getDailyQuotes().size());
+		List<Currency> result = wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))
 				.filter(entity -> myCurrencyMap.get(entity.getLocalDay()) == null
 						|| myCurrencyMap.get(entity.getLocalDay()).stream()
-								.anyMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
+								.noneMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
 				.collect(Collectors.toList());
+		LOG.info("Stored Fx Quotes: " + result.size());
+		return result;
 	}
 
 	private Currency convert(Entry<String, DailyFxQuoteImportDto> entry, CurrencyKey from_curr, CurrencyKey to_curr) {

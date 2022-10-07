@@ -49,11 +49,11 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
-//		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
-//		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.cronJobService.scheduledImporterSymbols())
-//				.thenRunAsync(() -> this.cronJobService.scheduledImporterRefIndexes(), delayedExecutor)
-////				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor)
-//				.thenRun(() -> LOGGER.info("startupDone() Done."));
-//		myFuture.get();
+		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
+		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.cronJobService.scheduledImporterSymbols())
+				.thenRunAsync(() -> this.cronJobService.scheduledImporterRefIndexes(), delayedExecutor)
+//				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor)
+				.thenRun(() -> LOGGER.info("startupDone() Done."));
+		myFuture.get();
 	}
 }
