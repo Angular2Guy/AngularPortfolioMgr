@@ -175,7 +175,8 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.orElse("Unknown");
 		Optional<CurrencyKey> symbolCurKeyOpt = Optional.ofNullable(portfolioToSymbol.getSymbol().getCurrencyKey())
 				.stream().findFirst();
-		String sectorName = portfolioElement.getSector();
+		String sectorName = Optional.ofNullable(portfolioToSymbol.getSymbol().getSectorStr()).stream().findFirst()
+				.orElse("Unknown");
 		portfolioElement.setSector(sectorName);
 		portfolioElement.setWeight(Optional.ofNullable(portfolioToSymbol.getWeight()).stream().findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);

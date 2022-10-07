@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -52,11 +51,6 @@ public class CronJobService {
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
 		this.environment = environment;
-	}
-
-	@PostConstruct
-	public void init() {
-		LOGGER.info("init called");
 	}
 
 	@Scheduled(fixedRate = 90000)
