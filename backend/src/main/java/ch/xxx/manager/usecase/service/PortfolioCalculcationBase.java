@@ -65,7 +65,7 @@ public abstract class PortfolioCalculcationBase {
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, final Portfolio portfolio) {
 		final BigDecimal currValue = currExtractor.apply(currencyQuote);
 		final BigDecimal quoteValue = quoteExtractor.apply(dailyQuote);
-		BigDecimal calcValue = BigDecimal.ZERO;
+		BigDecimal calcValue = quoteValue;
 		if (dailyQuote.getCurrencyKey().equals(currencyQuote.getFromCurrKey())
 				&& portfolio.getCurrencyKey().equals(currencyQuote.getToCurrKey())) {
 			calcValue = quoteValue.multiply(currValue);

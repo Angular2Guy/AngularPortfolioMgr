@@ -348,7 +348,10 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.map(myDailyQuote -> this.calcValue(Currency::getClose,
 						this.getCurrencyValue(portfolio, myDailyQuote, symbolCurrencyKeyOpt), DailyQuote::getClose,
 						myDailyQuote, portfolio))
-				.orElse(BigDecimal.ZERO);
+				.orElseGet(() -> {
+					LOGGER.info("symbolValueAtDate {}: {}", cutOffDate.toString(), 0);
+					return BigDecimal.ZERO;
+				});
 	}
 
 	private Currency getCurrencyValue(final Portfolio portfolio, DailyQuote myDailyQuote,
@@ -357,7 +360,12 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.map(symbolCurrencyKey -> this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(),
 						portfolio.getCurrencyKey(), symbolCurrencyKey))
 				.filter(Optional::isPresent).map(Optional::get).findFirst()
-				.orElse(new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
-						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
+				.orElseGet(() -> {
+					if(symbolCurrencyKeyOpt.isPresent() && !myDailyQuote.getCurrencyKey().equals(symbolCurrencyKeyOpt.get())) {
+						LOGGER.info("getCurrencyValue at {} returns 1 values.",myDailyQuote.getLocalDay().toString());
+					}
+					return new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
+						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
+					});
 	}
 }

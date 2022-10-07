@@ -134,7 +134,12 @@ public class CurrencyService {
 										BigDecimal.ONE.divide(myCurr.getLow(), 25, RoundingMode.HALF_UP),
 										BigDecimal.ONE.divide(myCurr.getClose(), 25, RoundingMode.HALF_UP)))
 								.findFirst()))
-				.filter(Optional::isPresent).map(Optional::get).findFirst();
+				.peek(myOpt -> {
+					if (myOpt.isEmpty() && day.isAfter(LocalDate.of(2005, 1, 1))) {
+						LOG.info("No CurrencyValue for {} portfolio: {} symbol: {}", day.toString(),
+								portfolioCurrencyKey.name(), symbolCurrencyKey.name());
+					}
+				}).filter(Optional::isPresent).map(Optional::get).findFirst();
 	}
 
 	public ImmutableSortedMap<LocalDate, Collection<Currency>> getCurrencyMap() {
