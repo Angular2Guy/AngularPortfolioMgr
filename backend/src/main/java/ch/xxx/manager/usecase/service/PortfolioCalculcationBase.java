@@ -23,6 +23,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
@@ -32,6 +35,7 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 public abstract class PortfolioCalculcationBase {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioCalculcationBase.class);
 	protected final DailyQuoteRepository dailyQuoteRepository;
 	protected final CurrencyService currencyService;
 
@@ -72,6 +76,12 @@ public abstract class PortfolioCalculcationBase {
 		} else if (dailyQuote.getCurrencyKey().equals(currencyQuote.getToCurrKey())
 				&& portfolio.getCurrencyKey().equals(currencyQuote.getFromCurrKey())) {
 			calcValue = quoteValue.divide(currValue, 10, RoundingMode.HALF_UP);
+		} else if (!dailyQuote.getCurrencyKey().equals(portfolio.getCurrencyKey())) {
+			LOGGER.info("calcValue at {} symbol: {} dailyQuote: {} portfolio: {} not found.",
+					dailyQuote.getLocalDay().toString(), dailyQuote.getSymbolKey(), dailyQuote.getCurrencyKey().name(),
+					portfolio.getCurrencyKey().name());
+			LOGGER.info("calcValue currencyQuote at {} value: {} from: {} to: {}", currencyQuote.getLocalDay().toString(), currencyQuote.getClose().toString(),
+					currencyQuote.getFromCurrKey().name(), currencyQuote.getToCurrKey().name());
 		}
 		return calcValue;
 	}

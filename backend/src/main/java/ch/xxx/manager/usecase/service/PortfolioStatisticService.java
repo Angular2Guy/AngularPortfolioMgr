@@ -180,7 +180,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		portfolioElement.setSector(sectorName);
 		portfolioElement.setWeight(Optional.ofNullable(portfolioToSymbol.getWeight()).stream().findFirst().orElse(0L));
 		portfolioElement.setName(ptsName);
-		portfolioElement.setCurrencyKey(portfolio.getCurrencyKey());
+		portfolioElement.setCurrencyKey(portfolioToSymbol.getSymbol().getCurrencyKey());
 		portfolioElement.setLastClose(this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now(), symbolCurKeyOpt));
 		portfolioElement.setMonth1(
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusMonths(1L), symbolCurKeyOpt));

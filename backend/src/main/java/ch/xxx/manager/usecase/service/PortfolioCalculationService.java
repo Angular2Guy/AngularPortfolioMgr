@@ -243,7 +243,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.orElse(new DailyQuote());
 		portfolioQuote.setClose(this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
 				portfolioToSymbol, portfolioQuote.getClose()));
-		portfolioQuote.setCurrencyKey(portfolioToSymbol.getSymbol().getCurrencyKey());
+		portfolioQuote.setCurrencyKey(portfolioQuotes.symbol().getCurrencyKey());
 		portfolioQuote.setHigh(this.calcValue(Currency::getHigh, currencyQuote, DailyQuote::getHigh, dailyQuote,
 				portfolioToSymbol, portfolioQuote.getHigh()));
 		portfolioQuote.setLocalDay(dailyQuote.getLocalDay());
@@ -251,8 +251,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				portfolioToSymbol, portfolioQuote.getLow()));
 		portfolioQuote.setOpen(this.calcValue(Currency::getOpen, currencyQuote, DailyQuote::getOpen, dailyQuote,
 				portfolioToSymbol, portfolioQuote.getOpen()));
-		portfolioQuote.setSymbol(portfolioQuotes.symbol);
-		portfolioQuote.setSymbolKey(portfolioQuotes.symbol.getSymbol());
+		portfolioQuote.setSymbol(portfolioQuotes.symbol());
+		portfolioQuote.setSymbolKey(portfolioQuotes.symbol().getSymbol());
 		portfolioQuote.setVolume(1L);
 		portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
 		portfolioQuotes.dailyQuotes.add(portfolioQuote);
