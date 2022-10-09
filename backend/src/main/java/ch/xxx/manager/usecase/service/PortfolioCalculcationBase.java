@@ -15,7 +15,6 @@ package ch.xxx.manager.usecase.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,10 @@ public abstract class PortfolioCalculcationBase {
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
 		return portfolioToSymbols.stream().map(pts -> pts.getSymbol())
-				.collect(Collectors.toMap(Symbol::getSymbol, mySymbol -> new ArrayList<>(mySymbol.getDailyQuotes())));
+				.collect(Collectors.toMap(Symbol::getSymbol,
+						mySymbol -> mySymbol.getDailyQuotes().stream()
+								.filter(myQuote -> mySymbol.getSymbol().equalsIgnoreCase(myQuote.getSymbolKey()))
+								.collect(Collectors.toList())));
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
@@ -80,7 +82,8 @@ public abstract class PortfolioCalculcationBase {
 			LOGGER.info("calcValue at {} symbol: {} dailyQuote: {} portfolio: {} not found.",
 					dailyQuote.getLocalDay().toString(), dailyQuote.getSymbolKey(), dailyQuote.getCurrencyKey().name(),
 					portfolio.getCurrencyKey().name());
-			LOGGER.info("calcValue currencyQuote at {} value: {} from: {} to: {}", currencyQuote.getLocalDay().toString(), currencyQuote.getClose().toString(),
+			LOGGER.info("calcValue currencyQuote at {} value: {} from: {} to: {}",
+					currencyQuote.getLocalDay().toString(), currencyQuote.getClose().toString(),
 					currencyQuote.getFromCurrKey().name(), currencyQuote.getToCurrKey().name());
 		}
 		return calcValue;

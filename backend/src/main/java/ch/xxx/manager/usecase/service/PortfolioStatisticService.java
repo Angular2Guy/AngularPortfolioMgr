@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -45,7 +44,6 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
-import ch.xxx.manager.usecase.mapping.MappingUtils;
 
 @Service
 @Transactional
@@ -84,8 +82,10 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null)
-				.flatMap(pts -> Stream.of(this.createPortfolioElement(portfolio,
-						dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts, comparisionSymbols)))
+//				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
+//						.distinct().toList().forEach(mySymbolKey -> LOGGER.info("SymbolKey: {}", mySymbolKey)))
+				.map(pts -> this.createPortfolioElement(portfolio,
+						dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts, comparisionSymbols))
 				.collect(Collectors.toList());
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
@@ -359,13 +359,13 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return symbolCurrencyKeyOpt.stream()
 				.map(symbolCurrencyKey -> this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(),
 						portfolio.getCurrencyKey(), symbolCurrencyKey))
-				.filter(Optional::isPresent).map(Optional::get).findFirst()
-				.orElseGet(() -> {
-					if(symbolCurrencyKeyOpt.isPresent() && !myDailyQuote.getCurrencyKey().equals(symbolCurrencyKeyOpt.get())) {
-						LOGGER.info("getCurrencyValue at {} returns 1 values.",myDailyQuote.getLocalDay().toString());
+				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
+					if (symbolCurrencyKeyOpt.isPresent()
+							&& !myDailyQuote.getCurrencyKey().equals(symbolCurrencyKeyOpt.get())) {
+						LOGGER.info("getCurrencyValue at {} returns 1 values.", myDailyQuote.getLocalDay().toString());
 					}
-					return new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(), portfolio.getCurrencyKey(),
-						BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
-					});
+					return new Currency(myDailyQuote.getLocalDay(), portfolio.getCurrencyKey(),
+							portfolio.getCurrencyKey(), BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
+				});
 	}
 }
