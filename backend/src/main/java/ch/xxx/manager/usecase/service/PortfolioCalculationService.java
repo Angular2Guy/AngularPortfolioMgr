@@ -230,8 +230,10 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
 			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
 					portfolioQuotes);
+			BigDecimal peClose = this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
+					portfolioToSymbol.getPortfolio());
 			return new CalcPortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
-					myPortfolioQuote.getClose(), portfolioToSymbol.getSymbol().getName(),
+					peClose, portfolioToSymbol.getSymbol().getName(),
 					portfolioToSymbol.getWeight());
 		});
 	}

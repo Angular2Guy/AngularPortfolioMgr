@@ -103,7 +103,7 @@ public class CurrencyService {
 	}
 
 	public Optional<Currency> getCurrencyQuote(LocalDate day, PortfolioToSymbol portfolioToSymbol) {
-		return getCurrencyQuote(day, portfolioToSymbol.getPortfolio().getCurrencyKey(),
+		return this.getCurrencyQuote(day, portfolioToSymbol.getPortfolio().getCurrencyKey(),
 				portfolioToSymbol.getSymbol().getCurrencyKey());
 	}
 
@@ -114,13 +114,18 @@ public class CurrencyService {
 					BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
 		}
 		return LongStream.range(0, 7).boxed()
-				.map(minusDays -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+				.map(minusDays -> Optional
+						.ofNullable(this.currencyMap.get(minusDays == 0 ? day : day.minusDays(minusDays)))
+						.orElse(List.of()).stream()
 //						.peek(myCurrency -> LOG.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: "
 //								+ myCurrency.getToCurrKey() + " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey()
 //								+ " symCur: " + portfolioToSymbol.getSymbol().getCurrencyKey()))
 						.filter(myCurrency -> portfolioCurrencyKey.equals(myCurrency.getFromCurrKey())
 								&& symbolCurrencyKey.equals(myCurrency.getToCurrKey()))
-						.findFirst().or(() -> Optional.ofNullable(this.currencyMap.get(day)).orElse(List.of()).stream()
+						.findFirst()
+						.or(() -> Optional
+								.ofNullable(this.currencyMap.get(minusDays == 0 ? day : day.minusDays(minusDays)))
+								.orElse(List.of()).stream()
 //								.peek(myCurrency -> LOG
 //										.info("symbol: "+portfolioToSymbol.getSymbol().getSymbol()+" from: " + myCurrency.getFromCurrKey() + " to: " + myCurrency.getToCurrKey()
 //												+ " ptsCur: " + portfolioToSymbol.getPortfolio().getCurrencyKey() + " symCur: "
@@ -136,7 +141,7 @@ public class CurrencyService {
 								.findFirst()))
 				.peek(myOpt -> {
 					if (myOpt.isEmpty() && day.isAfter(LocalDate.of(2005, 1, 1))) {
-						LOG.info("No CurrencyValue for {} portfolio: {} symbol: {}", day.toString(),
+						LOG.info("No CurrencyValue at {} portfolio: {} symbol: {}", day.toString(),
 								portfolioCurrencyKey.name(), symbolCurrencyKey.name());
 					}
 				}).filter(Optional::isPresent).map(Optional::get).findFirst();
