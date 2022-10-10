@@ -52,7 +52,7 @@ export class PortfolioTableComponent implements OnInit,OnDestroy {
   set localPortfolio(localPortfolio: Portfolio) {
 	this.myLocalPortfolio = localPortfolio;
 	const myPortfolioElements: CommonValues[] = [];
-	if(!!localPortfolio?.portfolioElements) {
+	if(!!localPortfolio?.portfolioElements) {		
 	   myPortfolioElements.push(localPortfolio)
 	   myPortfolioElements.push(...localPortfolio?.portfolioElements);
 	}
