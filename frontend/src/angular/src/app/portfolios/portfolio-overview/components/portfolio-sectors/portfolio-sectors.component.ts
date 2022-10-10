@@ -39,7 +39,7 @@ interface CalcPortfolioElement {
                 style({ opacity: 0, transform: 'scale(0.1)'  }),
                 group([
                     animate('300ms linear', style({ opacity: 1 })),
-                    animate('800ms linear', style({ transform: 'scale(1)' }))
+                    animate('1000ms linear', style({ transform: 'scale(1)' }))
                 ])
         ])
     ])
@@ -52,7 +52,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   @ViewChild('hideMe') 
   divHideMe: ElementRef;
   afterViewInitCalled = false;
-  chartState: 'ready' | 'not-ready' = 'not-ready'
+  chartState: 'ready' | 'not-ready' = 'not-ready';
   slicesSum = 1;
    
   private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
@@ -63,6 +63,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 	this.chartSlices.title = this.selPortfolio.name;
 	this.chartSlices.chartSlices = [];
 	this.chartsLoading = false;
+	this.chartState = 'not-ready';
   }
 
   ngAfterViewInit(): void {
@@ -74,7 +75,6 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 	if(!this.afterViewInitCalled || !this.selPortfolio?.id) {
 		return;
 	}
-	this.chartState = 'not-ready';
 	const sliceColors = window.getComputedStyle(this.divHideMe.nativeElement,':before')['content']
 	   .replace('"', '').replace('\"','').split(',');
 	//console.log(sliceColors);	
@@ -97,7 +97,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 	});
 	this.slicesSum = this.chartSlices.chartSlices.reduce((acc, mySlice) => acc = acc + mySlice.value, 0);
 	this.chartSlices.chartSlices = this.chartSlices.chartSlices.sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value).reverse();
-	this.chartState = 'ready';
+		setTimeout(() =>  {this.chartState = 'ready';});	
 	//console.log(this.chartSlices.chartSlices);
   }
   
@@ -108,6 +108,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   @Input()
   set selPortfolio(myPortfolio: Portfolio) {
 	this.localSelPortfolio = myPortfolio;
+	this.chartState = 'not-ready';
 	this.drawDonut();
   }
 }
