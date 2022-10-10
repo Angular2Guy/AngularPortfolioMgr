@@ -3,7 +3,7 @@
 
 Author: Sven Loesekann
 
-Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql
+Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka
 
 ## Articles
 * [Switching on features by Spring Profile in an Angular/Spring Boot application](https://angular2guy.wordpress.com/2021/10/13/switching-on-features-by-spring-profile-in-an-angular-spring-boot-application/)
@@ -13,13 +13,13 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 * [Configurable Services in the NgxSimpleCharts library](https://angular2guy.wordpress.com/2022/09/13/configurable-services-in-the-ngx-simple-charts-library/)
 
 ## What is the goal?
-The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle.
+The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle. Apache Kafka can be used for Jwt token revokation. 
 
 ## Current state of the project
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
 * The Gradle build is done. 
-* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. 
-* The setup of the Angular fronted is done. 
+* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation.
+* The Angular fronted displays different D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
