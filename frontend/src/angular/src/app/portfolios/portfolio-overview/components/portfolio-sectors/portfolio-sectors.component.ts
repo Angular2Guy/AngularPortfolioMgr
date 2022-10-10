@@ -11,6 +11,15 @@
    limitations under the License.
  */
 import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  query,
+  group
+} from '@angular/animations';
 import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
 import { Portfolio } from 'src/app/model/portfolio';
 
@@ -23,7 +32,18 @@ interface CalcPortfolioElement {
 @Component({
   selector: 'app-portfolio-sectors',
   templateUrl: './portfolio-sectors.component.html',
-  styleUrls: ['./portfolio-sectors.component.scss']
+  styleUrls: ['./portfolio-sectors.component.scss'],
+  animations: [
+	trigger('fadeInGrow', [
+        transition('* => ready', [
+                style({ opacity: 0, transform: 'scale(0.1)'  }),
+                group([
+                    animate('300ms linear', style({ opacity: 1 })),
+                    animate('800ms linear', style({ transform: 'scale(1)' }))
+                ])
+        ])
+    ])
+]
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   localSelPortfolio: Portfolio;
@@ -31,7 +51,8 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   chartsLoading = true;
   @ViewChild('hideMe') 
   divHideMe: ElementRef;
-  afterViewInitDone = false;
+  afterViewInitCalled = false;
+  chartState: 'ready' | 'not-ready' = 'not-ready'
   slicesSum = 1;
    
   private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
@@ -45,14 +66,15 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-	this.afterViewInitDone = true;
+	this.afterViewInitCalled = true;
 	this.drawDonut();
   }
   
   private drawDonut(): void {
-	if(!this.afterViewInitDone || !this.selPortfolio?.id) {
+	if(!this.afterViewInitCalled || !this.selPortfolio?.id) {
 		return;
 	}
+	this.chartState = 'not-ready';
 	const sliceColors = window.getComputedStyle(this.divHideMe.nativeElement,':before')['content']
 	   .replace('"', '').replace('\"','').split(',');
 	//console.log(sliceColors);	
@@ -75,6 +97,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
 	});
 	this.slicesSum = this.chartSlices.chartSlices.reduce((acc, mySlice) => acc = acc + mySlice.value, 0);
 	this.chartSlices.chartSlices = this.chartSlices.chartSlices.sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value).reverse();
+	this.chartState = 'ready';
 	//console.log(this.chartSlices.chartSlices);
   }
   

@@ -16,6 +16,6 @@
        </ol>
     </div>
     <div class="hide-me"><span #hideMe class="my-content"></span></div>
-	<sc-donut-chart [chartSlices]="chartSlices"></sc-donut-chart>
+	<sc-donut-chart class="donut-chart" #myDonutChart [@fadeInGrow]="chartState" [chartSlices]="chartSlices"></sc-donut-chart>
 </div>
 </div>
