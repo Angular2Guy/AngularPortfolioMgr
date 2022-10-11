@@ -13,6 +13,7 @@
 package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
@@ -199,7 +200,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 //				.peek(pts -> LOG.info(pts.getSymbol().getSymbol()))
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
-				.flatMap(value -> StreamHelpers.unboxOptionals(value)).map(pe -> pe.value())
+				.flatMap(value -> StreamHelpers.unboxOptionals(value))
+//				.peek(pe -> LOG.info("value: {}, weight: {}", pe.value(), pe.weight()))
+				.map(pe -> pe.value().multiply(BigDecimal.valueOf(pe.weight()), MathContext.DECIMAL128))				
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
