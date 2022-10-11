@@ -16,6 +16,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.PositiveOrZero;
 
 
 @Entity
@@ -24,6 +25,7 @@ public class PortfolioToSymbol extends EntityBase {
 	private Portfolio portfolio;
 	@ManyToOne
 	private Symbol symbol;
+	@PositiveOrZero
 	private Long weight;
 	private LocalDate changedAt;
 	private LocalDate removedAt;

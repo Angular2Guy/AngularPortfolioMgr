@@ -25,6 +25,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 
 @Entity
@@ -33,11 +35,16 @@ public class AppUser {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
     @SequenceGenerator(name="seq", sequenceName="hibernate_sequence", allocationSize = 50)
 	private Long id;
+	@NotBlank
+	@Size(max=255)
 	private String userName;
 	private LocalDate birthDate;
-	private LocalDateTime updatedAt;	
+	private LocalDateTime updatedAt;
+	@NotBlank
+	@Size(max=255)
 	private String password;
 	private String emailAddress;
+	@NotBlank
 	private String userRole;
 	private boolean locked;
 	private boolean enabled;

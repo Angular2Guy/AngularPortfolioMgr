@@ -20,21 +20,29 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 
 @Entity
 public class DailyQuote extends EntityBase {
+	@NotBlank
+	@Size(max=20)
 	private String symbolKey;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
+	@NotNull
 	private BigDecimal close;
 	private Long volume;
+	@NotNull
 	private LocalDate localDay;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private Symbol symbol;
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
 

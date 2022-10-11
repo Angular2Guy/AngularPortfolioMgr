@@ -16,28 +16,40 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class IntraDayQuote extends EntityBase {
+	@NotBlank
+	@Size(max = 20)
 	private String symbolKey;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
+	@NotNull
 	private BigDecimal close;
 	private Long volume;
 	private LocalDateTime localDateTime;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Symbol symbol;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private CurrencyKey currencyKey;
 
 	public IntraDayQuote() {
 		super();
 	}
-	
-	public IntraDayQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low,
-			BigDecimal close, Long volume, LocalDateTime localDateTime, Symbol symbol) {
+
+	public IntraDayQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
+			Long volume, LocalDateTime localDateTime, Symbol symbol, CurrencyKey currencyKey) {
 		super();
 		super.setId(id);
 		this.symbolKey = symbolKey;
@@ -48,8 +60,9 @@ public class IntraDayQuote extends EntityBase {
 		this.volume = volume;
 		this.localDateTime = localDateTime;
 		this.symbol = symbol;
+		this.currencyKey = currencyKey;
 	}
-	
+
 	public LocalDateTime getLocalDateTime() {
 		return localDateTime;
 	}
@@ -57,33 +70,43 @@ public class IntraDayQuote extends EntityBase {
 	public void setLocalDateTime(LocalDateTime localDateTime) {
 		this.localDateTime = localDateTime;
 	}
+
 	public BigDecimal getOpen() {
 		return open;
 	}
+
 	public void setOpen(BigDecimal open) {
 		this.open = open;
 	}
+
 	public BigDecimal getHigh() {
 		return high;
 	}
+
 	public void setHigh(BigDecimal high) {
 		this.high = high;
 	}
+
 	public BigDecimal getLow() {
 		return low;
 	}
+
 	public void setLow(BigDecimal low) {
 		this.low = low;
 	}
+
 	public BigDecimal getClose() {
 		return close;
 	}
+
 	public void setClose(BigDecimal close) {
 		this.close = close;
 	}
+
 	public Long getVolume() {
 		return volume;
 	}
+
 	public void setVolume(Long volume) {
 		this.volume = volume;
 	}
@@ -102,5 +125,13 @@ public class IntraDayQuote extends EntityBase {
 
 	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
+	}
+
+	public CurrencyKey getCurrencyKey() {
+		return currencyKey;
+	}
+
+	public void setCurrencyKey(CurrencyKey currencyKey) {
+		this.currencyKey = currencyKey;
 	}
 }

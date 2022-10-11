@@ -23,6 +23,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
@@ -31,9 +34,13 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 public class Portfolio extends PortfolioBase {
 	@ManyToOne
 	private AppUser appUser;
+	@NotBlank
+	@Size(max=255)
 	private String name;
-	@Enumerated(EnumType.STRING)
+	@NotNull
+	@Enumerated(EnumType.STRING)	
 	private CurrencyKey currencyKey;
+	@NotNull
 	private LocalDate createdAt;
 	@OneToMany(mappedBy = "portfolio")
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();

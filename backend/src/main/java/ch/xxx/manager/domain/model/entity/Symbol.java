@@ -23,6 +23,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
@@ -31,8 +34,11 @@ public class Symbol extends EntityBase {
 	public enum QuoteSource {
 		ALPHAVANTAGE, YAHOO, PORTFOLIO
 	}
-
+	@NotBlank
+	@Size(max=20)
 	private String symbol;
+	@NotBlank
+	@Size(max=255)
 	private String name;
 	private String sectorStr;
 	@ManyToOne
@@ -43,8 +49,10 @@ public class Symbol extends EntityBase {
 	private String description;
 	private String address;
 	private String country;
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private QuoteSource quoteSource;
 	@OneToMany(mappedBy = "symbol", orphanRemoval = true)

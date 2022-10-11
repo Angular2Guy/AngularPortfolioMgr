@@ -21,18 +21,30 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 @DiscriminatorValue("2")
 public class PortfolioElement extends PortfolioBase {
+	@NotBlank
+	@Size(max=255)
 	private String name;
+	@NotBlank
+	@Size(max=20)
 	private String symbol;
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currencyKey;
+	@NotNull
 	private LocalDate createdAt;
+	@NotNull
 	private BigDecimal lastClose;
+	@PositiveOrZero
 	private Long weight;
 	private String sector;
 	@ManyToOne

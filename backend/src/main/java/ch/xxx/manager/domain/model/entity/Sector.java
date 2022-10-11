@@ -17,10 +17,13 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Sector extends EntityBase {		
+	@Size(max=100)
 	private String alphavantageName;
+	@Size(max=100)
 	private String yahooName;
 	@OneToMany(mappedBy = "sector", orphanRemoval = true)
 	private Set<Symbol> symbols = new HashSet<>();
