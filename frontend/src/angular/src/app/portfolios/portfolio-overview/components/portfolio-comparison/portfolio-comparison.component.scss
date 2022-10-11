@@ -10,6 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+@use '@angular/material' as mat;
+    
 .my-container{
 	background: #ffffff;
 	height: 100%;
@@ -45,11 +47,14 @@
 	width: 100%;
 }
 ::ng-deep .bar-sxrt {
-    fill: #7CFC00 !important;
+	$green: mat.get-color-from-palette(mat.$green-palette, 900);
+    fill: $green !important;
 }
 ::ng-deep .bar-icga {
-    fill: #eff542 !important;
+	$lime: mat.get-color-from-palette(mat.$lime-palette, 900);
+    fill: $lime !important;
 }
 ::ng-deep .bar-ivv {
-    fill: #ff0000 !important;
+	$red: mat.get-color-from-palette(mat.$red-palette, 900);
+    fill: $red !important;
 }
