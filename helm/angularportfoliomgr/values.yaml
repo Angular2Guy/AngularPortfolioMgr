@@ -55,6 +55,8 @@ envApp:
     JPA_SHOW_SQL: true
     H2_CONSOLE: false
     SHUTDOWN_PHASE: 10s
+    SPRING_PROFILES_ACTIVE: "prod,prod-kafka"
+    KAFKA_SERVICE_NAME: kafkaService
   secret:    
     KAFKA_BOOTSTRAP_SERVERS: kafkaservice:9092 
     KAFKA_SERVER_NAME: kafkaapp
@@ -63,3 +65,4 @@ envApp:
     POSTGRES_PASSWORD: passwordtoreplace
     POSTGRES_URL: "jdbc:postgresql://postgresservice:5432/portfolio"
     APIKEY: replacewithAlphavatageApiKey
+    APIKEY_RAPIDAPI: replacewithrapidApiKey
