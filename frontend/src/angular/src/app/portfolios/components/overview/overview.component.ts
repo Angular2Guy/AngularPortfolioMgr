@@ -26,6 +26,7 @@ import { QuoteImportService } from '../../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
+import { SpinnerData, DialogSpinnerComponent } from '../dialog-spinner/dialog-spinner.component';
 import { OnDestroy } from '@angular/core';
 
 @Component({
@@ -126,9 +127,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		if(!!this.dialogSubscription) {
 			this.dialogSubscription.unsubscribe();
 		}
-		const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', data: portfolioData });
+		const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: portfolioData });
 		this.dialogSubscription = dialogRef.afterClosed().subscribe((symbol: Symbol) => {
 			if (symbol) {
+				const dialogSpinnerRef = this.dialog.open(DialogSpinnerComponent, { width: '500px', disableClose: true, hasBackdrop: true, 
+				   enterAnimationDuration: '500ms', exitAnimationDuration: '500ms', data: {title: $localize`:@@overviewPortfolioCalc:Portfolio Calculation`} as SpinnerData  });
 				symbol.weight = !symbol.weight ? 0 : symbol.weight;
 				this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight, symbol.changedAt)
 					.subscribe(result => {
@@ -137,6 +140,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 							this.portfolios = [...filteredPortfolios, result];
 							this.myPortfolio = result;
 							this.selPortfolio(result, true);
+							dialogSpinnerRef.close();
 						}
 					});
 			}

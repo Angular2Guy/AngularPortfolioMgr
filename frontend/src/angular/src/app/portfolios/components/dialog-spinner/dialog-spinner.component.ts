@@ -10,16 +10,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
- 
-.container{
-	display: flex;	
-	width: 100%;	
-	justify-content: center;
-	align-content: center;
+import { Component, OnInit, Inject } from '@angular/core';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+
+export interface SpinnerData {
+	title: string;
 }
-.content {
-	margin-top: 50px;
-}
-.example-margin {
-  margin: 0 10px;
+
+@Component({
+  selector: 'app-dialog-spinner',
+  templateUrl: './dialog-spinner.component.html',
+  styleUrls: ['./dialog-spinner.component.scss']
+})
+export class DialogSpinnerComponent implements OnInit {  
+  
+  constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) { }
+
+  ngOnInit(): void {
+	console.log('title: ' + this.data.title);
+  }
+
 }
