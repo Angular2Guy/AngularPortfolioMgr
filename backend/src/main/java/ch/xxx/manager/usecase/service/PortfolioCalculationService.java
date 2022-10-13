@@ -121,26 +121,27 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	public PortfolioWithElements calculatePortfolio(Portfolio portfolio, Optional<PortfolioToSymbol> ptsOpt) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
-		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolio.getPortfolioToSymbols(), ptsOpt);
+		Portfolio myPortfolio = this.addDailyQuotes(portfolio);
+		PortfolioData myPortfolioData = this.calculatePortfolioData(myPortfolio.getPortfolioToSymbols(), ptsOpt);
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
-		portfolio.setMonth1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setMonth1(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
-		portfolio.setMonth6(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setMonth6(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
-		portfolio.setYear1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setYear1(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
-		portfolio.setYear2(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setYear2(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
-		portfolio.setYear5(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setYear5(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
-		portfolio.setYear10(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
+		myPortfolio.setYear10(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
-		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
+		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(myPortfolio,
 				myPortfolioData.portfolioQuotes.dailyQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
 				myPortfolioData.dailyQuotesToRemove, myPortfolioData.portfolioQuotes.dailyQuotes);

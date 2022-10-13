@@ -104,4 +104,11 @@ public abstract class PortfolioCalculcationBase {
 		return dailyQuotesKeyMap.keySet().size() == 1L ? allDates
 				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
+	
+	protected Portfolio addDailyQuotes(Portfolio portfolio) {
+		portfolio.getPortfolioToSymbols().forEach(pts -> {
+			pts.getSymbol().getDailyQuotes().addAll(this.dailyQuoteRepository.findBySymbolId(pts.getSymbol().getId()));
+		});
+		return portfolio;
+	}
 }
