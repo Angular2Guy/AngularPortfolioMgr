@@ -14,20 +14,24 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule }    from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DialogSpinnerComponent } from './components/dialog-spinner/dialog-spinner.component';
 
 @NgModule({
-	declarations: [],
+	declarations: [DialogSpinnerComponent],
 	imports: [
 		CommonModule,
 		HttpClientModule,
 		FormsModule,
-		ReactiveFormsModule
+		ReactiveFormsModule,
+		MatProgressSpinnerModule
 	],
 	exports: [		
 		CommonModule,
 		HttpClientModule,
 		FormsModule,
-		ReactiveFormsModule
+		ReactiveFormsModule,
+		DialogSpinnerComponent
 		]
 })
 export class BaseModule { }

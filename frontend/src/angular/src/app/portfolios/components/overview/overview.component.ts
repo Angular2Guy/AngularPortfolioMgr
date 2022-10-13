@@ -26,7 +26,7 @@ import { QuoteImportService } from '../../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
-import { SpinnerData, DialogSpinnerComponent } from '../dialog-spinner/dialog-spinner.component';
+import { SpinnerData, DialogSpinnerComponent } from 'src/app/base/components/dialog-spinner/dialog-spinner.component';
 import { OnDestroy } from '@angular/core';
 
 @Component({

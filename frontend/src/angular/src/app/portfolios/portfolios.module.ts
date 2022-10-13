@@ -36,11 +36,10 @@ import { DevAppInfoService } from './service/dev-app-info.service';
 import { ProdAppInfoService } from './service/prod-app-info.service';
 import { ProdConfigComponent } from './components/prod-config/prod-config.component';
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
-import { DialogSpinnerComponent } from './components/dialog-spinner/dialog-spinner.component';
 import { TokenInterceptor } from 'ngx-simple-charts/base-service';
 
 @NgModule({
-    declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, DialogSpinnerComponent,
+    declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, 
         PortfolioTableComponent, ProdConfigComponent, DevConfigComponent],
     imports: [
         BaseModule,
