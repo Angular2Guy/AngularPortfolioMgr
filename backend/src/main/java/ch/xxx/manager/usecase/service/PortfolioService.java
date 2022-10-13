@@ -108,8 +108,11 @@ public class PortfolioService {
 			LocalDateTime changedAt) {
 		Portfolio updatedPortfolio = this.portfolioToSymbolRepository
 				.saveAndFlush(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio();
+		Optional<PortfolioToSymbol> ptsOpt = updatedPortfolio.getPortfolioToSymbols().stream()
+				.filter(pts -> pts.getSymbol().getId().equals(symbolId))
+				.findFirst();
 		PortfolioWithElements portfolioWithElements = this.portfolioCalculationService
-				.calculatePortfolio(updatedPortfolio);
+				.calculatePortfolio(updatedPortfolio, Optional.empty());
 		return updatePortfolioElements(portfolioWithElements);
 	}
 
@@ -160,7 +163,7 @@ public class PortfolioService {
 						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
 				.map(newEntity -> this.portfolioToSymbolRepository.saveAndFlush(newEntity))
 				.map(newEntity -> this.updatePortfolioElements(this.portfolioCalculationService
-						.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio()))))
+						.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio()), Optional.empty())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
 	}
@@ -171,7 +174,7 @@ public class PortfolioService {
 						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService
-						.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio())))
+						.calculatePortfolio(this.addDailyQuotes(newEntity.getPortfolio()), Optional.empty()))
 				.peek(portfolioWithElements -> this.dailyQuoteRepository
 						.saveAll(portfolioWithElements.portfolioDailyQuotes()))
 				.peek(portfolioWithElements -> this.removeDailyQuotes(portfolioWithElements.portfolio(),
@@ -207,11 +210,11 @@ public class PortfolioService {
 		entity.setPortfolio(this.portfolioRepository.findById(dto.getId()).map(myPts -> {
 			myPts.getPortfolioToSymbols().add(entity);
 			return myPts;
-		}).orElse(null));
+		}).orElseThrow(() -> new RuntimeException(String.format("Portfolio with id %d not found.", dto.getId()))));
 		entity.setSymbol(this.symbolRepository.findById(symbolId).map(myPts -> {
 			myPts.getPortfolioToSymbols().add(entity);
 			return myPts;
-		}).orElse(null));
+		}).orElseThrow(() -> new RuntimeException(String.format("Symbol with id %d not found", symbolId))));
 		entity.setWeight(weight);
 		entity.setChangedAt(changedAt);
 		return entity;

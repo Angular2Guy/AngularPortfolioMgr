@@ -118,10 +118,10 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return resultPortfolioElements;
 	}
 
-	public PortfolioWithElements calculatePortfolio(Portfolio portfolio) {
+	public PortfolioWithElements calculatePortfolio(Portfolio portfolio, Optional<PortfolioToSymbol> ptsOpt) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
-		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolio.getPortfolioToSymbols());
+		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolio.getPortfolioToSymbols(), ptsOpt);
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
 		portfolio.setMonth1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
@@ -147,7 +147,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return result;
 	}
 
-	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols) {
+	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols, Optional<PortfolioToSymbol> ptsOpt) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
 //		commonQuoteDates.stream().filter(myDate -> LocalDate.of(2022, 9, 1).isBefore(myDate))
