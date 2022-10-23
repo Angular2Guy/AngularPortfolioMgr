@@ -11,7 +11,7 @@
    limitations under the License.
  */
 plugins {
-	id 'org.springframework.boot' version '2.7.0'
+	id 'org.springframework.boot' version '2.7.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'    
 }
@@ -36,20 +36,20 @@ dependencies {
 	implementation 'org.liquibase:liquibase-core'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'com.google.guava:guava:31.1-jre'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
-	implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.8'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+	implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.12'
 	implementation 'commons-net:commons-net:3.8.0'	
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
-	implementation 'net.javacrumbs.shedlock:shedlock-spring:4.34.0'
-	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.34.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-spring:4.42.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.42.0'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '0.23.1'
+	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.0.0'
 			
 	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
