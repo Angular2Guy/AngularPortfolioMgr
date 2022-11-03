@@ -12,12 +12,12 @@
  */
 package ch.xxx.manager.adapter.events;
 
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.transaction.Transactional;
-
+import org.apache.kafka.clients.admin.AdminClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -26,49 +26,72 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.domain.producer.EventProducer;
 
 @Service
-@Transactional
 @Profile("kafka | prod-kafka")
 public class KafkaProducer implements EventProducer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
 	private final KafkaTemplate<String,String> kafkaTemplate;
 	private final ObjectMapper objectMapper;
+	private final AdminClient adminClient;
 	
-	public KafkaProducer(KafkaTemplate<String,String> kafkaTemplate, ObjectMapper objectMapper) {
+	public KafkaProducer(KafkaTemplate<String,String> kafkaTemplate, ObjectMapper objectMapper, AdminClient adminClient) {
 		this.kafkaTemplate = kafkaTemplate;
 		this.objectMapper = objectMapper;
+		this.adminClient = adminClient;
 	}
 	
+	@Override
 	public void sendLogoutMsg(RevokedTokenDto revokedTokenDto) {		
 		try {
 			String msg = this.objectMapper.writeValueAsString(revokedTokenDto);
 			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.USER_LOGOUT_TOPIC, revokedTokenDto.getUuid(), msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
+		} catch (Exception e) {
 			LOGGER.error("sendLogoutMsg ", e);
 			throw new AuthenticationException("Logout failed.");
 		}
 		LOGGER.info("send logout msg: {}", revokedTokenDto.toString());
 	}
 	
+	@Override
 	public void sendNewUserMsg(AppUserDto appUserDto) {
 		try {
 			String msg = this.objectMapper.writeValueAsString(appUserDto);
 			ListenableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate.send(KafkaConfig.NEW_USER_TOPIC, appUserDto.getUsername(), msg);
 			listenableFuture.get(2, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
+		} catch (Exception e) {
 			LOGGER.error("SendNewUserMsg ", e);
 			throw new AuthenticationException("User creation failed.");
 		}
 		LOGGER.info("send new user msg: {}", appUserDto.toString());
+	}
+	
+	@Override
+	public void sendKafkaEvent(KafkaEventDto kafkaEventDto) {
+		try {
+			Set<String> topicNames = this.adminClient.listTopics().names().get(2, TimeUnit.SECONDS);
+			if (topicNames.stream()
+					.anyMatch(topicName -> topicName.trim().equalsIgnoreCase(kafkaEventDto.getTopicName().trim()))) {
+				ListenableFuture<SendResult<String, String>> listenableFuture = this.kafkaTemplate
+						.send(kafkaEventDto.getTopicName(), kafkaEventDto.getTopicContent());
+				listenableFuture.get(2, TimeUnit.SECONDS);
+			} else {
+				LOGGER.error("SendKafkaEven Topic {} not found.", kafkaEventDto.getTopicName());
+				throw new AuthenticationException("Kafka Event failed.");
+			}
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			LOGGER.error("SendKafkaEvent ", e);
+			throw new AuthenticationException("Kafka Event failed.");
+		}
+		LOGGER.info("send Kafka event to {}", kafkaEventDto.getTopicName());
 	}
 }

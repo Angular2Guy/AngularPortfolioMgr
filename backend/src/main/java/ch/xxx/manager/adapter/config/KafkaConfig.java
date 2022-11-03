@@ -12,14 +12,20 @@
  */
 package ch.xxx.manager.adapter.config;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.kafka.clients.DefaultHostResolver;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +35,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
@@ -41,6 +49,7 @@ public class KafkaConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConfig.class);
 	public static final String NEW_USER_TOPIC = "new-user-topic";
 	// private static final String NEW_USER_DLT_TOPIC = "new-user-topic-retry";
+	public static final String DEFAULT_DLT_TOPIC = "default-dlt-topic";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
 	// private static final String USER_LOGOUT_DLT_TOPIC = "user-logout-topic-retry";
 	private static final String GZIP = "gzip";
@@ -105,6 +114,27 @@ public class KafkaConfig {
 				.config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
 	}
 
+	@Bean
+	public DeadLetterPublishingRecoverer recoverer(
+			@Qualifier("kafkaRetryTemplate") KafkaTemplate<?, ?> bytesKafkaTemplate,
+			@Qualifier("kafkaRetryTemplate") KafkaTemplate<?, ?> kafkaTemplate) {
+		Map<Class<?>, KafkaOperations<? extends Object, ? extends Object>> templates = new LinkedHashMap<>();
+		templates.put(byte[].class, bytesKafkaTemplate);
+		templates.put(String.class, kafkaTemplate);
+		return new DeadLetterPublishingRecoverer(templates);
+	}
+	
+	@Bean
+	public AdminClient kafkaAdminClient() {
+		return KafkaAdminClient.create(this.producerFactory.getConfigurationProperties());
+	}
+	
+	@Bean
+	public NewTopic defaultDltTopic() {
+		return TopicBuilder.name(KafkaConfig.DEFAULT_DLT_TOPIC)
+				.config(TopicConfig.COMPRESSION_TYPE_CONFIG, this.compressionType).compact().build();
+	}
+	
 	@Bean
 	@Primary
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {

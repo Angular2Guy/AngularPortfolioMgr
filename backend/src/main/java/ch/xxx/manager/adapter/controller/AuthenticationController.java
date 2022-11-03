@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.AuthCheckDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.AppUserService;
@@ -47,6 +50,8 @@ public class AuthenticationController {
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	private String confirmUrl;
+	@Value("${spring.profiles.active:}")
+	private String activeProfile;
 	
 	public AuthenticationController(AppUserService appUserService) {
 		this.appUserService = appUserService;
@@ -100,5 +105,19 @@ public class AuthenticationController {
 	@PutMapping()
 	public AppUserDto putUser(@RequestBody AppUserDto appUserDto) {
 		return this.appUserService.save(appUserDto);
+	}
+	
+	@PutMapping("/kafkaEvent")
+	public ResponseEntity<Boolean> putKafkaEvent(@RequestBody KafkaEventDto dto) {
+		ResponseEntity<Boolean> result = new ResponseEntity<Boolean>(Boolean.FALSE, HttpStatus.FORBIDDEN);
+		if (!this.activeProfile.toLowerCase().contains("prod")) {
+			result = new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.ACCEPTED);
+			try {
+				this.appUserService.sendKafkaEvent(dto);
+			} catch (Exception e) {
+				result = new ResponseEntity<Boolean>(Boolean.FALSE, HttpStatus.BAD_REQUEST);
+			}
+		}
+		return result;
 	}
 }

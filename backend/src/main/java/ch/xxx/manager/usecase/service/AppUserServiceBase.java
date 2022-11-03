@@ -40,6 +40,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
@@ -254,5 +255,9 @@ public class AppUserServiceBase {
 		return this.repository.findAll().stream()
 				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), null, 10L)))
 				.collect(Collectors.toList());
+	}
+	
+	public void sendKafkaEvent(KafkaEventDto kafkaEventDto) {
+		LOGGER.info("KafkaEvent not send.");
 	}
 }

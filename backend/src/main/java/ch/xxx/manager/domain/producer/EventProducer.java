@@ -13,9 +13,11 @@
 package ch.xxx.manager.domain.producer;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 
 public interface EventProducer {
 	void sendLogoutMsg(RevokedTokenDto revokedTokenDto);
 	void sendNewUserMsg(AppUserDto appUserDto);
+	void sendKafkaEvent(KafkaEventDto kafkaEventDto);
 }

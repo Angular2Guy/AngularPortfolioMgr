@@ -25,11 +25,11 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.usecase.service.AppUserServiceEvents;
 
@@ -39,18 +39,26 @@ public class KafkaConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 	private final ObjectMapper objectMapper;
 	private final AppUserServiceEvents appUserService;
-	
-	public KafkaConsumer(ObjectMapper objectMapper, AppUserServiceEvents appUserService) {
+	private final KafkaListenerDltHandler kafkaListenerDltHandler;
+
+	public KafkaConsumer(ObjectMapper objectMapper, AppUserServiceEvents appUserService,
+			KafkaListenerDltHandler kafkaListenerDltHandler) {
 		this.objectMapper = objectMapper;
 		this.appUserService = appUserService;
+		this.kafkaListenerDltHandler = kafkaListenerDltHandler;
 	}
 
 	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
-	public void consumerForNewUserTopic(String message) throws JsonMappingException, JsonProcessingException {
+	public void consumerForNewUserTopic(String message) {
 		LOGGER.info("consumerForNewUserTopic [{}]", message);
-		AppUserDto dto = this.objectMapper.readValue(message, AppUserDto.class);
-		this.appUserService.signinMsg(dto);
+		try {
+			AppUserDto dto = this.objectMapper.readValue(message, AppUserDto.class);
+			this.appUserService.signinMsg(dto);
+		} catch (Exception e) {
+			LOGGER.warn("send failed consumerForNewUserTopic [{}]", message);
+			this.kafkaListenerDltHandler.sendToDefaultDlt(new KafkaEventDto(KafkaConfig.DEFAULT_DLT_TOPIC, message));
+		}
 	}
 
 	@DltHandler
@@ -60,9 +68,14 @@ public class KafkaConsumer {
 
 	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
-	public void consumerForUserLogoutsTopic(String message) throws JsonMappingException, JsonProcessingException {
+	public void consumerForUserLogoutsTopic(String message) {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);
-		RevokedTokenDto dto = this.objectMapper.readValue(message, RevokedTokenDto.class);
-		this.appUserService.logoutMsg(dto);
+		try {
+			RevokedTokenDto dto = this.objectMapper.readValue(message, RevokedTokenDto.class);
+			this.appUserService.logoutMsg(dto);
+		} catch (JsonProcessingException e) {
+			LOGGER.warn("send failed consumerForUserLogoutsTopic [{}]", message);
+			this.kafkaListenerDltHandler.sendToDefaultDlt(new KafkaEventDto(KafkaConfig.DEFAULT_DLT_TOPIC, message));
+		}
 	}
 }

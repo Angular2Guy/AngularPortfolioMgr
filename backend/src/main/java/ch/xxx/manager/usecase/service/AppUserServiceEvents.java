@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
@@ -72,5 +73,9 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 		Boolean result = super.logout(revokedTokenDto);
 		this.updateLoggedOutUsers();
 		return result;
+	}
+	
+	public void sendKafkaEvent(KafkaEventDto kafkaEventDto) {
+		this.eventProducer.sendKafkaEvent(kafkaEventDto);
 	}
 }

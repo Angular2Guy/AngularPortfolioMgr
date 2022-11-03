@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 
@@ -30,4 +31,5 @@ public interface AppUserService {
 	TokenSubjectRole getTokenRoles(Map<String, String> headers);
 	AppUserDto load(Long id);
 	List<AppUserDto> loadAll();
+	void sendKafkaEvent(KafkaEventDto kafkaEventDto);
 }
