@@ -85,7 +85,7 @@ public class KafkaProducer implements EventProducer {
 						.send(kafkaEventDto.getTopicName(), kafkaEventDto.getTopicContent());
 				listenableFuture.get(2, TimeUnit.SECONDS);
 			} else {
-				LOGGER.error("SendKafkaEven Topic {} not found.", kafkaEventDto.getTopicName());
+				LOGGER.error("Send KafkaEvent Topic {} not found.", kafkaEventDto.getTopicName());
 				throw new AuthenticationException("Kafka Event failed.");
 			}
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
