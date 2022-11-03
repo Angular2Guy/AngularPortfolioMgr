@@ -48,12 +48,10 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 public class KafkaConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConfig.class);
 	public static final String NEW_USER_TOPIC = "new-user-topic";
-	// private static final String NEW_USER_DLT_TOPIC = "new-user-topic-retry";
 	public static final String DEFAULT_DLT_TOPIC = "default-dlt-topic";
 	public static final String USER_LOGOUT_TOPIC = "user-logout-topic";
-	// private static final String USER_LOGOUT_DLT_TOPIC = "user-logout-topic-retry";
-	private static final String GZIP = "gzip";
-	private static final String ZSTD = "zstd";
+//	private static final String GZIP = "gzip";
+//	private static final String ZSTD = "zstd";
 
 	private ProducerFactory<String, String> producerFactory;
 	@Value("${kafka.server.name}")
