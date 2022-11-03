@@ -49,6 +49,6 @@ public class AppUserMapper {
 
 	public AppUser convert(AppUserDto dto) {
 		return new AppUser(dto.getId(), dto.getUsername(), dto.getBirthdate(), dto.getPassword(), dto.getEmailAddress(),
-				dto.getUserRole(), dto.isLocked(), dto.isEnabled(), dto.getUserRole(), Set.of());
+				dto.getUserRole() == null || dto.getUserRole().isBlank() ? "XXX" : dto.getUserRole(), dto.isLocked(), dto.isEnabled(), dto.getUserRole(), Set.of());
 	}
 }
