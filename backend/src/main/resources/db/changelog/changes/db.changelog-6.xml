@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Sven Loesekann Licensed under the Apache License, Version 
+	2.0 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+	<changeSet author="angular2guy" id="20">
+		<createTable tableName="symbol_financials">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="start_date" type="date">
+				<constraints nullable="false"
+					notNullConstraintName="symbol_financials_start_date_not_null" />
+			</column>
+			<column name="end_date" type="date">
+				<constraints nullable="false"
+					notNullConstraintName="symbol_financials_end_date_not_null" />
+			</column>
+			<column name="year" type="int">
+				<constraints nullable="false"
+					notNullConstraintName="symbol_financials_year_not_null" />
+			</column>
+			<column name="quarter" type="varchar(10)">
+				<constraints nullable="false"
+					notNullConstraintName="symbol_financials_quarter_not_null" />
+			</column>
+			<column name="symbol" type="varchar(20)">
+				<constraints nullable="false"
+					notNullConstraintName="symbol_financials_symbol_not_null" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="angular2guy" id="21">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_year" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_year"
+			tableName="symbol_financials">
+			<column name="year" />
+		</createIndex>
+	</changeSet>
+	<changeSet author="angular2guy" id="22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_quarter" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_quarter"
+			tableName="symbol_financials">
+			<column name="quarter" />
+		</createIndex>
+	</changeSet>
+	<changeSet author="angular2guy" id="23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_symbol" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_symbol"
+			tableName="symbol_financials">
+			<column name="symbol" />
+		</createIndex>
+	</changeSet>
+	<changeSet author="angular2guy" id="24">
+		<createTable tableName="financial_element">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="label" type="varchar(2048)" />
+			<column name="concept" type="varchar(255)">
+				<constraints nullable="false"
+					notNullConstraintName="financial_element_concept_not_null" />
+			</column>
+			<column name="currency" type="varchar(10)">
+				<constraints nullable="false"
+					notNullConstraintName="financial_element_currency_not_null" />
+			</column>
+			<column name="value" type="number(12,4)">
+				<constraints nullable="false"
+					notNullConstraintName="financial_element_value_not_null" />
+			</column>
+			<column name="symbol_financials_id" type="bigint">
+				<constraints nullable="false"
+					notNullConstraintName="financial_element_symbol_financials_id_not_null"
+					foreignKeyName="fk_financial_element_symbol_financials_id"
+					references="symbol_financials(id)" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="angular2guy" id="25">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="financial_element"
+					indexName="ix_financial_element_symbol_financials_id" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_financial_element_symbol_financials_id"
+			tableName="financial_element">
+			<column name="symbol_financials_id" />
+		</createIndex>
+	</changeSet>
+</databaseChangeLog>
