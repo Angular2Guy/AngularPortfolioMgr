@@ -21,6 +21,8 @@ import ch.xxx.manager.usecase.service.AppInfoService;
 public class ProdAppInfoService implements AppInfoService {
 	@Value("${spring.profiles.active:}")
 	private String profiles;
+	@Value("${path.financial-data:}")
+	private String financialDataPath;
 
 	@Override
 	public String getProfiles() {
@@ -30,6 +32,11 @@ public class ProdAppInfoService implements AppInfoService {
 	@Override
 	public String getClassName() {
 		return ProdAppInfoService.class.getCanonicalName();
+	}
+
+	@Override
+	public String getFinancialDataImportPath() {
+		return this.financialDataPath;
 	}
 
 }

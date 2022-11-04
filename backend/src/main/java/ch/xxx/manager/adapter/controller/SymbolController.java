@@ -19,9 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.QuoteImportService;
@@ -84,5 +87,10 @@ public class SymbolController {
 	@GetMapping("/name/{name}")
 	public List<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
 		return this.service.getSymbolByName(name);
+	}
+	
+	@PutMapping("/importus/financialdata")
+	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
+		return "";
 	}
 }

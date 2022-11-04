@@ -12,8 +12,12 @@
  */
 package ch.xxx.manager.usecase.service;
 
-public interface AppInfoService {
-	String getProfiles();
-	String getClassName();
-	String getFinancialDataImportPath();
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
+@Transactional
+@Service
+public class FinancialDataImportService {
+
 }

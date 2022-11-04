@@ -10,10 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.domain.model.dto;
 
-public interface AppInfoService {
-	String getProfiles();
-	String getClassName();
-	String getFinancialDataImportPath();
+public class ImportFinancialDataDto {
+	private String filename;
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
 }
