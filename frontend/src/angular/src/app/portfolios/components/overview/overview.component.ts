@@ -42,6 +42,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	importingSymbols = false;
 	private timeoutId = -1;
 	dialogRef: MatDialogRef<unknown, any> = null;
+	financialsDialogRef: MatDialogRef<unknown, any> = null;
 	dialogSubscription: Subscription;
 	private profiles: string = null;
 	private showPortfolioTable = true;

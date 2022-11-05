@@ -37,10 +37,11 @@ import { ProdAppInfoService } from './service/prod-app-info.service';
 import { ProdConfigComponent } from './components/prod-config/prod-config.component';
 import { DevConfigComponent } from './components/dev-config/dev-config.component';
 import { TokenInterceptor } from 'ngx-simple-charts/base-service';
+import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
 
 @NgModule({
     declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, 
-        PortfolioTableComponent, ProdConfigComponent, DevConfigComponent],
+        PortfolioTableComponent, ProdConfigComponent, DevConfigComponent, ImportFinancialsComponent],
     imports: [
         BaseModule,
         MatListModule,
