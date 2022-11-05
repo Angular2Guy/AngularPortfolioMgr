@@ -12,12 +12,23 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import javax.transaction.Transactional;
-
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-@Transactional
+import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+
+
 @Service
 public class FinancialDataImportService {
-
+	private final FileClient fileClient;
+	
+	public FinancialDataImportService(FileClient fileClient) {
+		this.fileClient = fileClient;
+	}
+	
+	@Async
+	public void importFinancialData(ImportFinancialDataDto importFinancialDataDto) {
+		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
+	}
 }

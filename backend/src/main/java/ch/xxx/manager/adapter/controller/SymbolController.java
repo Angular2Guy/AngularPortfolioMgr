@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
+import ch.xxx.manager.usecase.service.FinancialDataImportService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -38,12 +39,14 @@ public class SymbolController {
 	private final SymbolImportService importService;
 	private final SymbolService service;
 	private final QuoteImportService quoteImportService;
+	private final FinancialDataImportService financialDataImportService;
 
 	public SymbolController(SymbolImportService importService, SymbolService service,
-			QuoteImportService quoteImportService) {
+			QuoteImportService quoteImportService, FinancialDataImportService financialDataImportService) {
 		this.importService = importService;
 		this.service = service;
 		this.quoteImportService = quoteImportService;
+		this.financialDataImportService = financialDataImportService;
 	}
 
 	@GetMapping(path = "/importus/all", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -91,6 +94,7 @@ public class SymbolController {
 	
 	@PutMapping("/importus/financialdata")
 	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
-		return "";
+		this.financialDataImportService.importFinancialData(importFinancialDataDto);
+		return "started";
 	}
 }

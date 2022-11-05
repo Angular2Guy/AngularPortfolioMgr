@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.file;
+package ch.xxx.manager.domain.file;
 
-public class FileClient {
-
+public interface FileClient {
+	Boolean importZipFile(String filename);
 }
