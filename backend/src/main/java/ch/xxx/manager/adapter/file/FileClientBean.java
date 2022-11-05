@@ -50,15 +50,15 @@ public class FileClientBean implements FileClient {
 
 	private void handleZipEntry(ZipEntry zipEntry) {
 		if (!zipEntry.isDirectory()) {
-			ZipInputStream inputStream = null;
+			ZipInputStream zipInputStream = null;
 			try {
 				LOGGER.info("Filename: {}, Filesize: {}", zipEntry.getName(), zipEntry.getSize());
 				File inFile = new File(zipEntry.getName());
-				inputStream = new ZipInputStream(new FileInputStream(inFile));
+				zipInputStream = new ZipInputStream(new FileInputStream(inFile));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			} finally {
-				this.closeStream(inputStream);
+				this.closeStream(zipInputStream);
 			}
 		} else {			
 			ZipInputStream zipInputStream = null;
@@ -86,14 +86,6 @@ public class FileClientBean implements FileClient {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		}
-	}
-
-	private ZipEntry createZipEntry(File myFile) {
-		try {
-			return new ZipEntry(myFile.getCanonicalPath());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 	}
 }
