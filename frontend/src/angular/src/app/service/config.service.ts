@@ -21,6 +21,7 @@ import { tap } from 'rxjs/operators';
 })
 export class ConfigService {
 	private profiles: string = null;
+	private importPath: string = null;
 	
 	constructor(private http: HttpClient) { }
 
@@ -32,5 +33,11 @@ export class ConfigService {
 		}
 	}
 
-  
+    getImportPath(): Observable<string> {
+		if(!this.importPath) {
+			return this.http.get(`/rest/config/importPath`, {responseType: 'text'}).pipe(tap(value => this.importPath = value));
+		} else {
+			return of(this.importPath);
+		}			
+    }
 }

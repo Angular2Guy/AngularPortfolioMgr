@@ -173,6 +173,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.tokenService.logout();
 	}
 
+	showFinancialsImport(): void {
+		console.log('showFinancialsConfig()');
+	}
+
 	showConfig(): void {
 		if (!this.dialogRef && this.profiles) {
 			if(!!this.dialogSubscription) {

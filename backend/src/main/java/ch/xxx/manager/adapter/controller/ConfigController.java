@@ -20,4 +20,9 @@ public class ConfigController {
 	public String getProfiles() {
 		return this.appInfoService.getProfiles();
 	}
+	
+	@GetMapping(path = "/importpath", produces =  MediaType.TEXT_PLAIN_VALUE)
+	public String getImportPath() {
+		return this.appInfoService.getProfiles();
+	}
 }
