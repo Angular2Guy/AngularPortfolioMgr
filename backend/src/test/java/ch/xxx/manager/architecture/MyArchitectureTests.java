@@ -58,6 +58,7 @@ public class MyArchitectureTests {
 			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
 			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
 			.adapter("cron", "..adapter.cron..").adapter("repo", "..adapter.repository..")
+			.adapter("file", "..adapter.file..")
 			.adapter("events", "..adapter.events..").adapter("client", "..adapter.client..")
 			.adapter("config", "..adapter.config..").withOptionalLayers(true);
 

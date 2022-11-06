@@ -27,7 +27,7 @@ import ch.xxx.manager.usecase.service.AppInfoService;
 
 @Component
 public class FileClientBean implements FileClient {
-	private Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
 	private AppInfoService appInfoService;
 
 	public FileClientBean(AppInfoService appInfoService) {
