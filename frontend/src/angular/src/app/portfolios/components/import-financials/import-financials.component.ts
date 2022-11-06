@@ -35,7 +35,7 @@ export class ImportFinancialsComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<OverviewComponent>, private configService: ConfigService,
 		@Inject(MAT_DIALOG_DATA) public data: ImportFinancialsData, private fb: FormBuilder) {
 	this.financialsForm = fb.group({
-		[FormFields.Filename]: ['', Validators.required]
+		[FormFields.Filename]: ['', [Validators.required, Validators.minLength(5)]]
 	  } as AbstractControlOptions);
   }
 
@@ -44,7 +44,7 @@ export class ImportFinancialsComponent implements OnInit {
   }
 
   okClick(): void {
-	this.dialogRef.close(this.financialsForm[FormFields.Filename].value);
+	this.dialogRef.close(this.financialsForm.controls[FormFields.Filename].value);
   }
   
   cancelClick(): void {
