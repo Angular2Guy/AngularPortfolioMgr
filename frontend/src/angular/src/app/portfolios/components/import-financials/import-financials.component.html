@@ -2,7 +2,10 @@
     <form [formGroup]="financialsForm" novalidate>        
 			<ul class="list-style">
 				<li>
-					
+					<h1 i18n="@@financialDataImport">Financialdata import</h1>
+				</li>
+				<li>
+					<span i18n="@@filepath">Filepath: </span><span>{{filepath}}</span>
 				</li>
 				<li>
 					<mat-form-field class="form-field"> 
@@ -12,7 +15,7 @@
 					</mat-form-field>
 				</li>
 				<li>
-					<button mat-button (click)="okClick()" [disabled]="!filePath" tabindex="-1" i18n="@@ok">Ok</button>
+					<button mat-button (click)="okClick()" [disabled]="!filename || !filepath" tabindex="-1" i18n="@@ok">Ok</button>
 					<button mat-button (click)="cancelClick()" tabindex="-1" i18n="@@cancel">Cancel</button>
 				</li>
 			</ul>

@@ -35,7 +35,7 @@ export class ConfigService {
 
     getImportPath(): Observable<string> {
 		if(!this.importPath) {
-			return this.http.get(`/rest/config/importPath`, {responseType: 'text'}).pipe(tap(value => this.importPath = value));
+			return this.http.get(`/rest/config/importpath`, {responseType: 'text'}).pipe(tap(value => this.importPath = value));
 		} else {
 			return of(this.importPath);
 		}			

@@ -13,6 +13,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ImportFinancialsData } from '../model/import-financials-data';
 
 @Injectable({providedIn: 'root'})
 export class SymbolImportService {
@@ -33,5 +34,9 @@ export class SymbolImportService {
   
   getIndexSymbols(): Observable<string> {
 	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
+  }
+  
+  putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {
+	return this.http.put<string>('/rest/symbol/importus/financialdata', importFinancialsData);
   }
 }

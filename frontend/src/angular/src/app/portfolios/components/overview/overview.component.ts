@@ -15,6 +15,7 @@ import { TokenService } from 'ngx-simple-charts/base-service';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../../service/portfolio.service';
 import { Portfolio } from '../../../model/portfolio';
+import { ImportFinancialsData } from '../../../model/import-financials-data';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
 import { PortfolioData } from '../../../model/portfolio-data';
@@ -26,6 +27,7 @@ import { QuoteImportService } from '../../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
+import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
 import { SpinnerData, DialogSpinnerComponent } from 'src/app/base/components/dialog-spinner/dialog-spinner.component';
 import { OnDestroy } from '@angular/core';
 
@@ -41,8 +43,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 	importingSymbols = false;
 	private timeoutId = -1;
-	dialogRef: MatDialogRef<unknown, any> = null;
-	financialsDialogRef: MatDialogRef<unknown, any> = null;
 	dialogSubscription: Subscription;
 	private profiles: string = null;
 	private showPortfolioTable = true;
@@ -61,7 +61,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
     ngOnDestroy(): void {		
-        this.dialogRef = null;
 		if(!!this.dialogSubscription) {
 			this.dialogSubscription.unsubscribe();
 			this.dialogSubscription = null;
@@ -74,7 +73,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	newPortfolio() {
-		if (!this.dialogRef) {
 			if(!!this.dialogSubscription) {
 				this.dialogSubscription.unsubscribe();
 			}
@@ -83,8 +81,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
 				portfolioElements: [], userId: (this.tokenService.userId as number), year1: null, year10: null, year2: null, year5: null
 			};
 			const newPortfolioData: PortfolioData = { portfolio: portfolio };
-			this.dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
-			this.dialogSubscription = this.dialogRef.afterClosed().subscribe(result => {
+			const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
+			this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
 				if (result) {
 					this.portfolioService.postPortfolio(result)
 						.subscribe(myPortfolio => {
@@ -93,9 +91,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 							this.selPortfolio(myPortfolio, true);
 						});
 				}
-				this.dialogRef = null;
 			});
-		}
 	}
 
 	selPortfolio(portfolio: Portfolio, showPortTab = false) {
@@ -174,18 +170,22 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	showFinancialsImport(): void {
-		console.log('showFinancialsConfig()');
+		this.configService.getImportPath().subscribe(result => {
+			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
+			dialogRef.afterClosed().subscribe((result: ImportFinancialsData) => console.log(result));
+		});
+		//console.log('showFinancialsConfig()');
 	}
 
 	showConfig(): void {
-		if (!this.dialogRef && this.profiles) {
+		if (this.profiles) {
 			if(!!this.dialogSubscription) {
 				this.dialogSubscription.unsubscribe();				
 			}
 			const myOptions = { width: '700px' };
-			this.dialogRef = this.profiles.toLowerCase().includes('prod') ? 
+			let dialogRef = this.profiles.toLowerCase().includes('prod') ? 
 				this.dialog.open(ProdConfigComponent, myOptions) : this.dialog.open(DevConfigComponent, myOptions);
-			this.dialogSubscription = this.dialogRef.afterClosed().subscribe(() => this.dialogRef = null);
+			this.dialogSubscription = dialogRef.afterClosed().subscribe(() => dialogRef = null);
 		}
 	}
 }

@@ -10,8 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { OverviewComponent } from '../overview/overview.component';
+import { ImportFinancialsData } from '../../../model/import-financials-data';
+import { ConfigService } from 'src/app/service/config.service';
 
 enum FormFields {
 	Filename = 'filename',
@@ -25,23 +29,25 @@ enum FormFields {
 export class ImportFinancialsComponent implements OnInit {
   protected financialsForm: FormGroup;  
   protected FormFields = FormFields;
-  protected filePath: string = null;
+  protected filepath: string = null;
+  protected filename: string = null;
   
-  constructor(private fb: FormBuilder) {
+  constructor(public dialogRef: MatDialogRef<OverviewComponent>, private configService: ConfigService,
+		@Inject(MAT_DIALOG_DATA) public data: ImportFinancialsData, private fb: FormBuilder) {
 	this.financialsForm = fb.group({
 		[FormFields.Filename]: ['', Validators.required]
 	  } as AbstractControlOptions);
   }
 
   ngOnInit(): void {
-	
+	this.configService.getImportPath().subscribe(result => this.filepath = result);
   }
 
   okClick(): void {
-	console.log('okClick()');
+	this.dialogRef.close(this.financialsForm[FormFields.Filename].value);
   }
   
   cancelClick(): void {
-	console.log('cancelClick()');
+	this.dialogRef.close();
   }
 }

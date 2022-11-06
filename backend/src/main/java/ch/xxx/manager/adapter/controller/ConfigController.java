@@ -23,6 +23,6 @@ public class ConfigController {
 	
 	@GetMapping(path = "/importpath", produces =  MediaType.TEXT_PLAIN_VALUE)
 	public String getImportPath() {
-		return this.appInfoService.getProfiles();
+		return this.appInfoService.getFinancialDataImportPath();
 	}
 }
