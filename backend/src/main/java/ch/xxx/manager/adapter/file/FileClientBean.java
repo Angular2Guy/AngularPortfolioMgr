@@ -12,10 +12,12 @@
  */
 package ch.xxx.manager.adapter.file;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
@@ -35,47 +37,34 @@ public class FileClientBean implements FileClient {
 	}
 
 	public Boolean importZipFile(String filename) {
-		ZipInputStream zipTargetStream = null;
+		ZipFile initialFile = null;
 		try {
-			File initialFile = new File(this.appInfoService.getFinancialDataImportPath() + filename);
-			zipTargetStream = new ZipInputStream(new FileInputStream(initialFile));
-			this.handleZipEntry(zipTargetStream.getNextEntry());
+			initialFile = new ZipFile(this.appInfoService.getFinancialDataImportPath() + filename);
+			Enumeration<? extends ZipEntry> entries = initialFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry element = entries.nextElement();
+				if (!element.isDirectory()) {
+					InputStream inputStream = null;
+					try {
+						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
+						inputStream = initialFile.getInputStream(element);
+						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+						LOGGER.info(text != null ? text.substring(0, 100) : "");
+					} finally {
+						inputStream.close();
+					}
+				}
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
-			this.closeStream(zipTargetStream);
+			try {
+				initialFile.close();
+			} catch (IOException e) {
+				LOGGER.error("File close failed.", e);
+			}
 		}
 		return true;
-	}
-
-	private void handleZipEntry(ZipEntry zipEntry) {
-		if (!zipEntry.isDirectory()) {
-			ZipInputStream zipInputStream = null;
-			try {
-				LOGGER.info("Filename: {}, Filesize: {}", zipEntry.getName(), zipEntry.getSize());
-				File inFile = new File(zipEntry.getName());
-				zipInputStream = new ZipInputStream(new FileInputStream(inFile));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} finally {
-				this.closeStream(zipInputStream);
-			}
-		} else {			
-			ZipInputStream zipInputStream = null;
-			try {
-				File inFile = new File(zipEntry.getName());
-				zipInputStream = new ZipInputStream(new FileInputStream(inFile));
-				ZipEntry nextEntry = zipInputStream.getNextEntry();
-				while(nextEntry != null) {
-					this.handleZipEntry(nextEntry);
-					nextEntry = zipInputStream.getNextEntry();
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} finally {
-				this.closeStream(zipInputStream);
-			}
-		}
 	}
 
 	private void closeStream(ZipInputStream inputStream) {
