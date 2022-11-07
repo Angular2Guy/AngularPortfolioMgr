@@ -44,7 +44,7 @@ export class ImportFinancialsComponent implements OnInit {
   }
 
   okClick(): void {
-	this.dialogRef.close(this.financialsForm.controls[FormFields.Filename].value);
+	this.dialogRef.close({filename: this.financialsForm.controls[FormFields.Filename].value, path: this.filepath} as ImportFinancialsData);
   }
   
   cancelClick(): void {

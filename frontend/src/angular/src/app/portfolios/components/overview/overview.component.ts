@@ -21,6 +21,7 @@ import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component'
 import { PortfolioData } from '../../../model/portfolio-data';
 import { SymbolImportService } from '../../../service/symbol-import.service';
 import { forkJoin, Subscription } from 'rxjs';
+import { switchMap,tap } from 'rxjs/operators';
 import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
 import { Symbol } from '../../../model/symbol';
 import { QuoteImportService } from '../../../service/quote-import.service';
@@ -172,7 +173,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	showFinancialsImport(): void {
 		this.configService.getImportPath().subscribe(result => {
 			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
-			dialogRef.afterClosed().subscribe((result: ImportFinancialsData) => console.log(result));
+			dialogRef.afterClosed()
+			.pipe(switchMap((result: ImportFinancialsData) => this.symbolImportService.putImportFinancialsData(result)))				
+			.subscribe(result => console.log(result));
 		});
 		//console.log('showFinancialsConfig()');
 	}

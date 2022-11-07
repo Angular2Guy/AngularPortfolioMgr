@@ -36,7 +36,7 @@ export class SymbolImportService {
 	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
   }
   
-  putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {
+  putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {	
 	return this.http.put<string>('/rest/symbol/importus/financialdata', importFinancialsData);
   }
 }

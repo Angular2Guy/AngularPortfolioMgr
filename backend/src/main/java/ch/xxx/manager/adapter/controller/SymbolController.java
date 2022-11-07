@@ -92,7 +92,7 @@ public class SymbolController {
 		return this.service.getSymbolByName(name);
 	}
 	
-	@PutMapping("/importus/financialdata")
+	@PutMapping(path = "/importus/financialdata", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
 		this.financialDataImportService.importFinancialData(importFinancialDataDto);
 		return "started";
