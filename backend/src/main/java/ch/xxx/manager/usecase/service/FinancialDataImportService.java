@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 
 @Service
 public class FinancialDataImportService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataImportService.class);
 	private final FileClient fileClient;
 	
 	public FinancialDataImportService(FileClient fileClient) {
@@ -29,6 +32,10 @@ public class FinancialDataImportService {
 	
 	@Async
 	public void importFinancialData(ImportFinancialDataDto importFinancialDataDto) {
+		try {
 		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
+		}catch(Exception e) {
+			LOGGER.warn("importFinancialData failed.",e);
+		}
 	}
 }

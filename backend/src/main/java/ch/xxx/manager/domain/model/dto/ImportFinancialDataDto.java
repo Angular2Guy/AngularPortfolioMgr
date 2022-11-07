@@ -14,6 +14,7 @@ package ch.xxx.manager.domain.model.dto;
 
 public class ImportFinancialDataDto {
 	private String filename;
+	private String path;
 
 	public String getFilename() {
 		return filename;
@@ -21,5 +22,13 @@ public class ImportFinancialDataDto {
 
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 }
