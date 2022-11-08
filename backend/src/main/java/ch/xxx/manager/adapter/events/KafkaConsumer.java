@@ -24,7 +24,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.adapter.config.KafkaConfig;
@@ -66,14 +65,14 @@ public class KafkaConsumer {
 		LOGGER.info(in + " from " + topic);
 	}
 
-	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
+	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
 	public void consumerForUserLogoutsTopic(String message) {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);
 		try {
 			RevokedTokenDto dto = this.objectMapper.readValue(message, RevokedTokenDto.class);
 			this.appUserService.logoutMsg(dto);
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			LOGGER.warn("send failed consumerForUserLogoutsTopic [{}]", message);
 			this.kafkaListenerDltHandler.sendToDefaultDlt(new KafkaEventDto(KafkaConfig.DEFAULT_DLT_TOPIC, message));
 		}
