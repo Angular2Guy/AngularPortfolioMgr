@@ -38,4 +38,5 @@ public class FinancialDataImportService {
 			LOGGER.warn("importFinancialData failed.",e);
 		}
 	}
+	
 }

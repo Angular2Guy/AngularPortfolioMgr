@@ -18,22 +18,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 
 @Component
 public class FileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
 	private AppInfoService appInfoService;
+	private ObjectMapper objectMapper;
 
-	public FileClientBean(AppInfoService appInfoService) {
+	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper) {
 		this.appInfoService = appInfoService;
+		this.objectMapper = objectMapper;
 	}
 
 	public Boolean importZipFile(String filename) {
@@ -49,7 +53,9 @@ public class FileClientBean implements FileClient {
 						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
 						inputStream = initialFile.getInputStream(element);
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-						LOGGER.info(text != null ? text.substring(0, 100) : "");
+						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text, SymbolFinancialsDto.class);
+						LOGGER.info(symbolFinancialsDto.toString());
+//						LOGGER.info(text != null ? text.substring(0, 100) : "");
 					} finally {
 						inputStream.close();
 					}
@@ -58,20 +64,15 @@ public class FileClientBean implements FileClient {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
-			try {
-				initialFile.close();
-			} catch (IOException e) {
-				LOGGER.error("File close failed.", e);
-			}
+			this.closeFile(initialFile);
 		}
 		return true;
 	}
 
-	private void closeStream(ZipInputStream inputStream) {
-		if (inputStream != null) {
+	private void closeFile(ZipFile zipFile) {
+		if (zipFile != null) {
 			try {
-				inputStream.closeEntry();
-				inputStream.close();
+				zipFile.close();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
