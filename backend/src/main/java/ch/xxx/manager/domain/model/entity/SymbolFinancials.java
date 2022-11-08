@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,6 +41,7 @@ public class SymbolFinancials extends EntityBase {
 	}
 	private LocalDate startDate;
 	private LocalDate endDate;
+	@Column(name="`year`")
 	private int year;
 	@Enumerated(EnumType.STRING)
 	private Quarter quarter;

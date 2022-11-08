@@ -12,31 +12,54 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.domain.file.FileClient;
-import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
-
+import ch.xxx.manager.domain.model.entity.FinancialElement;
+import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
+import ch.xxx.manager.domain.model.entity.SymbolFinancials;
+import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
+import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
+import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
 
 @Service
 public class FinancialDataImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataImportService.class);
-	private final FileClient fileClient;
-	
-	public FinancialDataImportService(FileClient fileClient) {
-		this.fileClient = fileClient;
+	private final SymbolFinancialsMapper symbolFinancialsMapper;
+	private final SymbolFinancialsRepository symbolFinancialsRepository;
+	private final FinancialElementRepository financialElementRepository;
+
+	public FinancialDataImportService(SymbolFinancialsMapper symbolFinancialsMapper,
+			SymbolFinancialsRepository symbolFinancialsRepository,
+			FinancialElementRepository financialElementRepository) {
+		this.symbolFinancialsMapper = symbolFinancialsMapper;
+		this.symbolFinancialsRepository = symbolFinancialsRepository;
+		this.financialElementRepository = financialElementRepository;
 	}
-	
-	@Async
-	public void importFinancialData(ImportFinancialDataDto importFinancialDataDto) {
-		try {
-		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
-		}catch(Exception e) {
-			LOGGER.warn("importFinancialData failed.",e);
-		}
+
+	@Transactional(value = TxType.REQUIRES_NEW)
+	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
+		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream()
+				.map(myDto -> this.symbolFinancialsMapper.toEntity(myDto)).collect(Collectors.toSet());
+		this.symbolFinancialsRepository.saveAll(symbolFinancials);
+		this.financialElementRepository.saveAll(symbolFinancials.stream()
+				.map(mySymbolFinancials -> concatFinancialElemenst(mySymbolFinancials)).flatMap(Set::stream).collect(Collectors.toSet()));
 	}
-	
+
+	private Set<FinancialElement> concatFinancialElemenst(SymbolFinancials mySymbolFinancials) {
+		Set<FinancialElement> financialElements = new HashSet<>();
+		financialElements.addAll(mySymbolFinancials.getBalanceSheet());
+		financialElements.addAll(mySymbolFinancials.getCashFlow());
+		financialElements.addAll(mySymbolFinancials.getIncome());
+		return financialElements;
+	}
 }

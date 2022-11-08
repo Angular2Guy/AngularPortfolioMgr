@@ -17,9 +17,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.usecase.mapping.SymbolMapper;
@@ -27,12 +32,15 @@ import ch.xxx.manager.usecase.mapping.SymbolMapper;
 @Service
 @Transactional
 public class SymbolService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolService.class);
 	private final SymbolRepository repository;
 	private final SymbolMapper symbolMapper;
+	private final FileClient fileClient;
 
-	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper) {
+	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper, FileClient fileClient) {
 		this.repository = repository;
 		this.symbolMapper = symbolMapper;
+		this.fileClient = fileClient;
 	}
 
 	public List<SymbolDto> getAllSymbols() {
@@ -52,5 +60,14 @@ public class SymbolService {
 				.map(myName -> this.repository.findByName(myName.trim().toLowerCase()).stream()
 						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
 				.orElse(List.of());
+	}
+	
+	@Async
+	public void importFinancialData(ImportFinancialDataDto importFinancialDataDto) {
+		try {
+			this.fileClient.importZipFile(importFinancialDataDto.getFilename());
+		} catch (Exception e) {
+			LOGGER.warn("importFinancialData failed.", e);
+		}
 	}
 }

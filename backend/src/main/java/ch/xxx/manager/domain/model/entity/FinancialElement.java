@@ -14,6 +14,7 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -29,6 +30,7 @@ public class FinancialElement extends EntityBase {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private CurrencyKey currency;
+	@Column(name="`value`")
 	private BigDecimal value;
 	@ManyToOne
 	private SymbolFinancials symbolFinancials;

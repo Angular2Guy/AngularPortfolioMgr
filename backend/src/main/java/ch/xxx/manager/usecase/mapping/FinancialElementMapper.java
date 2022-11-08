@@ -1,6 +1,7 @@
 package ch.xxx.manager.usecase.mapping;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class FinancialElementMapper {
 		entity.setId(financialElementDto.getId());
 		entity.setLabel(financialElementDto.getLabel());
 		try {
-			entity.setValue(new BigDecimal(financialElementDto.getValue()));
+			entity.setValue(new BigDecimal(financialElementDto.getValue()).round(MathContext.DECIMAL64));
 		} catch (Exception e) {
 			entity.setValue(BigDecimal.ZERO);
 		}

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
-import ch.xxx.manager.usecase.service.FinancialDataImportService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -37,16 +36,14 @@ import ch.xxx.manager.usecase.service.SymbolService;
 public class SymbolController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolController.class);
 	private final SymbolImportService importService;
-	private final SymbolService service;
+	private final SymbolService symbolService;
 	private final QuoteImportService quoteImportService;
-	private final FinancialDataImportService financialDataImportService;
 
 	public SymbolController(SymbolImportService importService, SymbolService service,
-			QuoteImportService quoteImportService, FinancialDataImportService financialDataImportService) {
+			QuoteImportService quoteImportService) {
 		this.importService = importService;
-		this.service = service;
+		this.symbolService = service;
 		this.quoteImportService = quoteImportService;
-		this.financialDataImportService = financialDataImportService;
 	}
 
 	@GetMapping(path = "/importus/all", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -79,22 +76,22 @@ public class SymbolController {
 
 	@GetMapping("/all")
 	public List<SymbolDto> getAllSymbols() {
-		return this.service.getAllSymbols();
+		return this.symbolService.getAllSymbols();
 	}
 
 	@GetMapping("/symbol/{symbol}")
 	public List<SymbolDto> getSymbolBySymbol(@PathVariable("symbol") String symbol) {
-		return this.service.getSymbolBySymbol(symbol);
+		return this.symbolService.getSymbolBySymbol(symbol);
 	}
 
 	@GetMapping("/name/{name}")
 	public List<SymbolDto> getSymbolByName(@PathVariable("name") String name) {
-		return this.service.getSymbolByName(name);
+		return this.symbolService.getSymbolByName(name);
 	}
 	
 	@PutMapping(path = "/importus/financialdata")
 	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
-		this.financialDataImportService.importFinancialData(importFinancialDataDto);
+		this.symbolService.importFinancialData(importFinancialDataDto);
 		return "{\"status\": \"started\" }";
 	}
 }

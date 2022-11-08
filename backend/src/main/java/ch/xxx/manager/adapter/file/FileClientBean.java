@@ -15,7 +15,9 @@ package ch.xxx.manager.adapter.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -28,16 +30,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
+import ch.xxx.manager.usecase.service.FinancialDataImportService;
 
 @Component
 public class FileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
 	private AppInfoService appInfoService;
 	private ObjectMapper objectMapper;
+	private FinancialDataImportService financialDataImportService;
 
-	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper) {
+	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper, FinancialDataImportService financialDataImportService) {
 		this.appInfoService = appInfoService;
 		this.objectMapper = objectMapper;
+		this.financialDataImportService = financialDataImportService;
 	}
 
 	public Boolean importZipFile(String filename) {
@@ -45,6 +50,7 @@ public class FileClientBean implements FileClient {
 		try {
 			initialFile = new ZipFile(this.appInfoService.getFinancialDataImportPath() + filename);
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
+			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>(); 
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
 				if (!element.isDirectory()) {
@@ -54,11 +60,16 @@ public class FileClientBean implements FileClient {
 						inputStream = initialFile.getInputStream(element);
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text, SymbolFinancialsDto.class);
+						symbolFinancialsDtos.add(symbolFinancialsDto);
 						LOGGER.info(symbolFinancialsDto.toString());
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
 					} finally {
 						inputStream.close();
 					}
+				}
+				if(symbolFinancialsDtos.size() > 1000 || !entries.hasMoreElements()) {
+					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
+					symbolFinancialsDtos.clear();
 				}
 			}
 		} catch (IOException e) {
