@@ -18,6 +18,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +26,7 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class FinancialElement extends EntityBase {
+	@Lob
 	private String label;
 	private String concept;
 	@NotNull
