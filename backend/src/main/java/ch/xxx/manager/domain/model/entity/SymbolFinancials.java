@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @Entity
 public class SymbolFinancials extends EntityBase {
 	public static enum Quarter {
-		FY("FY"),Q1("Q1"), Q2("Q2"), Q3("Q3"), Q4("Q4");
+		H1("H1"), H2("H2"), H3("H3"), H4("H4"), T1("T1"), T2("T2"), T3("T3"), T4("T4"), CY("CY"), FY("FY"), Q1("Q1"), Q2("Q2"), Q3("Q3"), Q4("Q4");
 
 		public final String value;
 

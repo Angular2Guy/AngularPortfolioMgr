@@ -69,7 +69,7 @@ public class FileClientBean implements FileClient {
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text, SymbolFinancialsDto.class);
 						symbolFinancialsDtos.add(symbolFinancialsDto);
-						LOGGER.info(symbolFinancialsDto.toString());
+//						LOGGER.info(symbolFinancialsDto.toString());
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
 					} finally {
 						inputStream.close();

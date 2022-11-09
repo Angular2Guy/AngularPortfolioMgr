@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -35,6 +36,7 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 @Configuration
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "PT2H")
+@EnableAsync
 public class ApplicationConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 

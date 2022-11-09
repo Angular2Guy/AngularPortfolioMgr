@@ -116,4 +116,8 @@
 		<modifyDataType columnName="value" tableName="financial_element" newDataType="number(17,4)"/>
 		<modifyDataType columnName="label" tableName="financial_element" newDataType="varchar(4096)"/>
 	</changeSet>
+	<changeSet id="27" author="angular2guy">
+		<modifyDataType columnName="value" tableName="financial_element" newDataType="number(34,4)"/>
+		<modifyDataType columnName="label" tableName="financial_element" newDataType="clob"/>
+	</changeSet>
 </databaseChangeLog>

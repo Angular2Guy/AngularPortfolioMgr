@@ -69,5 +69,6 @@ public class SymbolService {
 		} catch (Exception e) {
 			LOGGER.warn("importFinancialData failed.", e);
 		}
+		LOGGER.info("Financial Data import finished.");
 	}
 }

@@ -53,6 +53,7 @@ public class FinancialDataImportService {
 		this.symbolFinancialsRepository.saveAll(symbolFinancials);
 		this.financialElementRepository.saveAll(symbolFinancials.stream()
 				.map(mySymbolFinancials -> concatFinancialElemenst(mySymbolFinancials)).flatMap(Set::stream).collect(Collectors.toSet()));
+		LOGGER.info("Items imported: {}", symbolFinancials.size());
 	}
 
 	private Set<FinancialElement> concatFinancialElemenst(SymbolFinancials mySymbolFinancials) {
