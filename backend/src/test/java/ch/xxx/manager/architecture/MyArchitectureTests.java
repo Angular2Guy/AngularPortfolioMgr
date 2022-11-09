@@ -16,6 +16,9 @@
 package ch.xxx.manager.architecture;
 
 import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
+import static org.assertj.core.api.Assertions.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo;
+import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
 
 import java.util.List;
 
@@ -45,12 +48,11 @@ import com.tngtech.archunit.library.Architectures;
 import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
+import ch.xxx.manager.adapter.file.FileClientTest;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })
 public class MyArchitectureTests {
-	private static final ArchRule NO_CLASSES_SHOULD_USE_FIELD_INJECTION = createNoFieldInjectionRule();
-
 	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");
 
 	@ArchTest
@@ -105,7 +107,7 @@ public class MyArchitectureTests {
 					ArchRule beAnnotatedWith = ArchRuleDefinition.classes().that()
 							.resideInAPackage("..adapter.controller..").should().beAnnotatedWith(RestController.class)
 							.orShould().beAnnotatedWith(Configuration.class);
-					beAnnotatedWith.check(this.importedClasses);
+					beAnnotatedWith.check(importedClasses);
 				});
 	}
 
@@ -113,7 +115,7 @@ public class MyArchitectureTests {
 	public void ruleExceptionsType() {
 		ArchRule exceptionType = ArchRuleDefinition.classes().that().resideInAPackage("..domain.exception..").should()
 				.beAssignableTo(RuntimeException.class).orShould().beAssignableTo(DefaultErrorAttributes.class);
-		exceptionType.check(this.importedClasses);
+		exceptionType.check(importedClasses);
 	}
 
 	@Test
@@ -122,12 +124,12 @@ public class MyArchitectureTests {
 				.resideInAPackage("..adapter.cron..").should().beAnnotatedWith(Scheduled.class).andShould()
 				.beAnnotatedWith(SchedulerLock.class).orShould().beAnnotatedWith(PostConstruct.class).orShould()
 				.beAnnotatedWith(Order.class).orShould().beAnnotatedWith(EventListener.class);
-		exceptionType.check(this.importedClasses);
+		exceptionType.check(importedClasses);
 	}
 
 	@Test
 	public void ruleGeneralCodingRulesLoggers() {
-		JavaClasses classesToCheck = this.importedClasses
+		JavaClasses classesToCheck = importedClasses
 				.that(JavaClass.Predicates.resideOutsideOfPackages("..domain.utils.."));
 		ArchRuleDefinition.fields().that().haveRawType(Logger.class).should().bePrivate().andShould().beStatic()
 				.andShould().beFinal().because("we agreed on this convention").check(classesToCheck);
@@ -136,18 +138,20 @@ public class MyArchitectureTests {
 	@Test
 	public void ruleGeneralCodingRules() {
 		ArchRule archRule = CompositeArchRule.of(GeneralCodingRules.NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS)
-				.and(NO_CLASSES_SHOULD_USE_FIELD_INJECTION).because("Good practice");
-		JavaClasses classesToCheck = this.importedClasses
-				.that(JavaClass.Predicates.resideOutsideOfPackages("..adapter.clients.test.."));
+				.and(this.createNoFieldInjectionRule()).because("Good practice");
+		JavaClasses classesToCheck = importedClasses
+				.that(JavaClass.Predicates.resideOutsideOfPackages("..adapter.clients.test..").and().doesNot(equivalentTo(FileClientTest.class)));
 		archRule.check(classesToCheck);
+		
 	}
 
-	private static ArchRule createNoFieldInjectionRule() {
+	private ArchRule createNoFieldInjectionRule() {
 		ArchCondition<JavaField> annotatedWithSpringAutowired = beAnnotatedWith(
 				"org.springframework.beans.factory.annotation.Autowired");
 		ArchCondition<JavaField> annotatedWithGuiceInject = beAnnotatedWith("com.google.inject.Inject");
 		ArchCondition<JavaField> annotatedWithJakartaInject = beAnnotatedWith("javax.inject.Inject");
-		ArchRule beAnnotatedWithAnInjectionAnnotation = ArchRuleDefinition.noFields()
+		ArchRule beAnnotatedWithAnInjectionAnnotation = ArchRuleDefinition
+				.noFields()
 				.should(annotatedWithSpringAutowired.or(annotatedWithGuiceInject).or(annotatedWithJakartaInject)
 						.as("be annotated with an injection annotation"));
 		return beAnnotatedWithAnInjectionAnnotation;
