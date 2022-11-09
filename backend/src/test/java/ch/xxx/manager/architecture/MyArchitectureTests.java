@@ -139,6 +139,7 @@ public class MyArchitectureTests {
 	public void ruleGeneralCodingRules() {
 		ArchRule archRule = CompositeArchRule.of(GeneralCodingRules.NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS)
 				.and(this.createNoFieldInjectionRule()).because("Good practice");
+		@SuppressWarnings("static-access")
 		JavaClasses classesToCheck = importedClasses
 				.that(JavaClass.Predicates.resideOutsideOfPackages("..adapter.clients.test..").and().doesNot(equivalentTo(FileClientTest.class)));
 		archRule.check(classesToCheck);
