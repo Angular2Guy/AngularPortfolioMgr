@@ -32,7 +32,7 @@ public class FileClientTest {
 	@Value("${path.financial-data}")
 	private String filePath;
 	
-	@Test
+//	@Test
 	public void importFile() throws URISyntaxException {
 		String fullFilePath = this.getClass().getClassLoader().getResource(filePath).toURI().toASCIIString();
 		fullFilePath = fullFilePath.replace("file:", "");
