@@ -23,6 +23,8 @@ import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +40,7 @@ public class FileClientBean implements FileClient {
 	private AppInfoService appInfoService;
 	private ObjectMapper objectMapper;
 	private FinancialDataImportService financialDataImportService;
+	String financialDataImportPath;
 
 	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper, FinancialDataImportService financialDataImportService) {
 		this.appInfoService = appInfoService;
@@ -45,10 +48,15 @@ public class FileClientBean implements FileClient {
 		this.financialDataImportService = financialDataImportService;
 	}
 
+	@EventListener(ApplicationReadyEvent.class)
+	public void doOnStartup() {
+		this.financialDataImportPath = this.appInfoService.getFinancialDataImportPath();
+	}
+	
 	public Boolean importZipFile(String filename) {
 		ZipFile initialFile = null;
 		try {
-			initialFile = new ZipFile(this.appInfoService.getFinancialDataImportPath() + filename);
+			initialFile = new ZipFile(this.financialDataImportPath + filename);
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>(); 
 			while (entries.hasMoreElements()) {
