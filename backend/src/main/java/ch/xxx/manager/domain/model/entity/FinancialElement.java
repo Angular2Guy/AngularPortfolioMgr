@@ -27,6 +27,7 @@ import ch.xxx.manager.domain.utils.CurrencyKey;
 @Entity
 public class FinancialElement extends EntityBase {
 	@Lob
+	@Column(columnDefinition = "text")
 	private String label;
 	private String concept;
 	@NotNull

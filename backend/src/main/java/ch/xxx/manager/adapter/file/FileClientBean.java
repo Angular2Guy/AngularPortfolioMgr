@@ -75,7 +75,7 @@ public class FileClientBean implements FileClient {
 						inputStream.close();
 					}
 				}
-				if(symbolFinancialsDtos.size() > 1000 || !entries.hasMoreElements()) {
+				if(symbolFinancialsDtos.size() >= 500 || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
 				}
