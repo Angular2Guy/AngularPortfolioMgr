@@ -61,7 +61,7 @@ public class FileClientBean implements FileClient {
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>(); 
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
-				if (!element.isDirectory()) {
+				if (!element.isDirectory() && element.getSize() > 10) {
 					InputStream inputStream = null;
 					try {
 						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
@@ -71,6 +71,8 @@ public class FileClientBean implements FileClient {
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
+					} catch (Exception e) {
+						LOGGER.info("Exception with file: {}", element.getName(), e);
 					} finally {
 						inputStream.close();
 					}
