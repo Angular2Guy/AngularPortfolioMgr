@@ -19,4 +19,5 @@ public interface SymbolFinancialsRepository {
 	SymbolFinancials save(SymbolFinancials symbolfinancials);
 	List<SymbolFinancials> saveAll(Iterable<SymbolFinancials> symbolfinancials);
     Optional<SymbolFinancials> findById(Long id);
+    void deleteAll();
 }

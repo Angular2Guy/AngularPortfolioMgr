@@ -42,4 +42,9 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	public Optional<SymbolFinancials> findById(Long id) {
 		return this.jpaSymbolFinancialsRepository.findById(id);
 	}
+
+	@Override
+	public void deleteAll() {
+		this.jpaSymbolFinancialsRepository.deleteAll();
+	}
 }

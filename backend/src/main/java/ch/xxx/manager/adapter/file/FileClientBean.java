@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.entity.dto.FinancialElementDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataImportService;
@@ -42,7 +45,8 @@ public class FileClientBean implements FileClient {
 	private FinancialDataImportService financialDataImportService;
 	String financialDataImportPath;
 
-	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper, FinancialDataImportService financialDataImportService) {
+	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
+			FinancialDataImportService financialDataImportService) {
 		this.appInfoService = appInfoService;
 		this.objectMapper = objectMapper;
 		this.financialDataImportService = financialDataImportService;
@@ -52,13 +56,13 @@ public class FileClientBean implements FileClient {
 	public void doOnStartup() {
 		this.financialDataImportPath = this.appInfoService.getFinancialDataImportPath();
 	}
-	
+
 	public Boolean importZipFile(String filename) {
 		ZipFile initialFile = null;
 		try {
 			initialFile = new ZipFile(this.financialDataImportPath + filename);
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
-			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>(); 
+			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
 				if (!element.isDirectory() && element.getSize() > 10) {
@@ -67,7 +71,19 @@ public class FileClientBean implements FileClient {
 						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
 						inputStream = initialFile.getInputStream(element);
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text, SymbolFinancialsDto.class);
+						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text,
+								SymbolFinancialsDto.class);
+						Optional.ofNullable(symbolFinancialsDto.getData()).stream().forEach(myFinancialsDataDto -> {
+							myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
+									.map(myFinancialElementDto -> fixConcept(
+											myFinancialElementDto)).collect(Collectors.toSet()));
+							myFinancialsDataDto.setCashFlow(myFinancialsDataDto.getCashFlow().stream()
+									.map(myFinancialElementDto -> fixConcept(
+											myFinancialElementDto)).collect(Collectors.toSet()));
+							myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
+									.map(myFinancialElementDto -> fixConcept(
+											myFinancialElementDto)).collect(Collectors.toSet()));
+						});
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
@@ -77,7 +93,7 @@ public class FileClientBean implements FileClient {
 						inputStream.close();
 					}
 				}
-				if(symbolFinancialsDtos.size() >= 500 || !entries.hasMoreElements()) {
+				if (symbolFinancialsDtos.size() >= 500 || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
 				}
@@ -88,6 +104,15 @@ public class FileClientBean implements FileClient {
 			this.closeFile(initialFile);
 		}
 		return true;
+	}
+
+	private FinancialElementDto fixConcept(FinancialElementDto myFinancialElementDto) {
+		myFinancialElementDto.setConcept(myFinancialElementDto.getConcept() != null
+				&& myFinancialElementDto.getConcept().contains(":")
+						? myFinancialElementDto.getConcept().trim()
+								.substring(myFinancialElementDto.getConcept().indexOf(':') +1)
+						: myFinancialElementDto.getConcept());
+		return myFinancialElementDto;
 	}
 
 	private void closeFile(ZipFile zipFile) {

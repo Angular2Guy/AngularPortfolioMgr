@@ -43,4 +43,8 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 		return this.jpaFinancialElementRepository.findById(id);
 	}
 
+	@Override
+	public void deleteAll() {
+		this.jpaFinancialElementRepository.deleteAll();
+	}
 }
