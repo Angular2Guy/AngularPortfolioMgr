@@ -120,4 +120,16 @@
 		<modifyDataType columnName="value" tableName="financial_element" newDataType="number(34,4)"/>
 		<modifyDataType columnName="label" tableName="financial_element" newDataType="clob"/>
 	</changeSet>
+	<changeSet author="angular2guy" id="28">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="financial_element"
+					indexName="ix_financial_element_concept" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_financial_element_concept"
+			tableName="financial_element">
+			<column name="concept" />
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>

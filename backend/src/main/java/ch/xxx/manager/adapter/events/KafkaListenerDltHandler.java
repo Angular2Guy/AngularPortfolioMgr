@@ -35,7 +35,7 @@ import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 @Transactional
 @Service
 public class KafkaListenerDltHandler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaListenerDltHandler.class);
 	private final KafkaTemplate<String, String> kafkaTemplate;
 	private final ObjectMapper objectMapper;
 
