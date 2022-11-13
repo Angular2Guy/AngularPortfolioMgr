@@ -15,8 +15,8 @@ package ch.xxx.manager.domain.model.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

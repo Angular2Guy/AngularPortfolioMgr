@@ -14,9 +14,9 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.time.LocalDate;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.PositiveOrZero;
 
 
 @Entity

@@ -19,10 +19,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import ch.xxx.manager.usecase.service.JwtTokenService;
@@ -30,7 +30,7 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 @Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 	private static final String DEVPATH="/rest/dev/**";
 	private static final String PRODPATH="/rest/prod/**";
 	private final JwtTokenService jwtTokenService;
@@ -41,22 +41,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		this.jwtTokenService = jwtTokenProvider;
 	}
 	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 		JwtTokenFilter customFilter = new JwtTokenFilter(jwtTokenService);
 		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
-		http.httpBasic()
-		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and().authorizeRequests()		
-		.antMatchers("/rest/config/**").permitAll()
-		.antMatchers("/rest/auth/**").permitAll()
-		.antMatchers("/rest/**").authenticated()
-		.antMatchers(blockedPath).denyAll()
-		.antMatchers("/**").permitAll()
+		HttpSecurity httpSecurity = http.authorizeHttpRequests()
+		.requestMatchers("/rest/config/**").permitAll()
+		.requestMatchers("/rest/auth/**").permitAll()
+		.requestMatchers("/rest/**").authenticated()
+		.requestMatchers(blockedPath).denyAll()
+		.requestMatchers("/**").permitAll()
 		.anyRequest().authenticated()
+		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and().csrf().disable()
 		.headers().frameOptions().sameOrigin()
 		.and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+		return httpSecurity.build();
 	}
 
 	@Bean

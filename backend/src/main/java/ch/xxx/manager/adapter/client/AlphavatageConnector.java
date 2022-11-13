@@ -15,8 +15,6 @@ package ch.xxx.manager.adapter.client;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +37,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 	@Value("${show.api.key}")
 	private String showApiKey;
 	
-	@PostConstruct
+	@jakarta.annotation.PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
 			LOGGER.info("ApiKey: " + apiKey);

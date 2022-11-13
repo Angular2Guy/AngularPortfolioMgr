@@ -15,14 +15,10 @@
  */
 package ch.xxx.manager.architecture;
 
-import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
-import static org.assertj.core.api.Assertions.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo;
-import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
+import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
 
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -49,6 +45,7 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import ch.xxx.manager.adapter.file.FileClientTest;
+import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })

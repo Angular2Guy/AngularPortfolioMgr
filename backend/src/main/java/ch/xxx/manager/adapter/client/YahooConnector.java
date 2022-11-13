@@ -19,8 +19,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,7 +38,7 @@ public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private CsvMapper csvMapper = new CsvMapper();
 
-	@PostConstruct
+	@jakarta.annotation.PostConstruct
 	public void init() {
 		this.csvMapper.registerModule(new JavaTimeModule());
 	}

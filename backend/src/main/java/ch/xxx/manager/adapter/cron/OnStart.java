@@ -12,12 +12,7 @@
  */
 package ch.xxx.manager.adapter.cron;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.usecase.service.SymbolImportService;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class OnStart {
