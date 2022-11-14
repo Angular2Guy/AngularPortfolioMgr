@@ -110,16 +110,16 @@ public class QuoteImportService {
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 				.map(mySymbolEntity -> this.symbolRepository.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofSeconds(1L))))
 				.flatMap(symbolEntity -> Stream.of(
-						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity, List.of(), null))
+						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity,  null))
 						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
 				.count();
 	}
 
 	private List<DailyQuote> customImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
+			Symbol symbolEntity, Duration delay) {
 		return switch (symbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, entities, delay);
-		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, entities, delay);
+		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, delay);
+		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, delay);
 		default -> List.of();
 		};
 	}
@@ -135,14 +135,10 @@ public class QuoteImportService {
 	}
 
 	public Long importUpdateDailyQuotes(Set<String> symbols, Duration delay) {
-		record SymbolAndQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
-		}
 		return symbols.stream()
 				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-						.flatMap(symbolEntity -> Stream.of(new SymbolAndQuotes(symbolEntity,
-								this.dailyQuoteRepository.findBySymbolId(symbolEntity.getId()))))
-						.map(myRecord -> this.customImport(symbol, this.currencyService.getCurrencyMap(),
-								myRecord.symbol, myRecord.dailyQuotes, delay))
+						.map(mySymbol -> this.customImport(symbol, this.currencyService.getCurrencyMap(),
+								mySymbol, delay))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}
@@ -195,16 +191,16 @@ public class QuoteImportService {
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
+			Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
-		return entities.isEmpty()
+		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
 				? this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay).blockOptional(myTimeout)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 				: this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay).blockOptional(myTimeout)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
 						.stream()
-						.filter(dto -> entities.stream()
+						.filter(dto -> symbolEntity.getDailyQuotes().stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
 						.collect(Collectors.toList());
 	}
@@ -230,21 +226,22 @@ public class QuoteImportService {
 				importDto.getLow(), importDto.getAdjClose(),
 				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
 				symbolEntity, symbolEntity.getCurrencyKey());
+		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}
 
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, List<DailyQuote> entities, Duration delay) {
+			Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
-		return entities.isEmpty()
+		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
 				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
 						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.orElse(List.of())
 				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay).retry(1)
 						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 						.orElse(List.of()).stream()
-						.filter(dto -> entities.stream()
+						.filter(dto -> symbolEntity.getDailyQuotes().stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
 						.collect(Collectors.toList());
 	}
@@ -261,6 +258,7 @@ public class QuoteImportService {
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
 				Long.parseLong(dto.getVolume()),
 				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity, symbolEntity.getCurrencyKey());
+		symbolEntity.getIntraDayQuotes().add(entity);
 		return entity;
 	}
 
@@ -273,7 +271,7 @@ public class QuoteImportService {
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
-				.collect(Collectors.toList());
+				.collect(Collectors.toList());			
 		return quotes;
 	}
 
@@ -291,6 +289,7 @@ public class QuoteImportService {
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
 				symbolEntity, symbolEntity.getCurrencyKey());
+		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}
 

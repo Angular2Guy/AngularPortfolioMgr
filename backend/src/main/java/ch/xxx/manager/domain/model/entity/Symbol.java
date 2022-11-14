@@ -66,17 +66,13 @@ public class Symbol extends EntityBase {
 		super();
 	}
 
-	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource,
-			Set<DailyQuote> dailyQuotes, Set<IntraDayQuote> intraDayQuotes, Set<PortfolioToSymbol> portfolioToSymbols) {
+	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource) {
 		super();
 		super.setId(id);
 		this.symbol = symbol;
 		this.name = name;
 		this.currencyKey = currencyKey;
 		this.quoteSource = quoteSource;
-		this.dailyQuotes = dailyQuotes;
-		this.intraDayQuotes = intraDayQuotes;
-		this.portfolioToSymbols = portfolioToSymbols;
 	}
 
 	public String getSymbol() {

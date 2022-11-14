@@ -50,7 +50,7 @@ public class SymbolImportService {
 		this.hkexClient = hkexClient;
 		this.repository = repository;
 		this.xetraClient = xetraClient;
-	}	
+	}
 
 	public List<Symbol> refreshSymbolEntities() {
 		List<Symbol> symbolEnities = this.repository.findAll();
@@ -68,8 +68,9 @@ public class SymbolImportService {
 	public Long importUsSymbols(List<String> nasdaq) {
 		this.refreshSymbolEntities();
 		LOGGER.info("importUsSymbols() called.");
-		List<Symbol> result = this.repository.saveAll(nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+		List<Symbol> result = this.repository
+				.saveAll(nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
+						.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
 	}
 
@@ -97,8 +98,9 @@ public class SymbolImportService {
 	public Long importDeSymbols(List<String> xetra) {
 		this.refreshSymbolEntities();
 		LOGGER.info("importDeSymbols() called.");
-		List<Symbol> result = this.repository.saveAll(xetra.stream().filter(this::filter).filter(this::filterXetra).flatMap(line -> this.convertXetra(line))
-				.collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet().stream()
+		List<Symbol> result = this.repository.saveAll(xetra.stream().filter(this::filter).filter(this::filterXetra)
+				.flatMap(line -> this.convertXetra(line)).collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet()
+				.stream()
 				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
 				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
@@ -108,10 +110,11 @@ public class SymbolImportService {
 		LOGGER.info("importReferenceIndexes() called.");
 		final List<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
-		List<Symbol> result = this.repository.saveAll(localSymbolStrs.stream().flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
-			symbolStrsToImport.add(entity.getSymbol());
-			return entity;
-		}).collect(Collectors.toList()));
+		List<Symbol> result = this.repository.saveAll(
+				localSymbolStrs.stream().flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
+					symbolStrsToImport.add(entity.getSymbol());
+					return entity;
+				}).collect(Collectors.toList()));
 		return result.stream().map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
 	}
 
@@ -120,7 +123,7 @@ public class SymbolImportService {
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()
 				.orElseThrow(() -> new RuntimeException("Unknown indexSymbol: " + indexSymbol));
 		Symbol symbolEntity = new Symbol(null, compIndex.getSymbol(), compIndex.getName(), compIndex.getCurrencyKey(),
-				compIndex.getSource(), null, null, null);
+				compIndex.getSource());
 		return this.replaceEntity(symbolEntity);
 	}
 
@@ -144,8 +147,8 @@ public class SymbolImportService {
 		String cutSymbol = dto.getSymbol().trim().length() > 4
 				? dto.getSymbol().trim().substring(dto.getSymbol().length() - 4)
 				: dto.getSymbol().trim();
-		return Stream.of(new Symbol(null, String.format("%s.HK", cutSymbol), dto.getName(), CurrencyKey.HKD,
-				QuoteSource.YAHOO, Set.of(), Set.of(), Set.of()));
+		return Stream.of(
+				new Symbol(null, String.format("%s.HK", cutSymbol), dto.getName(), CurrencyKey.HKD, QuoteSource.YAHOO));
 	}
 
 	private boolean filter(HkSymbolImportDto dto) {
@@ -173,7 +176,7 @@ public class SymbolImportService {
 				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		Symbol entity = new Symbol(null, symbol,
 				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100), CurrencyKey.EUR,
-				QuoteSource.ALPHAVANTAGE, Set.of(), Set.of(), Set.of());
+				QuoteSource.ALPHAVANTAGE);
 		return Stream.of(entity);
 	}
 
@@ -182,7 +185,7 @@ public class SymbolImportService {
 		Symbol entity = new Symbol(null,
 				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15),
 				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100), CurrencyKey.USD,
-				QuoteSource.ALPHAVANTAGE, Set.of(), Set.of(), Set.of());
+				QuoteSource.ALPHAVANTAGE);
 		return Stream.of(entity);
 	}
 }

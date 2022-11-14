@@ -15,10 +15,8 @@ package ch.xxx.manager.usecase.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -215,7 +213,7 @@ public class PortfolioService {
 
 	private PortfolioToSymbol createPortfolioPtSAndSymbol(Portfolio portfolioEntity) {
 		Symbol symbolEntity = new Symbol(null, ServiceUtils.generateRandomPortfolioSymbol(), portfolioEntity.getName(),
-				CurrencyKey.EUR, QuoteSource.PORTFOLIO, Set.of(), Set.of(), new HashSet<PortfolioToSymbol>());
+				CurrencyKey.EUR, QuoteSource.PORTFOLIO);
 		return this.portfolioToSymbolRepository
 				.saveAndFlush(this.createPtSEntity(portfolioEntity, this.symbolRepository.save(symbolEntity)));
 	}
