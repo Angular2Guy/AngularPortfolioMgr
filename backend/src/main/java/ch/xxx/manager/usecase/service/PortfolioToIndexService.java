@@ -43,8 +43,10 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class PortfolioToIndexService {
 	record QuoteDtoAndWeight(BigDecimal weight, QuoteDto quoteDto) {
 	}

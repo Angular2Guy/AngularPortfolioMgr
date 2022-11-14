@@ -27,6 +27,7 @@ import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
+import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -37,7 +38,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 	@Value("${show.api.key}")
 	private String showApiKey;
 	
-	@jakarta.annotation.PostConstruct
+	@PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
 			LOGGER.info("ApiKey: " + apiKey);
@@ -73,12 +74,28 @@ public class AlphavatageConnector implements AlphavatageClient {
 		return Mono.empty();
 	}
 
+//	@Override
+//	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
+//		try {
+//			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
+//			final String myUrl = String.format(
+//					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s", symbol,
+//					fullSeriesStr, this.apiKey);
+//			LOGGER.info(myUrl);
+//			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
+//					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
+//		} catch (URISyntaxException e) {
+//			LOGGER.error("getTimeseriesHistory failed.", e);
+//		}
+//		return Mono.empty();
+//	}
+
 	@Override
 	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s", symbol,
+					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s", symbol,
 					fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
@@ -88,7 +105,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		}
 		return Mono.empty();
 	}
-
+	
 	@Override
 	public Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
 		try {

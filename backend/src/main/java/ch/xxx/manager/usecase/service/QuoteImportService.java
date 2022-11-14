@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
-import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.DailyQuoteImportAdjDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
@@ -267,6 +267,14 @@ public class QuoteImportService {
 		return this.intraDayQuoteRepository.saveAll(entities);
 	}
 
+//	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
+//			Map<LocalDate, Collection<Currency>> currencyMap) {
+//		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
+//				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
+//				.collect(Collectors.toList());			
+//		return quotes;
+//	}
+	
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
@@ -275,16 +283,8 @@ public class QuoteImportService {
 		return quotes;
 	}
 
-	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
+	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportAdjDto dto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		Optional<CurrencyKey> currencyIdOpt = currencyMap
-//				.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)) == null
-//						? Optional.empty()
-//						: currencyMap.get(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE)).stream()
-//								.filter(entity -> Optional.ofNullable(entity.getToCurrKey())
-//										.filter(myCurrKey -> myCurrKey.equals(symbolEntity.getCurrencyKey()))
-//										.isPresent())
-//								.flatMap(entity -> Stream.of(entity.getToCurrKey())).findFirst();
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
@@ -292,6 +292,16 @@ public class QuoteImportService {
 		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}
+	
+//	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
+//			Map<LocalDate, Collection<Currency>> currencyMap) {
+//		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
+//				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
+//				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
+//				symbolEntity, symbolEntity.getCurrencyKey());
+//		symbolEntity.getDailyQuotes().add(entity);
+//		return entity;
+//	}
 
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
