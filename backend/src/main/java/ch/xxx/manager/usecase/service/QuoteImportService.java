@@ -117,11 +117,13 @@ public class QuoteImportService {
 
 	private List<DailyQuote> customImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, Duration delay) {
-		return switch (symbolEntity.getQuoteSource()) {
+		List<DailyQuote> result = switch (symbolEntity.getQuoteSource()) {
 		case ALPHAVANTAGE -> this.alphavantageImport(symbol, currencyMap, symbolEntity, delay);
 		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, delay);
 		default -> List.of();
 		};
+		LOGGER.info("{} Dailyquotes for Symbol {} imported", result.size(), symbol);
+		return result;
 	}
 
 	public Long importUpdateDailyQuotes(String symbol) {
@@ -135,10 +137,14 @@ public class QuoteImportService {
 	}
 
 	public Long importUpdateDailyQuotes(Set<String> symbols, Duration delay) {
+//		LOGGER.info("findBySymbolSingle result: {}", this.symbolRepository.findBySymbolSingle(symbols.iterator().next().toLowerCase()).size());
+//		LOGGER.info("count: {}",this.symbolRepository.findBySymbolSingle(symbols.iterator().next().toLowerCase()).stream()
+//				.flatMap(mySymbol -> this.customImport(symbols.iterator().next().toLowerCase(), this.currencyService.getCurrencyMap(),
+//						mySymbol, delay).stream()).count());
 		return symbols.stream()
 				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-						.map(mySymbol -> this.customImport(symbol, this.currencyService.getCurrencyMap(),
-								mySymbol, delay))
+						.flatMap(mySymbol -> Stream.of(this.customImport(symbols.iterator().next().toLowerCase(), this.currencyService.getCurrencyMap(),
+								mySymbol, delay)))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}

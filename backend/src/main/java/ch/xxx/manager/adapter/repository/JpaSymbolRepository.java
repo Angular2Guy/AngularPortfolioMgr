@@ -23,7 +23,7 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {	
 	@Query("select s from Symbol s where lower(s.symbol) like %:symbol%")
 	List<Symbol> findBySymbol(@Param(value = "symbol") String symbol);
-	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
+	@Query("select s from Symbol s where lower(s.symbol) = :symbol")
 	List<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
 	@Query("select s from Symbol s where lower(s.name) like %:name%")
 	List<Symbol> findByName(@Param(value = "name") String name);
