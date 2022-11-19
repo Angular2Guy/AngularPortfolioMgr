@@ -44,7 +44,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	}
 
 	@Override
-	public void deleteAll() {
+	public void deleteAllBatch() {
 		this.jpaSymbolFinancialsRepository.deleteAllInBatch();
 	}
 }

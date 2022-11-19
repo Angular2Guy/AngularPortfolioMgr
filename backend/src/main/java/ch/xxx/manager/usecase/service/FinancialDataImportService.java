@@ -48,8 +48,8 @@ public class FinancialDataImportService {
 
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void clearFinancialsData() {
-		this.financialElementRepository.deleteAll();
-		this.symbolFinancialsRepository.deleteAll();		
+		this.financialElementRepository.deleteAllBatch();
+		this.symbolFinancialsRepository.deleteAllBatch();		
 	}
 	
 	@Transactional(value = TxType.REQUIRES_NEW)

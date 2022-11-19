@@ -104,7 +104,7 @@ public class FileClientBean implements FileClient {
 						inputStream.close();
 					}
 				}
-				if (symbolFinancialsDtos.size() >= 500 || !entries.hasMoreElements()) {
+				if (symbolFinancialsDtos.size() >= 50 || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
 					LOGGER.info("Persist time: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()));

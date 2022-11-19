@@ -19,5 +19,5 @@ public interface FinancialElementRepository {
 	FinancialElement save(FinancialElement financialElement);
     List<FinancialElement> saveAll(Iterable<FinancialElement> symbols);
 	Optional<FinancialElement> findById(Long id);
-	void deleteAll();
+	void deleteAllBatch();
 }
