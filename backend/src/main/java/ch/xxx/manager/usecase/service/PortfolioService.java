@@ -110,7 +110,7 @@ public class PortfolioService {
 				.filter(pts -> pts.getSymbol().getId().equals(symbolId))
 				.findFirst();
 		PortfolioWithElements portfolioWithElements = this.portfolioCalculationService
-				.calculatePortfolio(updatedPortfolio, Optional.empty());
+				.calculatePortfolio(updatedPortfolio, ptsOpt);
 		return updatePortfolioElements(portfolioWithElements);
 	}
 

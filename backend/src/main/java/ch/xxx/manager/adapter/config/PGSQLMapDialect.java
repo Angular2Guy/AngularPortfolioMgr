@@ -12,15 +12,12 @@
  */
 package ch.xxx.manager.adapter.config;
 
-import org.hibernate.dialect.PostgreSQL95Dialect;
+import org.hibernate.dialect.DatabaseVersion;
+import org.hibernate.dialect.PostgreSQLDialect;
 
-public class PGSQLMapDialect extends PostgreSQL95Dialect {
+public class PGSQLMapDialect extends PostgreSQLDialect {
 
-//	@Override
-//	public SqlTypeDescriptor remapSqlTypeDescriptor(SqlTypeDescriptor sqlTypeDescriptor) {
-//		if (Types.CLOB == sqlTypeDescriptor.getSqlType() || Types.LONGVARCHAR == sqlTypeDescriptor.getSqlType()) {
-//			return sqlTypeDescriptor.INSTANCE;
-//		}
-//		return super.remapSqlTypeDescriptor(sqlTypeDescriptor);
-//	}
+	public PGSQLMapDialect() {
+		super( DatabaseVersion.make( 9, 5 ) );
+	}
 }

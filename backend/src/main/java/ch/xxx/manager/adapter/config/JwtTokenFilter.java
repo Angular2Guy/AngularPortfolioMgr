@@ -19,15 +19,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
 import ch.xxx.manager.usecase.service.JwtTokenService;
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
-public class JwtTokenFilter extends GenericFilterBean {	
-	
+public class JwtTokenFilter extends GenericFilterBean {
+
 	private JwtTokenService jwtTokenProvider;
 
 	public JwtTokenFilter(JwtTokenService jwtTokenProvider) {
@@ -41,9 +40,9 @@ public class JwtTokenFilter extends GenericFilterBean {
 		if (token != null && jwtTokenProvider.validateToken(token)) {
 			Authentication auth = token != null ? jwtTokenProvider.getAuthentication(token) : null;
 			SecurityContextHolder.getContext().setAuthentication(auth);
-		}		
+		}
 
-		filterChain.doFilter(request, response);		
+		filterChain.doFilter(request, response);
 	}
 
 }
