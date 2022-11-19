@@ -69,27 +69,31 @@ public class FileClientBean implements FileClient {
 			this.financialDataImportService.clearFinancialsData();
 			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
+			boolean first = true;
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
 				LocalDateTime start = LocalDateTime.now();
 				if (!element.isDirectory() && element.getSize() > 10) {
 					InputStream inputStream = null;
 					try {
-						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
+						if (first) {
+							LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
+							first = false;
+						}
 						inputStream = initialFile.getInputStream(element);
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text,
 								SymbolFinancialsDto.class);
 						Optional.ofNullable(symbolFinancialsDto.getData()).stream().forEach(myFinancialsDataDto -> {
 							myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
-									.map(myFinancialElementDto -> fixConcept(
-											myFinancialElementDto)).collect(Collectors.toSet()));
+									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.collect(Collectors.toSet()));
 							myFinancialsDataDto.setCashFlow(myFinancialsDataDto.getCashFlow().stream()
-									.map(myFinancialElementDto -> fixConcept(
-											myFinancialElementDto)).collect(Collectors.toSet()));
+									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.collect(Collectors.toSet()));
 							myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
-									.map(myFinancialElementDto -> fixConcept(
-											myFinancialElementDto)).collect(Collectors.toSet()));
+									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.collect(Collectors.toSet()));
 						});
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
@@ -104,6 +108,7 @@ public class FileClientBean implements FileClient {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
 					LOGGER.info("Persist time: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()));
+					first = true;
 				}
 			}
 		} catch (IOException e) {
@@ -115,10 +120,10 @@ public class FileClientBean implements FileClient {
 	}
 
 	private FinancialElementDto fixConcept(FinancialElementDto myFinancialElementDto) {
-		myFinancialElementDto.setConcept(myFinancialElementDto.getConcept() != null
-				&& myFinancialElementDto.getConcept().contains(":")
+		myFinancialElementDto.setConcept(
+				myFinancialElementDto.getConcept() != null && myFinancialElementDto.getConcept().contains(":")
 						? myFinancialElementDto.getConcept().trim()
-								.substring(myFinancialElementDto.getConcept().indexOf(':') +1)
+								.substring(myFinancialElementDto.getConcept().indexOf(':') + 1)
 						: myFinancialElementDto.getConcept());
 		return myFinancialElementDto;
 	}
