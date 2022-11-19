@@ -47,11 +47,14 @@ public class FinancialDataImportService {
 	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
-	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
+	public void clearFinancialsData() {
 		this.financialElementRepository.deleteAll();
-		this.symbolFinancialsRepository.deleteAll();
+		this.symbolFinancialsRepository.deleteAll();		
+	}
+	
+	@Transactional(value = TxType.REQUIRES_NEW)
+	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
 		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream().map(myDto -> this.symbolFinancialsMapper.toEntity(myDto)).collect(Collectors.toSet());
-		
 		this.symbolFinancialsRepository.saveAll(symbolFinancials);
 		this.financialElementRepository.saveAll(symbolFinancials.stream()
 				.map(mySymbolFinancials -> concatFinancialElemenst(mySymbolFinancials)).flatMap(Set::stream).collect(Collectors.toSet()));

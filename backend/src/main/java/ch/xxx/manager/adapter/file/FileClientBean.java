@@ -15,6 +15,8 @@ package ch.xxx.manager.adapter.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -62,9 +64,14 @@ public class FileClientBean implements FileClient {
 		try {
 			initialFile = new ZipFile(this.financialDataImportPath + filename);
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
+			LocalDateTime startCleanup = LocalDateTime.now();
+			LOGGER.info("Clear start");
+			this.financialDataImportService.clearFinancialsData();
+			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
+				LocalDateTime start = LocalDateTime.now();
 				if (!element.isDirectory() && element.getSize() > 10) {
 					InputStream inputStream = null;
 					try {
@@ -96,6 +103,7 @@ public class FileClientBean implements FileClient {
 				if (symbolFinancialsDtos.size() >= 500 || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
+					LOGGER.info("Persist time: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()));
 				}
 			}
 		} catch (IOException e) {
