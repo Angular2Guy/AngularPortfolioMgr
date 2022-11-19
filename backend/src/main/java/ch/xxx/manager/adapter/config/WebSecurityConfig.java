@@ -25,42 +25,39 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.usecase.service.JwtTokenService;
 
 @Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class WebSecurityConfig {
-	private static final String DEVPATH="/rest/dev/**";
-	private static final String PRODPATH="/rest/prod/**";
+	private static final String DEVPATH = "/rest/dev/**";
+	private static final String PRODPATH = "/rest/prod/**";
 	private final JwtTokenService jwtTokenService;
 	@Value("${spring.profiles.active:}")
-	private String activeProfile;	
-	
+	private String activeProfile;
+
 	public WebSecurityConfig(JwtTokenService jwtTokenProvider) {
 		this.jwtTokenService = jwtTokenProvider;
 	}
-	
+
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 		JwtTokenFilter customFilter = new JwtTokenFilter(jwtTokenService);
 		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
-		HttpSecurity httpSecurity = http.authorizeHttpRequests()
-		.requestMatchers("/rest/config/**").permitAll()
-		.requestMatchers("/rest/auth/**").permitAll()
-		.requestMatchers("/rest/**").authenticated()
-		.requestMatchers(blockedPath).denyAll()
-		.requestMatchers("/**").permitAll()
-		.anyRequest().authenticated()
-		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and().csrf().disable()
-		.headers().frameOptions().sameOrigin()
-		.and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+		HttpSecurity httpSecurity = http
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/rest/config/**").permitAll()
+						.requestMatchers("/rest/auth/**").permitAll().requestMatchers("/rest/**")
+						.hasAuthority(Role.USERS.toString()).requestMatchers(blockedPath).denyAll())
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()).sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers().frameOptions()
+				.sameOrigin().and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
+		return new BCryptPasswordEncoder();
 	}
 }
