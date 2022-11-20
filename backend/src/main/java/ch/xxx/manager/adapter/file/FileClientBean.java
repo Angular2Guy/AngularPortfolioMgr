@@ -122,6 +122,7 @@ public class FileClientBean implements FileClient {
 			LOGGER.info("Recreate indexes.");
 			this.financialDataImportService.createFeIndexes();
 			LOGGER.info("Indexes ready.");
+			this.financialDataImportService.updateFeConcepts();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {

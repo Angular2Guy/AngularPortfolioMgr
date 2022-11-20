@@ -12,14 +12,11 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
-import jakarta.transaction.Transactional.TxType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,8 @@ import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 
 @Service
 public class FinancialDataImportService {
@@ -39,7 +38,7 @@ public class FinancialDataImportService {
 	private final SymbolFinancialsMapper symbolFinancialsMapper;
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
 	private final FinancialElementRepository financialElementRepository;
-	private final List<FeConceptDto> feConcepts = new ArrayList<>();
+	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 
 	public FinancialDataImportService(SymbolFinancialsMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
@@ -70,9 +69,15 @@ public class FinancialDataImportService {
 	@Transactional
 	public List<FeConceptDto> findFeConcepts() {
 		if(this.feConcepts.isEmpty()) {
-			this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
+			this.updateFeConcepts();
 		}
 		return this.feConcepts;
+	}
+	
+	@Transactional
+	public void updateFeConcepts() {
+		this.feConcepts.clear();
+		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());		
 	}
 	
 	@Transactional(value = TxType.REQUIRES_NEW)
