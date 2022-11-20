@@ -17,7 +17,7 @@ import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.SqlResultSetMapping;
 
 @SqlResultSetMapping(name = "Mapping.FeConceptDto", classes = @ConstructorResult(targetClass = FeConceptDto.class, columns = {
-		@ColumnResult(name = "concept_count"), @ColumnResult(name = "concept") }))
+		@ColumnResult(name = "concept"), @ColumnResult(name = "concept_count") }))
 public class FeConceptDto {
 	private String concept;
 	private int timesFound;

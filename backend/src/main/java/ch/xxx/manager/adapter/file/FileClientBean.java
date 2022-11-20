@@ -42,9 +42,9 @@ import ch.xxx.manager.usecase.service.FinancialDataImportService;
 @Component
 public class FileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
-	private AppInfoService appInfoService;
-	private ObjectMapper objectMapper;
-	private FinancialDataImportService financialDataImportService;
+	private final AppInfoService appInfoService;
+	private final ObjectMapper objectMapper;
+	private final FinancialDataImportService financialDataImportService;
 	String financialDataImportPath;
 
 	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
@@ -65,7 +65,9 @@ public class FileClientBean implements FileClient {
 			initialFile = new ZipFile(this.financialDataImportPath + filename);
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
 			LocalDateTime startCleanup = LocalDateTime.now();
-			LOGGER.info("Clear start");
+			LOGGER.info("Drop indexes.");
+			this.financialDataImportService.dropFeIndexes();
+			LOGGER.info("Clear start.");
 			this.financialDataImportService.clearFinancialsData();
 			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
@@ -117,6 +119,9 @@ public class FileClientBean implements FileClient {
 					first = true;
 				}
 			}
+			LOGGER.info("Recreate indexes.");
+			this.financialDataImportService.createFeIndexes();
+			LOGGER.info("Indexes ready.");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {

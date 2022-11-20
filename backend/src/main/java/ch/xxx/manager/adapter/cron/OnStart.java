@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.cron;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -21,18 +22,20 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.usecase.service.FinancialDataImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.annotation.PostConstruct;
 
 @Component
 public class OnStart {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OnStart.class);
-	private final CronJobService cronJobService;
 	private final SymbolImportService symbolImportService;
+	private final FinancialDataImportService financialDataImportService;
 
-	public OnStart(CronJobService cronJobService, SymbolImportService symbolImportService) {
-		this.cronJobService = cronJobService;
+	public OnStart(SymbolImportService symbolImportService, FinancialDataImportService financialDataImportService) {
 		this.symbolImportService = symbolImportService;
+		this.financialDataImportService = financialDataImportService;
 	}
 
 	@PostConstruct
@@ -45,11 +48,7 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
-//		Executor delayedExecutor = CompletableFuture.delayedExecutor(2L, TimeUnit.MINUTES);
-//		CompletableFuture<Void> myFuture = CompletableFuture.runAsync(() -> this.cronJobService.scheduledImporterSymbols())
-//				.thenRunAsync(() -> this.cronJobService.scheduledImporterRefIndexes(), delayedExecutor)
-////				.thenRunAsync(() -> this.scheduledImporterQuotes(), delayedExecutor)
-//				.thenRun(() -> LOGGER.info("startupDone() Done."));
-//		myFuture.get();
+		List<FeConceptDto> feConcepts = this.financialDataImportService.findFeConcepts();
+		LOGGER.info("Concept count {}", feConcepts.size());
 	}
 }

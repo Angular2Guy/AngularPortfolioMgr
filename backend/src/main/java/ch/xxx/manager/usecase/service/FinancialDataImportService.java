@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
@@ -50,6 +51,23 @@ public class FinancialDataImportService {
 	public void clearFinancialsData() {
 		this.financialElementRepository.deleteAllBatch();
 		this.symbolFinancialsRepository.deleteAllBatch();		
+	}
+	
+	@Transactional(value=TxType.REQUIRES_NEW)
+	public void dropFeIndexes() {
+		this.financialElementRepository.dropConceptIndex();
+		this.financialElementRepository.dropSymbolFinancialsIdIndex();
+	}
+	
+	@Transactional(value=TxType.REQUIRES_NEW)
+	public void createFeIndexes() {
+		this.financialElementRepository.createConceptIndex();
+		this.financialElementRepository.createSymbolFinancialsIdIndex();
+	}
+	
+	@Transactional
+	public List<FeConceptDto> findFeConcepts() {
+		return this.financialElementRepository.findCommonFeConcepts();
 	}
 	
 	@Transactional(value = TxType.REQUIRES_NEW)

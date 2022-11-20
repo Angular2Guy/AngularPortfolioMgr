@@ -17,14 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.CurrencyKey;
@@ -33,9 +31,10 @@ import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
+import jakarta.transaction.Transactional;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
-@Component
+@Service
 public class CronJobService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronJobService.class);
 	private final SymbolImportService symbolImportService;
