@@ -15,6 +15,7 @@ package ch.xxx.manager.adapter.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
@@ -71,6 +72,6 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 
 	@Override
 	public List<FeConceptDto> findCommonFeConcepts() {
-		return this.jpaFinancialElementRepository.findCommonFeConcepts();
+		return this.jpaFinancialElementRepository.findCommonFeConcepts(Pageable.ofSize(200));
 	}
 }

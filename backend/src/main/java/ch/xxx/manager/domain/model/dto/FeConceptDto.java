@@ -12,17 +12,11 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.ConstructorResult;
-import jakarta.persistence.SqlResultSetMapping;
-
-@SqlResultSetMapping(name = "Mapping.FeConceptDto", classes = @ConstructorResult(targetClass = FeConceptDto.class, columns = {
-		@ColumnResult(name = "concept"), @ColumnResult(name = "concept_count") }))
 public class FeConceptDto {
 	private String concept;
-	private int timesFound;
+	private Long timesFound;
 
-	public FeConceptDto(String concept, int timesFound) {
+	public FeConceptDto(String concept, Long timesFound) {
 		super();
 		this.concept = concept;
 		this.timesFound = timesFound;
@@ -36,11 +30,11 @@ public class FeConceptDto {
 		this.concept = concept;
 	}
 
-	public int getTimesFound() {
+	public Long getTimesFound() {
 		return timesFound;
 	}
 
-	public void setTimesFound(int timesFound) {
+	public void setTimesFound(Long timesFound) {
 		this.timesFound = timesFound;
 	}
 }

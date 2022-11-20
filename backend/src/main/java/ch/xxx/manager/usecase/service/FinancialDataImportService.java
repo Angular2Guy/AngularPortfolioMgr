@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ public class FinancialDataImportService {
 	private final SymbolFinancialsMapper symbolFinancialsMapper;
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
 	private final FinancialElementRepository financialElementRepository;
+	private final List<FeConceptDto> feConcepts = new ArrayList<>();
 
 	public FinancialDataImportService(SymbolFinancialsMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
@@ -67,7 +69,10 @@ public class FinancialDataImportService {
 	
 	@Transactional
 	public List<FeConceptDto> findFeConcepts() {
-		return this.financialElementRepository.findCommonFeConcepts();
+		if(this.feConcepts.isEmpty()) {
+			this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
+		}
+		return this.feConcepts;
 	}
 	
 	@Transactional(value = TxType.REQUIRES_NEW)

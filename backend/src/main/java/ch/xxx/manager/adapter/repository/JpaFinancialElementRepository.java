@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,6 +35,6 @@ public interface JpaFinancialElementRepository extends JpaRepository<FinancialEl
 	@Modifying
 	@Query(nativeQuery = true, value = "create index ix_financial_element_concept on financial_element (concept)")
 	void createConceptIndex();
-	@Query(nativeQuery = true, value = "select count(*) as concept_count, concept from financial_element fe group by concept order by concept_count desc")	
-	List<FeConceptDto> findCommonFeConcepts();
+	@Query(value = "select new ch.xxx.manager.domain.model.dto.FeConceptDto(concept, count(fe.id) as concept_count) from FinancialElement fe group by fe.concept order by concept_count desc")	
+	List<FeConceptDto> findCommonFeConcepts(Pageable pageable);
 }
