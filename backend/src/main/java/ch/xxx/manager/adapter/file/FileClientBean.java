@@ -70,6 +70,8 @@ public class FileClientBean implements FileClient {
 			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
 			boolean first = true;
+			final int[] maxChildren = new int[1];
+			maxChildren[0] = 0;
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
 				LocalDateTime start = LocalDateTime.now();
@@ -94,6 +96,10 @@ public class FileClientBean implements FileClient {
 							myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
 									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
 									.collect(Collectors.toSet()));
+							int bsChildern = myFinancialsDataDto.getBalanceSheet() == null ? 0 : myFinancialsDataDto.getBalanceSheet().size();
+							int cfChildern = myFinancialsDataDto.getCashFlow() == null ? 0 : myFinancialsDataDto.getCashFlow().size();
+							int icChildern = myFinancialsDataDto.getIncome() == null ? 0 : myFinancialsDataDto.getIncome().size();
+							maxChildren[0] = bsChildern + cfChildern + icChildern > maxChildren[0] ? bsChildern + cfChildern + icChildern : maxChildren[0];
 						});
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
@@ -107,7 +113,7 @@ public class FileClientBean implements FileClient {
 				if (symbolFinancialsDtos.size() >= 50 || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
-					LOGGER.info("Persist time: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()));
+					LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()), maxChildren[0]);
 					first = true;
 				}
 			}
