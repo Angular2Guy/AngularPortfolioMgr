@@ -15,9 +15,16 @@ package ch.xxx.manager.domain.model.entity;
 import java.util.List;
 import java.util.Optional;
 
+import ch.xxx.manager.domain.model.dto.FeConceptDto;
+
 public interface FinancialElementRepository {
 	FinancialElement save(FinancialElement financialElement);
     List<FinancialElement> saveAll(Iterable<FinancialElement> symbols);
 	Optional<FinancialElement> findById(Long id);
 	void deleteAllBatch();
+	void dropSymbolFinancialsIdIndex();
+	void dropConceptIndex();
+	void createSymbolFinancialsIdIndex();
+	void createConceptIndex();
+	List<FeConceptDto> findCommonConcepts();
 }

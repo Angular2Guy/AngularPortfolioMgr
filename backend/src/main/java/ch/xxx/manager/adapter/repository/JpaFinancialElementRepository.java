@@ -12,17 +12,28 @@
  */
 package ch.xxx.manager.adapter.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 
-public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long> {	
-//	@Query("select s from Symbol s where lower(s.symbol) like %:symbol%")
-//	List<Symbol> findBySymbol(@Param(value = "symbol") String symbol);
-//	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
-//	List<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
-//	@Query("select s from Symbol s where lower(s.name) like %:name%")
-//	List<Symbol> findByName(@Param(value = "name") String name);
-//	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
-//	List<Symbol> findByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
+public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long> {
+	@Modifying
+	@Query(nativeQuery = true, value = "drop index ix_financial_element_symbol_financials_id")
+	void dropSymbolFinancialsIdIndex();
+	@Modifying
+	@Query(nativeQuery = true, value = "drop index ix_financial_element_concept")
+	void dropConceptIndex();
+	@Modifying
+	@Query(nativeQuery = true, value = "create index ix_financial_element_symbol_financials_id on financial_element (symbol_financials_id)")
+	void createSymbolFinancialsIdIndex();
+	@Modifying
+	@Query(nativeQuery = true, value = "create index ix_financial_element_concept on financial_element (concept)")
+	void createConceptIndex();
+	@Query(nativeQuery = true, value = "select count(*) as concept_count, concept from financial_element fe group by concept order by concept_count desc")	
+	List<FeConceptDto> findCommonConcepts();
 }

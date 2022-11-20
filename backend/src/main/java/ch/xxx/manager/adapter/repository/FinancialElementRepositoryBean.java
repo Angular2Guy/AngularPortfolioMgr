@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 
@@ -46,5 +47,30 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	@Override
 	public void deleteAllBatch() {
 		this.jpaFinancialElementRepository.deleteAllInBatch();;
+	}
+
+	@Override
+	public void dropSymbolFinancialsIdIndex() {
+		this.jpaFinancialElementRepository.dropSymbolFinancialsIdIndex();
+	}
+
+	@Override
+	public void dropConceptIndex() {
+		this.jpaFinancialElementRepository.dropConceptIndex();
+	}
+
+	@Override
+	public void createSymbolFinancialsIdIndex() {
+		this.jpaFinancialElementRepository.createSymbolFinancialsIdIndex();
+	}
+
+	@Override
+	public void createConceptIndex() {
+		this.jpaFinancialElementRepository.createConceptIndex();
+	}
+
+	@Override
+	public List<FeConceptDto> findCommonConcepts() {
+		return this.jpaFinancialElementRepository.findCommonConcepts();
 	}
 }
