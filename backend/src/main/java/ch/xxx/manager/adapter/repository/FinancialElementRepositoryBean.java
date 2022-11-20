@@ -70,7 +70,7 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	}
 
 	@Override
-	public List<FeConceptDto> findCommonConcepts() {
-		return this.jpaFinancialElementRepository.findCommonConcepts();
+	public List<FeConceptDto> findCommonFeConcepts() {
+		return this.jpaFinancialElementRepository.findCommonFeConcepts();
 	}
 }
