@@ -33,14 +33,14 @@ import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 
 @Service
-public class FinancialDataImportService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataImportService.class);
+public class FinancialDataService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataService.class);
 	private final SymbolFinancialsMapper symbolFinancialsMapper;
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
 	private final FinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 
-	public FinancialDataImportService(SymbolFinancialsMapper symbolFinancialsMapper,
+	public FinancialDataService(SymbolFinancialsMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
 			FinancialElementRepository financialElementRepository) {
 		this.symbolFinancialsMapper = symbolFinancialsMapper;

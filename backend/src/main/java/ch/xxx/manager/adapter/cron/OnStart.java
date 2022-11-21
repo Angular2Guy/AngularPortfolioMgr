@@ -23,7 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
-import ch.xxx.manager.usecase.service.FinancialDataImportService;
+import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.annotation.PostConstruct;
 
@@ -31,9 +31,9 @@ import jakarta.annotation.PostConstruct;
 public class OnStart {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OnStart.class);
 	private final SymbolImportService symbolImportService;
-	private final FinancialDataImportService financialDataImportService;
+	private final FinancialDataService financialDataImportService;
 
-	public OnStart(SymbolImportService symbolImportService, FinancialDataImportService financialDataImportService) {
+	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService) {
 		this.symbolImportService = symbolImportService;
 		this.financialDataImportService = financialDataImportService;
 	}

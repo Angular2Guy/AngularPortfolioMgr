@@ -37,18 +37,18 @@ import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
-import ch.xxx.manager.usecase.service.FinancialDataImportService;
+import ch.xxx.manager.usecase.service.FinancialDataService;
 
 @Component
 public class FileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
 	private final AppInfoService appInfoService;
 	private final ObjectMapper objectMapper;
-	private final FinancialDataImportService financialDataImportService;
+	private final FinancialDataService financialDataImportService;
 	String financialDataImportPath;
 
 	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
-			FinancialDataImportService financialDataImportService) {
+			FinancialDataService financialDataImportService) {
 		this.appInfoService = appInfoService;
 		this.objectMapper = objectMapper;
 		this.financialDataImportService = financialDataImportService;
