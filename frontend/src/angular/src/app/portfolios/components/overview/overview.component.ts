@@ -27,6 +27,7 @@ import { Symbol } from '../../../model/symbol';
 import { QuoteImportService } from '../../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
+import { FinancialDataService } from 'src/app/service/financial-data.service';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
 import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
 import { SpinnerData, DialogSpinnerComponent } from 'src/app/base/components/dialog-spinner/dialog-spinner.component';
@@ -50,6 +51,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
 	constructor(private tokenService: TokenService, private configService: ConfigService,
 		private router: Router,
+		private financialDataService: FinancialDataService,
 		private portfolioService: PortfolioService,
 		private symbolImportService: SymbolImportService,
 		private quoteImportService: QuoteImportService,
@@ -94,6 +96,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 				}
 			});
 	}
+
+    toFinancialData() {
+	   console.log('toFinancialData()');
+    }
 
 	selPortfolio(portfolio: Portfolio, showPortTab = false) {
 		this.myPortfolio = portfolio;
@@ -174,7 +180,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.configService.getImportPath().subscribe(result => {
 			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
 			dialogRef.afterClosed()
-			.pipe(switchMap((result: ImportFinancialsData) => this.symbolImportService.putImportFinancialsData(result)))				
+			.pipe(switchMap((result: ImportFinancialsData) => this.financialDataService.putImportFinancialsData(result)))				
 			.subscribe(result => console.log(result));
 		});
 		//console.log('showFinancialsConfig()');

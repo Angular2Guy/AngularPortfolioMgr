@@ -15,24 +15,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImportFinancialsData } from '../model/import-financials-data';
 
-@Injectable({providedIn: 'root'})
-export class SymbolImportService {
+@Injectable({
+  providedIn: 'root'
+})
+export class FinancialDataService {
 
   constructor(private http: HttpClient) { }
-
-  getSymbolImportUs(): Observable<string> {
-	return this.http.get('/rest/symbol/importus/all', {responseType: 'text'});
-  }
-
-  getSymbolImportHk(): Observable<string> {
-	return this.http.get('/rest/symbol/importhk/all', {responseType: 'text'});
-  }
-
-  getSymbolImportDe(): Observable<string> {
-	return this.http.get('/rest/symbol/importde/all', {responseType: 'text'});
-  }
   
-  getIndexSymbols(): Observable<string> {
-	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
+  putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {	
+	return this.http.put<string>('/rest/financialdata/importus/data', importFinancialsData, {responseType: 'json'});
   }
 }
