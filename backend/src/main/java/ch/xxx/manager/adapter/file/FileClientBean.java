@@ -123,6 +123,7 @@ public class FileClientBean implements FileClient {
 			this.financialDataImportService.createFeIndexes();
 			LOGGER.info("Indexes ready.");
 			this.financialDataImportService.updateFeConcepts();
+			LOGGER.info("FeConcepts updated.");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
