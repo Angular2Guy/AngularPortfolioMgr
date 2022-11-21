@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.entity.FinancialElement;
-import ch.xxx.manager.domain.model.entity.dto.FinancialElementDto;
+import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Component
 public class FinancialElementMapper {
-	public FinancialElementDto toDto(FinancialElement financialElement) {
-		FinancialElementDto dto = new FinancialElementDto();
+	public FinancialElementImportDto toDto(FinancialElement financialElement) {
+		FinancialElementImportDto dto = new FinancialElementImportDto();
 		dto.setConcept(financialElement.getConcept());
 		dto.setCurrency(financialElement.getCurrency().toString());
 		dto.setLabel(financialElement.getLabel());
@@ -22,7 +22,7 @@ public class FinancialElementMapper {
 		return dto;
 	}
 
-	public FinancialElement toEntity(FinancialElementDto financialElementDto) {
+	public FinancialElement toEntity(FinancialElementImportDto financialElementDto) {
 		FinancialElement entity = new FinancialElement();
 		entity.setConcept(financialElementDto.getConcept());
 		entity.setCurrency(List.of(CurrencyKey.values()).stream().filter(

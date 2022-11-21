@@ -14,7 +14,7 @@ package ch.xxx.manager.domain.model.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class FinancialElementDto {
+public class FinancialElementImportDto {
 	private Long id;
 	private String label;
 	private String concept;

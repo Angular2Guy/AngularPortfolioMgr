@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.domain.file.FileClient;
-import ch.xxx.manager.domain.model.entity.dto.FinancialElementDto;
+import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataService;
@@ -132,7 +132,7 @@ public class FileClientBean implements FileClient {
 		return true;
 	}
 
-	private FinancialElementDto fixConcept(FinancialElementDto myFinancialElementDto) {
+	private FinancialElementImportDto fixConcept(FinancialElementImportDto myFinancialElementDto) {
 		myFinancialElementDto.setConcept(
 				myFinancialElementDto.getConcept() != null && myFinancialElementDto.getConcept().contains(":")
 						? myFinancialElementDto.getConcept().trim()

@@ -37,6 +37,6 @@ export class SymbolImportService {
   }
   
   putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {	
-	return this.http.put<string>('/rest/symbol/importus/financialdata', importFinancialsData, {responseType: 'json'});
+	return this.http.put<string>('/rest/financialdata/importus/data', importFinancialsData, {responseType: 'json'});
   }
 }

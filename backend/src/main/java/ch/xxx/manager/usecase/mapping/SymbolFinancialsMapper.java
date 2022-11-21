@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
-import ch.xxx.manager.domain.model.entity.dto.FinancialElementDto;
+import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.model.entity.dto.FinancialsDataDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 
@@ -52,7 +52,7 @@ public class SymbolFinancialsMapper {
 		return dto;
 	}
 
-	private FinancialElementDto addSymbolFinancialsDto(SymbolFinancialsDto dto, FinancialElementDto myElement) {
+	private FinancialElementImportDto addSymbolFinancialsDto(SymbolFinancialsDto dto, FinancialElementImportDto myElement) {
 		myElement.setSymbolFinancialsDto(dto);
 		return myElement;
 	}

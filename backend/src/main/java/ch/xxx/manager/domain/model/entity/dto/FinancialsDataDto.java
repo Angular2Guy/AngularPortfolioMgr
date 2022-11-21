@@ -18,28 +18,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FinancialsDataDto {
 	@JsonProperty(value = "bs")
-	private Set<FinancialElementDto> balanceSheet = new HashSet<>();
+	private Set<FinancialElementImportDto> balanceSheet = new HashSet<>();
 	@JsonProperty(value = "cf")
-	private Set<FinancialElementDto> cashFlow = new HashSet<>();
+	private Set<FinancialElementImportDto> cashFlow = new HashSet<>();
 	@JsonProperty(value = "ic")
-	private Set<FinancialElementDto> income = new HashSet<>();
+	private Set<FinancialElementImportDto> income = new HashSet<>();
 	
-	public Set<FinancialElementDto> getBalanceSheet() {
+	public Set<FinancialElementImportDto> getBalanceSheet() {
 		return balanceSheet;
 	}
-	public void setBalanceSheet(Set<FinancialElementDto> balanceSheet) {
+	public void setBalanceSheet(Set<FinancialElementImportDto> balanceSheet) {
 		this.balanceSheet = balanceSheet;
 	}
-	public Set<FinancialElementDto> getCashFlow() {
+	public Set<FinancialElementImportDto> getCashFlow() {
 		return cashFlow;
 	}
-	public void setCashFlow(Set<FinancialElementDto> cashFlow) {
+	public void setCashFlow(Set<FinancialElementImportDto> cashFlow) {
 		this.cashFlow = cashFlow;
 	}
-	public Set<FinancialElementDto> getIncome() {
+	public Set<FinancialElementImportDto> getIncome() {
 		return income;
 	}
-	public void setIncome(Set<FinancialElementDto> income) {
+	public void setIncome(Set<FinancialElementImportDto> income) {
 		this.income = income;
 	}
 
