@@ -74,4 +74,14 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	public List<FeConceptDto> findCommonFeConcepts() {
 		return this.jpaFinancialElementRepository.findCommonFeConcepts(Pageable.ofSize(200));
 	}
+
+	@Override
+	public void dropFkConstraintSymbolFinancials() {
+		this.jpaFinancialElementRepository.dropFkConstraintSymbolFinancials();
+	}
+
+	@Override
+	public void createFkConstraintSymbolFinancials() {
+		this.jpaFinancialElementRepository.createFkConstraintSymbolFinancials();
+	}
 }

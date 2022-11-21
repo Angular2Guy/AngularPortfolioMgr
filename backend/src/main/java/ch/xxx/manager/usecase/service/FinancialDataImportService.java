@@ -56,12 +56,14 @@ public class FinancialDataImportService {
 	
 	@Transactional(value=TxType.REQUIRES_NEW)
 	public void dropFeIndexes() {
+		this.financialElementRepository.dropFkConstraintSymbolFinancials();
 		this.financialElementRepository.dropConceptIndex();
 		this.financialElementRepository.dropSymbolFinancialsIdIndex();
 	}
 	
 	@Transactional(value=TxType.REQUIRES_NEW)
 	public void createFeIndexes() {
+		this.financialElementRepository.createFkConstraintSymbolFinancials();
 		this.financialElementRepository.createConceptIndex();
 		this.financialElementRepository.createSymbolFinancialsIdIndex();
 	}

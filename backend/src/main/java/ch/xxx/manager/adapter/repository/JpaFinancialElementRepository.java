@@ -30,6 +30,12 @@ public interface JpaFinancialElementRepository extends JpaRepository<FinancialEl
 	@Query(nativeQuery = true, value = "drop index ix_financial_element_concept")
 	void dropConceptIndex();
 	@Modifying
+	@Query(nativeQuery = true, value = "alter table financial_element drop constraint fk_financial_element_symbol_financials_id")
+	void dropFkConstraintSymbolFinancials();
+	@Modifying
+	@Query(nativeQuery = true, value = "alter table financial_element add constraint fk_financial_element_symbol_financials_id foreign key (symbol_financials_id) references symbol_financials(id)")
+	void createFkConstraintSymbolFinancials();
+	@Modifying
 	@Query(nativeQuery = true, value = "create index ix_financial_element_symbol_financials_id on financial_element (symbol_financials_id)")
 	void createSymbolFinancialsIdIndex();
 	@Modifying
