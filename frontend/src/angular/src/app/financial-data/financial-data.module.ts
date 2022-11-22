@@ -18,6 +18,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { FinancialDataRoutingModule } from './financial-data-routing.module';
 import { OverviewComponent } from './components/overview/overview.component';
 import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
@@ -34,6 +35,7 @@ import { ImportFinancialsComponent } from './components/import-financials/import
     MatFormFieldModule,
     MatButtonModule,
     MatInputModule,
+    MatIconModule,
     BaseModule,
     FinancialDataRoutingModule
   ]
