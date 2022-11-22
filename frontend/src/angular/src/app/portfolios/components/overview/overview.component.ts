@@ -97,10 +97,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			});
 	}
 
-    toFinancialData() {
-	   console.log('toFinancialData()');
-    }
-
 	selPortfolio(portfolio: Portfolio, showPortTab = false) {
 		this.myPortfolio = portfolio;
 		this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
@@ -114,6 +110,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			  this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
 		}
 	}
+
+    showFinancialData() {
+		this.router.navigate([`/financialdata`]);
+    }
 
 	private refreshPortfolios() {
 		this.portfolioService.getPortfolioByUserId((this.tokenService.userId as number)).subscribe(myPortfolios => {

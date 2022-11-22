@@ -20,6 +20,9 @@ const routes: Routes = [
 	{ path: 'portfolios',
 	  canActivate: [MainGuard],
       loadChildren: () => import('./portfolios/portfolios.module').then(m => m.PortfoliosModule) },
+    { path: 'financialdata',
+	  canActivate: [MainGuard],
+      loadChildren: () => import('./financial-data/financial-data.module').then(m => m.FinancialDataModule) },
 	{ path: 'login',
       loadChildren: () => import('./login/login.module').then(m => m.LoginModule) },
 	{ path: '**', redirectTo: 'spinner' }
