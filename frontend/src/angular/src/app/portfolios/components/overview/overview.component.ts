@@ -10,12 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { TokenService } from 'ngx-simple-charts/base-service';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../../service/portfolio.service';
 import { Portfolio } from '../../../model/portfolio';
-import { ImportFinancialsData } from '../../../model/import-financials-data';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
 import { PortfolioData } from '../../../model/portfolio-data';
@@ -27,11 +26,8 @@ import { Symbol } from '../../../model/symbol';
 import { QuoteImportService } from '../../../service/quote-import.service';
 import { ConfigService } from 'src/app/service/config.service';
 import { ProdConfigComponent } from '../prod-config/prod-config.component';
-import { FinancialDataService } from 'src/app/service/financial-data.service';
 import { DevConfigComponent } from '../dev-config/dev-config.component';
-import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
 import { SpinnerData, DialogSpinnerComponent } from 'src/app/base/components/dialog-spinner/dialog-spinner.component';
-import { OnDestroy } from '@angular/core';
 
 @Component({
 	selector: 'app-overview',
@@ -39,19 +35,18 @@ import { OnDestroy } from '@angular/core';
 	styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-	windowHeight: number = null;
+	protected windowHeight: number = null;
 	portfolios: Portfolio[] = [];
 	myPortfolio!: Portfolio;
 	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
 	importingSymbols = false;
 	private timeoutId = -1;
-	dialogSubscription: Subscription;
+	private dialogSubscription: Subscription;
 	private profiles: string = null;
 	private showPortfolioTable = true;
 
 	constructor(private tokenService: TokenService, private configService: ConfigService,
-		private router: Router,
-		private financialDataService: FinancialDataService,
+		private router: Router,		
 		private portfolioService: PortfolioService,
 		private symbolImportService: SymbolImportService,
 		private quoteImportService: QuoteImportService,
@@ -64,10 +59,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
     ngOnDestroy(): void {		
-		if(!!this.dialogSubscription) {
-			this.dialogSubscription.unsubscribe();
-			this.dialogSubscription = null;
-		}
+		this.cleanupDialogSubcription();
     }
 
 	@HostListener('window:resize', ['$event'])
@@ -76,25 +68,23 @@ export class OverviewComponent implements OnInit, OnDestroy {
 	}
 
 	newPortfolio() {
-			if(!!this.dialogSubscription) {
-				this.dialogSubscription.unsubscribe();
+		this.cleanupDialogSubcription();
+		const portfolio: Portfolio = {
+			id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [], currencyKey: null,
+			portfolioElements: [], userId: (this.tokenService.userId as number), year1: null, year10: null, year2: null, year5: null
+		};
+		const newPortfolioData: PortfolioData = { portfolio: portfolio };
+		const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
+		this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
+			if (result) {
+				this.portfolioService.postPortfolio(result)
+					.subscribe(myPortfolio => {
+						this.portfolios = [...this.portfolios, myPortfolio];
+						this.myPortfolio = myPortfolio;
+						this.selPortfolio(myPortfolio, true);
+					});
 			}
-			const portfolio: Portfolio = {
-				id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [], currencyKey: null,
-				portfolioElements: [], userId: (this.tokenService.userId as number), year1: null, year10: null, year2: null, year5: null
-			};
-			const newPortfolioData: PortfolioData = { portfolio: portfolio };
-			const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
-			this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
-				if (result) {
-					this.portfolioService.postPortfolio(result)
-						.subscribe(myPortfolio => {
-							this.portfolios = [...this.portfolios, myPortfolio];
-							this.myPortfolio = myPortfolio;
-							this.selPortfolio(myPortfolio, true);
-						});
-				}
-			});
+		});
 	}
 
 	selPortfolio(portfolio: Portfolio, showPortTab = false) {
@@ -128,9 +118,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
 	addSymbol(portfolio: Portfolio) {
 		const portfolioData: PortfolioData = { portfolio: portfolio };
-		if(!!this.dialogSubscription) {
-			this.dialogSubscription.unsubscribe();
-		}
+		this.cleanupDialogSubcription();
 		const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: portfolioData });
 		this.dialogSubscription = dialogRef.afterClosed().subscribe((symbol: Symbol) => {
 			if (symbol) {
@@ -176,25 +164,20 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.tokenService.logout();
 	}
 
-	showFinancialsImport(): void {
-		this.configService.getImportPath().subscribe(result => {
-			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
-			dialogRef.afterClosed()
-			.pipe(switchMap((result: ImportFinancialsData) => this.financialDataService.putImportFinancialsData(result)))				
-			.subscribe(result => console.log(result));
-		});
-		//console.log('showFinancialsConfig()');
-	}
-
 	showConfig(): void {
 		if (this.profiles) {
-			if(!!this.dialogSubscription) {
-				this.dialogSubscription.unsubscribe();				
-			}
+			this.cleanupDialogSubcription();
 			const myOptions = { width: '700px' };
 			let dialogRef = this.profiles.toLowerCase().includes('prod') ? 
 				this.dialog.open(ProdConfigComponent, myOptions) : this.dialog.open(DevConfigComponent, myOptions);
 			this.dialogSubscription = dialogRef.afterClosed().subscribe(() => dialogRef = null);
 		}
 	}
+	
+	private cleanupDialogSubcription(): void {
+	   if(!!this.dialogSubscription) {
+			this.dialogSubscription.unsubscribe();
+			this.dialogSubscription = null;
+		}
+    }
 }

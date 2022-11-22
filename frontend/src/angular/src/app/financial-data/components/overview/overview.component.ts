@@ -10,18 +10,59 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { switchMap,tap } from 'rxjs/operators';
+import { forkJoin, Subscription } from 'rxjs';
+import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
+import { FinancialDataService } from 'src/app/service/financial-data.service';
+import { ImportFinancialsData } from '../../../model/import-financials-data';
+import { TokenService } from 'ngx-simple-charts/base-service';
+import { ConfigService } from 'src/app/service/config.service';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })
-export class OverviewComponent implements OnInit {
-
-  constructor() { }
+export class OverviewComponent implements OnInit, OnDestroy {
+  protected windowHeight: number = null;
+  private dialogSubscription: Subscription;
+  
+  constructor(private financialDataService: FinancialDataService, private tokenService: TokenService, private dialog: MatDialog, private configService: ConfigService) { }
 
   ngOnInit(): void {
+	this.windowHeight = window.innerHeight - 84;
   }
 
+    ngOnDestroy(): void {		
+		this.cleanupDialogSubcription();
+    }
+
+    private cleanupDialogSubcription(): void {
+	   if(!!this.dialogSubscription) {
+			this.dialogSubscription.unsubscribe();
+			this.dialogSubscription = null;
+		}
+    }
+
+	@HostListener('window:resize', ['$event'])
+	onResize(event: any) {
+		this.windowHeight = event.target.innerHeight - 84;
+	}
+
+    showFinancialsImport(): void {
+		this.cleanupDialogSubcription();
+		this.configService.getImportPath().subscribe(result => {
+			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
+			this.dialogSubscription = dialogRef.afterClosed()
+			.pipe(switchMap((result: ImportFinancialsData) => this.financialDataService.putImportFinancialsData(result)))				
+			.subscribe(result => console.log(result));
+		});
+		//console.log('showFinancialsConfig()');
+	}
+	
+	logout(): void {
+		this.tokenService.logout();
+	}
 }

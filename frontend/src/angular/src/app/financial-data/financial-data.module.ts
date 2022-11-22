@@ -12,17 +12,29 @@
  */
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { BaseModule } from '../base/base.module';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 import { FinancialDataRoutingModule } from './financial-data-routing.module';
 import { OverviewComponent } from './components/overview/overview.component';
+import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
 
 
 @NgModule({
   declarations: [
-    OverviewComponent
+    OverviewComponent,ImportFinancialsComponent
   ],
   imports: [
     CommonModule,
+    MatDialogModule,
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatInputModule,
+    BaseModule,
     FinancialDataRoutingModule
   ]
 })
