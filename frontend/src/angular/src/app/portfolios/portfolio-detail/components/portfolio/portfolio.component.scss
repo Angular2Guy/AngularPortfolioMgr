@@ -23,7 +23,7 @@ table {
   flex-direction: column; 
 }
 
-.custom-spinner ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+.custom-spinner ::ng-deep .mat-mdc-progress-spinner circle, .mat-mdc-progress-spinner circle {
 	stroke: #ffffff !important;
 }
 
@@ -32,7 +32,7 @@ table {
 	margin-left: 20px;
 }
 	
-.mat-table {
+.mat-mdc-table {
   overflow: auto;  
 }
 

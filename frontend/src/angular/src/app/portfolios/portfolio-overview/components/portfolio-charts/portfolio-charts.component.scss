@@ -16,10 +16,12 @@
 	width: 100%;
 }
 
-.mat-tab-group {
+.mat-mdc-tab-group {
 	height: 100%;
 }
 
+/*TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version.
+ */
 ::ng-deep .mat-tab-body-wrapper {
 	height: 100%;
 }
