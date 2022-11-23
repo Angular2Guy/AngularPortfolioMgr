@@ -2,7 +2,7 @@
 <mat-toolbar color="primary">
 	<span i18n="@@overviewPortfolioManger">Portfolio Manager</span>
 	<span class="example-fill-remaining-space"></span>
-	<span class="header-space"><button mat-button (click)="showConfig()" i18n="@@config">Config</button></span>
+	<span class="header-space"><button mat-flat-button color="primary" (click)="showConfig()" i18n="@@config">Config</button></span>
 	<span class="custom-spinner header-space" *ngIf="importingSymbols">
 		<mat-progress-spinner
 					diameter="32" 
@@ -10,8 +10,8 @@
 					color="primary">
 		</mat-progress-spinner>
 	</span>
-	<span class="header-space"><button mat-button (click)="importSymbols()" i18n="@@overviewImportSymbols">Import Symbols</button></span>
-	<span><button mat-button (click)="logout()" i18n="@@logout">Logout</button></span>
+	<span class="header-space"><button mat-flat-button color="primary" (click)="importSymbols()" i18n="@@overviewImportSymbols">Import Symbols</button></span>
+	<span><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">Logout</button></span>
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
   <mat-sidenav opened mode="side" class="portfolio-list">

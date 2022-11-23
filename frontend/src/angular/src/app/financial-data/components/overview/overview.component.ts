@@ -12,6 +12,7 @@
  */
 import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { switchMap,tap } from 'rxjs/operators';
 import { forkJoin, Subscription } from 'rxjs';
 import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
@@ -29,7 +30,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   protected windowHeight: number = null;
   private dialogSubscription: Subscription;
   
-  constructor(private financialDataService: FinancialDataService, private tokenService: TokenService, private dialog: MatDialog, private configService: ConfigService) { }
+  constructor(private financialDataService: FinancialDataService, private tokenService: TokenService, 
+     private dialog: MatDialog, private configService: ConfigService, private router: Router) { }
 
   ngOnInit(): void {
 	this.windowHeight = window.innerHeight - 84;
@@ -60,6 +62,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 			.subscribe(result => console.log(result));
 		});
 		//console.log('showFinancialsConfig()');
+	}
+	
+	back(): void {
+		this.router.navigate(['/portfolios/overview'])
 	}
 	
 	logout(): void {

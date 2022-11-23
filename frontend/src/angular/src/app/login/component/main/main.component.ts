@@ -30,7 +30,7 @@ export class MainComponent {
 		private router: Router) { }
 
   openLoginDialog():void {
-	const dialogRef = this.dialog.open(LoginComponent, { width: '500px', data: {login: this.login}});
+	const dialogRef = this.dialog.open(LoginComponent, { width: '600px', data: {login: this.login}});
 	dialogRef.afterClosed().subscribe( result => {
 		this.login = typeof result == 'undefined' ? null : result;	
 		if(this.login) {
