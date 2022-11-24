@@ -66,3 +66,4 @@ envApp:
     POSTGRES_URL: "jdbc:postgresql://postgresservice:5432/portfolio"
     APIKEY: replacewithAlphavatageApiKey
     APIKEY_RAPIDAPI: replacewithrapidApiKey
+    FINANCIAL_DATA_PATH: "/tmp/"
