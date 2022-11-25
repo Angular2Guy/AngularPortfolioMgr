@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
-import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
@@ -51,51 +49,47 @@ public class FinancialDataService {
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void clearFinancialsData() {
 		this.financialElementRepository.deleteAllBatch();
-		this.symbolFinancialsRepository.deleteAllBatch();		
+		this.symbolFinancialsRepository.deleteAllBatch();
 	}
-	
-	@Transactional(value=TxType.REQUIRES_NEW)
+
+	@Transactional(value = TxType.REQUIRES_NEW)
 	public void dropFeIndexes() {
 		this.financialElementRepository.dropFkConstraintSymbolFinancials();
 		this.financialElementRepository.dropConceptIndex();
 		this.financialElementRepository.dropSymbolFinancialsIdIndex();
+		this.financialElementRepository.dropFinancialElementTypeIndex();
 	}
-	
-	@Transactional(value=TxType.REQUIRES_NEW)
+
+	@Transactional(value = TxType.REQUIRES_NEW)
 	public void createFeIndexes() {
 		this.financialElementRepository.createFkConstraintSymbolFinancials();
 		this.financialElementRepository.createConceptIndex();
 		this.financialElementRepository.createSymbolFinancialsIdIndex();
+		this.financialElementRepository.createFinancialElementTypeIndex();
 	}
-	
+
 	@Transactional
 	public List<FeConceptDto> findFeConcepts() {
-		if(this.feConcepts.isEmpty()) {
+		if (this.feConcepts.isEmpty()) {
 			this.updateFeConcepts();
 		}
 		return this.feConcepts;
 	}
-	
+
 	@Transactional
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
-		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());		
-	}
-	
-	@Transactional(value = TxType.REQUIRES_NEW)
-	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
-		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream().map(myDto -> this.symbolFinancialsMapper.toEntity(myDto)).collect(Collectors.toSet());
-		this.symbolFinancialsRepository.saveAll(symbolFinancials);
-		this.financialElementRepository.saveAll(symbolFinancials.stream()
-				.map(mySymbolFinancials -> concatFinancialElemenst(mySymbolFinancials)).flatMap(Set::stream).collect(Collectors.toSet()));
-		LOGGER.info("Items imported: {}", symbolFinancials.size());
+		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
 	}
 
-	private Set<FinancialElement> concatFinancialElemenst(SymbolFinancials mySymbolFinancials) {
-		Set<FinancialElement> financialElements = new HashSet<>();
-		financialElements.addAll(mySymbolFinancials.getBalanceSheet());
-		financialElements.addAll(mySymbolFinancials.getCashFlow());
-		financialElements.addAll(mySymbolFinancials.getIncome());
-		return financialElements;
+	@Transactional(value = TxType.REQUIRES_NEW)
+	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
+		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream()
+				.map(myDto -> this.symbolFinancialsMapper.toEntity(myDto)).collect(Collectors.toSet());
+		this.symbolFinancialsRepository.saveAll(symbolFinancials);
+		this.financialElementRepository.saveAll(symbolFinancials.stream()
+				.flatMap(mySymbolFinancials -> mySymbolFinancials.getFinancialElements().stream())
+				.collect(Collectors.toSet()));
+		LOGGER.info("Items imported: {}", symbolFinancials.size());
 	}
 }

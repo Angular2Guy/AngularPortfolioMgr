@@ -28,5 +28,7 @@ public interface FinancialElementRepository {
 	void createConceptIndex();
 	void dropFkConstraintSymbolFinancials();
 	void createFkConstraintSymbolFinancials();
+	void createFinancialElementTypeIndex();
+	void dropFinancialElementTypeIndex();
 	List<FeConceptDto> findCommonFeConcepts();
 }

@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.mapping;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.model.entity.dto.FinancialsDataDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 @Component
 public class SymbolFinancialsMapper {
@@ -39,20 +41,29 @@ public class SymbolFinancialsMapper {
 		dto.setSymbol(symbolFinancials.getSymbol());
 		dto.setYear(symbolFinancials.getYear());
 		FinancialsDataDto financialsDataDto = new FinancialsDataDto();
-		financialsDataDto.setBalanceSheet(symbolFinancials.getBalanceSheet().stream()
+		financialsDataDto.setBalanceSheet(symbolFinancials.getFinancialElements().stream()
+				.filter(myElment -> DataHelper.FinancialElementType.BalanceSheet
+						.equals(myElment.getFinancialElementType()))
 				.map(myElement -> this.financialElementMapper.toDto(myElement))
 				.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setCashFlow(
-				symbolFinancials.getCashFlow().stream().map(myElement -> this.financialElementMapper.toDto(myElement))
+				symbolFinancials.getFinancialElements().stream()
+				.filter(myElment -> DataHelper.FinancialElementType.CashFlow
+						.equals(myElment.getFinancialElementType()))
+				.map(myElement -> this.financialElementMapper.toDto(myElement))
 						.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setIncome(
-				symbolFinancials.getIncome().stream().map(myElement -> this.financialElementMapper.toDto(myElement))
+				symbolFinancials.getFinancialElements().stream()
+				.filter(myElment -> DataHelper.FinancialElementType.Income
+						.equals(myElment.getFinancialElementType()))
+				.map(myElement -> this.financialElementMapper.toDto(myElement))
 						.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		dto.setData(financialsDataDto);
 		return dto;
 	}
 
-	private FinancialElementImportDto addSymbolFinancialsDto(SymbolFinancialsDto dto, FinancialElementImportDto myElement) {
+	private FinancialElementImportDto addSymbolFinancialsDto(SymbolFinancialsDto dto,
+			FinancialElementImportDto myElement) {
 		myElement.setSymbolFinancialsDto(dto);
 		return myElement;
 	}
@@ -66,15 +77,16 @@ public class SymbolFinancialsMapper {
 		entity.setSymbol(symbolFinancialsDto.getSymbol());
 		entity.setYear(symbolFinancialsDto.getYear());
 		if (symbolFinancialsDto.getData() != null) {
-			entity.setBalanceSheet(symbolFinancialsDto.getData().getBalanceSheet().stream()
-					.map(myElement -> this.financialElementMapper.toEntity(myElement))
+			Set<FinancialElement> financialElements = symbolFinancialsDto.getData().getBalanceSheet().stream()
+					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.BalanceSheet))
+					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet());
+			financialElements.addAll(symbolFinancialsDto.getData().getCashFlow().stream()
+					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.CashFlow))
 					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet()));
-			entity.setCashFlow(symbolFinancialsDto.getData().getCashFlow().stream()
-					.map(myElement -> this.financialElementMapper.toEntity(myElement))
+			financialElements.addAll(symbolFinancialsDto.getData().getIncome().stream()
+					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.Income))
 					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet()));
-			entity.setIncome(symbolFinancialsDto.getData().getIncome().stream()
-					.map(myElement -> this.financialElementMapper.toEntity(myElement))
-					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet()));
+			entity.getFinancialElements().addAll(financialElements);
 		}
 		return entity;
 	}

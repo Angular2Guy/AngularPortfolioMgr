@@ -22,8 +22,9 @@ public class FinancialElementMapper {
 		return dto;
 	}
 
-	public FinancialElement toEntity(FinancialElementImportDto financialElementDto) {
+	public FinancialElement toEntity(FinancialElementImportDto financialElementDto, DataHelper.FinancialElementType financialElementType) {
 		FinancialElement entity = new FinancialElement();
+		entity.setFinancialElementType(financialElementType);
 		entity.setConcept(financialElementDto.getConcept());
 		entity.setCurrency(List.of(DataHelper.CurrencyKey.values()).stream().filter(
 				myCurrencyKey -> financialElementDto.getCurrency().toUpperCase().contains(myCurrencyKey.toString()))

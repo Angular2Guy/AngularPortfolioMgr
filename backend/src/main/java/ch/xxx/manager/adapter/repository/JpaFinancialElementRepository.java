@@ -41,6 +41,12 @@ public interface JpaFinancialElementRepository extends JpaRepository<FinancialEl
 	@Modifying
 	@Query(nativeQuery = true, value = "create index ix_financial_element_concept on financial_element (concept)")
 	void createConceptIndex();
+	@Modifying
+	@Query(nativeQuery = true, value = "create index ix_financial_element_financial_element_type on financial_element (financial_element_type)")
+	void createFinancialElementTypeIndex();
+	@Modifying
+	@Query(nativeQuery = true, value = "drop index ix_financial_element_financial_element_type")
+	void dropFinancialElementTypeIndex();
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.FeConceptDto(concept, count(fe.id) as concept_count) from FinancialElement fe group by fe.concept order by concept_count desc")	
 	List<FeConceptDto> findCommonFeConcepts(Pageable pageable);
 }

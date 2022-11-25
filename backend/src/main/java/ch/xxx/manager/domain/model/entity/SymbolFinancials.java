@@ -37,11 +37,7 @@ public class SymbolFinancials extends EntityBase {
 	@Size(max=20)
 	private String symbol;
 	@OneToMany(mappedBy = "symbolFinancials")
-	private Set<FinancialElement> balanceSheet = new HashSet<FinancialElement>();
-	@OneToMany(mappedBy = "symbolFinancials")
-	private Set<FinancialElement> cashFlow = new HashSet<FinancialElement>();
-	@OneToMany(mappedBy = "symbolFinancials")
-	private Set<FinancialElement> income = new HashSet<FinancialElement>();
+	private Set<FinancialElement> financialElements = new HashSet<FinancialElement>();
 	
 	public LocalDate getStartDate() {
 		return startDate;
@@ -73,22 +69,10 @@ public class SymbolFinancials extends EntityBase {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public Set<FinancialElement> getBalanceSheet() {
-		return balanceSheet;
+	public Set<FinancialElement> getFinancialElements() {
+		return financialElements;
 	}
-	public void setBalanceSheet(Set<FinancialElement> balanceSheet) {
-		this.balanceSheet = balanceSheet;
-	}
-	public Set<FinancialElement> getCashFlow() {
-		return cashFlow;
-	}
-	public void setCashFlow(Set<FinancialElement> cashFlow) {
-		this.cashFlow = cashFlow;
-	}
-	public Set<FinancialElement> getIncome() {
-		return income;
-	}
-	public void setIncome(Set<FinancialElement> income) {
-		this.income = income;
+	public void setFinancialElements(Set<FinancialElement> financialElements) {
+		this.financialElements = financialElements;
 	}
 }

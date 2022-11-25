@@ -25,4 +25,5 @@ public class SymbolFinancialsQueryParams {
 	@NotBlank
 	@Size(max=20)
 	private String symbol;
+	
 }

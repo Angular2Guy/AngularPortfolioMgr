@@ -107,18 +107,23 @@
 					indexName="ix_financial_element_symbol_financials_id" />
 			</not>
 		</preConditions>
-		<createIndex indexName="ix_financial_element_symbol_financials_id"
+		<createIndex
+			indexName="ix_financial_element_symbol_financials_id"
 			tableName="financial_element">
 			<column name="symbol_financials_id" />
 		</createIndex>
 	</changeSet>
 	<changeSet id="26" author="angular2guy">
-		<modifyDataType columnName="value" tableName="financial_element" newDataType="number(17,4)"/>
-		<modifyDataType columnName="label" tableName="financial_element" newDataType="varchar(4096)"/>
+		<modifyDataType columnName="value"
+			tableName="financial_element" newDataType="number(17,4)" />
+		<modifyDataType columnName="label"
+			tableName="financial_element" newDataType="varchar(4096)" />
 	</changeSet>
 	<changeSet id="27" author="angular2guy">
-		<modifyDataType columnName="value" tableName="financial_element" newDataType="number(34,4)"/>
-		<modifyDataType columnName="label" tableName="financial_element" newDataType="clob"/>
+		<modifyDataType columnName="value"
+			tableName="financial_element" newDataType="number(34,4)" />
+		<modifyDataType columnName="label"
+			tableName="financial_element" newDataType="clob" />
 	</changeSet>
 	<changeSet author="angular2guy" id="28">
 		<preConditions onFail="MARK_RAN">
@@ -130,6 +135,24 @@
 		<createIndex indexName="ix_financial_element_concept"
 			tableName="financial_element">
 			<column name="concept" />
+		</createIndex>
+	</changeSet>
+	<changeSet author="angular2guy" id="29">
+		<addColumn tableName="financial_element">
+			<column name="financial_element_type" type="varchar(20)" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="angular2guy" id="30">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="financial_element"
+					indexName="ix_financial_element_financial_element_type" />
+			</not>
+		</preConditions>
+		<createIndex
+			indexName="ix_financial_element_financial_element_type"
+			tableName="financial_element">
+			<column name="financial_element_type" />
 		</createIndex>
 	</changeSet>
 </databaseChangeLog>

@@ -28,13 +28,13 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 
 	public FinancialElementRepositoryBean(JpaFinancialElementRepository jpaFinancialElementRepository) {
 		this.jpaFinancialElementRepository = jpaFinancialElementRepository;
-	}	
+	}
 
 	@Override
 	public FinancialElement save(FinancialElement financialElement) {
 		return this.jpaFinancialElementRepository.save(financialElement);
 	}
-	
+
 	@Override
 	public List<FinancialElement> saveAll(Iterable<FinancialElement> symbols) {
 		return this.jpaFinancialElementRepository.saveAll(symbols);
@@ -47,7 +47,8 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 
 	@Override
 	public void deleteAllBatch() {
-		this.jpaFinancialElementRepository.deleteAllInBatch();;
+		this.jpaFinancialElementRepository.deleteAllInBatch();
+		;
 	}
 
 	@Override
@@ -83,5 +84,15 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	@Override
 	public void createFkConstraintSymbolFinancials() {
 		this.jpaFinancialElementRepository.createFkConstraintSymbolFinancials();
+	}
+
+	@Override
+	public void createFinancialElementTypeIndex() {
+		this.jpaFinancialElementRepository.createFinancialElementTypeIndex();
+	}
+
+	@Override
+	public void dropFinancialElementTypeIndex() {
+		this.jpaFinancialElementRepository.dropFinancialElementTypeIndex();
 	}
 }
