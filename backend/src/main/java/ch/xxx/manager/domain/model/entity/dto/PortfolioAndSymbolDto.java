@@ -14,7 +14,7 @@ package ch.xxx.manager.domain.model.entity.dto;
 
 import java.time.LocalDate;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 public class PortfolioAndSymbolDto {
 	private Long id;
@@ -27,13 +27,13 @@ public class PortfolioAndSymbolDto {
 	private Long symbolId;
 	private String symbol;
 	private String symbolName;
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 
 	public PortfolioAndSymbolDto() {}
 	
 	public PortfolioAndSymbolDto(Long id, Long userId, String portfolioName, LocalDate createdAt, Long weight,
 			LocalDate changedAt, LocalDate removedAt, Long symbolId, String symbol, String symbolName,
-			CurrencyKey currencyKey) {
+			DataHelper.CurrencyKey currencyKey) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -108,10 +108,10 @@ public class PortfolioAndSymbolDto {
 	public void setSymbolName(String symbolName) {
 		this.symbolName = symbolName;
 	}
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 	

@@ -42,7 +42,7 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service

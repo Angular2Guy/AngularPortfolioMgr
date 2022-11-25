@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,25 +27,12 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 public class SymbolFinancials extends EntityBase {
-	public static enum Quarter {
-		H1("H1"), H2("H2"), H3("H3"), H4("H4"), T1("T1"), T2("T2"), T3("T3"), T4("T4"), CY("CY"), FY("FY"), Q1("Q1"), Q2("Q2"), Q3("Q3"), Q4("Q4");
-
-		public final String value;
-
-		private Quarter(String value) {
-			this.value = value;
-		}
-
-		public String toString() {
-			return this.value;
-		}
-	}
 	private LocalDate startDate;
 	private LocalDate endDate;
 	@Column(name="`year`")
 	private int year;
 	@Enumerated(EnumType.STRING)
-	private Quarter quarter;
+	private DataHelper.Quarter quarter;
 	@NotBlank
 	@Size(max=20)
 	private String symbol;
@@ -73,10 +61,10 @@ public class SymbolFinancials extends EntityBase {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	public Quarter getQuarter() {
+	public DataHelper.Quarter getQuarter() {
 		return quarter;
 	}
-	public void setQuarter(Quarter quarter) {
+	public void setQuarter(DataHelper.Quarter quarter) {
 		this.quarter = quarter;
 	}
 	public String getSymbol() {

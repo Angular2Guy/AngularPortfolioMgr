@@ -12,19 +12,20 @@
  */
 package ch.xxx.manager.usecase.service;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 
 public enum ComparisonIndex {
-	SP500("IVV", "S&P 500 ETF", CurrencyKey.USD, QuoteSource.ALPHAVANTAGE),
-	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", CurrencyKey.EUR, QuoteSource.ALPHAVANTAGE),
-	MSCI_CHINA("ICGA.DE", "Msci China ETF", CurrencyKey.USD, QuoteSource.ALPHAVANTAGE);
+	SP500("IVV", "S&P 500 ETF", DataHelper.CurrencyKey.USD, QuoteSource.ALPHAVANTAGE),
+	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", DataHelper.CurrencyKey.EUR, QuoteSource.ALPHAVANTAGE),
+	MSCI_CHINA("ICGA.DE", "Msci China ETF", DataHelper.CurrencyKey.USD, QuoteSource.ALPHAVANTAGE);
 
 	private String symbol;
 	private String name;
 	private CurrencyKey currencyKey;
 	private QuoteSource source;
 
-	private ComparisonIndex(String symbol, String name, CurrencyKey currency, QuoteSource source) {
+	private ComparisonIndex(String symbol, String name, DataHelper.CurrencyKey currency, QuoteSource source) {
 		this.symbol = symbol;
 		this.name = name;
 		this.currencyKey = currency;
@@ -39,7 +40,7 @@ public enum ComparisonIndex {
 		return name;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 

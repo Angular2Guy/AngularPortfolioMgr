@@ -26,8 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import jakarta.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,8 +40,9 @@ import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional

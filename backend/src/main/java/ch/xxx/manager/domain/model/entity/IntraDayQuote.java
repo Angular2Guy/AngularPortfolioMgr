@@ -15,6 +15,7 @@ package ch.xxx.manager.domain.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,8 +24,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
-import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class IntraDayQuote extends EntityBase {
@@ -42,14 +41,14 @@ public class IntraDayQuote extends EntityBase {
 	private Symbol symbol;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 
 	public IntraDayQuote() {
 		super();
 	}
 
 	public IntraDayQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
-			Long volume, LocalDateTime localDateTime, Symbol symbol, CurrencyKey currencyKey) {
+			Long volume, LocalDateTime localDateTime, Symbol symbol, DataHelper.CurrencyKey currencyKey) {
 		super();
 		super.setId(id);
 		this.symbolKey = symbolKey;
@@ -127,11 +126,11 @@ public class IntraDayQuote extends EntityBase {
 		this.symbol = symbol;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 }

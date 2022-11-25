@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,8 +28,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
-
 @Entity
 @DiscriminatorValue("1")
 public class Portfolio extends PortfolioBase {
@@ -39,7 +38,7 @@ public class Portfolio extends PortfolioBase {
 	private String name;
 	@NotNull
 	@Enumerated(EnumType.STRING)	
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	@NotNull
 	private LocalDate createdAt;
 	@OneToMany(mappedBy = "portfolio")
@@ -80,11 +79,11 @@ public class Portfolio extends PortfolioBase {
 		this.portfolioToSymbols = portfolioToSymbols;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 

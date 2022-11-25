@@ -15,19 +15,18 @@ package ch.xxx.manager.domain.model.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 public class PortfolioElementDto {
 	private Long id;
 	private String name;
 	private String symbol;
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime createdAt;
 	private BigDecimal lastClose;
@@ -43,7 +42,7 @@ public class PortfolioElementDto {
 	public PortfolioElementDto() {		
 	}
 	
-	public PortfolioElementDto(Long id, String name, String symbol, CurrencyKey currencyKey, LocalDateTime createdAt,
+	public PortfolioElementDto(Long id, String name, String symbol, DataHelper.CurrencyKey currencyKey, LocalDateTime createdAt,
 			BigDecimal lastClose, BigDecimal month1, BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5,
 			BigDecimal year10, Long weight, String sector) {
 		super();
@@ -81,10 +80,10 @@ public class PortfolioElementDto {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 	public LocalDateTime getCreatedAt() {

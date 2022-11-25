@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.CurrencyRepository;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 @Repository
 public class CurrencyRepositoryBean implements CurrencyRepository {
@@ -31,7 +31,7 @@ public class CurrencyRepositoryBean implements CurrencyRepository {
 	}
 
 	@Override
-	public Optional<Currency> findByToCurr(CurrencyKey toCurr) {
+	public Optional<Currency> findByToCurr(DataHelper.CurrencyKey toCurr) {
 		return this.jpaCurrencyRepository.findByToCurr(toCurr);
 	}
 

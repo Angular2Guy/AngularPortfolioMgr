@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 public interface CurrencyRepository {
-	Optional<Currency> findByToCurr(CurrencyKey toCurr);
+	Optional<Currency> findByToCurr(DataHelper.CurrencyKey toCurr);
 	List<Currency> findAll();
 	List<Currency> saveAll(Collection<Currency> currencies);
 }

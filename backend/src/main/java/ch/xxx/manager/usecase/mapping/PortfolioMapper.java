@@ -30,7 +30,7 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 @Component
 public class PortfolioMapper {
@@ -71,7 +71,7 @@ public class PortfolioMapper {
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
 		entity.setAppUser(Optional.ofNullable(appUser).orElse(null));
-		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(CurrencyKey.EUR));
+		entity.setCurrencyKey(Optional.ofNullable(dto.getCurrencyKey()).orElse(DataHelper.CurrencyKey.EUR));
 		return entity;
 	}
 

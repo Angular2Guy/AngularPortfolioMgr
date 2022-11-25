@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ch.xxx.manager.domain.model.entity.SymbolFinancials.Quarter;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 public class SymbolFinancialsDto {
 	private Long id;
@@ -25,7 +25,7 @@ public class SymbolFinancialsDto {
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private LocalDate endDate;
 	private int year;	
-	private Quarter quarter;
+	private DataHelper.Quarter quarter;
 	private String symbol;	
 	private FinancialsDataDto data;
 	
@@ -54,10 +54,10 @@ public class SymbolFinancialsDto {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	public Quarter getQuarter() {
+	public DataHelper.Quarter getQuarter() {
 		return quarter;
 	}
-	public void setQuarter(Quarter quarter) {
+	public void setQuarter(DataHelper.Quarter quarter) {
 		this.quarter = quarter;
 	}
 	public String getSymbol() {

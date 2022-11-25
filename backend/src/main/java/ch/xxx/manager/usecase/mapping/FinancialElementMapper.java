@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 @Component
 public class FinancialElementMapper {
@@ -25,9 +25,9 @@ public class FinancialElementMapper {
 	public FinancialElement toEntity(FinancialElementImportDto financialElementDto) {
 		FinancialElement entity = new FinancialElement();
 		entity.setConcept(financialElementDto.getConcept());
-		entity.setCurrency(List.of(CurrencyKey.values()).stream().filter(
+		entity.setCurrency(List.of(DataHelper.CurrencyKey.values()).stream().filter(
 				myCurrencyKey -> financialElementDto.getCurrency().toUpperCase().contains(myCurrencyKey.toString()))
-				.findFirst().orElse(CurrencyKey.USD));
+				.findFirst().orElse(DataHelper.CurrencyKey.USD));
 		entity.setId(financialElementDto.getId());
 		entity.setLabel(financialElementDto.getLabel());
 		try {

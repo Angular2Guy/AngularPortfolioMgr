@@ -31,7 +31,7 @@ import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import reactor.core.publisher.Mono;
 
 @Service

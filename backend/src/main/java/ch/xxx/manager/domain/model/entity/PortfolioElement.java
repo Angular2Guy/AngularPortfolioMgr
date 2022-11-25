@@ -15,6 +15,7 @@ package ch.xxx.manager.domain.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -25,8 +26,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-
-import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 @DiscriminatorValue("2")
@@ -39,7 +38,7 @@ public class PortfolioElement extends PortfolioBase {
 	private String symbol;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	@NotNull
 	private LocalDate createdAt;
 	@NotNull
@@ -67,10 +66,10 @@ public class PortfolioElement extends PortfolioBase {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 	public LocalDate getCreatedAt() {

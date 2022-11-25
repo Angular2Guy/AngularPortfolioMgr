@@ -14,14 +14,14 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AlphaOverviewImportDto {
@@ -38,7 +38,7 @@ public class AlphaOverviewImportDto {
 	@JsonProperty("Exchange")
 	private String exchange;
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currency;
+	private DataHelper.CurrencyKey currency;
 	@JsonProperty("Country")
 	private String country;
 	@JsonProperty("Sector")

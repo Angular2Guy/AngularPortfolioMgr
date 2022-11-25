@@ -18,7 +18,8 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
+
 
 public class SymbolDto {
 	private Long id;
@@ -30,7 +31,7 @@ public class SymbolDto {
 	private LocalDateTime changedAt;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 	private LocalDateTime removedAt;
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	private String sector;
 	private String industry;
 	private String description;
@@ -42,7 +43,7 @@ public class SymbolDto {
 	}
 
 	public SymbolDto(Long id, String symbol, String name, LocalDate changedAt, LocalDate removedAt, String source,
-			Long weight, CurrencyKey currencyKey, String sector, String industry, String description, String address,
+			Long weight, DataHelper.CurrencyKey currencyKey, String sector, String industry, String description, String address,
 			String country) {
 		super();
 		this.id = id;
@@ -116,11 +117,11 @@ public class SymbolDto {
 		this.source = source;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 

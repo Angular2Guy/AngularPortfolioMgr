@@ -19,9 +19,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.Currency;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 public interface JpaCurrencyRepository extends JpaRepository<Currency, Long> {
 	@Query("select c from Currency c where c.toCurrKey = :toCurr")
-	Optional<Currency> findByToCurr(@Param(value = "toCurr") CurrencyKey toCurr);	
+	Optional<Currency> findByToCurr(@Param(value = "toCurr") DataHelper.CurrencyKey toCurr);	
 }

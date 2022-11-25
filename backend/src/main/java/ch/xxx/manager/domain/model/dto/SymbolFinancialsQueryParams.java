@@ -12,6 +12,17 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-public class SymbolFinancialsQueryParams {
+import ch.xxx.manager.domain.utils.DataHelper;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
+public class SymbolFinancialsQueryParams {
+	private int year;
+	@Enumerated(EnumType.STRING)
+	private DataHelper.Quarter quarter;
+	@NotBlank
+	@Size(max=20)
+	private String symbol;
 }

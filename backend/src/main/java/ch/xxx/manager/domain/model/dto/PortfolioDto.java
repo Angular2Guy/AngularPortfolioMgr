@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 public class PortfolioDto {
 	private Long id;
@@ -33,7 +33,7 @@ public class PortfolioDto {
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;	
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	private List<SymbolDto> symbols = new ArrayList<>();
 	private List<PortfolioElementDto> portfolioElements = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class PortfolioDto {
 	}
 
 	public PortfolioDto(Long id, Long userId, String name, LocalDateTime createdAt, BigDecimal month1,
-			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10, CurrencyKey currencyKey) {
+			BigDecimal month6, BigDecimal year1, BigDecimal year2, BigDecimal year5, BigDecimal year10, DataHelper.CurrencyKey currencyKey) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -140,11 +140,11 @@ public class PortfolioDto {
 		return symbols;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 

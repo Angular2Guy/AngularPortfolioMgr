@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
@@ -74,9 +74,9 @@ public class CronJobService {
 
 	private void importCurrencyQuotes() {
 		LOGGER.info("Import of {} Hkd quotes finished.",
-				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.HKD.toString()));
+				this.currencyService.importFxDailyQuoteHistory(DataHelper.CurrencyKey.HKD.toString()));
 		LOGGER.info("Import of {} Usd quotes finished.",
-				this.currencyService.importFxDailyQuoteHistory(CurrencyKey.USD.toString()));
+				this.currencyService.importFxDailyQuoteHistory(DataHelper.CurrencyKey.USD.toString()));
 		this.currencyService.initCurrencyMap();
 	}
 

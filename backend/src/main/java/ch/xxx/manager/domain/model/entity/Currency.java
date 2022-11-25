@@ -15,7 +15,7 @@ package ch.xxx.manager.domain.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,10 +27,10 @@ public class Currency extends EntityBase {
 	private LocalDate localDay;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey fromCurrKey;
+	private DataHelper.CurrencyKey fromCurrKey;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey toCurrKey;
+	private DataHelper.CurrencyKey toCurrKey;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
@@ -41,7 +41,7 @@ public class Currency extends EntityBase {
 		super();
 	}
 
-	public Currency(LocalDate localDay, CurrencyKey fromCurrKey, CurrencyKey toCurrKey, BigDecimal open,
+	public Currency(LocalDate localDay, DataHelper.CurrencyKey fromCurrKey, DataHelper.CurrencyKey toCurrKey, BigDecimal open,
 			BigDecimal high, BigDecimal low, BigDecimal close) {
 		super();
 		this.localDay = localDay;
@@ -93,19 +93,19 @@ public class Currency extends EntityBase {
 		this.localDay = localDay;
 	}
 
-	public CurrencyKey getFromCurrKey() {
+	public DataHelper.CurrencyKey getFromCurrKey() {
 		return fromCurrKey;
 	}
 
-	public void setFromCurrKey(CurrencyKey fromCurrKey) {
+	public void setFromCurrKey(DataHelper.CurrencyKey fromCurrKey) {
 		this.fromCurrKey = fromCurrKey;
 	}
 
-	public CurrencyKey getToCurrKey() {
+	public DataHelper.CurrencyKey getToCurrKey() {
 		return toCurrKey;
 	}
 
-	public void setToCurrKey(CurrencyKey toCurrKey) {
+	public void setToCurrKey(DataHelper.CurrencyKey toCurrKey) {
 		this.toCurrKey = toCurrKey;
 	}
 }

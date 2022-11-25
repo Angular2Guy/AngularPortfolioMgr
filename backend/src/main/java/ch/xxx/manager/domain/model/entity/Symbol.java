@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,8 +27,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
-import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class Symbol extends EntityBase {
@@ -51,7 +50,7 @@ public class Symbol extends EntityBase {
 	private String country;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currencyKey;
+	private DataHelper.CurrencyKey currencyKey;
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private QuoteSource quoteSource;
@@ -66,7 +65,7 @@ public class Symbol extends EntityBase {
 		super();
 	}
 
-	public Symbol(Long id, String symbol, String name, CurrencyKey currencyKey, QuoteSource quoteSource) {
+	public Symbol(Long id, String symbol, String name, DataHelper.CurrencyKey currencyKey, QuoteSource quoteSource) {
 		super();
 		super.setId(id);
 		this.symbol = symbol;
@@ -91,11 +90,11 @@ public class Symbol extends EntityBase {
 		this.name = name;
 	}
 
-	public CurrencyKey getCurrencyKey() {
+	public DataHelper.CurrencyKey getCurrencyKey() {
 		return currencyKey;
 	}
 
-	public void setCurrencyKey(CurrencyKey currencyKey) {
+	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
 	}
 

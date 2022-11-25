@@ -14,6 +14,7 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.math.BigDecimal;
 
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,8 +22,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-
-import ch.xxx.manager.domain.utils.CurrencyKey;
 
 @Entity
 public class FinancialElement extends EntityBase {
@@ -32,7 +31,7 @@ public class FinancialElement extends EntityBase {
 	private String concept;
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CurrencyKey currency;
+	private DataHelper.CurrencyKey currency;
 	@Column(name="`value`")
 	private BigDecimal value;
 	@ManyToOne
@@ -50,10 +49,10 @@ public class FinancialElement extends EntityBase {
 	public void setConcept(String concept) {
 		this.concept = concept;
 	}
-	public CurrencyKey getCurrency() {
+	public DataHelper.CurrencyKey getCurrency() {
 		return currency;
 	}
-	public void setCurrency(CurrencyKey currency) {
+	public void setCurrency(DataHelper.CurrencyKey currency) {
 		this.currency = currency;
 	}
 	public BigDecimal getValue() {

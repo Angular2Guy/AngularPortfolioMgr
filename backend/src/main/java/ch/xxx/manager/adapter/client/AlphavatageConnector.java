@@ -25,7 +25,7 @@ import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
-import ch.xxx.manager.domain.utils.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
