@@ -25,7 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.JwtTokenService;
 
 @Configuration
@@ -49,7 +49,7 @@ public class WebSecurityConfig {
 		HttpSecurity httpSecurity = http
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/rest/config/**").permitAll()
 						.requestMatchers("/rest/auth/**").permitAll().requestMatchers("/rest/**")
-						.hasAuthority(Role.USERS.toString()).requestMatchers(blockedPath).denyAll())
+						.hasAuthority(DataHelper.Role.USERS.toString()).requestMatchers(blockedPath).denyAll())
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()).sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers().frameOptions()
 				.sameOrigin().and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);

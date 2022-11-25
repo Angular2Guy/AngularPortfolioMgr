@@ -17,6 +17,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.TokenSubjectRole;
+import ch.xxx.manager.usecase.service.JwtTokenService;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,14 +31,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import ch.xxx.manager.domain.utils.Role;
-import ch.xxx.manager.domain.utils.TokenSubjectRole;
-import ch.xxx.manager.usecase.service.JwtTokenService;
 
 @Component
 public class RestJwtFilter implements Filter {
@@ -49,7 +48,7 @@ public class RestJwtFilter implements Filter {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		if (httpReq.getRequestURI().contains("/rest") && this.isNotOpenRestEndpoint(httpReq)) {			
 			TokenSubjectRole tokenTuple = this.jwtTokenService.getTokenUserRoles(createHeaderMap(request));
-			if (tokenTuple.role() == null || !tokenTuple.role().contains(Role.USERS.name())) {
+			if (tokenTuple.role() == null || !tokenTuple.role().contains(DataHelper.Role.USERS.name())) {
 				HttpServletResponse httpRes = (HttpServletResponse) response;
 				httpRes.setStatus(401);
 				LOG.info("Request denied: ",httpReq.getRequestURL().toString());
