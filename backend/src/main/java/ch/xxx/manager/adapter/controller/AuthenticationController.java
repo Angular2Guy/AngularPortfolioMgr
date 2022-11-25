@@ -34,7 +34,7 @@ import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.AuthCheckDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RefreshTokenDto;
-import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 
 @RestController
@@ -60,7 +60,7 @@ public class AuthenticationController {
 	@PostMapping("/authorize")
 	public AuthCheckDto postAuthorize(@RequestBody AuthCheckDto authcheck, @RequestHeader Map<String, String> header) {
 		String tokenRoles = this.appUserService.getTokenRoles(header).role();
-		if (tokenRoles != null && tokenRoles.contains(Role.USERS.name()) && !tokenRoles.contains(Role.GUEST.name())) {
+		if (tokenRoles != null && tokenRoles.contains(DataHelper.Role.USERS.name()) && !tokenRoles.contains(DataHelper.Role.GUEST.name())) {
 			return new AuthCheckDto(authcheck.getPath(), true);
 		} else {
 			return new AuthCheckDto(authcheck.getPath(), false);

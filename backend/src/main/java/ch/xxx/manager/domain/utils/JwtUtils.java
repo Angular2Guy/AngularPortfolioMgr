@@ -77,8 +77,8 @@ public class JwtUtils {
 				.extractToken(Optional.ofNullable(request.getHeader(JwtUtils.AUTHORIZATION)));
 		Optional<Jws<Claims>> claims = JwtUtils.getClaims(tokenStr, jwtTokenKey);
 		if (claims.isPresent() && new Date().before(claims.get().getBody().getExpiration())
-				&& claims.get().getBody().get(TOKENAUTHKEY).toString().contains(Role.USERS.name())
-				&& !claims.get().getBody().get(TOKENAUTHKEY).toString().contains(Role.GUEST.name())) {
+				&& claims.get().getBody().get(TOKENAUTHKEY).toString().contains(DataHelper.Role.USERS.name())
+				&& !claims.get().getBody().get(TOKENAUTHKEY).toString().contains(DataHelper.Role.GUEST.name())) {
 			return true;
 		}
 		return false;

@@ -28,9 +28,6 @@ import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,8 +39,8 @@ import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
+import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.domain.utils.JwtUtils;
-import ch.xxx.manager.domain.utils.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -51,6 +48,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtTokenService {
@@ -83,7 +82,7 @@ public class JwtTokenService {
 		return JwtUtils.getTokenUserRoles(headers, this.jwtTokenKey);
 	}
 
-	public String createToken(String username, List<Role> roles, Optional<Date> issuedAtOpt) {
+	public String createToken(String username, List<DataHelper.Role> roles, Optional<Date> issuedAtOpt) {
 		Claims claims = Jwts.claims();
 		claims.setSubject(username);
 		claims.put(JwtUtils.TOKENAUTHKEY, roles.stream().map(s -> new SimpleGrantedAuthority(s.getAuthority()))
@@ -113,7 +112,7 @@ public class JwtTokenService {
 	}
 
 	public Authentication getAuthentication(String token) {
-		if (this.getAuthorities(token).stream().filter(role -> role.equals(Role.GUEST)).count() > 0) {
+		if (this.getAuthorities(token).stream().filter(role -> role.equals(DataHelper.Role.GUEST)).count() > 0) {
 			return new UsernamePasswordAuthenticationToken(this.getUsername(token), null);
 		}
 		return new UsernamePasswordAuthenticationToken(this.getUsername(token), "", this.getAuthorities(token));
@@ -130,15 +129,15 @@ public class JwtTokenService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Collection<Role> getAuthorities(String token) {
-		Collection<Role> roles = new LinkedList<>();
-		for (Role role : Role.values()) {
+	public Collection<DataHelper.Role> getAuthorities(String token) {
+		Collection<DataHelper.Role> roles = new LinkedList<>();
+		for (DataHelper.Role role : DataHelper.Role.values()) {
 			roles.add(role);
 		}
 		Collection<Map<String, String>> rolestrs = (Collection<Map<String, String>>) Jwts.parserBuilder()
 				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.TOKENAUTHKEY);
 		return rolestrs.stream().map(str -> roles.stream()
-				.filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(Role.GUEST))
+				.filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(DataHelper.Role.GUEST))
 				.collect(Collectors.toList());
 	}
 

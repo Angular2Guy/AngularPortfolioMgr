@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,10 +45,11 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
 import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
-import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.DataHelper.Role;
 import ch.xxx.manager.domain.utils.TokenSubjectRole;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
 import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
+import jakarta.annotation.PostConstruct;
 
 public class AppUserServiceBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceBase.class);

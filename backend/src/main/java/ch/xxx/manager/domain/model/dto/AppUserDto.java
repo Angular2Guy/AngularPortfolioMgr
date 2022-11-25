@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import ch.xxx.manager.domain.utils.Role;
+import ch.xxx.manager.domain.utils.DataHelper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppUserDto implements UserDetails {
@@ -49,7 +49,7 @@ public class AppUserDto implements UserDetails {
 		this.birthdate = birthdate;
 		this.password = password;
 		this.emailAddress = emailAddress;
-		this.userRole = userRole == null ? Role.GUEST.name() : userRole;
+		this.userRole = userRole == null ? DataHelper.Role.GUEST.name() : userRole;
 		this.locked = locked;
 		this.enabled = enabled;
 		this.uuid = uuid;
