@@ -22,11 +22,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { FinancialDataRoutingModule } from './financial-data-routing.module';
 import { OverviewComponent } from './components/overview/overview.component';
 import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
+import { CreateQueryComponent } from './components/create-query/create-query.component';
+import { QueryResultsComponent } from './components/query-results/query-results.component';
 
 
 @NgModule({
   declarations: [
-    OverviewComponent,ImportFinancialsComponent
+    OverviewComponent,ImportFinancialsComponent, CreateQueryComponent, QueryResultsComponent
   ],
   imports: [
     CommonModule,

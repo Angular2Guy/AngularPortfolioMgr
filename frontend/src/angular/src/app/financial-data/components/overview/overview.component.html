@@ -6,4 +6,12 @@
 	<span><button mat-flat-button color="primary" (click)="back()" i18n="@@back">Back</button></span>
 	<span><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">Logout</button></span>
 </mat-toolbar>
+<div class="base-container">
+	<div class="query-container">
+	   <app-create-query></app-create-query>
+	</div>
+	<div class="result-container">
+	   <app-query-results></app-query-results>
+	</div>
+</div>
 </div>

@@ -7,3 +7,19 @@
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }
+
+.base-container {
+	display: flex;
+	flex: 1 1 auto;
+	align-items: stretch;
+	height: calc(100vh - 80px);
+	width: 100%;
+}
+
+.query-container {
+	width: 100%;
+}
+
+.result-container {
+	width: 100%;
+}
