@@ -15,17 +15,23 @@ package ch.xxx.manager.domain.utils;
 import org.springframework.security.core.GrantedAuthority;
 
 public class DataHelper {
+	public static enum Operation {
+		And, AndNot, Or, OrNot
+	}
+
 	public static enum CurrencyKey {
 		EUR, HKD, USD
 	}
-	
-	public static enum FinancialElementType {CashFlow("cf"), BalanceSheet("bf"), Income("ic");
+
+	public static enum FinancialElementType {
+		CashFlow("cf"), BalanceSheet("bf"), Income("ic");
+
 		public final String value;
-		
+
 		private FinancialElementType(String value) {
 			this.value = value;
 		}
-		
+
 		public String toString() {
 			return this.value;
 		}
@@ -45,15 +51,15 @@ public class DataHelper {
 			return this.value;
 		}
 	}
-	
-	public static enum Role implements GrantedAuthority{
+
+	public static enum Role implements GrantedAuthority {
 		USERS, GUEST;
 
 		@Override
-		public String getAuthority() {		
+		public String getAuthority() {
 			return this.name();
 		}
-		
+
 	}
 
 }

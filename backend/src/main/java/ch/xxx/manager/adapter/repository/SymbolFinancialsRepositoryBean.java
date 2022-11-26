@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -51,9 +52,8 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	}
 
 	public List<SfQuarterDto> findCommonSfQuarters() {
-		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20));
-//				.stream()
-//				.filter(myDto -> myDto.getTimesFound() >= 10)
-//				.collect(Collectors.toList());
+		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20))
+				.stream().filter(myDto -> myDto.getTimesFound() >= 10)
+				.collect(Collectors.toList());
 	}
 }

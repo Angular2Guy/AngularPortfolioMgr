@@ -27,7 +27,7 @@ public class SymbolFinancialsQueryParams {
 	@JsonProperty
 	private List<DataHelper.Quarter> quarter = new LinkedList<>();
 	private String symbol;
-	private List<FinancialElementQueryParam> financialElementQueryParams = new ArrayList<>();
+	private List<FinancialElementParam> financialElementParams = new ArrayList<>();
 	
 	public FilterNumberDto getYearFilter() {
 		return yearFilter;
@@ -47,10 +47,10 @@ public class SymbolFinancialsQueryParams {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public List<FinancialElementQueryParam> getFinancialElementQueryParams() {
-		return financialElementQueryParams;
+	public List<FinancialElementParam> getFinancialElementParams() {
+		return financialElementParams;
 	}
-	public void setFinancialElementQueryParams(List<FinancialElementQueryParam> financialElementQueryParams) {
-		this.financialElementQueryParams = financialElementQueryParams;
+	public void setFinancialElementParams(List<FinancialElementParam> financialElementParams) {
+		this.financialElementParams = financialElementParams;
 	}
 }
