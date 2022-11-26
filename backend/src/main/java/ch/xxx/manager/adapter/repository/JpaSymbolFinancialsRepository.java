@@ -12,17 +12,16 @@
  */
 package ch.xxx.manager.adapter.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 
 public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	
-//	@Query("select s from Symbol s where lower(s.symbol) like %:symbol%")
-//	List<Symbol> findBySymbol(@Param(value = "symbol") String symbol);
-//	@Query("select s from Symbol s where lower(s.symbol) like :symbol")
-//	List<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
-//	@Query("select s from Symbol s where lower(s.name) like %:name%")
-//	List<Symbol> findByName(@Param(value = "name") String name);
-//	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
-//	List<Symbol> findByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
+	@Query(value = "select new ch.xxx.manager.domain.model.dto.SfQuarterDto(sf.quarter, count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.quarter order by quarter_count desc")	
+	List<SfQuarterDto> findCommonSfQuarters(Pageable pageable);
 }

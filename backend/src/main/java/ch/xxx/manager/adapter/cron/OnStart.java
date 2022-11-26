@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.annotation.PostConstruct;
@@ -31,11 +32,11 @@ import jakarta.annotation.PostConstruct;
 public class OnStart {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OnStart.class);
 	private final SymbolImportService symbolImportService;
-	private final FinancialDataService financialDataImportService;
+	private final FinancialDataService financialDataService;
 
 	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService) {
 		this.symbolImportService = symbolImportService;
-		this.financialDataImportService = financialDataImportService;
+		this.financialDataService = financialDataImportService;
 	}
 
 	@PostConstruct
@@ -48,7 +49,9 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
-		List<FeConceptDto> feConcepts = this.financialDataImportService.findFeConcepts();
+		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
 		LOGGER.info("Concept count {}", feConcepts.size());
+		List<SfQuarterDto> sfQuarters = this.financialDataService.findSfQuarters();
+		LOGGER.info("Quarter count {}", sfQuarters.size());
 	}
 }

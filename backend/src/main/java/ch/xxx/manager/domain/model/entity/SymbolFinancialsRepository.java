@@ -15,9 +15,12 @@ package ch.xxx.manager.domain.model.entity;
 import java.util.List;
 import java.util.Optional;
 
+import ch.xxx.manager.domain.model.dto.SfQuarterDto;
+
 public interface SymbolFinancialsRepository {
 	SymbolFinancials save(SymbolFinancials symbolfinancials);
 	List<SymbolFinancials> saveAll(Iterable<SymbolFinancials> symbolfinancials);
     Optional<SymbolFinancials> findById(Long id);
     void deleteAllBatch();
+    List<SfQuarterDto> findCommonSfQuarters();
 }

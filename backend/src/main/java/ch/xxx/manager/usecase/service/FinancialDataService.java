@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
@@ -37,6 +38,8 @@ public class FinancialDataService {
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
 	private final FinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
+	private final List<SfQuarterDto> sfQuarters = new CopyOnWriteArrayList<>();
+	
 
 	public FinancialDataService(SymbolFinancialsMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
@@ -77,10 +80,24 @@ public class FinancialDataService {
 	}
 
 	@Transactional
+	public void updateSfQuarters() {
+		this.sfQuarters.clear();
+		this.sfQuarters.addAll(this.symbolFinancialsRepository.findCommonSfQuarters());
+	}
+	
+	@Transactional
+	public List<SfQuarterDto> findSfQuarters() {
+		if (this.sfQuarters.isEmpty()) {
+			this.updateSfQuarters();
+		}
+		return this.sfQuarters;
+	}
+
+	@Transactional
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
 		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
-	}
+	}	
 
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {

@@ -15,24 +15,26 @@ package ch.xxx.manager.adapter.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 
 @Repository
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
-	
+
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository) {
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
 	}
-	
+
 	@Override
 	public SymbolFinancials save(SymbolFinancials symbolfinancials) {
 		return this.jpaSymbolFinancialsRepository.save(symbolfinancials);
 	}
-	
+
 	@Override
 	public List<SymbolFinancials> saveAll(Iterable<SymbolFinancials> symbolfinancials) {
 		return this.jpaSymbolFinancialsRepository.saveAll(symbolfinancials);
@@ -46,5 +48,12 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	@Override
 	public void deleteAllBatch() {
 		this.jpaSymbolFinancialsRepository.deleteAllInBatch();
+	}
+
+	public List<SfQuarterDto> findCommonSfQuarters() {
+		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20));
+//				.stream()
+//				.filter(myDto -> myDto.getTimesFound() >= 10)
+//				.collect(Collectors.toList());
 	}
 }
