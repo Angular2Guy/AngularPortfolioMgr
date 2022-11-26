@@ -12,18 +12,45 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ch.xxx.manager.domain.utils.DataHelper;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public class SymbolFinancialsQueryParams {
-	private int year;
-	@Enumerated(EnumType.STRING)
-	private DataHelper.Quarter quarter;
-	@NotBlank
-	@Size(max=20)
+	private FilterNumberDto yearFilter;
+	@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+	@JsonProperty
+	private List<DataHelper.Quarter> quarter = new LinkedList<>();
 	private String symbol;
+	private List<FinancialElementQueryParam> financialElementQueryParams = new ArrayList<>();
 	
+	public FilterNumberDto getYearFilter() {
+		return yearFilter;
+	}
+	public void setYearFilter(FilterNumberDto yearFilter) {
+		this.yearFilter = yearFilter;
+	}
+	public List<DataHelper.Quarter> getQuarter() {
+		return quarter;
+	}
+	public void setQuarter(List<DataHelper.Quarter> quarter) {
+		this.quarter = quarter;
+	}
+	public String getSymbol() {
+		return symbol;
+	}
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+	public List<FinancialElementQueryParam> getFinancialElementQueryParams() {
+		return financialElementQueryParams;
+	}
+	public void setFinancialElementQueryParams(List<FinancialElementQueryParam> financialElementQueryParams) {
+		this.financialElementQueryParams = financialElementQueryParams;
+	}
 }
