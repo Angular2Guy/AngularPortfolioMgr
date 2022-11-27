@@ -1,33 +1,45 @@
 <div class="container">
-<div>
-<h2 i18n="@@createQuerySymbolQuery">Symbol Query</h2>
-<div class="query-item base-query">
+	<div>
+		<h2 i18n="@@createQuerySymbolQuery">Symbol Query</h2>
+		<form [formGroup]="queryForm" novalidate>
+			<div class="query-item base-query">
+				<mat-form-field class="string-operator"> 
+				   <mat-label>Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.ConceptOperator" name="ConceptOperator">
+				      <mat-option *ngFor="let item of stringQueryItems" [value]="item">{{item}} </mat-option> 
+				   </mat-select>
+				</mat-form-field>
+				<mat-form-field class="form-field"> 
+						<input matInput type="text" [matAutocomplete]="autoConcept" formControlName="{{FormFields.Concept}}"
+							i18n-placeholder placeholder="concept" tabindex="2">
+						<mat-autocomplete #autoConcept="matAutocomplete" (optionSelected)="conceptSelected($event)">
+      						<mat-option *ngFor="let concept of concepts" [value]="concept" 
+      						    class="symbol-text">
+        						{{ concept }}
+      						</mat-option>
+    					</mat-autocomplete> 
+				</mat-form-field>
+			</div>
+		</form>
+	</div>
+	<div cdkDropListGroup>
+		<div class="query-container">
+			<h2 i18n="@@createQueryAvailableQueryItems">Available Query
+				Items</h2>
 
-</div>
-</div>
-<div cdkDropListGroup>
-  <div class="query-container">
-    <h2 i18n="@@createQueryAvailableQueryItems">Available Query Items</h2>
+			<div cdkDropList [cdkDropListData]="availableItems"
+				class="query-list" (cdkDropListDropped)="drop($event)">
+				<div class="query-item" *ngFor="let item of availableItems" cdkDrag>{{item.title}}</div>
+			</div>
+		</div>
 
-    <div
-      cdkDropList
-      [cdkDropListData]="available"
-      class="query-list"
-      (cdkDropListDropped)="drop($event)">
-      <div class="query-item" *ngFor="let item of available" cdkDrag>{{item.title}}</div>
-    </div>
-  </div>
+		<div class="query-container">
+			<h2 i18n="@@createQueryQueryItems">Query Items</h2>
 
-  <div class="query-container">
-    <h2 i18n="@@createQueryQueryItems">Query Items</h2>
-
-    <div
-      cdkDropList
-      [cdkDropListData]="query"
-      class="query-list"
-      (cdkDropListDropped)="drop($event)">
-      <div class="query-item" *ngFor="let item of query" cdkDrag>{{item.title}}</div>
-    </div>
-  </div>
-</div>
+			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
+				(cdkDropListDropped)="drop($event)">
+				<div class="query-item" *ngFor="let item of queryItems" cdkDrag>{{item.title}}</div>
+			</div>
+		</div>
+	</div>
 </div>

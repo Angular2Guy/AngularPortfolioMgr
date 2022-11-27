@@ -19,6 +19,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select'; 
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { FinancialDataRoutingModule } from './financial-data-routing.module';
 import { OverviewComponent } from './components/overview/overview.component';
@@ -39,6 +41,8 @@ import { QueryResultsComponent } from './components/query-results/query-results.
     MatButtonModule,
     MatInputModule,
     MatIconModule,
+    MatSelectModule,
+    MatAutocompleteModule,
     DragDropModule,
     BaseModule,
     FinancialDataRoutingModule

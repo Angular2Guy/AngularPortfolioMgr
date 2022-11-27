@@ -12,10 +12,17 @@
  */
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 export interface MyItem {
 	id: number;
 	title: string;
+}
+
+enum FormFields {
+	ConceptOperator = 'conceptOperator',
+	Concept = 'concept'
 }
 
 @Component({
@@ -26,12 +33,37 @@ export interface MyItem {
 export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [{id: 1, title: 'Query'}, {id: 2, title: 'And Term'}, {id: 3, title: 'And Not Term'}, 
      {id: 4, title: 'Or Term'}, {id: 5, title: 'Or Not Term'}];
-  available: MyItem[] = [];
+  protected queryForm: FormGroup; 
+  protected availableItems: MyItem[] = [];
+  protected queryItems: MyItem[] = [{id: 1, title: 'Query'}];
+  protected stringQueryItems: string[] =  ['Equals', 'Startswith', 'Endswith', 'Contains'];
+  protected readonly conceptsInit: string[] = ['AAA','BBB','CCC']; 
+  protected concepts: string[] = [];
+  protected FormFields = FormFields;
 
-  query: MyItem[] = [{id: 1, title: 'Query'}];
+  constructor(private fb: FormBuilder) { 
+			this.queryForm = fb.group({
+				conceptOperator: this.stringQueryItems[0],
+				concept: this.concepts[0],	
+			}
+			/*
+			, {
+				validators: [this.validate]
+			} 
+			as AbstractControlOptions
+			*/
+			);
+	}
 
   ngOnInit(): void {
-	this.availableInit.forEach(myItem => this.available.push(myItem));
+	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
+	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
+	this.queryForm.controls[FormFields.Concept].valueChanges.subscribe(myValue => this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));
+  }
+
+  conceptSelected(event: MatAutocompleteSelectedEvent): void {
+	console.log(event.option.value);
+	console.log(this.queryForm.controls[FormFields.Concept].value);
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {
@@ -45,10 +77,14 @@ export class CreateQueryComponent implements OnInit {
         event.currentIndex,
       );
       //console.log(event.container.data === this.todo);
-      while(this.available.length > 0) {
-	     this.available.pop();
+      while(this.availableItems.length > 0) {
+	     this.availableItems.pop();
       }
-      this.availableInit.forEach(myItem => this.available.push(myItem));
+      this.availableInit.forEach(myItem => this.availableItems.push(myItem));
     }
+  }
+  
+  private validate(): void {
+	
   }
 }
