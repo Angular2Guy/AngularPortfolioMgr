@@ -52,3 +52,14 @@
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }
+
+.content-margin {
+  margin: 20px;
+}
+
+.content-container{
+	display: flex;	
+	width: 100%;	
+	justify-content: center;
+	align-content: center;
+}

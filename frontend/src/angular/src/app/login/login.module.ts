@@ -22,6 +22,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
     declarations: [LoginComponent, MainComponent],
@@ -33,6 +34,7 @@ import { MatInputModule } from '@angular/material/input';
         MatDialogModule,
         MatButtonModule,
         MatInputModule,
+        MatProgressSpinnerModule,
         LoginRoutingModule,
     ],
     providers: [LoginService]

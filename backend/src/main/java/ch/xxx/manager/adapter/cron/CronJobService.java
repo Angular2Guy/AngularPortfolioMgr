@@ -95,17 +95,17 @@ public class CronJobService {
 	@Transactional
 	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
-	public void scheduledImporterQuotes() {
-		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
-				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
-		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
-				.filter(mySymbol -> symbolsToFilter.stream()
-						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
-				.collect(Collectors.toList());
-		Long quoteCount = symbolsToUpdate.stream()
-				.flatMap(mySymbol -> Stream.of(
-						this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(), Duration.ofSeconds(15))))
-				.reduce(0L, (acc, value) -> acc + value);
-		LOGGER.info("Quote import done for: {}", quoteCount);
+	public void scheduledImporterQuotes() {		
+//		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
+//				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
+//		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
+//				.filter(mySymbol -> symbolsToFilter.stream()
+//						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
+//				.collect(Collectors.toList());
+//		Long quoteCount = symbolsToUpdate.stream()
+//				.flatMap(mySymbol -> Stream.of(
+//						this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(), Duration.ofSeconds(15))))
+//				.reduce(0L, (acc, value) -> acc + value);
+//		LOGGER.info("Quote import done for: {}", quoteCount);
 	}
 }
