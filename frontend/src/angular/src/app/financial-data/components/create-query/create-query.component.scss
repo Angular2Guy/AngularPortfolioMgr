@@ -1,11 +1,23 @@
 .container {
-	background-color: #FF0000;
-	width: 100%;
-	height: 100%;
+	//background-color: #FF0000;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  margin: 5px;
+}
+
+.base-query {	
+  width: 100%;
+  border: solid 1px #ccc;
+  min-height: 60px;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  cursor: default !important;
 }
 
 .query-container {
-  width: 400px;
+  width: 100%;
   max-width: 100%;
   margin: 10px 25px 0 0;
   display: inline-block;
