@@ -47,7 +47,7 @@ export class CreateQueryComponent implements OnInit {
   constructor(private fb: FormBuilder) { 
 			this.queryForm = fb.group({
 				conceptOperator: this.stringQueryItems[0],
-				concept: this.concepts[0],
+				concept: [this.conceptsInit[0], [Validators.required]],
 				numberOperator: this.numberQueryItems[0],
 				numberValue: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}

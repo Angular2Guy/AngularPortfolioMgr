@@ -12,7 +12,7 @@
 				<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="autoConcept" formControlName="{{FormFields.Concept}}"
 							i18n-placeholder placeholder="concept" tabindex="2">
-						<mat-autocomplete #autoConcept="matAutocomplete" (optionSelected)="conceptSelected($event)">
+						<mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption (optionSelected)="conceptSelected($event)">
       						<mat-option *ngFor="let concept of concepts" [value]="concept" 
       						    class="symbol-text">
         						{{ concept }}
