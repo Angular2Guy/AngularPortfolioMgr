@@ -1,3 +1,27 @@
 <div class="container">
-<p>create-query works!</p>
+<div cdkDropListGroup>
+  <div class="query-container">
+    <h2 i18n="@@createQueryAvailableQueryItems">Available Query Items</h2>
+
+    <div
+      cdkDropList
+      [cdkDropListData]="available"
+      class="query-list"
+      (cdkDropListDropped)="drop($event)">
+      <div class="query-item" *ngFor="let item of available" cdkDrag>{{item.title}}</div>
+    </div>
+  </div>
+
+  <div class="query-container">
+    <h2 i18n="@@createQueryQueryItems">Query Items</h2>
+
+    <div
+      cdkDropList
+      [cdkDropListData]="query"
+      class="query-list"
+      (cdkDropListDropped)="drop($event)">
+      <div class="query-item" *ngFor="let item of query" cdkDrag>{{item.title}}</div>
+    </div>
+  </div>
+</div>
 </div>
