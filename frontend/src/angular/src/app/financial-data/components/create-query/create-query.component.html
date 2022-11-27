@@ -19,6 +19,16 @@
       						</mat-option>
     					</mat-autocomplete> 
 				</mat-form-field>
+				<mat-form-field class="number-operator"> 
+				   <mat-label>Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.NumberOperator" name="NumberOperator">
+				      <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{item}} </mat-option> 
+				   </mat-select>
+				</mat-form-field>
+				<mat-form-field class="formfield"> 
+				   <input matInput type="text" formControlName="{{FormFields.NumberValue}}" class="number-value"
+							 tabindex="3">
+				</mat-form-field>
 			</div>
 		</form>
 	</div>

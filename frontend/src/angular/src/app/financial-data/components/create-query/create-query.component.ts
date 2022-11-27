@@ -22,7 +22,9 @@ export interface MyItem {
 
 enum FormFields {
 	ConceptOperator = 'conceptOperator',
-	Concept = 'concept'
+	Concept = 'concept',
+	NumberOperator = 'numberOperator',
+	NumberValue = 'numberValue'
 }
 
 @Component({
@@ -36,7 +38,8 @@ export class CreateQueryComponent implements OnInit {
   protected queryForm: FormGroup; 
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [{id: 1, title: 'Query'}];
-  protected stringQueryItems: string[] =  ['Equals', 'Startswith', 'Endswith', 'Contains'];
+  protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
+  protected numberQueryItems: string[] =  ['=', '>=', '<='];
   protected readonly conceptsInit: string[] = ['AAA','BBB','CCC']; 
   protected concepts: string[] = [];
   protected FormFields = FormFields;
@@ -44,7 +47,9 @@ export class CreateQueryComponent implements OnInit {
   constructor(private fb: FormBuilder) { 
 			this.queryForm = fb.group({
 				conceptOperator: this.stringQueryItems[0],
-				concept: this.concepts[0],	
+				concept: this.concepts[0],
+				numberOperator: this.numberQueryItems[0],
+				numberValue: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}
 			/*
 			, {
@@ -58,7 +63,8 @@ export class CreateQueryComponent implements OnInit {
   ngOnInit(): void {
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
 	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
-	this.queryForm.controls[FormFields.Concept].valueChanges.subscribe(myValue => this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));
+	this.queryForm.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
+	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));	
   }
 
   conceptSelected(event: MatAutocompleteSelectedEvent): void {

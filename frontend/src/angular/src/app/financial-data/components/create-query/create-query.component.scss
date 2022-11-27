@@ -17,7 +17,15 @@
 }
 
 .string-operator {
-	max-width: 150px;	
+	max-width: 80px;	
+}
+
+.number-operator {
+	max-width: 80px;
+}
+
+.number-value {
+	text-align: right;
 }
 
 .query-container {
