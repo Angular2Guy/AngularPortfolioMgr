@@ -3,15 +3,17 @@
 		<h2 i18n="@@createQuerySymbolQuery">Symbol Query</h2>
 		<form [formGroup]="queryForm" novalidate>
 			<div class="query-item base-query">
+			<div>
 				<mat-form-field class="string-operator"> 
-				   <mat-label>Operator</mat-label> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="FormFields.ConceptOperator" name="ConceptOperator">
-				      <mat-option *ngFor="let item of stringQueryItems" [value]="item">{{item}} </mat-option> 
+				      <mat-option *ngFor="let item of stringQueryItems" [value]="item">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>
-				<mat-form-field class="form-field"> 
+				<mat-form-field class="form-field">
+				<mat-label i18n="@@createQueryQueryItemConcept">Concept</mat-label> 
 						<input matInput type="text" [matAutocomplete]="autoConcept" formControlName="{{FormFields.Concept}}"
-							i18n-placeholder placeholder="concept" tabindex="2">
+							i18n-placeholder placeholder="concept">
 						<mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption (optionSelected)="conceptSelected($event)">
       						<mat-option *ngFor="let concept of concepts" [value]="concept" 
       						    class="symbol-text">
@@ -19,16 +21,19 @@
       						</mat-option>
     					</mat-autocomplete> 
 				</mat-form-field>
+				</div>
+				<div>
 				<mat-form-field class="number-operator"> 
-				   <mat-label>Operator</mat-label> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="FormFields.NumberOperator" name="NumberOperator">
-				      <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{item}} </mat-option> 
+				      <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>
-				<mat-form-field class="formfield"> 
-				   <input matInput type="text" formControlName="{{FormFields.NumberValue}}" class="number-value"
-							 tabindex="3">
+				<mat-form-field class="formfield">
+				<mat-label i18n="@@value">Value</mat-label>  
+				   <input matInput type="text" formControlName="{{FormFields.NumberValue}}" class="number-value">
 				</mat-form-field>
+				</div>
 			</div>
 		</form>
 	</div>
