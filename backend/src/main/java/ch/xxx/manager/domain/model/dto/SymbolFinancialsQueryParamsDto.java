@@ -21,13 +21,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ch.xxx.manager.domain.utils.DataHelper;
 
-public class SymbolFinancialsQueryParams {
+public class SymbolFinancialsQueryParamsDto {
 	private FilterNumberDto yearFilter;
 	@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 	@JsonProperty
 	private List<DataHelper.Quarter> quarter = new LinkedList<>();
 	private String symbol;
-	private List<FinancialElementParam> financialElementParams = new ArrayList<>();
+	private List<FinancialElementParamDto> financialElementParams = new ArrayList<>();
 	
 	public FilterNumberDto getYearFilter() {
 		return yearFilter;
@@ -47,10 +47,10 @@ public class SymbolFinancialsQueryParams {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public List<FinancialElementParam> getFinancialElementParams() {
+	public List<FinancialElementParamDto> getFinancialElementParams() {
 		return financialElementParams;
 	}
-	public void setFinancialElementParams(List<FinancialElementParam> financialElementParams) {
+	public void setFinancialElementParams(List<FinancialElementParamDto> financialElementParams) {
 		this.financialElementParams = financialElementParams;
 	}
 }

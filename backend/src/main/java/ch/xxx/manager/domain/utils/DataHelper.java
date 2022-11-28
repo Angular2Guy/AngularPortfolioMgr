@@ -15,6 +15,8 @@ package ch.xxx.manager.domain.utils;
 import org.springframework.security.core.GrantedAuthority;
 
 public class DataHelper {
+	public static enum TermType {Query, StartTerm, EndTerm }
+	
 	public static enum Operation {
 		And, AndNot, Or, OrNot
 	}

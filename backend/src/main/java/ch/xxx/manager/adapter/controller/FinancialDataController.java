@@ -29,7 +29,7 @@ import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.FinancialElementDto;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
-import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParams;
+import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolService;
 
@@ -62,7 +62,7 @@ public class FinancialDataController {
 	}
 
 	@PostMapping("/search/params")
-	public List<FinancialElementDto> findSymbolFinancials(@RequestBody SymbolFinancialsQueryParams symbolFinancialsQueryParams) {
+	public List<FinancialElementDto> findSymbolFinancials(@RequestBody SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		return List.of(new FinancialElementDto());
 	}
 	

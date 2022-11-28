@@ -12,25 +12,37 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.xxx.manager.domain.utils.DataHelper.Operation;
+import ch.xxx.manager.domain.utils.DataHelper.TermType;
 
-public class FinancialElementQueryTerm implements FinancialElementParam {	
-	private Operation operation;	
-	private List<FinancialElementQueryParam> financialElementQueryParams = new ArrayList<>();
+public class FinancialElementParamDto  {
+	private FilterStringDto conceptFilter;
+	private FilterNumberDto valueFilter;
+	private Operation operation;
+	private TermType termType;
 
-	public List<FinancialElementQueryParam> getFinancialElementQueryParams() {
-		return financialElementQueryParams;
+	public FilterStringDto getConceptFilter() {
+		return conceptFilter;
 	}
-	public void setFinancialElementQueryParams(List<FinancialElementQueryParam> financialElementQueryParams) {
-		this.financialElementQueryParams = financialElementQueryParams;
+	public void setConceptFilter(FilterStringDto conceptFilter) {
+		this.conceptFilter = conceptFilter;
+	}
+	public FilterNumberDto getValueFilter() {
+		return valueFilter;
+	}
+	public void setValueFilter(FilterNumberDto valueFilter) {
+		this.valueFilter = valueFilter;
 	}
 	public Operation getOperation() {
 		return operation;
 	}
 	public void setOperation(Operation operation) {
 		this.operation = operation;
+	}
+	public TermType getTermType() {
+		return termType;
+	}
+	public void setTermType(TermType termType) {
+		this.termType = termType;
 	}
 }

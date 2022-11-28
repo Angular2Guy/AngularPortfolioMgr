@@ -34,6 +34,8 @@ export class QueryComponent implements OnInit, OnDestroy {
   public formArrayIndex: number;
   @Input()
   public queryItemType: ItemType; 
+  @Input()
+  public showType: boolean;
   protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];

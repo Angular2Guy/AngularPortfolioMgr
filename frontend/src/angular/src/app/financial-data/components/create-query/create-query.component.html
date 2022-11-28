@@ -1,7 +1,7 @@
 <div class="container">
+		<form [formGroup]="queryForm" novalidate>
 	<div>
 		<h2 i18n="@@query">Query</h2>
-		<form [formGroup]="queryForm" novalidate>
 			<div class="query-item base-query">
 			<div>
 				<mat-form-field class="term-operator"> 
@@ -43,7 +43,6 @@
 				</mat-form-field>
 				</div>
 			</div>
-		</form>
 	</div>
 	<div cdkDropListGroup>
 		<div class="query-container">
@@ -60,8 +59,9 @@
 
 			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
 				(cdkDropListDropped)="drop($event)">
-				<div class="query-item" *ngFor="let item of queryItems" cdkDrag>{{item.title}}</div>
+				<div class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag>{{item.title}}</div>
 			</div>
 		</div>
 	</div>
+   </form>
 </div>
