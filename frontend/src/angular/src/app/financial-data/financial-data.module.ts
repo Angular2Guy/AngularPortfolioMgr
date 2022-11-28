@@ -27,11 +27,12 @@ import { OverviewComponent } from './components/overview/overview.component';
 import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
 import { CreateQueryComponent } from './components/create-query/create-query.component';
 import { QueryResultsComponent } from './components/query-results/query-results.component';
+import { QueryComponent } from './components/query/query.component';
 
 
 @NgModule({
   declarations: [
-    OverviewComponent,ImportFinancialsComponent, CreateQueryComponent, QueryResultsComponent
+    OverviewComponent,ImportFinancialsComponent, CreateQueryComponent, QueryResultsComponent, QueryComponent
   ],
   imports: [
     CommonModule,
