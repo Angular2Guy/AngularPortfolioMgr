@@ -15,6 +15,7 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag
 import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
+import { Subscription } from 'rxjs';
 
 export interface MyItem {	
 	queryItemType: ItemType;
@@ -45,6 +46,7 @@ enum FormFields {
 export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}, 
      {queryItemType: ItemType.TermStart, title: 'Term Start'}, {queryItemType: ItemType.TermEnd, title: 'Term End'}];
+  private symbolSubscription: Subscription;
   protected readonly availableItemParams = {showType: true, formArray: null, formArrayIndex: -1 } as ItemParams;
   protected readonly queryItemParams = {showType: false, formArray: {}, formArrayIndex: -1 } as ItemParams;
   protected queryForm: FormGroup; 
@@ -54,7 +56,8 @@ export class CreateQueryComponent implements OnInit {
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
   protected quarterQueryItems: string[] = ['FY', 'CY', 'Q1', 'Q2', 'Q3', 'Q4'];
-  protected symbols = ['IBM', 'JNJ', 'MSFT', 'AMZN'];
+  protected readonly symbolsInit = ['IBM', 'JNJ', 'MSFT', 'AMZN'];
+  protected symbols = [];
   protected FormFields = FormFields;
 
   constructor(private fb: FormBuilder) { 
@@ -78,7 +81,10 @@ export class CreateQueryComponent implements OnInit {
 	}
 
   ngOnInit(): void {
+	this.symbolsInit.forEach(mySymbol => this.symbols.push(mySymbol));
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
+	this.symbolSubscription = this.queryForm.controls[FormFields.Symbol].valueChanges.subscribe(myValue => 
+	   this.symbols = this.symbolsInit.filter(myConcept => myConcept.includes(myValue)));	
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {
