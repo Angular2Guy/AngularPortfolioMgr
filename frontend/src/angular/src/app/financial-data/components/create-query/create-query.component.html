@@ -27,7 +27,7 @@
 				</mat-form-field>
 				<mat-form-field class="form-field"> 
 				   <mat-label i18n="@@quarter">Quarter</mat-label> 
-				   <mat-select [formControlName]="FormFields.Quarter" name="Quarter" >
+				   <mat-select [formControlName]="FormFields.Quarter" name="Quarter" multiple>
 				      <mat-option *ngFor="let item of quarterQueryItems" [value]="item">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>
