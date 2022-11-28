@@ -21,10 +21,12 @@ export interface MyItem {
 }
 
 enum FormFields {
+	TermOperator = 'termOperator',
 	ConceptOperator = 'conceptOperator',
 	Concept = 'concept',
 	NumberOperator = 'numberOperator',
-	NumberValue = 'numberValue'
+	NumberValue = 'numberValue',
+	QueryItems = 'queryItems'
 }
 
 @Component({
@@ -38,6 +40,7 @@ export class CreateQueryComponent implements OnInit {
   protected queryForm: FormGroup; 
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [{id: 1, title: 'Query'}];
+  protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
   protected readonly conceptsInit: string[] = ['AAA','BBB','CCC']; 
@@ -46,10 +49,12 @@ export class CreateQueryComponent implements OnInit {
 
   constructor(private fb: FormBuilder) { 
 			this.queryForm = fb.group({
-				conceptOperator: this.stringQueryItems[0],
-				concept: [this.conceptsInit[0], [Validators.required]],
-				numberOperator: this.numberQueryItems[0],
-				numberValue: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
+				[FormFields.TermOperator]: this.termQueryItems[0],
+				[FormFields.ConceptOperator]: this.stringQueryItems[0],
+				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
+				[FormFields.NumberOperator]: this.numberQueryItems[0],
+				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]],
+				[FormFields.QueryItems]: fb.array([])
 			}
 			/*
 			, {

@@ -17,15 +17,28 @@
 }
 
 .string-operator {
-	max-width: 80px;	
+	width: 70px;
 }
 
 .number-operator {
-	max-width: 80px;
+	width: 70px;
+}
+
+.term-operator {
+	width: 100px;
+}
+
+.operator {
+	font-size: 12px;
 }
 
 .number-value {
 	text-align: right;
+}
+
+.form-field {
+	font-size: 12px;
+	width: calc(100% - 70px);	
 }
 
 .query-container {

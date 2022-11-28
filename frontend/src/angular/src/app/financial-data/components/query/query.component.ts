@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import {FinancialsDataUtils, ItemType} from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 
@@ -26,12 +26,14 @@ enum FormFields {
   templateUrl: './query.component.html',
   styleUrls: ['./query.component.scss']
 })
-export class QueryComponent implements OnInit {
+export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   public baseFormArray: FormArray; 
   @Input()
+  public formArrayIndex: number;
+  @Input()
   public itemType: ItemType; 
-  protected termOperator = ['And', 'AndNot', 'Or', 'OrNot'];
+  protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
   protected readonly conceptsInit: string[] = ['AAA','BBB','CCC'];   
@@ -42,10 +44,10 @@ export class QueryComponent implements OnInit {
 	
   constructor(private fb: FormBuilder) { 
 			this.itemFormGroup = fb.group({
-				conceptOperator: this.stringQueryItems[0],
-				concept: [this.conceptsInit[0], [Validators.required]],
-				numberOperator: this.numberQueryItems[0],
-				numberValue: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
+				[FormFields.ConceptOperator]: this.stringQueryItems[0],
+				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
+				[FormFields.NumberOperator]: this.numberQueryItems[0],
+				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}
 			/*
 			, {
@@ -54,6 +56,7 @@ export class QueryComponent implements OnInit {
 			as AbstractControlOptions
 			*/
 			);
+			this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
 			
 	}
 
@@ -61,5 +64,9 @@ export class QueryComponent implements OnInit {
 	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
 	this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
 	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));	
+  }
+  
+  ngOnDestroy(): void {
+	this.baseFormArray.removeAt(this.formArrayIndex);
   }
 }
