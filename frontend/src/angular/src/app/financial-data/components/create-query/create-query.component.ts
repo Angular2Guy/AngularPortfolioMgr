@@ -28,11 +28,12 @@ export interface ItemParams {
 }
 
 enum FormFields {
-	TermOperator = 'termOperator',
-	ConceptOperator = 'conceptOperator',
-	Concept = 'concept',
-	NumberOperator = 'numberOperator',
-	NumberValue = 'numberValue',
+	YearOperator = 'yearOperator',
+	Year = 'year',
+	SymbolOperator = 'symbolOperator',
+	Symbol = 'symbol',
+	QuarterOperator = 'quarterOperator',
+	Quarter = 'quarter',
 	QueryItems = 'queryItems'
 }
 
@@ -52,17 +53,18 @@ export class CreateQueryComponent implements OnInit {
   protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
-  protected readonly conceptsInit: string[] = ['AAA','BBB','CCC']; 
-  protected concepts: string[] = [];
+  protected quarterQueryItems: string[] = ['FY', 'CY', 'Q1', 'Q2', 'Q3', 'Q4'];
+  protected symbols = ['IBM', 'JNJ', 'MSFT', 'AMZN'];
   protected FormFields = FormFields;
 
   constructor(private fb: FormBuilder) { 
 			this.queryForm = fb.group({
-				[FormFields.TermOperator]: this.termQueryItems[0],
-				[FormFields.ConceptOperator]: this.stringQueryItems[0],
-				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
-				[FormFields.NumberOperator]: this.numberQueryItems[0],
-				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]],
+				[FormFields.YearOperator]: this.termQueryItems[0],
+				[FormFields.Year]: [0, Validators.pattern('^\\d*$')],
+				[FormFields.SymbolOperator]: this.stringQueryItems[0],
+				[FormFields.Symbol]: '',
+				[FormFields.QuarterOperator]: this.numberQueryItems[0],
+				[FormFields.Quarter]: this.quarterQueryItems[0],
 				[FormFields.QueryItems]: fb.array([])
 			}
 			/*
@@ -77,14 +79,6 @@ export class CreateQueryComponent implements OnInit {
 
   ngOnInit(): void {
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
-	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
-	this.queryForm.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
-	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));	
-  }
-
-  conceptSelected(event: MatAutocompleteSelectedEvent): void {
-	console.log(event.option.value);
-	console.log(this.queryForm.controls[FormFields.Concept].value);
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {
