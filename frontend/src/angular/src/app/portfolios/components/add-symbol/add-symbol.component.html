@@ -16,7 +16,7 @@
 				<li>
 					<mat-form-field class="form-field"> 
 						<input matInput type="text" [matAutocomplete]="autoSymbol" formControlName="{{FormFields.SymbolSymbol}}"
-							i18n-placeholder placeholder="symbol" tabindex="2">
+							i18n-placeholder="@@phSymbol" placeholder="symbol" tabindex="2">
 						<mat-autocomplete autoActiveFirstOption #autoSymbol="matAutocomplete" (optionSelected)="symbolSelected($event)">
       						<mat-option *ngFor="let symbol of symbolsSymbol | async" [value]="symbol" 
       						    class="symbol-text" i18n="@@addSymbolSymbolAndName">

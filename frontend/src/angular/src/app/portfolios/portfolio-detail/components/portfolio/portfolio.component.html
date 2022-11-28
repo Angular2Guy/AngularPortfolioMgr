@@ -8,9 +8,9 @@
 					color="primary">
 		</mat-progress-spinner>
 	</span>
-	<span *ngIf="reloadData" class="spinner-text" i18n>loading...</span>
-	<span><button mat-flat-button color="primary" (click)="back()" i18n>Back</button></span>
-	<span><button mat-flat-button color="primary" (click)="logout()" i18n>Logout</button></span>
+	<span *ngIf="reloadData" class="spinner-text" i18n="@@loading">loading...</span>
+	<span><button mat-flat-button color="primary" (click)="back()" i18n="@@back">Back</button></span>
+	<span><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">Logout</button></span>
 </mat-toolbar>
 <mat-sidenav-container class="container" [ngStyle]="{'height.px': windowHeight}">
 	<mat-sidenav opened mode="side" class="symbol-list">
