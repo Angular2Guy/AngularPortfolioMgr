@@ -16,8 +16,8 @@ import { Router } from '@angular/router';
 import { switchMap,tap } from 'rxjs/operators';
 import { forkJoin, Subscription } from 'rxjs';
 import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
-import { FinancialDataService } from 'src/app/service/financial-data.service';
-import { ImportFinancialsData } from '../../../model/import-financials-data';
+import { FinancialDataService } from '../../service/financial-data.service';
+import { ImportFinancialsData } from '../../model/import-financials-data';
 import { TokenService } from 'ngx-simple-charts/base-service';
 import { ConfigService } from 'src/app/service/config.service';
 

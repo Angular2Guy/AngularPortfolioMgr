@@ -15,9 +15,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImportFinancialsData } from '../model/import-financials-data';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FinancialDataService {
 
   constructor(private http: HttpClient) { }

@@ -28,6 +28,9 @@ import { ImportFinancialsComponent } from './components/import-financials/import
 import { CreateQueryComponent } from './components/create-query/create-query.component';
 import { QueryResultsComponent } from './components/query-results/query-results.component';
 import { QueryComponent } from './components/query/query.component';
+import { FinancialDataService } from './service/financial-data.service';
+import { TokenInterceptor } from 'ngx-simple-charts/base-service';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 
 @NgModule({
@@ -47,6 +50,8 @@ import { QueryComponent } from './components/query/query.component';
     DragDropModule,
     BaseModule,
     FinancialDataRoutingModule
-  ]
+  ],
+  providers: [FinancialDataService,  
+       { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
 })
 export class FinancialDataModule { }

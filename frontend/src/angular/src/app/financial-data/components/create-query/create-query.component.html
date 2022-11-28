@@ -47,15 +47,17 @@
 	<div cdkDropListGroup>
 		<div class="query-container">
 			<h2 i18n="@@createQueryAvailableQueryItems">Available Query	Items</h2>
+			<h3 i18n="@@createQueryAddQueryItems">To add a Query Item. Drag it down.</h3>
 
 			<div cdkDropList [cdkDropListData]="availableItems"
 				class="query-list" (cdkDropListDropped)="drop($event)">
-				<div class="query-item" *ngFor="let item of availableItems" cdkDrag>{{item.title}}</div>
+				<app-query *ngFor="let item of availableItems" cdkDrag [queryItemType]="item.queryItemType" [baseFormArray]="availableItemParams.formArray" [formArrayIndex]="availableItemParams.formArrayIndex" [showType]="availableItemParams.showType" ></app-query>
 			</div>
 		</div>
 
 		<div class="query-container">
 			<h2 i18n="@@createQueryQueryItems">Query Items</h2>
+			<h3 i18n="@@createQueryRemoveQueryItems">To remove a Query Item. Drag it up.</h3>
 
 			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
 				(cdkDropListDropped)="drop($event)">

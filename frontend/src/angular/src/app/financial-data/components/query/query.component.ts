@@ -11,8 +11,9 @@
    limitations under the License.
  */
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import {FinancialsDataUtils, ItemType} from '../../model/financials-data-utils';
+import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 enum FormFields {
 	TermOperator = 'termOperator',
@@ -44,6 +45,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   protected FormFields = FormFields;
   protected itemFormGroup: FormGroup;
   protected ItemType = ItemType;
+  private conceptSubscription: Subscription;
 	
   constructor(private fb: FormBuilder) { 
 			this.itemFormGroup = fb.group({
@@ -58,18 +60,23 @@ export class QueryComponent implements OnInit, OnDestroy {
 			} 
 			as AbstractControlOptions
 			*/
-			);
-			this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
-			
+			);						
 	}
 
   ngOnInit(): void {
+	if(!this.showType) {
+		this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
+	}
 	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
-	this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
+	this.conceptSubscription = this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
 	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));	
   }
   
   ngOnDestroy(): void {
-	this.baseFormArray.removeAt(this.formArrayIndex);
+	if(!this.showType) {
+	   this.baseFormArray.removeAt(this.formArrayIndex);
+	}
+	this.conceptSubscription.unsubscribe();
+	this.conceptSubscription = null;
   }
 }

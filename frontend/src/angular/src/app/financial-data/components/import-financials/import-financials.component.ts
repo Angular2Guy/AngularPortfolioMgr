@@ -14,7 +14,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverviewComponent } from '../overview/overview.component';
-import { ImportFinancialsData } from '../../../model/import-financials-data';
+import { ImportFinancialsData } from '../../model/import-financials-data';
 import { ConfigService } from 'src/app/service/config.service';
 
 enum FormFields {

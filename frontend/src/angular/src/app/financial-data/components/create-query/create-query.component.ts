@@ -12,12 +12,19 @@
  */
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import { FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 
-export interface MyItem {
-	id: number;
+export interface MyItem {	
+	queryItemType: ItemType;
 	title: string;
+}
+
+export interface ItemParams {
+	showType: boolean;
+	formArray: FormArray;
+	formArrayIndex: number;
 }
 
 enum FormFields {
@@ -35,11 +42,13 @@ enum FormFields {
   styleUrls: ['./create-query.component.scss']
 })
 export class CreateQueryComponent implements OnInit {
-  private readonly availableInit: MyItem[] = [{id: 1, title: 'Query'}, {id: 2, title: 'And Term'}, {id: 3, title: 'And Not Term'}, 
-     {id: 4, title: 'Or Term'}, {id: 5, title: 'Or Not Term'}];
+  private readonly availableInit: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}, 
+     {queryItemType: ItemType.TermStart, title: 'And Term'}, {queryItemType: ItemType.TermEnd, title: 'And Not Term'}];
+  protected readonly availableItemParams = {showType: true, formArray: null, formArrayIndex: -1 } as ItemParams;
+  protected readonly queryItemParams = {showType: false, formArray: {}, formArrayIndex: 0 } as ItemParams;
   protected queryForm: FormGroup; 
   protected availableItems: MyItem[] = [];
-  protected queryItems: MyItem[] = [{id: 1, title: 'Query'}];
+  protected queryItems: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}];
   protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
@@ -63,6 +72,7 @@ export class CreateQueryComponent implements OnInit {
 			as AbstractControlOptions
 			*/
 			);
+			this.queryItemParams.formArray = this.queryForm.controls[FormFields.QueryItems] as FormArray;
 	}
 
   ngOnInit(): void {
