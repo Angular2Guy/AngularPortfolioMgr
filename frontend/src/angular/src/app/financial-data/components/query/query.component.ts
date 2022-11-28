@@ -15,6 +15,7 @@ import {FinancialsDataUtils, ItemType} from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 
 enum FormFields {
+	TermOperator = 'termOperator',
 	ConceptOperator = 'conceptOperator',
 	Concept = 'concept',
 	NumberOperator = 'numberOperator',

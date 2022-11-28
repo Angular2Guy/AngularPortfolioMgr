@@ -1,29 +1,41 @@
 <div class="query-item base-query">
-	<div>
-		<mat-form-field class="string-operator"> <mat-label
-			i18n="@@operator">Operator</mat-label> <mat-select
-			[formControlName]="FormFields.ConceptOperator" name="ConceptOperator">
-		<mat-option *ngFor="let item of stringQueryItems" [value]="item">{{item}}</mat-option>
-		</mat-select> </mat-form-field>
-		<mat-form-field class="form-field"> <mat-label
-			i18n="@@createQueryQueryItemConcept">Concept</mat-label> <input
-			matInput type="text" [matAutocomplete]="autoConcept"
-			formControlName="{{FormFields.Concept}}" i18n-placeholder
-			placeholder="concept"> <mat-autocomplete
-			#autoConcept="matAutocomplete" autoActiveFirstOption> <mat-option
-			*ngFor="let concept of concepts" [value]="concept"
-			class="symbol-text"> {{ concept }} </mat-option> </mat-autocomplete> </mat-form-field>
-	</div>
-	<div>
-		<mat-form-field class="number-operator"> 
-		  <mat-label
-			i18n="@@operator">Operator</mat-label> <mat-select
-			[formControlName]="FormFields.NumberOperator" name="NumberOperator">
-		<mat-option *ngFor="let item of numberQueryItems" [value]="item">{{item}}</mat-option>
-		</mat-select> </mat-form-field>
-		<mat-form-field class="formfield"> <mat-label
-			i18n="@@value">Value</mat-label> <input matInput type="text"
-			formControlName="{{FormFields.NumberValue}}" class="number-value">
-		</mat-form-field>
-	</div>
+    <div>
+				<mat-form-field class="term-operator"> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				   </mat-select>
+				</mat-form-field>
+			</div>
+			<div>
+				<mat-form-field class="string-operator"> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.ConceptOperator" name="ConceptOperator" class="operator">
+				      <mat-option *ngFor="let item of stringQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				   </mat-select>
+				</mat-form-field>
+				<mat-form-field class="form-field">
+				<mat-label i18n="@@createQueryQueryItemConcept">Concept</mat-label> 
+						<input matInput type="text" [matAutocomplete]="autoConcept" formControlName="{{FormFields.Concept}}"
+							i18n-placeholder placeholder="concept">
+						<mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption>
+      						<mat-option *ngFor="let concept of concepts" [value]="concept" 
+      						    class="symbol-text">
+        						{{ concept }}
+      						</mat-option>
+    					</mat-autocomplete> 
+				</mat-form-field>
+				</div>
+				<div>
+				<mat-form-field class="number-operator"> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.NumberOperator" name="NumberOperator" class="operator">
+				      <mat-option *ngFor="let item of numberQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				   </mat-select>
+				</mat-form-field>
+				<mat-form-field class="form-field">
+				<mat-label i18n="@@value">Value</mat-label>  
+				   <input matInput type="text" formControlName="{{FormFields.NumberValue}}" class="number-value">
+				</mat-form-field>
+				</div>
 </div>
