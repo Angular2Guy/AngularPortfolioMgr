@@ -33,7 +33,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   public formArrayIndex: number;
   @Input()
-  public itemType: ItemType; 
+  public queryItemType: ItemType; 
   protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
@@ -41,7 +41,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   protected concepts: string[] = [];
   protected FormFields = FormFields;
   protected itemFormGroup: FormGroup;
-  
+  protected ItemType = ItemType;
 	
   constructor(private fb: FormBuilder) { 
 			this.itemFormGroup = fb.group({

@@ -1,5 +1,5 @@
 <div class="query-item base-query">
-    <div>
+    <div *ngIf="queryItemType === ItemType.Query">
 				<mat-form-field class="term-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
@@ -7,7 +7,7 @@
 				   </mat-select>
 				</mat-form-field>
 			</div>
-			<div>
+			<div *ngIf="queryItemType === ItemType.Query">
 				<mat-form-field class="string-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="FormFields.ConceptOperator" name="ConceptOperator" class="operator">
@@ -26,7 +26,7 @@
     					</mat-autocomplete> 
 				</mat-form-field>
 				</div>
-				<div>
+				<div *ngIf="queryItemType === ItemType.Query">
 				<mat-form-field class="number-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="FormFields.NumberOperator" name="NumberOperator" class="operator">
@@ -38,4 +38,28 @@
 				   <input matInput type="text" formControlName="{{FormFields.NumberValue}}" class="number-value">
 				</mat-form-field>
 				</div>
+				
+			<div *ngIf="queryItemType === ItemType.TermStart">
+				<mat-form-field class="term-operator"> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				   </mat-select>
+				</mat-form-field>
+			</div>
+			<div *ngIf="queryItemType === ItemType.TermStart">
+				<div i18n=@@queryTermStart>Term Start</div>
+			</div>
+			
+			<div *ngIf="queryItemType === ItemType.TermEnd">
+				<mat-form-field class="term-operator"> 
+				   <mat-label i18n="@@operator">Operator</mat-label> 
+				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				   </mat-select>
+				</mat-form-field>
+			</div>
+			<div *ngIf="queryItemType === ItemType.TermEnd">
+				<div i18n=@@queryTermStart>Term Start</div>
+			</div>
 </div>
