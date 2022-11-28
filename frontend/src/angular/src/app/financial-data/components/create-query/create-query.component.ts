@@ -45,7 +45,7 @@ export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}, 
      {queryItemType: ItemType.TermStart, title: 'Term Start'}, {queryItemType: ItemType.TermEnd, title: 'Term End'}];
   protected readonly availableItemParams = {showType: true, formArray: null, formArrayIndex: -1 } as ItemParams;
-  protected readonly queryItemParams = {showType: false, formArray: {}, formArrayIndex: 0 } as ItemParams;
+  protected readonly queryItemParams = {showType: false, formArray: {}, formArrayIndex: -1 } as ItemParams;
   protected queryForm: FormGroup; 
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}];

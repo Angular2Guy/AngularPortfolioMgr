@@ -1,3 +1,4 @@
+<form [formGroup]="itemFormGroup" novalidate>
 <div class="query-item base-query">
     <div *ngIf="queryItemType === ItemType.Query && showType">
     	<div i18n="@@query">Query</div>
@@ -66,3 +67,4 @@
 				<div i18n=@@queryTermEnd>Term End</div>
 			</div>
 </div>
+</form>

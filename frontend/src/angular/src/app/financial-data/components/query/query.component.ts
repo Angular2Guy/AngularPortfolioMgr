@@ -12,7 +12,7 @@
  */
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
-import { FormArray, FormGroup, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { FormArray, FormGroup, FormBuilder, AbstractControl, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 enum FormFields {
@@ -34,9 +34,8 @@ export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   public formArrayIndex: number;
   @Input()
-  public queryItemType: ItemType; 
-  @Input()
-  public showType: boolean;
+  public queryItemType: ItemType;   
+  private _showType: boolean;
   protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
   protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
   protected numberQueryItems: string[] =  ['=', '>=', '<='];
@@ -49,6 +48,7 @@ export class QueryComponent implements OnInit, OnDestroy {
 	
   constructor(private fb: FormBuilder) { 
 			this.itemFormGroup = fb.group({
+				[FormFields.TermOperator]: this.termQueryItems[0],
 				[FormFields.ConceptOperator]: this.stringQueryItems[0],
 				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
 				[FormFields.NumberOperator]: this.numberQueryItems[0],
@@ -78,5 +78,25 @@ export class QueryComponent implements OnInit, OnDestroy {
 	}
 	this.conceptSubscription.unsubscribe();
 	this.conceptSubscription = null;
+  }
+  
+  get showType(): boolean {
+	return this._showType;
+  }
+  
+  @Input()
+  set showType(showType: boolean) {
+	this._showType = showType;
+	if(!this.showType) {
+		const formIndex = this?.baseFormArray?.controls?.findIndex(myControl => myControl === this.itemFormGroup) || -1;
+		if(formIndex >= 0) {
+			this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
+		}
+	} else {
+		const formIndex = this?.baseFormArray?.controls?.findIndex(myControl => myControl === this.itemFormGroup) || -1;
+		if(formIndex >= 0) {
+			this.baseFormArray.removeAt(formIndex);
+		}
+	}
   }
 }
