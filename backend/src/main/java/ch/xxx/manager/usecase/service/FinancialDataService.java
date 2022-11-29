@@ -20,28 +20,30 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
+import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
-import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
+import ch.xxx.manager.usecase.mapping.SymbolFinancialsImportMapper;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 
 @Service
 public class FinancialDataService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataService.class);
-	private final SymbolFinancialsMapper symbolFinancialsMapper;
+	private final SymbolFinancialsImportMapper symbolFinancialsMapper;
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
 	private final FinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 	private final List<SfQuarterDto> sfQuarters = new CopyOnWriteArrayList<>();
 	
 
-	public FinancialDataService(SymbolFinancialsMapper symbolFinancialsMapper,
+	public FinancialDataService(SymbolFinancialsImportMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
 			FinancialElementRepository financialElementRepository) {
 		this.symbolFinancialsMapper = symbolFinancialsMapper;
@@ -71,6 +73,11 @@ public class FinancialDataService {
 		this.financialElementRepository.createFinancialElementTypeIndex();
 	}
 
+	@Transactional
+	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		return List.of();
+	}
+	
 	@Transactional
 	public List<FeConceptDto> findFeConcepts() {
 		if (this.feConcepts.isEmpty()) {

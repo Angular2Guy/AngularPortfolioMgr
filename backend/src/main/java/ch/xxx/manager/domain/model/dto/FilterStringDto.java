@@ -14,6 +14,8 @@ package ch.xxx.manager.domain.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import jakarta.validation.constraints.NotNull;
+
 public class FilterStringDto {
 	public static enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=*");
 		private String value;
@@ -26,7 +28,7 @@ public class FilterStringDto {
 			return this.value;
 		}
 	}
-	
+	@NotNull
 	private Operation operation;
 	private String value;
 

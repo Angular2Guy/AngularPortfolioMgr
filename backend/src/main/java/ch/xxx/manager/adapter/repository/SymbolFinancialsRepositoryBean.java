@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
+import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 
@@ -55,5 +56,10 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20))
 				.stream().filter(myDto -> myDto.getTimesFound() >= 10)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		return List.of();
 	}
 }

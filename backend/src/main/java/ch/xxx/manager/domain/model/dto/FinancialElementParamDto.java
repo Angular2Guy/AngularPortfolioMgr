@@ -14,11 +14,16 @@ package ch.xxx.manager.domain.model.dto;
 
 import ch.xxx.manager.domain.utils.DataHelper.Operation;
 import ch.xxx.manager.domain.utils.DataHelper.TermType;
+import jakarta.validation.constraints.NotNull;
 
 public class FinancialElementParamDto  {
+	@NotNull
 	private FilterStringDto conceptFilter;
+	@NotNull
 	private FilterNumberDto valueFilter;
+	@NotNull
 	private Operation operation;
+	@NotNull
 	private TermType termType;
 
 	public FilterStringDto getConceptFilter() {

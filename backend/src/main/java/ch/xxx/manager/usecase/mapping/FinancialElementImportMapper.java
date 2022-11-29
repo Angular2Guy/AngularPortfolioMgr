@@ -11,7 +11,7 @@ import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.utils.DataHelper;
 
 @Component
-public class FinancialElementMapper {
+public class FinancialElementImportMapper {
 	public FinancialElementImportDto toDto(FinancialElement financialElement) {
 		FinancialElementImportDto dto = new FinancialElementImportDto();
 		dto.setConcept(financialElement.getConcept());

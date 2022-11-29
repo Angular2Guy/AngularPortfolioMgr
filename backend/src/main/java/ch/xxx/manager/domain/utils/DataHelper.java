@@ -14,6 +14,8 @@ package ch.xxx.manager.domain.utils;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public class DataHelper {
 	public static enum TermType {Query, StartTerm, EndTerm }
 	
@@ -48,7 +50,7 @@ public class DataHelper {
 		private Quarter(String value) {
 			this.value = value;
 		}
-
+		@JsonValue
 		public String toString() {
 			return this.value;
 		}

@@ -20,12 +20,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.DataHelper.Quarter;
 
 public class SymbolFinancialsQueryParamsDto {
 	private FilterNumberDto yearFilter;
 	@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 	@JsonProperty
-	private List<DataHelper.Quarter> quarter = new LinkedList<>();
+	private List<Quarter> quarter = new LinkedList<>();
 	private String symbol;
 	private List<FinancialElementParamDto> financialElementParams = new ArrayList<>();
 	

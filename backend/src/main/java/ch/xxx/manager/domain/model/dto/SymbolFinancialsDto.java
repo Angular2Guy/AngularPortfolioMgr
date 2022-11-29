@@ -12,17 +12,54 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.xxx.manager.domain.utils.DataHelper.Quarter;
+
 public class SymbolFinancialsDto {
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private int year;
+	private Quarter quarter;
+	private String symbol;
 	private List<FinancialElementDto> financialElementDtos = new ArrayList<>();
 
 	public List<FinancialElementDto> getFinancialElementDtos() {
 		return financialElementDtos;
 	}
-
 	public void setFinancialElementDtos(List<FinancialElementDto> financialElementDtos) {
 		this.financialElementDtos = financialElementDtos;
+	}
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+	}
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
+	public int getYear() {
+		return year;
+	}
+	public void setYear(int year) {
+		this.year = year;
+	}
+	public Quarter getQuarter() {
+		return quarter;
+	}
+	public void setQuarter(Quarter quarter) {
+		this.quarter = quarter;
+	}
+	public String getSymbol() {
+		return symbol;
+	}
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 }

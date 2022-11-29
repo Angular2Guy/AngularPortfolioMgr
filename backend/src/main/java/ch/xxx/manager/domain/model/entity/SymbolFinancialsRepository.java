@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
+import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 
 public interface SymbolFinancialsRepository {
 	SymbolFinancials save(SymbolFinancials symbolfinancials);
@@ -23,4 +24,5 @@ public interface SymbolFinancialsRepository {
     Optional<SymbolFinancials> findById(Long id);
     void deleteAllBatch();
     List<SfQuarterDto> findCommonSfQuarters();
+    List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
 }

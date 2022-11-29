@@ -25,13 +25,13 @@ import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.utils.DataHelper;
 
 @Component
-public class SymbolFinancialsMapper {
-	private final FinancialElementMapper financialElementMapper;
+public class SymbolFinancialsImportMapper {
+	private final FinancialElementImportMapper financialElementMapper;
 
-	public SymbolFinancialsMapper(FinancialElementMapper financialElementMapper) {
+	public SymbolFinancialsImportMapper(FinancialElementImportMapper financialElementMapper) {
 		this.financialElementMapper = financialElementMapper;
 	}
-
+	
 	public SymbolFinancialsDto toDto(SymbolFinancials symbolFinancials) {
 		SymbolFinancialsDto dto = new SymbolFinancialsDto();
 		dto.setEndDate(symbolFinancials.getEndDate());

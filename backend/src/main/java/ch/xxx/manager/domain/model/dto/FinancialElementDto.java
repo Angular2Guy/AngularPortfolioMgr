@@ -12,6 +12,45 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-public class FinancialElementDto {
+import java.math.BigDecimal;
 
+import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.domain.utils.DataHelper.FinancialElementType;
+
+public class FinancialElementDto {
+	private String label;
+	private String concept;
+	private FinancialElementType financialElementType;
+	private CurrencyKey currency;
+	private BigDecimal value;
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public String getConcept() {
+		return concept;
+	}
+	public void setConcept(String concept) {
+		this.concept = concept;
+	}
+	public FinancialElementType getFinancialElementType() {
+		return financialElementType;
+	}
+	public void setFinancialElementType(FinancialElementType financialElementType) {
+		this.financialElementType = financialElementType;
+	}
+	public CurrencyKey getCurrency() {
+		return currency;
+	}
+	public void setCurrency(CurrencyKey currency) {
+		this.currency = currency;
+	}
+	public BigDecimal getValue() {
+		return value;
+	}
+	public void setValue(BigDecimal value) {
+		this.value = value;
+	}
 }

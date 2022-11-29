@@ -14,6 +14,8 @@ package ch.xxx.manager.domain.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import jakarta.validation.constraints.NotNull;
+
 public class FilterNumberDto {
 	public static enum Operation {SmallerEqual("<="), LargerEqual(">="), Equal("=");
 		private String value;
@@ -27,6 +29,7 @@ public class FilterNumberDto {
 		}
 	}
 	
+	@NotNull
 	private Operation operation;
 	private Long value;
 	

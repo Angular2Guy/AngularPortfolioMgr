@@ -86,8 +86,12 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
 	this.subscriptions.push(this.queryForm.controls[FormFields.Symbol].valueChanges.subscribe(myValue => 
 	   this.symbols = this.symbolsInit.filter(myConcept => myConcept.includes(myValue))));	
-	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => this.numberQueryItems = values));	
-	this.subscriptions.push(this.financialDataService.getQuarters().subscribe(values => this.quarterQueryItems = (values.map(myValue => myValue.quarter))));
+	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => {
+		this.numberQueryItems = values;
+		this.queryForm.controls[FormFields.YearOperator].patchValue(values.filter(myValue => myValue === '=')[0]);
+	}));	
+	this.subscriptions.push(this.financialDataService.getQuarters().subscribe(values => 
+	   this.quarterQueryItems = (values.map(myValue => myValue.quarter))));
   }
 
   ngOnDestroy(): void {
