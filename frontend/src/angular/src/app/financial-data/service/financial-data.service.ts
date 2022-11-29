@@ -16,10 +16,12 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ImportFinancialsData } from '../model/import-financials-data';
 import { QuarterData } from '../model/quarter-data';
+import { FeConcept } from '../model/fe-concept';
 
 @Injectable()
 export class FinancialDataService {
   private quarters: QuarterData[] = [];
+  private feConcepts:FeConcept[] = [];
 
   constructor(private http: HttpClient) { }
   
@@ -32,6 +34,14 @@ export class FinancialDataService {
 		return of(this.quarters);
 	} else {
 		return this.http.get<QuarterData[]>('/rest/financialdata/symbolfinancials/quarters/all').pipe(tap(values => this.quarters = values));
+	}
+  }
+  
+  getConcepts(): Observable<FeConcept[]> {
+	if(this.feConcepts.length > 0) {
+		return of(this.feConcepts);
+	} else {		
+	   return this.http.get<FeConcept[]>(`/rest/financialdata/financialelement/concept/all`).pipe(tap(values => this.feConcepts = values)); 	
 	}
   }
 }

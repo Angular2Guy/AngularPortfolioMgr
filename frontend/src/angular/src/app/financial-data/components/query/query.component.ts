@@ -14,7 +14,9 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControl, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { ConfigService } from 'src/app/service/config.service';
+import { FinancialDataService } from '../../service/financial-data.service';
 
 enum FormFields {
 	QueryOperator = 'queryOperator',
@@ -40,18 +42,18 @@ export class QueryComponent implements OnInit, OnDestroy {
   protected termQueryItems: string[] = [];
   protected stringQueryItems: string[] = [];
   protected numberQueryItems: string[] = [];
-  protected readonly conceptsInit: string[] = ['AAA','BBB','CCC'];   
+  protected conceptsInit: string[] = [];
   protected concepts: string[] = [];
   protected FormFields = FormFields;
   protected itemFormGroup: FormGroup;
   protected ItemType = ItemType;
   private subscriptions: Subscription[] = [];
 	
-  constructor(private fb: FormBuilder, private configService: ConfigService) { 
+  constructor(private fb: FormBuilder, private configService: ConfigService, private financialDataService: FinancialDataService) { 
 			this.itemFormGroup = fb.group({
 				[FormFields.QueryOperator]: '',
 				[FormFields.ConceptOperator]: '',
-				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
+				[FormFields.Concept]: ['', [Validators.required]],
 				[FormFields.NumberOperator]: '',
 				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}
@@ -68,19 +70,20 @@ export class QueryComponent implements OnInit, OnDestroy {
 	if(!this.showType) {
 		this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
 	}
-	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
+	this.subscriptions.push(this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
+	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.toLowerCase().includes(myValue.toLowerCase()))));
 	//make service caching work
 	if(this.formArrayIndex === 0) {
 		this.getOperators(0);	
 	} else {
 		this.getOperators(400);
 	}
-	}
+  }
   
   private getOperators(delayMillis: number): void {
 	setTimeout(() => {
-		this.subscriptions.push(this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
-	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue))));	
+		this.subscriptions.push(this.financialDataService.getConcepts()
+		   .subscribe(myValues => myValues.forEach(myValue => this.conceptsInit.push(myValue.concept))));	
 	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => {
 		this.numberQueryItems = values;
 		this.itemFormGroup.controls[FormFields.ConceptOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
@@ -92,7 +95,7 @@ export class QueryComponent implements OnInit, OnDestroy {
 	this.subscriptions.push(this.configService.getQueryOperators().subscribe(values => {
 		this.termQueryItems = values;
 		this.itemFormGroup.controls[FormFields.QueryOperator].patchValue(values.filter(myValue => 'And' === myValue)[0]);
-	}));	
+	}));		
 	}, delayMillis);	
   }
   
