@@ -12,6 +12,45 @@
  */
 export enum ItemType {Query = 'Query', TermStart = 'TermStart', TermEnd = 'TermEnd'};
 
+
+
 export class FinancialsDataUtils {
+	public static compareNumbers(valueA: number, valueB: number, operator: string): boolean {
+		let result = !!valueA && !!valueB; 
+		switch(operator.trim()) {
+			case '=': 
+			   result = valueA === valueB;
+			   break;
+			case '<=':
+			   result = valueA <= valueB;
+			   break;
+			case '>=':
+			   result = valueA >= valueB;
+			   break;
+			default:
+			   throw 'Missing number operator: ' + operator;
+		}
+		return result;
+	}
 	
+	public static compartStrings(valueA: string, valueB: string, operator: string): boolean {
+		let result = !!valueA && !!valueB;
+		switch(operator.trim()) {
+			case '=':
+			   result = valueA.trim().toLowerCase() === valueB.trim().toLocaleLowerCase();
+			   break;
+			case '*=':
+			   result = valueA.trim().toLowerCase().startsWith(valueB.trim().toLowerCase());
+			   break;
+			case '=*':
+			   result = valueA.trim().toLowerCase().endsWith(valueB.trim().toLowerCase());
+			   break;
+			case '*=*':
+			   result = valueA.trim().toLowerCase().includes(valueB.trim().toLowerCase());
+			   break;
+			default:
+			   throw 'Missing string operator: ' + operator;
+		}
+		return result;
+	}
 }

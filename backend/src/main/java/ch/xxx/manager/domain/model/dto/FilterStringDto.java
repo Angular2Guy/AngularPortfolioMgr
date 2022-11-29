@@ -15,7 +15,7 @@ package ch.xxx.manager.domain.model.dto;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class FilterStringDto {
-	public static enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=");
+	public static enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=*");
 		private String value;
 		
 		private Operation(String value) {

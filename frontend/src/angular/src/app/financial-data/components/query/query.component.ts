@@ -71,7 +71,8 @@ export class QueryComponent implements OnInit, OnDestroy {
 		this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
 	}
 	this.subscriptions.push(this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
-	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.toLowerCase().includes(myValue.toLowerCase()))));
+	   this.concepts = this.conceptsInit.filter(myConcept => 
+	      FinancialsDataUtils.compartStrings(myConcept, myValue, this.itemFormGroup.controls[FormFields.ConceptOperator].value))));
 	//make service caching work
 	if(this.formArrayIndex === 0) {
 		this.getOperators(0);	
