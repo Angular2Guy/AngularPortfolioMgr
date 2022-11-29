@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.mapping;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,19 +42,19 @@ public class SymbolFinancialsImportMapper {
 		dto.setSymbol(symbolFinancials.getSymbol());
 		dto.setYear(symbolFinancials.getYear());
 		FinancialsDataDto financialsDataDto = new FinancialsDataDto();
-		financialsDataDto.setBalanceSheet(symbolFinancials.getFinancialElements().stream()
+		financialsDataDto.setBalanceSheet(Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.BalanceSheet
 						.equals(myElment.getFinancialElementType()))
 				.map(myElement -> this.financialElementMapper.toDto(myElement))
 				.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setCashFlow(
-				symbolFinancials.getFinancialElements().stream()
+				Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.CashFlow
 						.equals(myElment.getFinancialElementType()))
 				.map(myElement -> this.financialElementMapper.toDto(myElement))
 						.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setIncome(
-				symbolFinancials.getFinancialElements().stream()
+				Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.Income
 						.equals(myElment.getFinancialElementType()))
 				.map(myElement -> this.financialElementMapper.toDto(myElement))
@@ -77,13 +78,13 @@ public class SymbolFinancialsImportMapper {
 		entity.setSymbol(symbolFinancialsDto.getSymbol());
 		entity.setYear(symbolFinancialsDto.getYear());
 		if (symbolFinancialsDto.getData() != null) {
-			Set<FinancialElement> financialElements = symbolFinancialsDto.getData().getBalanceSheet().stream()
+			Set<FinancialElement> financialElements = Optional.ofNullable(symbolFinancialsDto.getData().getBalanceSheet()).stream().flatMap(Set::stream)
 					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.BalanceSheet))
 					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet());
-			financialElements.addAll(symbolFinancialsDto.getData().getCashFlow().stream()
+			financialElements.addAll(Optional.ofNullable(symbolFinancialsDto.getData().getCashFlow()).stream().flatMap(Set::stream)
 					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.CashFlow))
 					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet()));
-			financialElements.addAll(symbolFinancialsDto.getData().getIncome().stream()
+			financialElements.addAll(Optional.ofNullable(symbolFinancialsDto.getData().getIncome()).stream().flatMap(Set::stream)
 					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.Income))
 					.map(myElement -> addSymbolFinancialsEntity(entity, myElement)).collect(Collectors.toSet()));
 			entity.getFinancialElements().addAll(financialElements);
