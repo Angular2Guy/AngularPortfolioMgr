@@ -22,6 +22,10 @@ import { tap } from 'rxjs/operators';
 export class ConfigService {
 	private profiles: string = null;
 	private importPath: string = null;
+	private stringOperators: string[] = [];
+	private numberOperators: string[] = [];
+	private queryOperators: string[] = [];
+	private termOperators: string[] = [];
 	
 	constructor(private http: HttpClient) { }
 
@@ -39,5 +43,29 @@ export class ConfigService {
 		} else {
 			return of(this.importPath);
 		}			
+    }
+    
+    getStringOperators(): Observable<string[]> {
+		if(this.stringOperators.length > 0) {
+			return of(this.stringOperators);
+		} else {
+			return this.http.get<string[]>('/rest/config/operators/string').pipe(tap(value => this.stringOperators = value));
+		}
+    }
+    
+    getNumberOperators(): Observable<string[]> {	
+		if(this.numberOperators.length > 0) {
+			return of(this.numberOperators);
+		} else {
+			return this.http.get<string[]>('/rest/config/operators/number').pipe(tap(value => this.numberOperators = value));
+		}
+    }
+    
+    getQueryOperators(): Observable<string[]> {
+		if(this.queryOperators.length > 0) {
+			return of(this.queryOperators);
+		} else {
+			return this.http.get<string[]>('/rest/config/operators/query').pipe(tap(value => this.queryOperators = value));
+		}
     }
 }

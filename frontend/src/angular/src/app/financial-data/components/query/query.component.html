@@ -6,7 +6,7 @@
     <div *ngIf="queryItemType === ItemType.Query && !showType">
 				<mat-form-field class="term-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
-				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				   <mat-select [formControlName]="FormFields.QueryOperator" name="QueryOperator" class="operator">
 				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>
@@ -46,7 +46,7 @@
 			<div *ngIf="queryItemType === ItemType.TermStart && !showType">
 				<mat-form-field class="term-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
-				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				   <mat-select [formControlName]="FormFields.QueryOperator" name="TermOperator" class="operator">
 				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>
@@ -58,7 +58,7 @@
 			<div *ngIf="queryItemType === ItemType.TermEnd && !showType">
 				<mat-form-field class="term-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
-				   <mat-select [formControlName]="FormFields.TermOperator" name="TermOperator" class="operator">
+				   <mat-select [formControlName]="FormFields.QueryOperator" name="TermOperator" class="operator">
 				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
 				   </mat-select>
 				</mat-form-field>

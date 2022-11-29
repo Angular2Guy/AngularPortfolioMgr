@@ -10,8 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-export enum ItemType {Query = 'Query', TermStart = 'TermStart', TermEnd = 'TermEnd'};
-
-export class FinancialsDataUtils {
-	
+export interface QuarterData {
+	quarter: string;
+	timesFound: number;
 }

@@ -12,15 +12,26 @@
  */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ImportFinancialsData } from '../model/import-financials-data';
+import { QuarterData } from '../model/quarter-data';
 
 @Injectable()
 export class FinancialDataService {
+  private quarters: QuarterData[] = [];
 
   constructor(private http: HttpClient) { }
   
   putImportFinancialsData(importFinancialsData: ImportFinancialsData): Observable<string> {	
 	return this.http.put<string>('/rest/financialdata/importus/data', importFinancialsData, {responseType: 'json'});
+  }
+  
+  getQuarters(): Observable<QuarterData[]> {
+	if(this.quarters.length > 0) {
+		return of(this.quarters);
+	} else {
+		return this.http.get<QuarterData[]>('/rest/financialdata/symbolfinancials/quarters/all').pipe(tap(values => this.quarters = values));
+	}
   }
 }

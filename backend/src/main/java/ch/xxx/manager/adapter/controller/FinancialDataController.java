@@ -50,7 +50,7 @@ public class FinancialDataController {
 		return this.financialDataService.findFeConcepts();
 	}
 
-	@GetMapping("/symbolfinancials/quarter/all")
+	@GetMapping("/symbolfinancials/quarters/all")
 	public List<SfQuarterDto> getSfQuarters() {
 		return this.financialDataService.findSfQuarters();
 	}

@@ -10,12 +10,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { Subscription } from 'rxjs';
+import { SymbolService } from 'src/app/service/symbol.service';
+import { ConfigService } from 'src/app/service/config.service';
+import {FinancialDataService} from '../../service/financial-data.service';
 
 export interface MyItem {	
 	queryItemType: ItemType;
@@ -43,31 +46,29 @@ enum FormFields {
   templateUrl: './create-query.component.html',
   styleUrls: ['./create-query.component.scss']
 })
-export class CreateQueryComponent implements OnInit {
+export class CreateQueryComponent implements OnInit, OnDestroy {
   private readonly availableInit: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}, 
      {queryItemType: ItemType.TermStart, title: 'Term Start'}, {queryItemType: ItemType.TermEnd, title: 'Term End'}];
   private symbolSubscription: Subscription;
+  private subscriptions: Subscription[] = [];
   protected readonly availableItemParams = {showType: true, formArray: null, formArrayIndex: -1 } as ItemParams;
   protected readonly queryItemParams = {showType: false, formArray: {}, formArrayIndex: -1 } as ItemParams;
   protected queryForm: FormGroup; 
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}];
-  protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
-  protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
-  protected numberQueryItems: string[] =  ['=', '>=', '<='];
-  protected quarterQueryItems: string[] = ['FY', 'CY', 'Q1', 'Q2', 'Q3', 'Q4'];
+  protected numberQueryItems: string[] =  [];
+  protected quarterQueryItems: string[] = [];
   protected readonly symbolsInit = ['IBM', 'JNJ', 'MSFT', 'AMZN'];
   protected symbols = [];
   protected FormFields = FormFields;
 
-  constructor(private fb: FormBuilder) { 
+  constructor(private fb: FormBuilder, private symbolService: SymbolService, private configService: ConfigService, 
+     private financialDataService: FinancialDataService) { 
 			this.queryForm = fb.group({
-				[FormFields.YearOperator]: this.termQueryItems[0],
+				[FormFields.YearOperator]: '',
 				[FormFields.Year]: [0, Validators.pattern('^\\d*$')],
-				[FormFields.SymbolOperator]: this.stringQueryItems[0],
 				[FormFields.Symbol]: '',
-				[FormFields.QuarterOperator]: this.numberQueryItems[0],
-				[FormFields.Quarter]: this.quarterQueryItems[0],
+				[FormFields.Quarter]: '',
 				[FormFields.QueryItems]: fb.array([])
 			}
 			/*
@@ -83,8 +84,15 @@ export class CreateQueryComponent implements OnInit {
   ngOnInit(): void {
 	this.symbolsInit.forEach(mySymbol => this.symbols.push(mySymbol));
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
-	this.symbolSubscription = this.queryForm.controls[FormFields.Symbol].valueChanges.subscribe(myValue => 
-	   this.symbols = this.symbolsInit.filter(myConcept => myConcept.includes(myValue)));	
+	this.subscriptions.push(this.queryForm.controls[FormFields.Symbol].valueChanges.subscribe(myValue => 
+	   this.symbols = this.symbolsInit.filter(myConcept => myConcept.includes(myValue))));	
+	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => this.numberQueryItems = values));	
+	this.subscriptions.push(this.financialDataService.getQuarters().subscribe(values => this.quarterQueryItems = (values.map(myValue => myValue.quarter))));
+  }
+
+  ngOnDestroy(): void {
+	this.subscriptions.forEach(value => value.unsubscribe());
+	this.subscriptions = null;
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {

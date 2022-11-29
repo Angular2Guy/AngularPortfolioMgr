@@ -14,9 +14,10 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControl, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { ConfigService } from 'src/app/service/config.service';
 
 enum FormFields {
-	TermOperator = 'termOperator',
+	QueryOperator = 'queryOperator',
 	ConceptOperator = 'conceptOperator',
 	Concept = 'concept',
 	NumberOperator = 'numberOperator',
@@ -36,22 +37,22 @@ export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   public queryItemType: ItemType;   
   private _showType: boolean;
-  protected termQueryItems = ['And', 'AndNot', 'Or', 'OrNot'];
-  protected stringQueryItems: string[] =  ['=', '=*', '*=', '*=*'];
-  protected numberQueryItems: string[] =  ['=', '>=', '<='];
+  protected termQueryItems: string[] = [];
+  protected stringQueryItems: string[] = [];
+  protected numberQueryItems: string[] = [];
   protected readonly conceptsInit: string[] = ['AAA','BBB','CCC'];   
   protected concepts: string[] = [];
   protected FormFields = FormFields;
   protected itemFormGroup: FormGroup;
   protected ItemType = ItemType;
-  private conceptSubscription: Subscription;
+  private subscriptions: Subscription[] = [];
 	
-  constructor(private fb: FormBuilder) { 
+  constructor(private fb: FormBuilder, private configService: ConfigService) { 
 			this.itemFormGroup = fb.group({
-				[FormFields.TermOperator]: this.termQueryItems[0],
-				[FormFields.ConceptOperator]: this.stringQueryItems[0],
+				[FormFields.QueryOperator]: '',
+				[FormFields.ConceptOperator]: '',
 				[FormFields.Concept]: [this.conceptsInit[0], [Validators.required]],
-				[FormFields.NumberOperator]: this.numberQueryItems[0],
+				[FormFields.NumberOperator]: '',
 				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}
 			/*
@@ -68,16 +69,39 @@ export class QueryComponent implements OnInit, OnDestroy {
 		this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
 	}
 	this.conceptsInit.forEach(myConcept => this.concepts.push(myConcept));
-	this.conceptSubscription = this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
-	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue)));	
+	//make service caching work
+	if(this.formArrayIndex === 0) {
+		this.getOperators(0);	
+	} else {
+		this.getOperators(400);
+	}
+	}
+  
+  private getOperators(delayMillis: number): void {
+	setTimeout(() => {
+		this.subscriptions.push(this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
+	   this.concepts = this.conceptsInit.filter(myConcept => myConcept.includes(myValue))));	
+	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => {
+		this.numberQueryItems = values;
+		this.itemFormGroup.controls[FormFields.ConceptOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
+	}));
+	this.subscriptions.push(this.configService.getStringOperators().subscribe(values => {
+		this.stringQueryItems = values;
+		this.itemFormGroup.controls[FormFields.NumberOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
+	}));
+	this.subscriptions.push(this.configService.getQueryOperators().subscribe(values => {
+		this.termQueryItems = values;
+		this.itemFormGroup.controls[FormFields.QueryOperator].patchValue(values.filter(myValue => 'And' === myValue)[0]);
+	}));	
+	}, delayMillis);	
   }
   
   ngOnDestroy(): void {
 	if(!this.showType) {
 	   this.baseFormArray.removeAt(this.formArrayIndex);
 	}
-	this.conceptSubscription.unsubscribe();
-	this.conceptSubscription = null;
+	this.subscriptions.forEach(value => value.unsubscribe());	
+	this.subscriptions = null;
   }
   
   get showType(): boolean {

@@ -15,8 +15,18 @@ package ch.xxx.manager.domain.model.dto;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class FilterNumberDto {
-	public static enum Operation {SmallerEqual, LargerEqual, Equal};
-	@JsonValue
+	public static enum Operation {SmallerEqual("<="), LargerEqual(">="), Equal("=");
+		private String value;
+		
+		private Operation(String value) {
+			this.value = value;
+		}
+		@JsonValue
+		public String toString() {
+			return this.value;
+		}
+	}
+	
 	private Operation operation;
 	private Long value;
 	
