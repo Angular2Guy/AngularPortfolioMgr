@@ -10,11 +10,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
- pluginManagement {
-	repositories {
-		maven { url 'https://repo.spring.io/milestone' }
-		gradlePluginPortal()
-	}
-}
 rootProject.name = 'manager'
 include 'frontend' , 'backend'
