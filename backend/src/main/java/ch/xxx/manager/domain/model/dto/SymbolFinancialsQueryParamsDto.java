@@ -26,7 +26,7 @@ public class SymbolFinancialsQueryParamsDto {
 	private FilterNumberDto yearFilter;
 	@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 	@JsonProperty
-	private List<Quarter> quarter = new LinkedList<>();
+	private List<Quarter> quarters = new LinkedList<>();
 	private String symbol;
 	private List<FinancialElementParamDto> financialElementParams = new ArrayList<>();
 	
@@ -36,11 +36,11 @@ public class SymbolFinancialsQueryParamsDto {
 	public void setYearFilter(FilterNumberDto yearFilter) {
 		this.yearFilter = yearFilter;
 	}
-	public List<DataHelper.Quarter> getQuarter() {
-		return quarter;
+	public List<DataHelper.Quarter> getQuarters() {
+		return quarters;
 	}
-	public void setQuarter(List<DataHelper.Quarter> quarter) {
-		this.quarter = quarter;
+	public void setQuarters(List<DataHelper.Quarter> quarter) {
+		this.quarters = quarter;
 	}
 	public String getSymbol() {
 		return symbol;

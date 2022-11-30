@@ -23,6 +23,7 @@ public class FinancialElementDto {
 	private FinancialElementType financialElementType;
 	private CurrencyKey currency;
 	private BigDecimal value;
+	
 	public String getLabel() {
 		return label;
 	}

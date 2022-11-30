@@ -17,6 +17,8 @@ import { tap } from 'rxjs/operators';
 import { ImportFinancialsData } from '../model/import-financials-data';
 import { QuarterData } from '../model/quarter-data';
 import { FeConcept } from '../model/fe-concept';
+import { SymbolFinancialsQueryParams } from '../model/symbol-financials-query-params';
+import { SymbolFinancials } from '../model/symbol-financials';
 
 @Injectable()
 export class FinancialDataService {
@@ -43,5 +45,9 @@ export class FinancialDataService {
 	} else {		
 	   return this.http.get<FeConcept[]>(`/rest/financialdata/financialelement/concept/all`).pipe(tap(values => this.feConcepts = values)); 	
 	}
+  }
+  
+  postSymbolFinancialsParam(symbolFinancialsQueryParams: SymbolFinancialsQueryParams): Observable<SymbolFinancials[]> {
+	return this.http.post<SymbolFinancials[]>('/rest/financialdata/search/params', symbolFinancialsQueryParams);
   }
 }

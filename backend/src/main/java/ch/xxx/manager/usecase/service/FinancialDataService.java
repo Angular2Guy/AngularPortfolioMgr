@@ -75,7 +75,7 @@ public class FinancialDataService {
 
 	@Transactional
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		return List.of();
+		return this.symbolFinancialsRepository.findSymbolFinancials(symbolFinancialsQueryParams);
 	}
 	
 	@Transactional

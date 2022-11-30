@@ -60,6 +60,6 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		return List.of();
+		return this.jpaSymbolFinancialsRepository.findBySymbol(symbolFinancialsQueryParams.getSymbol());
 	}
 }

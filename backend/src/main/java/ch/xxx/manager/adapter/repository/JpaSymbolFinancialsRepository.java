@@ -24,4 +24,5 @@ import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.SfQuarterDto(sf.quarter, count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.quarter order by quarter_count desc")	
 	List<SfQuarterDto> findCommonSfQuarters(Pageable pageable);
+	List<SymbolFinancials> findBySymbol(String symbol);
 }

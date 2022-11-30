@@ -24,13 +24,13 @@ public class SymbolFinancialsDto {
 	private int year;
 	private Quarter quarter;
 	private String symbol;
-	private List<FinancialElementDto> financialElementDtos = new ArrayList<>();
+	private List<FinancialElementDto> financialElements = new ArrayList<>();
 
-	public List<FinancialElementDto> getFinancialElementDtos() {
-		return financialElementDtos;
+	public List<FinancialElementDto> getFinancialElements() {
+		return financialElements;
 	}
-	public void setFinancialElementDtos(List<FinancialElementDto> financialElementDtos) {
-		this.financialElementDtos = financialElementDtos;
+	public void setFinancialElements(List<FinancialElementDto> financialElements) {
+		this.financialElements = financialElements;
 	}
 	public LocalDate getStartDate() {
 		return startDate;
