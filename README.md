@@ -6,6 +6,7 @@ Author: Sven Loesekann
 Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka
 
 ## Articles
+* [Spring Boot 3 update experience](https://angular2guy.wordpress.com/2022/11/15/spring-boot-3-update-experience/)
 * [Spring Kafka errorhandling](https://angular2guy.wordpress.com/2022/11/11/spring-kafka-error-handling/)
 * [Switching on features by Spring Profile in an Angular/Spring Boot application](https://angular2guy.wordpress.com/2021/10/13/switching-on-features-by-spring-profile-in-an-angular-spring-boot-application/)
 * [Angular JWT Autorefresh With Spring Boot](https://angular2guy.wordpress.com/2021/07/31/angular-jwt-autorefresh-with-spring-boot/)
