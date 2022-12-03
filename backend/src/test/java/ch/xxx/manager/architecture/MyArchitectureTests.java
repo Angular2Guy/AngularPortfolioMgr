@@ -19,6 +19,7 @@ import static com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo
 import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -33,7 +34,9 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaField;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.importer.ImportOption.DoNotIncludeTests;
+import com.tngtech.archunit.core.importer.Location;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
@@ -45,12 +48,15 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import ch.xxx.manager.adapter.file.FileClientTest;
+import ch.xxx.manager.architecture.MyArchitectureTests.DoNotIncludeAotGenerated;
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
-@AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class })
+@AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class, DoNotIncludeAotGenerated.class })
 public class MyArchitectureTests {
-	private JavaClasses importedClasses = new ClassFileImporter().importPackages("ch.xxx.manager");
+	private JavaClasses importedClasses = new ClassFileImporter()
+			.withImportOptions(List.of(new DoNotIncludeTests(), new DoNotIncludeAotGenerated()))
+			.importPackages("ch.xxx.manager");
 
 	@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
@@ -153,5 +159,17 @@ public class MyArchitectureTests {
 				.should(annotatedWithSpringAutowired.or(annotatedWithGuiceInject).or(annotatedWithJakartaInject)
 						.as("be annotated with an injection annotation"));
 		return beAnnotatedWithAnInjectionAnnotation;
+	}
+	
+	static final class DoNotIncludeAotGenerated implements ImportOption {
+		private static final Pattern AOT_GENERATED_PATTERN = Pattern
+				.compile(".*(__BeanDefinitions|SpringCGLIB\\$\\$0)\\.class$");
+		private static final Pattern AOT_TEST_GENERATED_PATTERN = Pattern
+				.compile(".*__TestContext.*\\.class$");
+
+		@Override
+		public boolean includes(Location location) {
+			return !(location.matches(AOT_GENERATED_PATTERN) || location.matches(AOT_TEST_GENERATED_PATTERN));
+		}
 	}
 }
