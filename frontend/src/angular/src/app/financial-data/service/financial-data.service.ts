@@ -47,7 +47,7 @@ export class FinancialDataService {
 	}
   }
   
-  postSymbolFinancialsParam(symbolFinancialsQueryParams: SymbolFinancialsQueryParams): Observable<SymbolFinancials[]> {
+  postSymbolFinancialsParam(symbolFinancialsQueryParams: SymbolFinancialsQueryParams): Observable<SymbolFinancials[]> {		
 	return this.http.post<SymbolFinancials[]>('/rest/financialdata/search/params', symbolFinancialsQueryParams);
   }
 }

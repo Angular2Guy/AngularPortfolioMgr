@@ -15,7 +15,9 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag
 import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
-import { Subscription } from 'rxjs';
+import { SymbolFinancials } from '../../model/symbol-financials';
+import { SymbolFinancialsQueryParams, FinancialElementParams, FilterNumber, FilterString } from '../../model/symbol-financials-query-params';
+import { Subscription, Observable } from 'rxjs';
 import { SymbolService } from 'src/app/service/symbol.service';
 import { ConfigService } from 'src/app/service/config.service';
 import {FinancialDataService} from '../../service/financial-data.service';
@@ -115,6 +117,19 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
       }
       this.availableInit.forEach(myItem => this.availableItems.push(myItem));
     }
+  }
+  
+  public search(): void {
+	const symbolFinancials = {
+		yearFilter: {
+			operation: this.queryForm.controls[FormFields.YearOperator].value,
+			value: !this.queryForm.controls[FormFields.Year].value ? 0 : parseInt(this.queryForm.controls[FormFields.Year].value)
+		} as FilterNumber,
+		quarters: [] as string[],
+		symbol: this.queryForm.controls[FormFields.Symbol].value,
+		financialElementParams: [] as FinancialElementParams[]
+	} as SymbolFinancialsQueryParams;
+	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
   }
   
   private validate(): void {
