@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import ch.xxx.manager.domain.model.dto.FilterNumberDto.Operation;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
@@ -34,7 +35,8 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
 	private final EntityManager entityManager;
 
-	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository, EntityManager entityManager) {
+	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
+			EntityManager entityManager) {
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
 		this.entityManager = entityManager;
 	}
@@ -60,18 +62,38 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	}
 
 	public List<SfQuarterDto> findCommonSfQuarters() {
-		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20))
-				.stream().filter(myDto -> myDto.getTimesFound() >= 10)
-				.collect(Collectors.toList());
+		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20)).stream()
+				.filter(myDto -> myDto.getTimesFound() >= 10).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder().createQuery(SymbolFinancials.class);
+		CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder()
+				.createQuery(SymbolFinancials.class);
 		Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 		List<Predicate> predicates = new ArrayList<>();
-		if(symbolFinancialsQueryParams.getSymbol() != null || !symbolFinancialsQueryParams.getSymbol().isBlank()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("symbol"), symbolFinancialsQueryParams.getSymbol().trim()));
+		if (symbolFinancialsQueryParams.getSymbol() != null || !symbolFinancialsQueryParams.getSymbol().isBlank()) {
+			predicates.add(this.entityManager.getCriteriaBuilder().equal(
+					this.entityManager.getCriteriaBuilder().lower(root.get("symbol")),
+					symbolFinancialsQueryParams.getSymbol().trim().toLowerCase()));
+		}
+		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
+			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get("quarter"))
+					.value(symbolFinancialsQueryParams.getQuarters()));
+		}
+		if (symbolFinancialsQueryParams.getYearFilter() != null
+				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
+				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
+			if (Operation.SmallerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
+				this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("year"),
+						symbolFinancialsQueryParams.getYearFilter().getValue());
+			} else if (Operation.LargerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
+				this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("year"),
+						symbolFinancialsQueryParams.getYearFilter().getValue());
+			} else if(Operation.Equal.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
+				this.entityManager.getCriteriaBuilder().equal(root.get("year"),
+						symbolFinancialsQueryParams.getYearFilter().getValue());
+			}
 		}
 		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		return this.entityManager.createQuery(createQuery).setMaxResults(200).getResultList();

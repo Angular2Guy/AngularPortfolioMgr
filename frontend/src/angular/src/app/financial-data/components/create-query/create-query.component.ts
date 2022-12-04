@@ -119,13 +119,13 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     }
   }
   
-  public search(): void {
+  public search(): void {	
 	const symbolFinancials = {
 		yearFilter: {
 			operation: this.queryForm.controls[FormFields.YearOperator].value,
 			value: !this.queryForm.controls[FormFields.Year].value ? 0 : parseInt(this.queryForm.controls[FormFields.Year].value)
 		} as FilterNumber,
-		quarters: [] as string[],
+		quarters: this.queryForm.controls[FormFields.Quarter].value,
 		symbol: this.queryForm.controls[FormFields.Symbol].value,
 		financialElementParams: [] as FinancialElementParams[]
 	} as SymbolFinancialsQueryParams;
