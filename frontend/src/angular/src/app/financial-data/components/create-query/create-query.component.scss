@@ -5,6 +5,12 @@
   margin: 5px;
 }
 
+.search-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .base-query {	
   width: 100%;
   border: solid 1px #ccc !important;

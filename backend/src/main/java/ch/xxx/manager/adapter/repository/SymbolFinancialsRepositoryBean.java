@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,13 +24,19 @@ import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Repository
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
+	private final EntityManager entityManager;
 
-	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository) {
+	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository, EntityManager entityManager) {
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
+		this.entityManager = entityManager;
 	}
 
 	@Override
@@ -60,6 +67,13 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		return this.jpaSymbolFinancialsRepository.findBySymbol(symbolFinancialsQueryParams.getSymbol());
+		CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder().createQuery(SymbolFinancials.class);
+		Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
+		List<Predicate> predicates = new ArrayList<>();
+		if(symbolFinancialsQueryParams.getSymbol() != null || !symbolFinancialsQueryParams.getSymbol().isBlank()) {
+			predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("symbol"), symbolFinancialsQueryParams.getSymbol().trim()));
+		}
+		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
+		return this.entityManager.createQuery(createQuery).setMaxResults(200).getResultList();
 	}
 }
