@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ch.xxx.manager.domain.utils.DataHelper;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,9 +27,8 @@ import jakarta.validation.constraints.Size;
 @Entity
 public class SymbolFinancials extends EntityBase {
 	private LocalDate startDate;
-	private LocalDate endDate;
-	@Column(name="`year`")
-	private int year;
+	private LocalDate endDate;	
+	private int fiscalYear;
 	@Enumerated(EnumType.STRING)
 	private DataHelper.Quarter quarter;
 	@NotBlank
@@ -51,12 +49,6 @@ public class SymbolFinancials extends EntityBase {
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
-	public int getYear() {
-		return year;
-	}
-	public void setYear(int year) {
-		this.year = year;
-	}
 	public DataHelper.Quarter getQuarter() {
 		return quarter;
 	}
@@ -74,5 +66,11 @@ public class SymbolFinancials extends EntityBase {
 	}
 	public void setFinancialElements(Set<FinancialElement> financialElements) {
 		this.financialElements = financialElements;
+	}
+	public int getFiscalYear() {
+		return fiscalYear;
+	}
+	public void setFiscalYear(int fiscalYear) {
+		this.fiscalYear = fiscalYear;
 	}
 }

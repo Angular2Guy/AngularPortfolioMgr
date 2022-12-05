@@ -40,7 +40,7 @@ public class SymbolFinancialsImportMapper {
 		dto.setQuarter(symbolFinancials.getQuarter());
 		dto.setStartDate(symbolFinancials.getStartDate());
 		dto.setSymbol(symbolFinancials.getSymbol());
-		dto.setYear(symbolFinancials.getYear());
+		dto.setYear(symbolFinancials.getFiscalYear());
 		FinancialsDataDto financialsDataDto = new FinancialsDataDto();
 		financialsDataDto.setBalanceSheet(Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.BalanceSheet
@@ -76,7 +76,7 @@ public class SymbolFinancialsImportMapper {
 		entity.setQuarter(symbolFinancialsDto.getQuarter());
 		entity.setStartDate(symbolFinancialsDto.getStartDate());
 		entity.setSymbol(symbolFinancialsDto.getSymbol());
-		entity.setYear(symbolFinancialsDto.getYear());
+		entity.setFiscalYear(symbolFinancialsDto.getYear());
 		if (symbolFinancialsDto.getData() != null) {
 			Set<FinancialElement> financialElements = Optional.ofNullable(symbolFinancialsDto.getData().getBalanceSheet()).stream().flatMap(Set::stream)
 					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.BalanceSheet))

@@ -85,14 +85,14 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
 			if (Operation.SmallerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
-				this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("year"),
-						symbolFinancialsQueryParams.getYearFilter().getValue());
+				predicates.add(this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("fiscalYear"),
+						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			} else if (Operation.LargerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
-				this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("year"),
-						symbolFinancialsQueryParams.getYearFilter().getValue());
+				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("fiscalYear"),
+						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			} else if(Operation.Equal.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
-				this.entityManager.getCriteriaBuilder().equal(root.get("year"),
-						symbolFinancialsQueryParams.getYearFilter().getValue());
+				predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("fiscalYear"),
+						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
 		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);

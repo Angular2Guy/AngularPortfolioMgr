@@ -155,4 +155,27 @@
 			<column name="financial_element_type" />
 		</createIndex>
 	</changeSet>
+	<changeSet id="31" author="angular2guy">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="symbol_financials"
+				indexName="ix_symbol_financials_year" />
+		</preConditions>
+		<dropIndex indexName="ix_symbol_financials_year"
+			tableName="symbol_financials"/>
+	</changeSet>
+	<changeSet id="32" author="angular2guy">
+		<renameColumn oldColumnName="year" newColumnName="fiscal_year" tableName="symbol_financials"/>		
+	</changeSet>
+	<changeSet author="angular2guy" id="33">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_fiscal_year" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_fiscal_year"
+			tableName="symbol_financials">
+			<column name="fiscal_year" />
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>
