@@ -15,13 +15,15 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 * [Configurable Services in the NgxSimpleCharts library](https://angular2guy.wordpress.com/2022/09/13/configurable-services-in-the-ngx-simple-charts-library/)
 
 ## What is the goal?
-The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle. Apache Kafka can be used for Jwt token revokation. 
+The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle. Apache Kafka can be used for scalable Jwt token revokation. 
 
 ## Current state of the project
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
 * The Gradle build is done. 
-* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation.
+* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation. The error handling for problems with Kafka events is implemented with transaction rollback.
 * The Angular fronted displays different D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
+* The import for the Kaggle SEC Filings dataset is implemented. 
+* The UI for the search in the SEC Filing uses Drag and Drop.
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
