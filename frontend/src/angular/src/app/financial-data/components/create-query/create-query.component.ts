@@ -21,6 +21,7 @@ import { Subscription, Observable } from 'rxjs';
 import { SymbolService } from 'src/app/service/symbol.service';
 import { ConfigService } from 'src/app/service/config.service';
 import {FinancialDataService} from '../../service/financial-data.service';
+import {QueryFormFields} from '../query/query.component';
 
 export interface MyItem {	
 	queryItemType: ItemType;
@@ -127,7 +128,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		} as FilterNumber,
 		quarters: this.queryForm.controls[FormFields.Quarter].value,
 		symbol: this.queryForm.controls[FormFields.Symbol].value,
-		financialElementParams: [] as FinancialElementParams[]
+		financialElementParams: this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup))
 	} as SymbolFinancialsQueryParams;
 	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
   }
@@ -137,15 +138,15 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		console.log(value);
 		return {
 			conceptFilter: {
-				operation: '',
-				value: ''
+				operation: value.controls[QueryFormFields.ConceptOperator].value,
+				value: value.controls[QueryFormFields.Concept].value
 			},
 			valueFilter: {
-				operation: '',
-				value: 0	
+				operation: value.controls[QueryFormFields.NumberOperator].value,
+				value: value.controls[QueryFormFields.NumberValue].value	
 			},
-			operation: '',
-			termType: ''
+			operation: value.controls[QueryFormFields.QueryOperator].value,
+			termType: value.controls[QueryFormFields.ItemType].value
 		} as FinancialElementParams;
 	});
   }
