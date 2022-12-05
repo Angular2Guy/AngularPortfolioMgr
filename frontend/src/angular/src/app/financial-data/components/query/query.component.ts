@@ -18,7 +18,7 @@ import { switchMap } from 'rxjs/operators';
 import { ConfigService } from 'src/app/service/config.service';
 import { FinancialDataService } from '../../service/financial-data.service';
 
-enum FormFields {
+export enum QueryFormFields {
 	QueryOperator = 'queryOperator',
 	ConceptOperator = 'conceptOperator',
 	Concept = 'concept',
@@ -44,18 +44,18 @@ export class QueryComponent implements OnInit, OnDestroy {
   protected numberQueryItems: string[] = [];
   protected conceptsInit: string[] = [];
   protected concepts: string[] = [];
-  protected FormFields = FormFields;
+  protected QueryFormFields = QueryFormFields;
   protected itemFormGroup: FormGroup;
   protected ItemType = ItemType;
   private subscriptions: Subscription[] = [];
 	
   constructor(private fb: FormBuilder, private configService: ConfigService, private financialDataService: FinancialDataService) { 
 			this.itemFormGroup = fb.group({
-				[FormFields.QueryOperator]: '',
-				[FormFields.ConceptOperator]: '',
-				[FormFields.Concept]: ['', [Validators.required]],
-				[FormFields.NumberOperator]: '',
-				[FormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
+				[QueryFormFields.QueryOperator]: '',
+				[QueryFormFields.ConceptOperator]: '',
+				[QueryFormFields.Concept]: ['', [Validators.required]],
+				[QueryFormFields.NumberOperator]: '',
+				[QueryFormFields.NumberValue]: [0, [Validators.required, Validators.pattern('^[+-]?(\\d+[\\,\\.])*\\d+$')]]
 			}
 			/*
 			, {
@@ -70,9 +70,9 @@ export class QueryComponent implements OnInit, OnDestroy {
 	if(!this.showType) {
 		this.baseFormArray.insert(this.formArrayIndex ,this.itemFormGroup);
 	}
-	this.subscriptions.push(this.itemFormGroup.controls[FormFields.Concept].valueChanges.subscribe(myValue => 
+	this.subscriptions.push(this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges.subscribe(myValue => 
 	   this.concepts = this.conceptsInit.filter(myConcept => 
-	      FinancialsDataUtils.compartStrings(myConcept, myValue, this.itemFormGroup.controls[FormFields.ConceptOperator].value))));
+	      FinancialsDataUtils.compareStrings(myConcept, myValue, this.itemFormGroup.controls[QueryFormFields.ConceptOperator].value))));
 	//make service caching work
 	if(this.formArrayIndex === 0) {
 		this.getOperators(0);	
@@ -87,15 +87,15 @@ export class QueryComponent implements OnInit, OnDestroy {
 		   .subscribe(myValues => myValues.forEach(myValue => this.conceptsInit.push(myValue.concept))));	
 	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => {
 		this.numberQueryItems = values;
-		this.itemFormGroup.controls[FormFields.ConceptOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
+		this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
 	}));
 	this.subscriptions.push(this.configService.getStringOperators().subscribe(values => {
 		this.stringQueryItems = values;
-		this.itemFormGroup.controls[FormFields.NumberOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
+		this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
 	}));
 	this.subscriptions.push(this.configService.getQueryOperators().subscribe(values => {
 		this.termQueryItems = values;
-		this.itemFormGroup.controls[FormFields.QueryOperator].patchValue(values.filter(myValue => 'And' === myValue)[0]);
+		this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(values.filter(myValue => 'And' === myValue)[0]);
 	}));		
 	}, delayMillis);	
   }

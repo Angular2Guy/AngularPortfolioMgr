@@ -33,7 +33,7 @@ export class FinancialsDataUtils {
 		return result;
 	}
 	
-	public static compartStrings(valueA: string, valueB: string, operator: string): boolean {
+	public static compareStrings(valueA: string, valueB: string, operator: string): boolean {
 		let result = !!valueA && !!valueB;
 		switch(operator.trim()) {
 			case '=':
