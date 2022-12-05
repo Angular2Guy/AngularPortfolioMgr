@@ -28,6 +28,7 @@ import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
+import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
@@ -119,17 +120,21 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
 		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
 				&& myDto.getValueFilter().getValue() != null) {
-			Path<BigDecimal> joinPath = root.join(
-					symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class)).get("value");							
+
+			Path<BigDecimal> joinPath = root
+					.join(symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class)).get("value");
 			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
-				predicates.add(this.entityManager.getCriteriaBuilder()
-						.equal(joinPath, myDto.getValueFilter().getValue()));
-			} else if(myDto.getValueFilter().getOperation().equals(Operation.SmallerEqual)) {
-				predicates.add(this.entityManager.getCriteriaBuilder()
-						.lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
-			} else if(myDto.getValueFilter().getOperation().equals(Operation.LargerEqual)) {
-				predicates.add(this.entityManager.getCriteriaBuilder()
-						.greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
+				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(joinPath,
+						myDto.getValueFilter().getValue());
+				predicates.add(this.financialElementOperatorClause(myDto, equalPredicate));
+			} else if (myDto.getValueFilter().getOperation().equals(Operation.SmallerEqual)) {
+				Predicate lessThanOrEqualToPredicate = this.entityManager.getCriteriaBuilder()
+						.lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
+				predicates.add(this.financialElementOperatorClause(myDto, lessThanOrEqualToPredicate));
+			} else if (myDto.getValueFilter().getOperation().equals(Operation.LargerEqual)) {
+				Predicate greaterThanOrEqualToPredicate = this.entityManager.getCriteriaBuilder()
+						.greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
+				predicates.add(this.financialElementOperatorClause(myDto, greaterThanOrEqualToPredicate));
 			}
 		}
 	}
@@ -139,8 +144,8 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
 			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder()
-					.lower(root.join(symbolFinancials_.getDeclaredList("financialElements",
-							FinancialElement.class)).get("concept"));
+					.lower(root.join(symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class))
+							.get("concept"));
 			if (!myDto.getConceptFilter().getOperation()
 					.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.Equal)) {
 				String filterStr = String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
@@ -151,14 +156,29 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.EndsWith)) {
 					String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
 				}
-				predicates.add(this.entityManager.getCriteriaBuilder().like(lowerExp,
-						filterStr));
-			} else {				
-				predicates
-						.add(this.entityManager.getCriteriaBuilder().equal(
-								lowerExp,
-								myDto.getConceptFilter().getValue().trim().toLowerCase()));
+				Predicate likePredicate = this.entityManager.getCriteriaBuilder().like(lowerExp, filterStr);
+				predicates.add(financialElementOperatorClause(myDto, likePredicate));
+			} else {
+				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(lowerExp,
+						myDto.getConceptFilter().getValue().trim().toLowerCase());
+				predicates.add(this.financialElementOperatorClause(myDto, equalPredicate));
 			}
 		}
+	}
+
+	private Predicate financialElementOperatorClause(FinancialElementParamDto myDto, Predicate likePredicate) {
+		Predicate resultPredicate = null;
+		if (myDto.getOperation().equals(DataHelper.Operation.And)) {
+			resultPredicate = this.entityManager.getCriteriaBuilder().and(likePredicate);
+		} else if (myDto.getOperation().equals(DataHelper.Operation.AndNot)) {
+			resultPredicate = this.entityManager.getCriteriaBuilder()
+					.and(this.entityManager.getCriteriaBuilder().not(likePredicate));
+		} else if (myDto.getOperation().equals(DataHelper.Operation.Or)) {
+			resultPredicate = this.entityManager.getCriteriaBuilder().or(likePredicate);
+		} else if (myDto.getOperation().equals(DataHelper.Operation.OrNot)) {
+			resultPredicate = this.entityManager.getCriteriaBuilder()
+					.or(this.entityManager.getCriteriaBuilder().not(likePredicate));
+		}
+		return resultPredicate;
 	}
 }
