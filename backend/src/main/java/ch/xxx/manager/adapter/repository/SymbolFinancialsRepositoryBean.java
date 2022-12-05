@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,14 +22,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.dto.FilterNumberDto.Operation;
+import ch.xxx.manager.domain.model.dto.FinancialElementParamDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
@@ -90,12 +97,68 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			} else if (Operation.LargerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
 				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("fiscalYear"),
 						symbolFinancialsQueryParams.getYearFilter().getValue()));
-			} else if(Operation.Equal.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
+			} else if (Operation.Equal.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
 				predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("fiscalYear"),
 						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
+		if (symbolFinancialsQueryParams.getFinancialElementParams() != null
+				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()) {
+			symbolFinancialsQueryParams.getFinancialElementParams().forEach(myDto -> {
+				Metamodel m = this.entityManager.getMetamodel();
+				EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
+				financialElementConceptClause(root, predicates, myDto, symbolFinancials_);
+				financialElementValueClause(root, predicates, myDto, symbolFinancials_);
+			});
+		}
 		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		return this.entityManager.createQuery(createQuery).setMaxResults(200).getResultList();
+	}
+
+	private void financialElementValueClause(Root<SymbolFinancials> root, List<Predicate> predicates,
+			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
+		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
+				&& myDto.getValueFilter().getValue() != null) {
+			Path<BigDecimal> joinPath = root.join(
+					symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class)).get("value");							
+			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
+				predicates.add(this.entityManager.getCriteriaBuilder()
+						.equal(joinPath, myDto.getValueFilter().getValue()));
+			} else if(myDto.getValueFilter().getOperation().equals(Operation.SmallerEqual)) {
+				predicates.add(this.entityManager.getCriteriaBuilder()
+						.lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
+			} else if(myDto.getValueFilter().getOperation().equals(Operation.LargerEqual)) {
+				predicates.add(this.entityManager.getCriteriaBuilder()
+						.greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
+			}
+		}
+	}
+
+	private void financialElementConceptClause(Root<SymbolFinancials> root, List<Predicate> predicates,
+			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
+		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
+				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
+			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder()
+					.lower(root.join(symbolFinancials_.getDeclaredList("financialElements",
+							FinancialElement.class)).get("concept"));
+			if (!myDto.getConceptFilter().getOperation()
+					.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.Equal)) {
+				String filterStr = String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
+				if (myDto.getConceptFilter().getOperation()
+						.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.StartsWith)) {
+					String.format("%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
+				} else if (myDto.getConceptFilter().getOperation()
+						.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.EndsWith)) {
+					String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
+				}
+				predicates.add(this.entityManager.getCriteriaBuilder().like(lowerExp,
+						filterStr));
+			} else {				
+				predicates
+						.add(this.entityManager.getCriteriaBuilder().equal(
+								lowerExp,
+								myDto.getConceptFilter().getValue().trim().toLowerCase()));
+			}
+		}
 	}
 }

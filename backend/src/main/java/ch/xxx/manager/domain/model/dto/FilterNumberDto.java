@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +33,7 @@ public class FilterNumberDto {
 	
 	@NotNull
 	private Operation operation;
-	private Long value;
+	private BigDecimal value;
 	
 	public Operation getOperation() {
 		return operation;
@@ -39,10 +41,10 @@ public class FilterNumberDto {
 	public void setOperation(Operation operation) {
 		this.operation = operation;
 	}
-	public Long getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
-	public void setValue(Long value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 }
