@@ -92,6 +92,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		}
 		if (symbolFinancialsQueryParams.getYearFilter() != null
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
+				&& 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
 			if (Operation.SmallerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
 				predicates.add(this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("fiscalYear"),
@@ -148,7 +149,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 				&& myDto.getValueFilter().getValue() != null) {
 
 			Path<BigDecimal> joinPath = root
-					.join(symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class)).get("value");
+					.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class)).get("value");
 			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(joinPath,
 						myDto.getValueFilter().getValue());
@@ -170,7 +171,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
 			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder()
-					.lower(root.join(symbolFinancials_.getDeclaredList("financialElements", FinancialElement.class))
+					.lower(root.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class))
 							.get("concept"));
 			if (!myDto.getConceptFilter().getOperation()
 					.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.Equal)) {

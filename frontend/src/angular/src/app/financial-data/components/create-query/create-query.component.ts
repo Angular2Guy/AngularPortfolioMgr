@@ -128,27 +128,25 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		} as FilterNumber,
 		quarters: this.queryForm.controls[FormFields.Quarter].value,
 		symbol: this.queryForm.controls[FormFields.Symbol].value,
-		financialElementParams: this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup))
+		financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]?.value?.length ? this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
 	} as SymbolFinancialsQueryParams;
 	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
   }
   
   private createFinancialElementParam(formGroup: FormGroup): FinancialElementParams {
-	return this.queryForm.controls[FormFields.QueryItems].value.map(value => {
-		console.log(value);
+		console.log(formGroup);
 		return {
 			conceptFilter: {
-				operation: value.controls[QueryFormFields.ConceptOperator].value,
-				value: value.controls[QueryFormFields.Concept].value
+				operation: formGroup[QueryFormFields.ConceptOperator],
+				value: formGroup[QueryFormFields.Concept]
 			},
 			valueFilter: {
-				operation: value.controls[QueryFormFields.NumberOperator].value,
-				value: value.controls[QueryFormFields.NumberValue].value	
+				operation: formGroup[QueryFormFields.NumberOperator],
+				value: formGroup[QueryFormFields.NumberValue]
 			},
-			operation: value.controls[QueryFormFields.QueryOperator].value,
-			termType: value.controls[QueryFormFields.ItemType].value
+			operation: formGroup[QueryFormFields.QueryOperator],
+			termType: formGroup[QueryFormFields.ItemType]
 		} as FinancialElementParams;
-	});
   }
   
   private validate(): void {
