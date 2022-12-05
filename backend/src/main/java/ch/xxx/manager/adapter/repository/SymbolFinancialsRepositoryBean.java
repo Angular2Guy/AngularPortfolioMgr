@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -80,8 +81,6 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 				.createQuery(SymbolFinancials.class);
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 		final List<Predicate> predicates = new ArrayList<>();
-		final List<Predicate> subPredicates = new ArrayList<>();
-		final DataHelper.Operation[] operationArr = new DataHelper.Operation[1];
 		if (symbolFinancialsQueryParams.getSymbol() != null || !symbolFinancialsQueryParams.getSymbol().isBlank()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().equal(
 					this.entityManager.getCriteriaBuilder().lower(root.get("symbol")),
@@ -105,32 +104,39 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
+		final LinkedBlockingQueue<List<Predicate>> subPredicates = new LinkedBlockingQueue<List<Predicate>>();
+		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<DataHelper.Operation>();
 		if (symbolFinancialsQueryParams.getFinancialElementParams() != null
 				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()) {
 			symbolFinancialsQueryParams.getFinancialElementParams().forEach(myDto -> {
 				switch (myDto.getTermType()) {
-				case StartTerm -> operationArr[0] = myDto.getOperation();
+				case StartTerm -> {
+					try {
+						operationArr.put(myDto.getOperation());
+						subPredicates.put(new ArrayList<>());
+					} catch (InterruptedException e) {
+						new RuntimeException(e);
+					}
+				}
 				case Query -> {
 					Metamodel m = this.entityManager.getMetamodel();
 					EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
-					financialElementConceptClause(root, operationArr[0] == null ? predicates : subPredicates, myDto,
-							symbolFinancials_);
-					financialElementValueClause(root, operationArr[0] == null ? predicates : subPredicates, myDto,
+					financialElementConceptClause(root, operationArr.isEmpty() ? predicates : subPredicates.peek(),
+							myDto, symbolFinancials_);
+					financialElementValueClause(root, operationArr.isEmpty() ? predicates : subPredicates.peek(), myDto,
 							symbolFinancials_);
 				}
 				case EndTerm -> {
-					predicates.add(this.financialElementOperatorClause(operationArr[0],
-							(Predicate[]) subPredicates.stream().toArray()));
-					operationArr[0] = null;
-					subPredicates.clear();
+					predicates.add(this.operatorClause(operationArr.poll(),
+							subPredicates.poll().stream().toArray(x -> new Predicate[1])));
 				}
 				}
 			});
 		}
 		// validate terms
-		if (operationArr[0] != null || subPredicates.size() > 0) {
-			throw new RuntimeException(String.format("operationArr: %s, subPredicates: %d",
-					operationArr == null ? "" : operationArr.toString(), subPredicates.size()));
+		if (!operationArr.isEmpty() || !subPredicates.isEmpty()) {
+			throw new RuntimeException(
+					String.format("operationArr: %d, subPredicates: %d", operationArr.size(), subPredicates.size()));
 		}
 		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		return this.entityManager.createQuery(createQuery).setMaxResults(200).getResultList();
@@ -146,16 +152,15 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(joinPath,
 						myDto.getValueFilter().getValue());
-				predicates.add(this.financialElementOperatorClause(myDto.getOperation(), equalPredicate));
+				predicates.add(this.operatorClause(myDto.getOperation(), equalPredicate));
 			} else if (myDto.getValueFilter().getOperation().equals(Operation.SmallerEqual)) {
 				Predicate lessThanOrEqualToPredicate = this.entityManager.getCriteriaBuilder()
 						.lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
-				predicates.add(this.financialElementOperatorClause(myDto.getOperation(), lessThanOrEqualToPredicate));
+				predicates.add(this.operatorClause(myDto.getOperation(), lessThanOrEqualToPredicate));
 			} else if (myDto.getValueFilter().getOperation().equals(Operation.LargerEqual)) {
 				Predicate greaterThanOrEqualToPredicate = this.entityManager.getCriteriaBuilder()
 						.greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
-				predicates
-						.add(this.financialElementOperatorClause(myDto.getOperation(), greaterThanOrEqualToPredicate));
+				predicates.add(this.operatorClause(myDto.getOperation(), greaterThanOrEqualToPredicate));
 			}
 		}
 	}
@@ -178,16 +183,16 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 					String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
 				}
 				Predicate likePredicate = this.entityManager.getCriteriaBuilder().like(lowerExp, filterStr);
-				predicates.add(financialElementOperatorClause(myDto.getOperation(), likePredicate));
+				predicates.add(operatorClause(myDto.getOperation(), likePredicate));
 			} else {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(lowerExp,
 						myDto.getConceptFilter().getValue().trim().toLowerCase());
-				predicates.add(this.financialElementOperatorClause(myDto.getOperation(), equalPredicate));
+				predicates.add(this.operatorClause(myDto.getOperation(), equalPredicate));
 			}
 		}
 	}
 
-	private Predicate financialElementOperatorClause(DataHelper.Operation operation, Predicate... likePredicate) {
+	private Predicate operatorClause(DataHelper.Operation operation, Predicate... likePredicate) {
 		Predicate resultPredicate = null;
 		if (operation.equals(DataHelper.Operation.And)) {
 			resultPredicate = this.entityManager.getCriteriaBuilder().and(likePredicate);
