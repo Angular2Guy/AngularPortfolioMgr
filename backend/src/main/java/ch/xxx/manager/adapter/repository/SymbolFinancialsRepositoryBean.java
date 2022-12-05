@@ -92,7 +92,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		}
 		if (symbolFinancialsQueryParams.getYearFilter() != null
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
-				&& 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
+				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
 			if (Operation.SmallerEqual.equals(symbolFinancialsQueryParams.getYearFilter().getOperation())) {
 				predicates.add(this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("fiscalYear"),
@@ -146,7 +146,9 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	private void financialElementValueClause(Root<SymbolFinancials> root, List<Predicate> predicates,
 			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
 		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
-				&& myDto.getValueFilter().getValue() != null) {
+				&& myDto.getValueFilter().getValue() != null
+				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
+						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
 
 			Path<BigDecimal> joinPath = root
 					.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class)).get("value");
