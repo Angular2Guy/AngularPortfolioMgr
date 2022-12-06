@@ -88,8 +88,8 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 				&& (symbolFinancialsQueryParams.getYearFilter() == null || symbolFinancialsQueryParams.getYearFilter().getValue() == null 
 				|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
-			Set<FinancialElement> financialElements = this.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
-			return List.of();
+			Set<FinancialElement> financialElements = this.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());			
+			return new ArrayList<>(financialElements.stream().map(FinancialElement::getSymbolFinancials).collect(Collectors.toSet()));
 		}
 		final CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder()
 				.createQuery(SymbolFinancials.class);
@@ -173,7 +173,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		final CriteriaQuery<FinancialElement> createQuery = this.entityManager.getCriteriaBuilder()
 				.createQuery(FinancialElement.class);
 		final Root<FinancialElement> root = createQuery.from(FinancialElement.class);
-		//root.fetch("symbolFinancials");
+		root.fetch("symbolFinancials");
 		final List<Predicate> predicates = new ArrayList<>();
 		this.createFinancialElementClauses(financialElementParams, root, predicates, Optional.empty());
 		if (!predicates.isEmpty()) {
