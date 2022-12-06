@@ -71,7 +71,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 				[FormFields.YearOperator]: '',
 				[FormFields.Year]: [0, Validators.pattern('^\\d*$')],
 				[FormFields.Symbol]: '',
-				[FormFields.Quarter]: '',
+				[FormFields.Quarter]: [''],
 				[FormFields.QueryItems]: fb.array([])
 			}
 			/*
@@ -126,15 +126,17 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 			operation: this.queryForm.controls[FormFields.YearOperator].value,
 			value: !this.queryForm.controls[FormFields.Year].value ? 0 : parseInt(this.queryForm.controls[FormFields.Year].value)
 		} as FilterNumber,
-		quarters: this.queryForm.controls[FormFields.Quarter].value,
+		quarters: !this.queryForm.controls[FormFields.Quarter].value ? [] : this.queryForm.controls[FormFields.Quarter].value,
 		symbol: this.queryForm.controls[FormFields.Symbol].value,
-		financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]?.value?.length ? this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
+		financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]?.value?.length ? 
+		    this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
 	} as SymbolFinancialsQueryParams;
+	console.log(symbolFinancials);
 	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
   }
   
   private createFinancialElementParam(formGroup: FormGroup): FinancialElementParams {
-		console.log(formGroup);
+		//console.log(formGroup);
 		return {
 			conceptFilter: {
 				operation: formGroup[QueryFormFields.ConceptOperator],

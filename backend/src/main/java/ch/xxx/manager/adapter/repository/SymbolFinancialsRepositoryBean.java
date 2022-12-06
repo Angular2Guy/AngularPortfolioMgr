@@ -80,8 +80,9 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		final CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder()
 				.createQuery(SymbolFinancials.class);
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
+		root.fetch("financialElements");
 		final List<Predicate> predicates = new ArrayList<>();
-		if (symbolFinancialsQueryParams.getSymbol() != null || !symbolFinancialsQueryParams.getSymbol().isBlank()) {
+		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().equal(
 					this.entityManager.getCriteriaBuilder().lower(root.get("symbol")),
 					symbolFinancialsQueryParams.getSymbol().trim().toLowerCase()));
@@ -139,8 +140,12 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			throw new RuntimeException(
 					String.format("operationArr: %d, subPredicates: %d", operationArr.size(), subPredicates.size()));
 		}
-		createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
-		return this.entityManager.createQuery(createQuery).setMaxResults(200).getResultList();
+		if (!predicates.isEmpty()) {
+			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
+		} else {
+			createQuery.distinct(true);
+		}
+		return this.entityManager.createQuery(createQuery).setMaxResults(50).getResultList();
 	}
 
 	private void financialElementValueClause(Root<SymbolFinancials> root, List<Predicate> predicates,
@@ -151,7 +156,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
 
 			Path<BigDecimal> joinPath = root
-					.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class)).get("value");
+					.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class)).get("value");			
 			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(joinPath,
 						myDto.getValueFilter().getValue());
