@@ -23,9 +23,9 @@
 						<input matInput type="text" [matAutocomplete]="autoConcept" formControlName="{{QueryFormFields.Concept}}"
 							i18n-placeholder="@@phConcept" placeholder="concept">
 						<mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption>
-      						<mat-option *ngFor="let concept of concepts" [value]="concept" 
+      						<mat-option *ngFor="let concept of concepts" [value]="concept.concept" 
       						    class="symbol-text">
-        						{{ concept }}
+        						{{ concept.concept }}
       						</mat-option>
     					</mat-autocomplete> 
 				</mat-form-field>
