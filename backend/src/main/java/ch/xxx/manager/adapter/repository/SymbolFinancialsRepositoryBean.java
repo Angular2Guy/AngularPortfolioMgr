@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.repository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -143,9 +144,9 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		} else {
-			createQuery.distinct(true);
+			return new LinkedList<>();
 		}
-		return this.entityManager.createQuery(createQuery).setMaxResults(50).getResultList();
+		return this.entityManager.createQuery(createQuery).setMaxResults(25).getResultList();
 	}
 
 	private void financialElementValueClause(Root<SymbolFinancials> root, List<Predicate> predicates,

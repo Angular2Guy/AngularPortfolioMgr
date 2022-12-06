@@ -131,7 +131,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]?.value?.length ? 
 		    this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
 	} as SymbolFinancialsQueryParams;
-	console.log(symbolFinancials);
+	//console.log(symbolFinancials);
 	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
   }
   
