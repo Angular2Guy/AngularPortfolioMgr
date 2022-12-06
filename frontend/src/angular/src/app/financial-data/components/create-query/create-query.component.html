@@ -23,8 +23,8 @@
 						<input matInput type="text" [matAutocomplete]="autoSymbol" formControlName="{{FormFields.Symbol}}"
 							i18n-placeholder="@@phSymbol" placeholder="symbol">
 						<mat-autocomplete #autoSymbol="matAutocomplete" autoActiveFirstOption>
-      						<mat-option *ngFor="let symbol of symbols" [value]="symbol">
-        						{{ symbol }}
+      						<mat-option *ngFor="let symbol of symbols" [value]="symbol.symbol">
+        						{{ symbol.symbol }}
       						</mat-option>
     					</mat-autocomplete> 
 				</mat-form-field>

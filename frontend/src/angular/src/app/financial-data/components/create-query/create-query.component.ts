@@ -18,10 +18,12 @@ import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils
 import { SymbolFinancials } from '../../model/symbol-financials';
 import { SymbolFinancialsQueryParams, FinancialElementParams, FilterNumber, FilterString } from '../../model/symbol-financials-query-params';
 import { Subscription, Observable } from 'rxjs';
+import { switchMap,debounceTime } from 'rxjs/operators';
 import { SymbolService } from 'src/app/service/symbol.service';
 import { ConfigService } from 'src/app/service/config.service';
 import {FinancialDataService} from '../../service/financial-data.service';
 import {QueryFormFields} from '../query/query.component';
+import {Symbol} from 'src/app/model/symbol';
 
 export interface MyItem {	
 	queryItemType: ItemType;
@@ -61,8 +63,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   protected queryItems: MyItem[] = [{queryItemType: ItemType.Query, title: 'Query'}];
   protected numberQueryItems: string[] =  [];
   protected quarterQueryItems: string[] = [];
-  protected readonly symbolsInit = ['IBM', 'JNJ', 'MSFT', 'AMZN'];
-  protected symbols = [];
+  protected symbols:Symbol[] = [];
   protected FormFields = FormFields;
 
   constructor(private fb: FormBuilder, private symbolService: SymbolService, private configService: ConfigService, 
@@ -85,10 +86,10 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 	}
 
   ngOnInit(): void {
-	this.symbolsInit.forEach(mySymbol => this.symbols.push(mySymbol));
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
-	this.subscriptions.push(this.queryForm.controls[FormFields.Symbol].valueChanges.subscribe(myValue => 
-	   this.symbols = this.symbolsInit.filter(myConcept => myConcept.includes(myValue))));	
+	this.subscriptions.push(this.queryForm.controls[FormFields.Symbol].valueChanges
+	   .pipe(debounceTime(200),switchMap(myValue => this.symbolService.getSymbolBySymbol(myValue)))
+	   .subscribe(myValue => this.symbols = myValue));	
 	this.subscriptions.push(this.configService.getNumberOperators().subscribe(values => {
 		this.numberQueryItems = values;
 		this.queryForm.controls[FormFields.YearOperator].patchValue(values.filter(myValue => myValue === '=')[0]);
