@@ -14,12 +14,15 @@ package ch.xxx.manager.adapter.repository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -78,10 +81,22 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		if(symbolFinancialsQueryParams.getFinancialElementParams() != null 
+				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()
+				&& (symbolFinancialsQueryParams.getSymbol() == null || symbolFinancialsQueryParams.getSymbol().isBlank())
+				&& (symbolFinancialsQueryParams.getQuarters() == null || symbolFinancialsQueryParams.getQuarters().isEmpty())
+				&& (symbolFinancialsQueryParams.getYearFilter() == null || symbolFinancialsQueryParams.getYearFilter().getValue() == null 
+				|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
+				|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
+			Set<FinancialElement> financialElements = this.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
+			return List.of();
+		}
 		final CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder()
 				.createQuery(SymbolFinancials.class);
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 		root.fetch("financialElements");
+		
+		
 		final List<Predicate> predicates = new ArrayList<>();
 		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().equal(
@@ -107,11 +122,24 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
+		Metamodel m = this.entityManager.getMetamodel();
+		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
+		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), root, predicates, Optional.of(symbolFinancials_));
+		if (!predicates.isEmpty()) {
+			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
+		} else {
+			return new LinkedList<>();
+		}
+		return this.entityManager.createQuery(createQuery).setMaxResults(25).getResultList();
+	}
+
+	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
+			final Root<T> root, final List<Predicate> predicates, final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
 		final LinkedBlockingQueue<List<Predicate>> subPredicates = new LinkedBlockingQueue<List<Predicate>>();
 		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<DataHelper.Operation>();
-		if (symbolFinancialsQueryParams.getFinancialElementParams() != null
-				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()) {
-			symbolFinancialsQueryParams.getFinancialElementParams().forEach(myDto -> {
+		if (financialElementParamDtos != null
+				&& !financialElementParamDtos.isEmpty()) {
+			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
 				case StartTerm -> {
 					try {
@@ -122,12 +150,10 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 					}
 				}
 				case Query -> {
-					Metamodel m = this.entityManager.getMetamodel();
-					EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
 					financialElementConceptClause(root, operationArr.isEmpty() ? predicates : subPredicates.peek(),
-							myDto, symbolFinancials_);
+							myDto, symbolFinancialsOpt);
 					financialElementValueClause(root, operationArr.isEmpty() ? predicates : subPredicates.peek(), myDto,
-							symbolFinancials_);
+							symbolFinancialsOpt);
 				}
 				case EndTerm -> {
 					predicates.add(this.operatorClause(operationArr.poll(),
@@ -141,23 +167,35 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			throw new RuntimeException(
 					String.format("operationArr: %d, subPredicates: %d", operationArr.size(), subPredicates.size()));
 		}
+	}
+
+	private Set<FinancialElement> findFinancialElements(List<FinancialElementParamDto> financialElementParams) {
+		final CriteriaQuery<FinancialElement> createQuery = this.entityManager.getCriteriaBuilder()
+				.createQuery(FinancialElement.class);
+		final Root<FinancialElement> root = createQuery.from(FinancialElement.class);
+		//root.fetch("symbolFinancials");
+		final List<Predicate> predicates = new ArrayList<>();
+		this.createFinancialElementClauses(financialElementParams, root, predicates, Optional.empty());
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		} else {
-			return new LinkedList<>();
+			return new HashSet<>();
 		}
-		return this.entityManager.createQuery(createQuery).setMaxResults(25).getResultList();
+		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(7000).getResultList());	
 	}
 
-	private void financialElementValueClause(Root<SymbolFinancials> root, List<Predicate> predicates,
-			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
+	private <T> void financialElementValueClause(Root<T> root, List<Predicate> predicates,
+			FinancialElementParamDto myDto, Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
 		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
 				&& myDto.getValueFilter().getValue() != null
 				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
 						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
-
-			Path<BigDecimal> joinPath = root
-					.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class)).get("value");			
+			Path<BigDecimal> joinPath =  symbolFinancialsOpt.stream().map(mySymbolFinacials -> {
+				@SuppressWarnings("unchecked")
+				Path<BigDecimal> myPath = ((Root<SymbolFinancials>) root)
+					.join(mySymbolFinacials.getDeclaredSet("financialElements", FinancialElement.class)).get("value");
+				return myPath;
+			}).findFirst().orElse(root.get("value"));
 			if (myDto.getValueFilter().getOperation().equals(Operation.Equal)) {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(joinPath,
 						myDto.getValueFilter().getValue());
@@ -174,13 +212,14 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		}
 	}
 
-	private void financialElementConceptClause(Root<SymbolFinancials> root, List<Predicate> predicates,
-			FinancialElementParamDto myDto, EntityType<SymbolFinancials> symbolFinancials_) {
+	private <T> void financialElementConceptClause(Root<T> root, List<Predicate> predicates,
+			FinancialElementParamDto myDto, Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
-				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
-			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder()
-					.lower(root.join(symbolFinancials_.getDeclaredSet("financialElements", FinancialElement.class))
-							.get("concept"));
+				&& myDto.getConceptFilter().getValue().trim().length() > 2) {			
+			@SuppressWarnings("unchecked")
+			Expression<String> lowerExp = symbolFinancialsOpt.stream().map(mySymbolFinancials -> this.entityManager.getCriteriaBuilder()
+					.lower(((Root<SymbolFinancials>) root).join(mySymbolFinancials.getDeclaredSet("financialElements", FinancialElement.class))
+							.get("concept"))).findFirst().orElse(root.get("concept"));
 			if (!myDto.getConceptFilter().getOperation()
 					.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.Equal)) {
 				String filterStr = String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
