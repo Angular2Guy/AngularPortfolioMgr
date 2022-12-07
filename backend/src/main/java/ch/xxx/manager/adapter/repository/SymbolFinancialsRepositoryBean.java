@@ -96,17 +96,14 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
 			Set<FinancialElement> financialElements = this
 					.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
-			Map<FinancialElement, SymbolFinancials> map1 = financialElements.stream().map(fe -> {
-				this.entityManager.detach(fe);
-				this.entityManager.detach(fe.getSymbolFinancials());
-				return fe;
-			}).collect(Collectors.toMap(fe -> fe, fe -> fe.getSymbolFinancials()));
 			final Map<SymbolFinancials, List<FinancialElement>> sfToFeMap = new HashMap<>();
-			map1.entrySet().forEach(myEntry -> {
-				if (!sfToFeMap.containsKey(myEntry.getValue())) {
-					sfToFeMap.put(myEntry.getValue(), new ArrayList<>());
+			financialElements.forEach(myFe -> {
+				this.entityManager.detach(myFe);
+				this.entityManager.detach(myFe.getSymbolFinancials());
+				if(!sfToFeMap.containsKey(myFe.getSymbolFinancials())) {
+					sfToFeMap.put(myFe.getSymbolFinancials(), new ArrayList<>());
 				}
-				sfToFeMap.get(myEntry.getValue()).add(myEntry.getKey());
+				sfToFeMap.get(myFe.getSymbolFinancials()).add(myFe);
 			});
 			result = sfToFeMap.entrySet().stream().map(myEntry -> {
 				myEntry.getKey().setFinancialElements(new HashSet<>(myEntry.getValue()));
@@ -154,7 +151,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		} else {
 			return new LinkedList<>();
 		}
-		return this.entityManager.createQuery(createQuery).setMaxResults(25).getResultList();
+		return this.entityManager.createQuery(createQuery).getResultStream().limit(40).collect(Collectors.toList());
 	}
 
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
@@ -205,7 +202,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		} else {
 			return new HashSet<>();
 		}
-		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(7000).getResultList());
+		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(10000).getResultList());
 	}
 
 	private <T> void financialElementValueClause(Root<T> root, List<Predicate> predicates,
