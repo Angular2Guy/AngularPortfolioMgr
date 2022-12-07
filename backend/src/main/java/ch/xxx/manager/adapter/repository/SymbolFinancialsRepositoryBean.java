@@ -13,6 +13,10 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,11 +54,13 @@ import jakarta.persistence.metamodel.Metamodel;
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
+	private final JpaFinancialElementRepository jpaFinancialElementRepository;
 	private final EntityManager entityManager;
 
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
-			EntityManager entityManager) {
+			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
+		this.jpaFinancialElementRepository = jpaFinancialElementRepository;
 		this.entityManager = entityManager;
 	}
 
@@ -86,6 +92,8 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		List<SymbolFinancials> result = List.of();
+		record SfAndFe(SymbolFinancials symbolFinancials, List<FinancialElement> financialElements) {
+		}
 		if (symbolFinancialsQueryParams.getFinancialElementParams() != null
 				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()
 				&& (symbolFinancialsQueryParams.getSymbol() == null
@@ -97,23 +105,25 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 						|| 0 < BigDecimal.valueOf(1800)
 								.compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
+			LocalTime start1 = LocalTime.now();
 			Set<FinancialElement> financialElements = this
 					.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
-			record SfAndFe(SymbolFinancials symbolFinancials, List<FinancialElement> financialElements) {}
 			final Map<Long, SfAndFe> sfToFeMap = new HashMap<>();
 			financialElements.forEach(myFe -> {
 				this.entityManager.detach(myFe);
 				this.entityManager.detach(myFe.getSymbolFinancials());
 				if (!sfToFeMap.containsKey(myFe.getSymbolFinancials().getId())) {
-					sfToFeMap.put(myFe.getSymbolFinancials().getId(), new SfAndFe(myFe.getSymbolFinancials(), new ArrayList<>(List.of(myFe))));
+					sfToFeMap.put(myFe.getSymbolFinancials().getId(),
+							new SfAndFe(myFe.getSymbolFinancials(), new ArrayList<>(List.of(myFe))));
 				}
 				sfToFeMap.get(myFe.getSymbolFinancials().getId()).financialElements().add(myFe);
 			});
-			result = sfToFeMap.entrySet().stream()
-			.map(myEntry -> {
-				myEntry.getValue().symbolFinancials().setFinancialElements(new HashSet<>(myEntry.getValue().financialElements()));
+			result = sfToFeMap.entrySet().stream().map(myEntry -> {
+				myEntry.getValue().symbolFinancials()
+						.setFinancialElements(new HashSet<>(myEntry.getValue().financialElements()));
 				return myEntry.getValue().symbolFinancials();
 			}).collect(Collectors.toList());
+			LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 			return result;
 		}
 
@@ -155,7 +165,15 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		} else {
 			return new LinkedList<>();
 		}
-		return this.entityManager.createQuery(createQuery).getResultStream().limit(40).collect(Collectors.toList());
+		LocalTime start1 = LocalTime.now();
+		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(200)
+				.collect(Collectors.toList());
+		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
+		LocalTime start2 = LocalTime.now();
+		result = this.jpaSymbolFinancialsRepository
+				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
+		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
