@@ -121,7 +121,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     }
   }
   
-  public search(): void {	
+  public search(): void {		
+	console.log(this.queryForm.controls[FormFields.QueryItems].value);
 	const symbolFinancials = {
 		yearFilter: {
 			operation: this.queryForm.controls[FormFields.YearOperator].value,

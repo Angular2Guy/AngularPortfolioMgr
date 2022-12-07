@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +48,7 @@ import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
 	private final EntityManager entityManager;
 
@@ -238,13 +241,11 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 			FinancialElementParamDto myDto, Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
-			@SuppressWarnings("unchecked")
-			Expression<String> lowerExp = symbolFinancialsOpt.stream()
-					.map(mySymbolFinancials -> this.entityManager.getCriteriaBuilder()
-							.lower(((Root<SymbolFinancials>) root).join(
-									mySymbolFinancials.getDeclaredSet("financialElements", FinancialElement.class))
-									.get("concept")))
-					.findFirst().orElse(root.get("concept"));
+			@SuppressWarnings("unchecked")			
+			Expression<String> lowerExp = symbolFinancialsOpt.isPresent() ? this.entityManager.getCriteriaBuilder()
+					.lower(((Root<SymbolFinancials>) root).join(
+							symbolFinancialsOpt.get().getDeclaredSet("financialElements", FinancialElement.class))
+							.get("concept")) : ((Root<FinancialElement>) root).get("concept");					
 			if (!myDto.getConceptFilter().getOperation()
 					.equals(ch.xxx.manager.domain.model.dto.FilterStringDto.Operation.Equal)) {
 				String filterStr = String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
