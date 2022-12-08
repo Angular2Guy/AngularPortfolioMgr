@@ -10,12 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { SymbolFinancials } from '../../model/symbol-financials';
+import { FinancialElement, FinancialElementExt } from '../../model/financial-element';
 import { SymbolFinancialsQueryParams, FinancialElementParams, FilterNumber, FilterString } from '../../model/symbol-financials-query-params';
 import { Subscription, Observable } from 'rxjs';
 import { switchMap,debounceTime } from 'rxjs/operators';
@@ -65,6 +66,10 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   protected quarterQueryItems: string[] = [];
   protected symbols:Symbol[] = [];
   protected FormFields = FormFields;
+  @Output()
+  symbolFinancials = new EventEmitter<SymbolFinancials[]>();
+  @Output()
+  financialElements = new EventEmitter<FinancialElementExt[]>();
 
   constructor(private fb: FormBuilder, private symbolService: SymbolService, private configService: ConfigService, 
      private financialDataService: FinancialDataService) { 
@@ -86,6 +91,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 	}
 
   ngOnInit(): void {
+	this.symbolFinancials.emit([]);
+	this.financialElements.emit([]);
 	this.availableInit.forEach(myItem => this.availableItems.push(myItem));
 	this.subscriptions.push(this.queryForm.controls[FormFields.Symbol].valueChanges
 	   .pipe(debounceTime(200),switchMap(myValue => this.symbolService.getSymbolBySymbol(myValue)))
@@ -134,7 +141,26 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		    this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
 	} as SymbolFinancialsQueryParams;
 	//console.log(symbolFinancials);
-	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => console.log(result));
+	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => {		
+		console.log(result);	
+		if(result.length > 0 && !!result[0]['symbol']) {
+			this.symbolFinancials.emit(result);
+			this.financialElements.emit([]);
+		} else if(result.length > 0 && !result[0]['symbol']) {
+			this.symbolFinancials.emit([]);
+			const myResult = result.map(mySymbolFinancials => mySymbolFinancials.financialElements.map(myFinancialElement => {
+				const financialElementExt = new FinancialElementExt(myFinancialElement);
+				financialElementExt.year = mySymbolFinancials.year;
+				financialElementExt.quarter = mySymbolFinancials.quarter;
+				financialElementExt.symbol = mySymbolFinancials.symbol;
+				return financialElementExt;
+			}));
+			this.financialElements.emit([].concat.apply([], myResult));
+		} else {
+			this.symbolFinancials.emit([]);
+			this.financialElements.emit([]);
+		}
+	});
   }
   
   private createFinancialElementParam(formGroup: FormGroup): FinancialElementParams {

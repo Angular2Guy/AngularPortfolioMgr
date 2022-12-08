@@ -17,3 +17,22 @@ export interface FinancialElement {
 	currency: string;
 	value: number;
 }
+
+export class FinancialElementExt implements FinancialElement {		
+	constructor(financialElement: FinancialElement) {
+		this.label = financialElement.label;
+		this.concept = financialElement.concept;
+		this.financialElementType = financialElement.financialElementType;
+		this.currency = financialElement.currency;
+		this.value = financialElement.value;
+	}
+	
+	label: string = '';
+	concept: string = '';
+	financialElementType: string = '';
+	currency: string = '';
+	value: number = 0;
+	year: number = 0;
+	quarter: string = '';
+	symbol: string = '';
+}
