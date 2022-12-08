@@ -2,7 +2,7 @@
 		<form [formGroup]="queryForm" novalidate>
 	<div>
 		<div class="search-header">
-			<h2 i18n="@@query">Query</h2>
+			<h2 i18n="@@createQueryCompanyQuery">Company Query</h2>
 			<button mat-raised-button color="primary" (click)="search()" i18n="@@search">Search</button>
 		</div>
 			<div class="symbol-financials-container">
@@ -38,7 +38,7 @@
 	</div>
 	<div cdkDropListGroup>
 		<div class="query-container">
-			<h2 i18n="@@createQueryAvailableQueryItems">Available Query	Items</h2>
+			<h2 i18n="@@createQueryAvailableSecQueryItems">Available Sec Query Items</h2>
 			<h3 i18n="@@createQueryAddQueryItems">To add a Query Item. Drag it down.</h3>
 
 			<div cdkDropList [cdkDropListData]="availableItems"
@@ -50,7 +50,7 @@
 		</div>
 
 		<div class="query-container">
-			<h2 i18n="@@createQueryQueryItems">Query Items</h2>
+			<h2 i18n="@@createQuerySecQueryItems">Sec Query Items</h2>
 			<h3 i18n="@@createQueryRemoveQueryItems">To remove a Query Item. Drag it up.</h3>
 
 			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
