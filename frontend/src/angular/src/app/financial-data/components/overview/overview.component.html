@@ -8,10 +8,10 @@
 </mat-toolbar>
 <div class="base-container">
 	<div class="query-container">
-	   <app-create-query></app-create-query>
+	   <app-create-query (symbolFinancials)="updateSymbolFinancials($event)" (financialElements)="updateFinancialElements($event)"></app-create-query>
 	</div>
 	<div class="result-container">
-	   <app-query-results></app-query-results>
+	   <app-query-results [symbolFinancials]="symbolFinancials" [financialElements]="financialElements"></app-query-results>
 	</div>
 </div>
 </div>

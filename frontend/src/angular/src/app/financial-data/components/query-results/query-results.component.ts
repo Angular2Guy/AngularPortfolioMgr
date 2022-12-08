@@ -10,7 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import {SymbolFinancials} from '../../model/symbol-financials';
+import {FinancialElementExt} from '../../model/financial-element';
 
 @Component({
   selector: 'app-query-results',
@@ -18,5 +20,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./query-results.component.scss']
 })
 export class QueryResultsComponent {
-
+  @Input()
+  symbolFinancials: SymbolFinancials[] = [];
+  @Input()
+  financialElements: FinancialElementExt[] = [];
+  
 }

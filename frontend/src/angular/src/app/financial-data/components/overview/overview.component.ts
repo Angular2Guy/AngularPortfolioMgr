@@ -18,6 +18,8 @@ import { forkJoin, Subscription } from 'rxjs';
 import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
 import { FinancialDataService } from '../../service/financial-data.service';
 import { ImportFinancialsData } from '../../model/import-financials-data';
+import {SymbolFinancials} from '../../model/symbol-financials';
+import {FinancialElementExt} from '../../model/financial-element';
 import { TokenService } from 'ngx-simple-charts/base-service';
 import { ConfigService } from 'src/app/service/config.service';
 
@@ -29,6 +31,8 @@ import { ConfigService } from 'src/app/service/config.service';
 export class OverviewComponent implements OnInit, OnDestroy {
   protected windowHeight: number = null;
   private dialogSubscription: Subscription;
+  protected symbolFinancials: SymbolFinancials[] = [];
+  protected financialElements: FinancialElementExt[] = [];
   
   constructor(private financialDataService: FinancialDataService, private tokenService: TokenService, 
      private dialog: MatDialog, private configService: ConfigService, private router: Router) { }
@@ -53,6 +57,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
 		this.windowHeight = event.target.innerHeight - 84;
 	}
 
+    updateSymbolFinancials(event: SymbolFinancials[]): void {
+		this.symbolFinancials = event;
+    }
+
+    updateFinancialElements(event: FinancialElementExt[]): void {
+		this.financialElements = event;
+    }
+    
     showFinancialsImport(): void {
 		this.cleanupDialogSubcription();
 		this.configService.getImportPath().subscribe(result => {

@@ -130,7 +130,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   
   public search(): void {		
 	console.log(this.queryForm.controls[FormFields.QueryItems].value);
-	const symbolFinancials = {
+	const symbolFinancialsParams = {
 		yearFilter: {
 			operation: this.queryForm.controls[FormFields.YearOperator].value,
 			value: !this.queryForm.controls[FormFields.Year].value ? 0 : parseInt(this.queryForm.controls[FormFields.Year].value)
@@ -141,12 +141,15 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 		    this.queryForm.controls[FormFields.QueryItems].value.map(myFormGroup => this.createFinancialElementParam(myFormGroup)) : []
 	} as SymbolFinancialsQueryParams;
 	//console.log(symbolFinancials);
-	this.financialDataService.postSymbolFinancialsParam(symbolFinancials).subscribe(result => {		
-		console.log(result);	
-		if(result.length > 0 && !!result[0]['symbol']) {
+	this.financialDataService.postSymbolFinancialsParam(symbolFinancialsParams).subscribe(result => {				
+		if(result.length > 0 && (!!symbolFinancialsParams?.yearFilter?.value 
+		   || !!symbolFinancialsParams?.quarters?.length || !!symbolFinancialsParams?.symbol)) {
+			console.log(result.length);	
 			this.symbolFinancials.emit(result);
 			this.financialElements.emit([]);
-		} else if(result.length > 0 && !result[0]['symbol']) {
+		} else if(result.length > 0 && !(!!symbolFinancialsParams?.yearFilter?.value 
+		   || !!symbolFinancialsParams?.quarters?.length || !!symbolFinancialsParams?.symbol)) {
+			console.log(result.length);	
 			this.symbolFinancials.emit([]);
 			const myResult = result.map(mySymbolFinancials => mySymbolFinancials.financialElements.map(myFinancialElement => {
 				const financialElementExt = new FinancialElementExt(myFinancialElement);
@@ -157,6 +160,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 			}));
 			this.financialElements.emit([].concat.apply([], myResult));
 		} else {
+			console.log(result);	
 			this.symbolFinancials.emit([]);
 			this.financialElements.emit([]);
 		}
