@@ -50,7 +50,7 @@ import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
 public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean implements SymbolFinancialsRepository {
-	private static Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final EntityManager entityManager;
 
 	private record TermCollection(Collection<Predicate> and, Collection<Predicate> andNot, Collection<Predicate> or,
