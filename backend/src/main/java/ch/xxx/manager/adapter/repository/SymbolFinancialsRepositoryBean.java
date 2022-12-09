@@ -29,13 +29,11 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.dto.FilterNumberDto.Operation;
 import ch.xxx.manager.domain.model.dto.FilterStringDto;
 import ch.xxx.manager.domain.model.dto.FinancialElementParamDto;
-import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
@@ -51,9 +49,8 @@ import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
-public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
-	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
+public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean implements SymbolFinancialsRepository {
+	private static Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final EntityManager entityManager;
 
 	private record TermCollection(Collection<Predicate> and, Collection<Predicate> andNot, Collection<Predicate> or,
@@ -62,35 +59,10 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
 			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
-		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
+		super(jpaSymbolFinancialsRepository);
 		this.entityManager = entityManager;
 	}
-
-	@Override
-	public SymbolFinancials save(SymbolFinancials symbolfinancials) {
-		return this.jpaSymbolFinancialsRepository.save(symbolfinancials);
-	}
-
-	@Override
-	public List<SymbolFinancials> saveAll(Iterable<SymbolFinancials> symbolfinancials) {
-		return this.jpaSymbolFinancialsRepository.saveAll(symbolfinancials);
-	}
-
-	@Override
-	public Optional<SymbolFinancials> findById(Long id) {
-		return this.jpaSymbolFinancialsRepository.findById(id);
-	}
-
-	@Override
-	public void deleteAllBatch() {
-		this.jpaSymbolFinancialsRepository.deleteAllInBatch();
-	}
-
-	public List<SfQuarterDto> findCommonSfQuarters() {
-		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20)).stream()
-				.filter(myDto -> myDto.getTimesFound() >= 10).collect(Collectors.toList());
-	}
-
+	
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		List<SymbolFinancials> result = List.of();

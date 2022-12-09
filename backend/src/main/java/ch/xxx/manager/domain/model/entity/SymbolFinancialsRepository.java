@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,5 @@ public interface SymbolFinancialsRepository {
     void deleteAllBatch();
     List<SfQuarterDto> findCommonSfQuarters();
     List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
+    List<SymbolFinancials> findAllByIdFetchEager(Collection<Long> ids);
 }

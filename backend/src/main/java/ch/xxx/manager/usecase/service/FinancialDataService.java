@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
@@ -76,6 +75,11 @@ public class FinancialDataService {
 	@Transactional
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		return this.symbolFinancialsRepository.findSymbolFinancials(symbolFinancialsQueryParams);
+	}
+	
+	@Transactional
+	public List<SymbolFinancials> findSymbolFinancialsByIds(List<Long> symbolsFinancialsIds) {		
+		return symbolsFinancialsIds.size() > 250 ? List.of() : this.symbolFinancialsRepository.findAllByIdFetchEager(symbolsFinancialsIds);
 	}
 	
 	@Transactional

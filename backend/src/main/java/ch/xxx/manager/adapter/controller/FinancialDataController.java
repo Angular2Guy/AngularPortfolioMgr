@@ -30,6 +30,7 @@ import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
+import ch.xxx.manager.domain.model.dto.SymbolFinancialsIdParamDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
 import ch.xxx.manager.usecase.service.FinancialDataService;
@@ -71,6 +72,14 @@ public class FinancialDataController {
 			@RequestBody SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		return this.financialDataService.findSymbolFinancials(symbolFinancialsQueryParams).stream()
 				.map(mySymbolFe -> this.symbolFinancialsMapper.toDto(mySymbolFe)).collect(Collectors.toList());
+	}
+
+	@PostMapping("/search/symbolfinancials/ids")
+	public List<SymbolFinancialsDto> findSymbolFinancialsByIds(
+			@RequestBody SymbolFinancialsIdParamDto symbolFinancialsIdParamDto) {
+		return this.financialDataService.findSymbolFinancialsByIds(symbolFinancialsIdParamDto.getSymbolFinancialsIds())
+				.stream().map(mySymbolFinancials -> this.symbolFinancialsMapper.toDto(mySymbolFinancials))
+				.collect(Collectors.toList());
 	}
 
 	@PutMapping(path = "/importus/data")
