@@ -15,8 +15,6 @@ package ch.xxx.manager.adapter.repository;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +42,10 @@ import ch.xxx.manager.domain.utils.DataHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Fetch;
+import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -54,13 +56,11 @@ import jakarta.persistence.metamodel.Metamodel;
 public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
-	private final JpaFinancialElementRepository jpaFinancialElementRepository;
 	private final EntityManager entityManager;
 
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
 			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
-		this.jpaFinancialElementRepository = jpaFinancialElementRepository;
 		this.entityManager = entityManager;
 	}
 
@@ -158,8 +158,9 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		}
 		Metamodel m = this.entityManager.getMetamodel();
 		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
-		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), root, predicates,
-				Optional.of(symbolFinancials_));
+		root.fetch("financialElements");
+		Path<FinancialElement> fePath = root.get("financialElements");
+		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates, Optional.of(symbolFinancials_));
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		} else {
@@ -169,24 +170,18 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(200)
 				.collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
-		LocalTime start2 = LocalTime.now();
-		result = this.jpaSymbolFinancialsRepository
-				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
-		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
+		result = myResult;
+//		LocalTime start2 = LocalTime.now();
+//		result = this.jpaSymbolFinancialsRepository
+//				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
+//		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
-			final Root<T> root, final List<Predicate> predicates,
-			final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
+			final Path<FinancialElement> fePath, final List<Predicate> predicates, final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
 		final LinkedBlockingQueue<List<Predicate>> subPredicates = new LinkedBlockingQueue<List<Predicate>>();
 		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<DataHelper.Operation>();
-		@SuppressWarnings("unchecked")
-		final Path<FinancialElement> fePath = symbolFinancialsOpt.isPresent()
-				? ((Root<SymbolFinancials>) root)
-						.join(symbolFinancialsOpt.get().getDeclaredSet("financialElements", FinancialElement.class))
-				: ((Root<FinancialElement>) root);
 		if (financialElementParamDtos != null && !financialElementParamDtos.isEmpty()) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
@@ -224,7 +219,7 @@ public class SymbolFinancialsRepositoryBean implements SymbolFinancialsRepositor
 		final Root<FinancialElement> root = createQuery.from(FinancialElement.class);
 		root.fetch("symbolFinancials");
 		final List<Predicate> predicates = new ArrayList<>();
-		this.createFinancialElementClauses(financialElementParams, root, predicates, Optional.empty());
+		this.createFinancialElementClauses(financialElementParams, root, predicates,Optional.empty());
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		} else {
