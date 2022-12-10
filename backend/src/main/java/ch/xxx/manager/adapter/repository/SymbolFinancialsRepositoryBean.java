@@ -105,6 +105,32 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				.createQuery(SymbolFinancials.class);
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 
+		final List<Predicate> predicates = createSymbolFinancials(symbolFinancialsQueryParams, root);
+		Metamodel m = this.entityManager.getMetamodel();
+		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
+		root.fetch("financialElements");
+		Path<FinancialElement> fePath = root.get("financialElements");
+		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates,
+				Optional.of(symbolFinancials_));
+		if (!predicates.isEmpty()) {
+			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
+		} else {
+			return new LinkedList<>();
+		}
+		LocalTime start1 = LocalTime.now();
+		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(200)
+				.collect(Collectors.toList());
+		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
+		result = myResult;
+//		LocalTime start2 = LocalTime.now();
+//		result = this.jpaSymbolFinancialsRepository
+//				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
+//		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
+		return result;
+	}
+
+	private List<Predicate> createSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+			final Root<SymbolFinancials> root) {
 		final List<Predicate> predicates = new ArrayList<>();
 		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().equal(
@@ -128,27 +154,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
-		Metamodel m = this.entityManager.getMetamodel();
-		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
-		root.fetch("financialElements");
-		Path<FinancialElement> fePath = root.get("financialElements");
-		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates,
-				Optional.of(symbolFinancials_));
-		if (!predicates.isEmpty()) {
-			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
-		} else {
-			return new LinkedList<>();
-		}
-		LocalTime start1 = LocalTime.now();
-		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(200)
-				.collect(Collectors.toList());
-		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
-		result = myResult;
-//		LocalTime start2 = LocalTime.now();
-//		result = this.jpaSymbolFinancialsRepository
-//				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
-//		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
-		return result;
+		return predicates;
 	}
 
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
