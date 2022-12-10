@@ -17,7 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class DataHelper {
-	public static enum TermType {Query, StartTerm, EndTerm }
+	public static enum TermType {Query, TermStart, TermEnd }
 	
 	public static enum Operation {
 		And, AndNot, Or, OrNot

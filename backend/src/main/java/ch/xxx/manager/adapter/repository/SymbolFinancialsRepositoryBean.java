@@ -161,7 +161,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		if (financialElementParamDtos != null) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
-				case StartTerm -> {
+				case TermStart -> {
 					try {
 						operationArr.put(myDto.getOperation());
 						subTermCollection.put(new TermCollection(new ArrayList<>(), new ArrayList<>(),
@@ -176,8 +176,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					financialElementValueClause(fePath,
 							operationArr.isEmpty() ? termCollection : subTermCollection.peek(), myDto);
 				}
-				case EndTerm -> {
-					Predicate myPredicate = createSubPredicate(operationArr, termCollection);
+				case TermEnd -> {
+					Predicate myPredicate = createSubPredicate(operationArr, operationArr.isEmpty() ? termCollection : subTermCollection.poll());
 					predicates.add(myPredicate);
 				}
 				}
@@ -278,12 +278,12 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		}
 	}
 
-	private void operatorClause(TermCollection predicates, DataHelper.Operation operation, Predicate... likePredicate) {
+	private void operatorClause(TermCollection termCollection, DataHelper.Operation operation, Predicate... likePredicate) {
 		switch (operation) {
-		case And -> predicates.and().addAll(List.of(likePredicate));
-		case AndNot -> predicates.andNot().addAll(List.of(likePredicate));
-		case Or -> predicates.or().addAll(List.of(likePredicate));
-		case OrNot -> predicates.orNot().addAll(List.of(likePredicate));
+		case And -> termCollection.and().addAll(List.of(likePredicate));
+		case AndNot -> termCollection.andNot().addAll(List.of(likePredicate));
+		case Or -> termCollection.or().addAll(List.of(likePredicate));
+		case OrNot -> termCollection.orNot().addAll(List.of(likePredicate));
 		}
 	}
 }
