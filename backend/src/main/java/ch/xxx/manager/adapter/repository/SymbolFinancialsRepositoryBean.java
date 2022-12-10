@@ -49,7 +49,8 @@ import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
-public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean implements SymbolFinancialsRepository {
+public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean
+		implements SymbolFinancialsRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final EntityManager entityManager;
 
@@ -62,7 +63,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		super(jpaSymbolFinancialsRepository);
 		this.entityManager = entityManager;
 	}
-	
+
 	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		List<SymbolFinancials> result = List.of();
@@ -106,6 +107,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 
 		final List<Predicate> predicates = createSymbolFinancials(symbolFinancialsQueryParams, root);
+
 		Metamodel m = this.entityManager.getMetamodel();
 		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
 		root.fetch("financialElements");
@@ -145,11 +147,12 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
 				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
-			switch(symbolFinancialsQueryParams.getYearFilter().getOperation()) {
-			case SmallerEqual -> predicates.add(this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(root.get("fiscalYear"),
-					symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case LargerEqual -> predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("fiscalYear"),
-					symbolFinancialsQueryParams.getYearFilter().getValue()));
+			switch (symbolFinancialsQueryParams.getYearFilter().getOperation()) {
+			case SmallerEqual -> predicates.add(this.entityManager.getCriteriaBuilder()
+					.lessThanOrEqualTo(root.get("fiscalYear"), symbolFinancialsQueryParams.getYearFilter().getValue()));
+			case LargerEqual ->
+				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("fiscalYear"),
+						symbolFinancialsQueryParams.getYearFilter().getValue()));
 			case Equal -> predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("fiscalYear"),
 					symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
@@ -183,8 +186,17 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 							operationArr.isEmpty() ? termCollection : subTermCollection.peek(), myDto);
 				}
 				case TermEnd -> {
-					Predicate myPredicate = createSubPredicate(operationArr, operationArr.isEmpty() ? termCollection : subTermCollection.poll());
-					predicates.add(myPredicate);
+					TermCollection myTermCollection = operationArr.isEmpty() ? termCollection
+							: subTermCollection.poll();
+					Collection<Predicate> myPredicates = this.createTermCollectionPredicate(myTermCollection);
+					TermCollection baseTermCollection = subTermCollection.peek() == null ? termCollection
+							: subTermCollection.peek();
+					switch (operationArr.poll()) {
+					case And -> baseTermCollection.and().addAll(myPredicates);
+					case AndNot -> baseTermCollection.andNot().addAll(myPredicates);
+					case Or -> baseTermCollection.or().addAll(myPredicates);
+					case OrNot -> baseTermCollection.orNot().addAll(myPredicates);
+					}
 				}
 				}
 			});
@@ -195,21 +207,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					subTermCollection.size()));
 		}
 		predicates.addAll(this.createTermCollectionPredicate(termCollection));
-	}
-
-	private Predicate createSubPredicate(final LinkedBlockingQueue<DataHelper.Operation> operationArr,
-			final TermCollection termCollection) {
-		Predicate myPredicate = switch (operationArr.poll()) {
-		case And -> this.entityManager.getCriteriaBuilder()
-				.and(this.createTermCollectionPredicate(termCollection).toArray(new Predicate[0]));
-		case AndNot -> this.entityManager.getCriteriaBuilder().not(this.entityManager.getCriteriaBuilder()
-				.and(this.createTermCollectionPredicate(termCollection).toArray(new Predicate[0])));
-		case Or -> this.entityManager.getCriteriaBuilder()
-				.or(this.createTermCollectionPredicate(termCollection).toArray(new Predicate[0]));
-		case OrNot -> this.entityManager.getCriteriaBuilder().not(this.entityManager.getCriteriaBuilder()
-				.or(this.createTermCollectionPredicate(termCollection).toArray(new Predicate[0])));
-		};
-		return myPredicate;
 	}
 
 	private Collection<Predicate> createTermCollectionPredicate(TermCollection termCollection) {
@@ -266,13 +263,13 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
 			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder().lower(fePath.get("concept"));
-			if (!myDto.getConceptFilter().getOperation()
-					.equals(FilterStringDto.Operation.Equal)) {
-				String filterStr = switch(myDto.getConceptFilter().getOperation()) {
+			if (!myDto.getConceptFilter().getOperation().equals(FilterStringDto.Operation.Equal)) {
+				String filterStr = switch (myDto.getConceptFilter().getOperation()) {
 				case Contains -> String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
 				case StartsWith -> String.format("%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
 				case EndsWith -> String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
-				default -> throw new IllegalArgumentException("Unexpected value: " + myDto.getConceptFilter().getOperation());
+				default ->
+					throw new IllegalArgumentException("Unexpected value: " + myDto.getConceptFilter().getOperation());
 				};
 				Predicate likePredicate = this.entityManager.getCriteriaBuilder().like(lowerExp, filterStr);
 				operatorClause(termCollection, myDto.getOperation(), likePredicate);
@@ -284,7 +281,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		}
 	}
 
-	private void operatorClause(TermCollection termCollection, DataHelper.Operation operation, Predicate... likePredicate) {
+	private void operatorClause(TermCollection termCollection, DataHelper.Operation operation,
+			Predicate... likePredicate) {
 		switch (operation) {
 		case And -> termCollection.and().addAll(List.of(likePredicate));
 		case AndNot -> termCollection.andNot().addAll(List.of(likePredicate));
