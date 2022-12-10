@@ -213,12 +213,15 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		List<Predicate> predicates = new ArrayList<>();
 		if (!termCollection.and().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().and(termCollection.and().toArray(new Predicate[0])));
-		} else if (!termCollection.andNot().isEmpty()) {
+		} 
+		if (!termCollection.andNot().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().not(
 					this.entityManager.getCriteriaBuilder().and(termCollection.andNot().toArray(new Predicate[0]))));
-		} else if (!termCollection.or().isEmpty()) {
+		} 
+		if (!termCollection.or().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().or(termCollection.or().toArray(new Predicate[0])));
-		} else if (!termCollection.orNot().isEmpty()) {
+		} 
+		if (!termCollection.orNot().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder()
 					.not(this.entityManager.getCriteriaBuilder().or(termCollection.or().toArray(new Predicate[0]))));
 		}
