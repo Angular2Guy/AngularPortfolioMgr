@@ -113,6 +113,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   drop(event: CdkDragDrop<MyItem[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      const myFormArrayItem = this.queryForm[FormFields.QueryItems].value.splice(event.previousIndex,1)[0];
+      this.queryForm[FormFields.QueryItems].value.splice(event.currentIndex, 0, myFormArrayItem);
     } else {
       transferArrayItem(
         event.previousContainer.data,
