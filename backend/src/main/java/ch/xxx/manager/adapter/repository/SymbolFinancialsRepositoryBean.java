@@ -54,10 +54,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
 	private final EntityManager entityManager;
 
-	private record TermCollection(Collection<Predicate> and, Collection<Predicate> andNot, Collection<Predicate> or,
-			Collection<Predicate> orNot) {
-	}
-
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
 			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
 		super(jpaSymbolFinancialsRepository);
@@ -106,7 +102,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				.createQuery(SymbolFinancials.class);
 		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
 
-		final List<Predicate> predicates = createSymbolFinancials(symbolFinancialsQueryParams, root);
+		final List<Predicate> predicates = createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root);
 
 		Metamodel m = this.entityManager.getMetamodel();
 		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
@@ -131,7 +127,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		return result;
 	}
 
-	private List<Predicate> createSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
 		final List<Predicate> predicates = new ArrayList<>();
 		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
@@ -162,41 +158,47 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
 			final Path<FinancialElement> fePath, final List<Predicate> predicates,
-			final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
-		TermCollection termCollection = new TermCollection(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-				new ArrayList<>());
-		final LinkedBlockingQueue<TermCollection> subTermCollection = new LinkedBlockingQueue<TermCollection>();
-		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<DataHelper.Operation>();
+			final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {		
+		final LinkedBlockingQueue<Collection<Predicate>> subTermCollection = new LinkedBlockingQueue<>();
+		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<>();
+		final Collection<Predicate> result = new LinkedList<>();
 		if (financialElementParamDtos != null) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
 				case TermStart -> {
 					try {
 						operationArr.put(myDto.getOperation());
-						subTermCollection.put(new TermCollection(new ArrayList<>(), new ArrayList<>(),
-								new ArrayList<>(), new ArrayList<>()));
+						subTermCollection.put(new ArrayList<>());
 					} catch (InterruptedException e) {
 						new RuntimeException(e);
 					}
 				}
 				case Query -> {
 					financialElementConceptClause(fePath,
-							operationArr.isEmpty() ? termCollection : subTermCollection.peek(), myDto);
+							operationArr.isEmpty() ? result : subTermCollection.peek(), myDto);
 					financialElementValueClause(fePath,
-							operationArr.isEmpty() ? termCollection : subTermCollection.peek(), myDto);
+							operationArr.isEmpty() ? result : subTermCollection.peek(), myDto);
 				}
 				case TermEnd -> {
-					TermCollection myTermCollection = operationArr.isEmpty() ? termCollection
-							: subTermCollection.poll();
-					Collection<Predicate> myPredicates = this.createTermCollectionPredicate(myTermCollection);
-					TermCollection baseTermCollection = subTermCollection.peek() == null ? termCollection
-							: subTermCollection.peek();
-					switch (operationArr.poll()) {
-					case And -> baseTermCollection.and().addAll(myPredicates);
-					case AndNot -> baseTermCollection.andNot().addAll(myPredicates);
-					case Or -> baseTermCollection.or().addAll(myPredicates);
-					case OrNot -> baseTermCollection.orNot().addAll(myPredicates);
+					if(operationArr.isEmpty() || subTermCollection.isEmpty()) {
+						throw new RuntimeException(String.format("operationArr: %d, subPredicates: %d", operationArr.size(),
+								subTermCollection.size()));
 					}
+					Collection<Predicate> myPredicates = subTermCollection.poll();
+					Collection<Predicate> baseTermCollection = subTermCollection.peek() == null ? result
+							: subTermCollection.peek();
+					DataHelper.Operation operation = operationArr.poll();
+					Collection<Predicate> resultPredicates = operation == null ? myPredicates : 
+						switch (operation) {
+						case And -> List.of(this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0])));
+						case AndNot -> List.of(this.entityManager.getCriteriaBuilder().not(
+								this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0]))));
+						case Or -> List.of(this.entityManager.getCriteriaBuilder().or(myPredicates.toArray(new Predicate[0])));
+						case OrNot -> List.of(this.entityManager.getCriteriaBuilder()
+						.not(this.entityManager.getCriteriaBuilder().or(myPredicates.toArray(new Predicate[0]))));
+						};
+					
+					baseTermCollection.addAll(resultPredicates);
 				}
 				}
 			});
@@ -206,26 +208,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			throw new RuntimeException(String.format("operationArr: %d, subPredicates: %d", operationArr.size(),
 					subTermCollection.size()));
 		}
-		predicates.addAll(this.createTermCollectionPredicate(termCollection));
-	}
-
-	private Collection<Predicate> createTermCollectionPredicate(TermCollection termCollection) {
-		List<Predicate> predicates = new ArrayList<>();
-		if (!termCollection.and().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().and(termCollection.and().toArray(new Predicate[0])));
-		} 
-		if (!termCollection.andNot().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().not(
-					this.entityManager.getCriteriaBuilder().and(termCollection.andNot().toArray(new Predicate[0]))));
-		} 
-		if (!termCollection.or().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().or(termCollection.or().toArray(new Predicate[0])));
-		} 
-		if (!termCollection.orNot().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder()
-					.not(this.entityManager.getCriteriaBuilder().or(termCollection.or().toArray(new Predicate[0]))));
-		}
-		return predicates;
+		predicates.addAll(result);
 	}
 
 	private Set<FinancialElement> findFinancialElements(List<FinancialElementParamDto> financialElementParams) {
@@ -240,28 +223,27 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		} else {
 			return new HashSet<>();
 		}
-		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(10000).getResultList());
+		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(5000).getResultList());
 	}
 
-	private <T> void financialElementValueClause(Path<FinancialElement> fePath, TermCollection termCollection,
+	private <T> void financialElementValueClause(Path<FinancialElement> fePath, Collection<Predicate> myPredicates,
 			FinancialElementParamDto myDto) {
 		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
 				&& myDto.getValueFilter().getValue() != null
 				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
 						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
 			Expression<BigDecimal> joinPath = fePath.get("value");
-			switch (myDto.getValueFilter().getOperation()) {
-			case Equal -> this.operatorClause(termCollection, myDto.getOperation(),
-					this.entityManager.getCriteriaBuilder().equal(joinPath, myDto.getValueFilter().getValue()));
-			case SmallerEqual -> this.operatorClause(termCollection, myDto.getOperation(), this.entityManager
-					.getCriteriaBuilder().lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
-			case LargerEqual -> this.operatorClause(termCollection, myDto.getOperation(), this.entityManager
-					.getCriteriaBuilder().greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue()));
-			}
+			myPredicates.add(switch (myDto.getValueFilter().getOperation()) {
+			case Equal -> this.entityManager.getCriteriaBuilder().equal(joinPath, myDto.getValueFilter().getValue());
+			case SmallerEqual -> this.entityManager
+					.getCriteriaBuilder().lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
+			case LargerEqual -> this.entityManager
+					.getCriteriaBuilder().greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
+			});
 		}
 	}
 
-	private <T> void financialElementConceptClause(Path<FinancialElement> fePath, TermCollection termCollection,
+	private <T> void financialElementConceptClause(Path<FinancialElement> fePath, Collection<Predicate> myPredicates,
 			FinancialElementParamDto myDto) {
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
@@ -275,22 +257,12 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					throw new IllegalArgumentException("Unexpected value: " + myDto.getConceptFilter().getOperation());
 				};
 				Predicate likePredicate = this.entityManager.getCriteriaBuilder().like(lowerExp, filterStr);
-				operatorClause(termCollection, myDto.getOperation(), likePredicate);
+				myPredicates.add(likePredicate);
 			} else {
 				Predicate equalPredicate = this.entityManager.getCriteriaBuilder().equal(lowerExp,
 						myDto.getConceptFilter().getValue().trim().toLowerCase());
-				this.operatorClause(termCollection, myDto.getOperation(), equalPredicate);
+				myPredicates.add(equalPredicate);
 			}
-		}
-	}
-
-	private void operatorClause(TermCollection termCollection, DataHelper.Operation operation,
-			Predicate... likePredicate) {
-		switch (operation) {
-		case And -> termCollection.and().addAll(List.of(likePredicate));
-		case AndNot -> termCollection.andNot().addAll(List.of(likePredicate));
-		case Or -> termCollection.or().addAll(List.of(likePredicate));
-		case OrNot -> termCollection.orNot().addAll(List.of(likePredicate));
 		}
 	}
 }

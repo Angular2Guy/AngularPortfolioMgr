@@ -21,9 +21,7 @@ public class FinancialElementParamDto  {
 	private FilterStringDto conceptFilter;
 	@NotNull
 	private FilterNumberDto valueFilter;
-	@NotNull
 	private Operation operation;
-	@NotNull
 	private TermType termType;
 
 	public FilterStringDto getConceptFilter() {
