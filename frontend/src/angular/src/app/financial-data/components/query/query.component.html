@@ -3,14 +3,6 @@
     <div *ngIf="queryItemType === ItemType.Query && showType">
     	<div i18n="@@query">Query</div>
     </div>
-    <div *ngIf="queryItemType === ItemType.Query && !showType">
-				<mat-form-field class="term-operator"> 
-				   <mat-label i18n="@@operator">Operator</mat-label> 
-				   <mat-select [formControlName]="QueryFormFields.QueryOperator" name="QueryOperator" class="operator">
-				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
-				   </mat-select>
-				</mat-form-field>
-			</div>
 			<div *ngIf="queryItemType === ItemType.Query && !showType">
 				<mat-form-field class="string-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
@@ -65,6 +57,11 @@
 			</div>
 			<div *ngIf="queryItemType === ItemType.TermEnd">
 				<div i18n=@@queryTermEnd>Term End</div>
+			</div>
+			<div *ngIf="!showType">
+			   <button mat-icon-button (click)="itemRemove()">
+			   		<mat-icon>close</mat-icon>
+			   </button>
 			</div>
 </div>
 </form>

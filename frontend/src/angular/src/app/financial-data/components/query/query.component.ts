@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { FormArray, FormGroup, FormBuilder, AbstractControl, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -40,6 +40,8 @@ export class QueryComponent implements OnInit, OnDestroy {
   public formArrayIndex: number;
   @Input()
   public queryItemType: ItemType;   
+  @Output()
+  public removeItem = new EventEmitter<number>();
   private _showType: boolean;
   protected termQueryItems: string[] = [];
   protected stringQueryItems: string[] = [];
@@ -82,6 +84,10 @@ export class QueryComponent implements OnInit, OnDestroy {
 	} else {
 		this.getOperators(400);
 	}
+  }
+ 
+  itemRemove(): void {
+	  this.removeItem.emit(this.formArrayIndex);
   }
   
   private getOperators(delayMillis: number): void {

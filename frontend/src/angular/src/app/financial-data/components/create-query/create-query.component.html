@@ -56,7 +56,7 @@
 			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
 				(cdkDropListDropped)="drop($event)">
 				<app-query class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag [queryItemType]="item.queryItemType" 
-				   [baseFormArray]="queryItemParams.formArray" [formArrayIndex]="i" 
+				   [baseFormArray]="queryItemParams.formArray" [formArrayIndex]="i" (removeItem)="removeItem($event)"
 				   [showType]="queryItemParams.showType" ></app-query>
 				<!-- <div class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag>{{item.title}}</div> -->
 			</div>

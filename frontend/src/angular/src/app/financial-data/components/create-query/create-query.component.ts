@@ -12,7 +12,7 @@
  */
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormArray, FormBuilder, AbstractControlOptions, Validators, ValidationErrors, FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { FinancialsDataUtils, ItemType } from '../../model/financials-data-utils';
 import { SymbolFinancials } from '../../model/symbol-financials';
@@ -126,6 +126,11 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
       }
       this.availableInit.forEach(myItem => this.availableItems.push(myItem));
     }
+  }
+
+  public removeItem(index: number): void {
+	//console.log(index);
+	this.queryItems.splice(index, 1);
   }
   
   public search(): void {		

@@ -22,9 +22,9 @@ export interface FilterString extends FilterBase {
 }
  
 export interface FinancialElementParams {
-	conceptFilter: FilterString;
-	valueFilter: FilterNumber;
-	operation: string;
+	conceptFilter?: FilterString;
+	valueFilter?: FilterNumber;
+	operation?: string;
 	termType: string;
 }
  
