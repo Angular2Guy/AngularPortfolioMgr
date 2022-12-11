@@ -51,7 +51,7 @@
 				<mat-form-field class="term-operator"> 
 				   <mat-label i18n="@@operator">Operator</mat-label> 
 				   <mat-select [formControlName]="QueryFormFields.QueryOperator" name="TermOperator" class="operator">
-				      <mat-option *ngFor="let item of termQueryItems" [value]="item" class="operator">{{item}}</mat-option> 
+				      <mat-option selected value="End" class="operator"i18n="@@end">End</mat-option> 
 				   </mat-select>
 				</mat-form-field>
 			</div>

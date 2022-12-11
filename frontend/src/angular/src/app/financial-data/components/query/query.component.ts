@@ -77,7 +77,7 @@ export class QueryComponent implements OnInit, OnDestroy {
 	this.subscriptions.push(this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges.pipe(debounceTime(200)).subscribe(myValue => 
 	   this.financialDataService.getConcepts().subscribe(myConceptList => this.concepts = myConceptList.filter(myConcept => 	      
 	   FinancialsDataUtils.compareStrings(myConcept.concept, myValue, this.itemFormGroup.controls[QueryFormFields.ConceptOperator].value)))));
-	this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(this.queryItemType);
+	this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(this.queryItemType);	
 	//make service caching work
 	if(this.formArrayIndex === 0) {
 		this.getOperators(0);	
@@ -104,10 +104,15 @@ export class QueryComponent implements OnInit, OnDestroy {
 		this.stringQueryItems = values;
 		this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(values.filter(myValue => '=' === myValue)[0]);
 	}));
+	if(ItemType.TermEnd === this.queryItemType) {
+		this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue('End');			
+	    this.itemFormGroup.controls[QueryFormFields.QueryOperator].disable();	
+	} else {
 	this.subscriptions.push(this.configService.getQueryOperators().subscribe(values => {
 		this.termQueryItems = values;
 		this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(values.filter(myValue => 'And' === myValue)[0]);
-	}));		
+	}));	
+	}	
 	}, delayMillis);	
   }
   
