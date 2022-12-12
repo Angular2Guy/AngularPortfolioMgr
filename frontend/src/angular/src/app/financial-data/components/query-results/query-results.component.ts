@@ -10,25 +10,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from "@angular/core";
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { MatTableDataSource } from "@angular/material/table";
+import { MatSort } from "@angular/material/sort";
 
 @Component({
   selector: "app-query-results",
   templateUrl: "./query-results.component.html",
   styleUrls: ["./query-results.component.scss"],
 })
-export class QueryResultsComponent implements OnInit {
+export class QueryResultsComponent implements AfterViewInit {
   @Input()
   symbolFinancials: SymbolFinancials[] = [];
+  @ViewChild(MatSort) sort: MatSort;
   protected displayedColumns: string[] = ['concept', 'value', 'currency', 'year', 'quarter', 'symbol'];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
   private _financialElements: FinancialElementExt[] = [];
   
-  ngOnInit(): void {
-    this.dataSource.filterPredicate = (data: FinancialElementExt, filter: string) => data?.symbol?.trim().toLowerCase().includes(filter);	
+  ngAfterViewInit(): void {
+    this.dataSource.filterPredicate = (data: FinancialElementExt, filter: string) => data?.symbol?.trim().toLowerCase().includes(filter);
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {

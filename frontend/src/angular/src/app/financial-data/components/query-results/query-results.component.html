@@ -5,34 +5,34 @@
   <input matInput (keyup)="applyFilter($event)" placeholder="symbol" #input>
 </mat-form-field>
 
-<mat-table [dataSource]="dataSource" class="mytable">
+<mat-table [dataSource]="dataSource" class="mytable" matSort>
   <ng-container matColumnDef="concept">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept">Concept</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort i18n="@@queryResultsConcept">Concept</mat-header-cell>
     <mat-cell *matCellDef="let element" matTooltip="{{element.concept}}"> {{element.concept}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="symbol">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsSymbol">Symbol</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@queryResultsSymbol">Symbol</mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element.symbol}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="year">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsYear">Year</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@queryResultsYear">Year</mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="quarter">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsQuarter">Quarter</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@queryResultsQuarter">Quarter</mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element.quarter}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="currency">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsCurrency">Currency</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@queryResultsCurrency">Currency</mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element.currency}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="value">
-    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsValue">Value</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@queryResultsValue">Value</mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
   </ng-container>
 
