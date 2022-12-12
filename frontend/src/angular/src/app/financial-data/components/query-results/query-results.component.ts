@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { MatTableDataSource } from "@angular/material/table";
@@ -20,12 +20,21 @@ import { MatTableDataSource } from "@angular/material/table";
   templateUrl: "./query-results.component.html",
   styleUrls: ["./query-results.component.scss"],
 })
-export class QueryResultsComponent {
+export class QueryResultsComponent implements OnInit {
   @Input()
   symbolFinancials: SymbolFinancials[] = [];
   protected displayedColumns: string[] = ['concept', 'value', 'currency', 'year', 'quarter', 'symbol'];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
   private _financialElements: FinancialElementExt[] = [];
+  
+  ngOnInit(): void {
+    this.dataSource.filterPredicate = (data: FinancialElementExt, filter: string) => data?.symbol?.trim().toLowerCase().includes(filter);	
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
   
   get financialElements(): FinancialElementExt[] {
 	  return this._financialElements;

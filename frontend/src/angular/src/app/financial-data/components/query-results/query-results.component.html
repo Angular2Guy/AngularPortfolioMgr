@@ -1,4 +1,10 @@
 <div class="container">
+
+<mat-form-field>
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="symbol" #input>
+</mat-form-field>
+
 <mat-table [dataSource]="dataSource" class="mytable">
   <ng-container matColumnDef="concept">
     <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept">Concept</mat-header-cell>
