@@ -1,31 +1,31 @@
 .myform {
-	flex: 1 0 auto;
-	width: 100%;
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 .string-operator {
-	width: 70px;
+  width: 70px;
 }
 
 .number-operator {
-	width: 70px;
+  width: 70px;
 }
 
 .term-operator {
-	width: 100px;
+  width: 100px;
 }
 
 .operator {
-	font-size: 12px;
+  font-size: 12px;
 }
 
 .number-value {
-	text-align: right;
+  text-align: right;
 }
 
 .form-field {
-	font-size: 12px;
-	width: calc(100% - 70px);	
+  font-size: 12px;
+  width: calc(100% - 70px);
 }
 
 .query-item {
@@ -43,5 +43,5 @@
 }
 
 ::ng-deep .mat-mdc-form-field-bottom-align::before {
-	display: unset;
+  display: unset;
 }

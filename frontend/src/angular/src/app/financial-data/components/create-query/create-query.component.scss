@@ -1,17 +1,17 @@
 .container {
-	//background-color: #FF0000;
+  //background-color: #FF0000;
   width: calc(100% - 10px);
   height: calc(100% - 10px);
   margin: 5px;
 }
 
 .search-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.base-query {	
+.base-query {
   width: 100%;
   border: solid 1px #ccc !important;
   min-height: 60px;
@@ -23,33 +23,33 @@
 }
 
 .symbol-financials-container {
-	display: flex;
-	gap: 5px;
-	margin: 5px 5px 0 0;
+  display: flex;
+  gap: 5px;
+  margin: 5px 5px 0 0;
 }
 
 .string-operator {
-	width: 70px;
+  width: 70px;
 }
 
 .number-operator {
-	width: 70px;
+  width: 70px;
 }
 
 .term-operator {
-	width: 100px;
+  width: 100px;
 }
 
 .operator {
-	font-size: 12px;
+  font-size: 12px;
 }
 
 .number-value {
-	text-align: right;
+  text-align: right;
 }
 
 .form-field {
-	width: 100%;	
+  width: 100%;
 }
 
 .query-container {
@@ -69,7 +69,7 @@
   display: block;
 }
 
-.query-item { 
+.query-item {
   display: flex;
   flex: 1 0 auto;
 }
@@ -78,8 +78,7 @@
   box-sizing: border-box;
   border-radius: 4px;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
 .cdk-drag-placeholder {
@@ -99,5 +98,5 @@
 }
 
 ::ng-deep .mat-mdc-form-field-bottom-align::before {
-	display: unset;
+  display: unset;
 }

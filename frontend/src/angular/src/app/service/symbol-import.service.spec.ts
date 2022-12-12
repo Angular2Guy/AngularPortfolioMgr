@@ -10,9 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { SymbolImportService } from './symbol-import.service';
+import { SymbolImportService } from "./symbol-import.service";
 
 /*describe('SymbolImportService', () => {
   let service: SymbolImportService;

@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { QueryResultsComponent } from './query-results.component';
+import { QueryResultsComponent } from "./query-results.component";
 /*
 describe('QueryResultsComponent', () => {
   let component: QueryResultsComponent;

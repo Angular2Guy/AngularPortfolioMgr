@@ -11,6 +11,6 @@
    limitations under the License.
  */
 export interface FeConcept {
-	concept: string;
-	timesFound: number;
+  concept: string;
+  timesFound: number;
 }

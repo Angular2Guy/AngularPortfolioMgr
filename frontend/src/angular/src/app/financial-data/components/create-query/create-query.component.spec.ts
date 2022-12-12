@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { CreateQueryComponent } from './create-query.component';
+import { CreateQueryComponent } from "./create-query.component";
 /*
 describe('CreateQueryComponent', () => {
   let component: CreateQueryComponent;

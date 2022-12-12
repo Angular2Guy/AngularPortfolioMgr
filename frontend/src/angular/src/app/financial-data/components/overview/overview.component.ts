@@ -10,77 +10,92 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { switchMap,tap } from 'rxjs/operators';
-import { forkJoin, Subscription } from 'rxjs';
-import { ImportFinancialsComponent } from '../import-financials/import-financials.component';
-import { FinancialDataService } from '../../service/financial-data.service';
-import { ImportFinancialsData } from '../../model/import-financials-data';
-import {SymbolFinancials} from '../../model/symbol-financials';
-import {FinancialElementExt} from '../../model/financial-element';
-import { TokenService } from 'ngx-simple-charts/base-service';
-import { ConfigService } from 'src/app/service/config.service';
+import { Component, OnInit, HostListener, OnDestroy } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { Router } from "@angular/router";
+import { switchMap, tap } from "rxjs/operators";
+import { forkJoin, Subscription } from "rxjs";
+import { ImportFinancialsComponent } from "../import-financials/import-financials.component";
+import { FinancialDataService } from "../../service/financial-data.service";
+import { ImportFinancialsData } from "../../model/import-financials-data";
+import { SymbolFinancials } from "../../model/symbol-financials";
+import { FinancialElementExt } from "../../model/financial-element";
+import { TokenService } from "ngx-simple-charts/base-service";
+import { ConfigService } from "src/app/service/config.service";
 
 @Component({
-  selector: 'app-overview',
-  templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss']
+  selector: "app-overview",
+  templateUrl: "./overview.component.html",
+  styleUrls: ["./overview.component.scss"],
 })
 export class OverviewComponent implements OnInit, OnDestroy {
   protected windowHeight: number = null;
   private dialogSubscription: Subscription;
   protected symbolFinancials: SymbolFinancials[] = [];
   protected financialElements: FinancialElementExt[] = [];
-  
-  constructor(private financialDataService: FinancialDataService, private tokenService: TokenService, 
-     private dialog: MatDialog, private configService: ConfigService, private router: Router) { }
+
+  constructor(
+    private financialDataService: FinancialDataService,
+    private tokenService: TokenService,
+    private dialog: MatDialog,
+    private configService: ConfigService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-	this.windowHeight = window.innerHeight - 84;
+    this.windowHeight = window.innerHeight - 84;
   }
 
-    ngOnDestroy(): void {		
-		this.cleanupDialogSubcription();
-    }
+  ngOnDestroy(): void {
+    this.cleanupDialogSubcription();
+  }
 
-    private cleanupDialogSubcription(): void {
-	   if(!!this.dialogSubscription) {
-			this.dialogSubscription.unsubscribe();
-			this.dialogSubscription = null;
-		}
+  private cleanupDialogSubcription(): void {
+    if (!!this.dialogSubscription) {
+      this.dialogSubscription.unsubscribe();
+      this.dialogSubscription = null;
     }
+  }
 
-	@HostListener('window:resize', ['$event'])
-	onResize(event: any) {
-		this.windowHeight = event.target.innerHeight - 84;
-	}
+  @HostListener("window:resize", ["$event"])
+  onResize(event: any) {
+    this.windowHeight = event.target.innerHeight - 84;
+  }
 
-    updateSymbolFinancials(event: SymbolFinancials[]): void {
-		this.symbolFinancials = event;
-    }
+  updateSymbolFinancials(event: SymbolFinancials[]): void {
+    this.symbolFinancials = event;
+  }
 
-    updateFinancialElements(event: FinancialElementExt[]): void {
-		this.financialElements = event;
-    }
-    
-    showFinancialsImport(): void {
-		this.cleanupDialogSubcription();
-		this.configService.getImportPath().subscribe(result => {
-			const dialogRef = this.dialog.open(ImportFinancialsComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: {filename: '', path: result} as ImportFinancialsData});
-			this.dialogSubscription = dialogRef.afterClosed()
-			.pipe(switchMap((result: ImportFinancialsData) => this.financialDataService.putImportFinancialsData(result)))				
-			.subscribe(result => console.log(result));
-		});
-		//console.log('showFinancialsConfig()');
-	}
-	
-	back(): void {
-		this.router.navigate(['/portfolios/overview'])
-	}
-	
-	logout(): void {
-		this.tokenService.logout();
-	}
+  updateFinancialElements(event: FinancialElementExt[]): void {
+    this.financialElements = event;
+  }
+
+  showFinancialsImport(): void {
+    this.cleanupDialogSubcription();
+    this.configService.getImportPath().subscribe((result) => {
+      const dialogRef = this.dialog.open(ImportFinancialsComponent, {
+        width: "500px",
+        disableClose: true,
+        hasBackdrop: true,
+        data: { filename: "", path: result } as ImportFinancialsData,
+      });
+      this.dialogSubscription = dialogRef
+        .afterClosed()
+        .pipe(
+          switchMap((result: ImportFinancialsData) =>
+            this.financialDataService.putImportFinancialsData(result)
+          )
+        )
+        .subscribe((result) => console.log(result));
+    });
+    //console.log('showFinancialsConfig()');
+  }
+
+  back(): void {
+    this.router.navigate(["/portfolios/overview"]);
+  }
+
+  logout(): void {
+    this.tokenService.logout();
+  }
 }

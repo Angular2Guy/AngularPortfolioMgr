@@ -10,22 +10,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { switchMap, tap } from 'rxjs/operators';
-import { Symbol } from '../../../../model/symbol';
-import { Portfolio } from '../../../../model/portfolio';
-import { TokenService } from 'ngx-simple-charts/base-service';
-import { PortfolioService } from '../../../../service/portfolio.service';
-import { Subscription, Subject } from 'rxjs';
-
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  EventEmitter,
+  ChangeDetectorRef,
+} from "@angular/core";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
+import { switchMap, tap } from "rxjs/operators";
+import { Symbol } from "../../../../model/symbol";
+import { Portfolio } from "../../../../model/portfolio";
+import { TokenService } from "ngx-simple-charts/base-service";
+import { PortfolioService } from "../../../../service/portfolio.service";
+import { Subscription, Subject } from "rxjs";
 
 @Component({
-  selector: 'app-portfolio',
-  templateUrl: './portfolio.component.html',
-  styleUrls: ['./portfolio.component.scss']
+  selector: "app-portfolio",
+  templateUrl: "./portfolio.component.html",
+  styleUrls: ["./portfolio.component.scss"],
 })
-export class PortfolioComponent implements OnInit, OnDestroy { 
+export class PortfolioComponent implements OnInit, OnDestroy {
   symbols: Symbol[] = [];
   reloadData = false;
   windowHeight = 0;
@@ -34,44 +39,60 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   showSymbol = true;
   private routeParamSubscription: Subscription;
 
-  constructor(private route: ActivatedRoute, private tokenService: TokenService, 
-              private portfolioService: PortfolioService, private router: Router, 
-			  private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(
+    private route: ActivatedRoute,
+    private tokenService: TokenService,
+    private portfolioService: PortfolioService,
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-	this.windowHeight = window.innerHeight - 84;
-	this.routeParamSubscription = this.route.paramMap.pipe(
-		tap(() => this.reloadData = true),
-		//tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
-		switchMap((params: ParamMap) => this.portfolioService.getPortfolioById(parseInt(params.get('portfolioId')))),
-		tap(() => this.reloadData = false))		
-		.subscribe(myPortfolio => {
-			this.symbols = myPortfolio.symbols;
-			this.selSymbol = myPortfolio?.symbols.length > 0 ? myPortfolio.symbols[0] : this.selSymbol; 
-			this.portfolio = myPortfolio;
-		});
+    this.windowHeight = window.innerHeight - 84;
+    this.routeParamSubscription = this.route.paramMap
+      .pipe(
+        tap(() => (this.reloadData = true)),
+        //tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
+        switchMap((params: ParamMap) =>
+          this.portfolioService.getPortfolioById(
+            parseInt(params.get("portfolioId"))
+          )
+        ),
+        tap(() => (this.reloadData = false))
+      )
+      .subscribe((myPortfolio) => {
+        this.symbols = myPortfolio.symbols;
+        this.selSymbol =
+          myPortfolio?.symbols.length > 0
+            ? myPortfolio.symbols[0]
+            : this.selSymbol;
+        this.portfolio = myPortfolio;
+      });
   }
 
   ngOnDestroy(): void {
-    this.routeParamSubscription.unsubscribe();	
-  }   
+    this.routeParamSubscription.unsubscribe();
+  }
 
   updateReloadData(state: boolean) {
-	this.reloadData = state;
-	this.changeDetectorRef.detectChanges();
-	//console.log('loading:'+state);
+    this.reloadData = state;
+    this.changeDetectorRef.detectChanges();
+    //console.log('loading:'+state);
   }
 
   selectSymbol(symbol: Symbol): void {
-	this.showSymbol = this?.selSymbol?.symbol === symbol?.symbol ? !this.showSymbol : this.showSymbol;
-	this.selSymbol = symbol;
+    this.showSymbol =
+      this?.selSymbol?.symbol === symbol?.symbol
+        ? !this.showSymbol
+        : this.showSymbol;
+    this.selSymbol = symbol;
   }
 
   back(): void {
-	this.router.navigate(['/portfolios/overview']);
+    this.router.navigate(["/portfolios/overview"]);
   }
 
-  logout():void {
-	this.tokenService.logout();	
+  logout(): void {
+    this.tokenService.logout();
   }
 }

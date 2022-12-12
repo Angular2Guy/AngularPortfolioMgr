@@ -10,42 +10,43 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input } from '@angular/core';
-import { ServiceUtils } from '../../../../model/service-utils';
-import { Symbol } from '../../../../model/symbol';
-import { Portfolio, CommonValues } from '../../../../model/portfolio';
+import { Component, OnInit, Input } from "@angular/core";
+import { ServiceUtils } from "../../../../model/service-utils";
+import { Symbol } from "../../../../model/symbol";
+import { Portfolio, CommonValues } from "../../../../model/portfolio";
 
 @Component({
-  selector: 'app-symbol-overview',
-  templateUrl: './symbol-overview.component.html',
-  styleUrls: ['./symbol-overview.component.scss']
+  selector: "app-symbol-overview",
+  templateUrl: "./symbol-overview.component.html",
+  styleUrls: ["./symbol-overview.component.scss"],
 })
 export class SymbolOverviewComponent implements OnInit {
   @Input()
   portfolio: Portfolio;
   private localSymbol: Symbol;
   serviceUtils = ServiceUtils;
-  
-  constructor() { }
 
-  ngOnInit(): void {
-  }
+  constructor() {}
+
+  ngOnInit(): void {}
 
   getPortfolioElement(): CommonValues {
-	return ServiceUtils.isPortfolioSymbol(this.symbol) ? this.portfolio 
-	   : this.portfolio.portfolioElements.filter(value => value.symbol === this.symbol.symbol)[0];
+    return ServiceUtils.isPortfolioSymbol(this.symbol)
+      ? this.portfolio
+      : this.portfolio.portfolioElements.filter(
+          (value) => value.symbol === this.symbol.symbol
+        )[0];
   }
 
-	@Input()
-	set symbol(mySymbol: Symbol) {
-		if (!!mySymbol) {
-			this.localSymbol = mySymbol;
-			//console.log(this.localSymbol);
-		}
-	}
+  @Input()
+  set symbol(mySymbol: Symbol) {
+    if (!!mySymbol) {
+      this.localSymbol = mySymbol;
+      //console.log(this.localSymbol);
+    }
+  }
 
-	get symbol(): Symbol {
-		return this.localSymbol;
-	}
-
+  get symbol(): Symbol {
+    return this.localSymbol;
+  }
 }

@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { FinancialElement } from './financial-element';
- 
+import { FinancialElement } from "./financial-element";
+
 export interface SymbolFinancials {
-	startDate: Date;
-	endDate: Date;
-	year: number;
-	quarter: string;
-	symbol: string;
-	financialElements: FinancialElement[];
+  startDate: Date;
+  endDate: Date;
+  year: number;
+  quarter: string;
+  symbol: string;
+  financialElements: FinancialElement[];
 }

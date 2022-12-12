@@ -1,14 +1,21 @@
 <div class="my-container">
-<mat-tab-group dynamicHeight>
-  <mat-tab i18-label="@@portfolioChartsComparison" label="Portfolio Comparison">
-    <ng-template matTabContent>
-      <app-portfolio-comparison [selPortfolio]="selPortfolio"></app-portfolio-comparison>
-    </ng-template>
-  </mat-tab>
-  <mat-tab i18n-label="@@portfolioChartsSectors" label="Portfolio Sectors">
-    <ng-template matTabContent>
-      <app-portfolio-sectors [selPortfolio]="selPortfolio"></app-portfolio-sectors>
-    </ng-template>
-  </mat-tab>
-</mat-tab-group>
+  <mat-tab-group dynamicHeight>
+    <mat-tab
+      i18-label="@@portfolioChartsComparison"
+      label="Portfolio Comparison"
+    >
+      <ng-template matTabContent>
+        <app-portfolio-comparison
+          [selPortfolio]="selPortfolio"
+        ></app-portfolio-comparison>
+      </ng-template>
+    </mat-tab>
+    <mat-tab i18n-label="@@portfolioChartsSectors" label="Portfolio Sectors">
+      <ng-template matTabContent>
+        <app-portfolio-sectors
+          [selPortfolio]="selPortfolio"
+        ></app-portfolio-sectors>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
 </div>

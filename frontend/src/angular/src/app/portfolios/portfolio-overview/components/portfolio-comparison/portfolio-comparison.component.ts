@@ -10,26 +10,34 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { DateTime, Duration } from 'luxon';
-import { ChartBars, ChartBar } from 'ngx-simple-charts/bar';
-import { Portfolio } from 'src/app/model/portfolio';
-import { PortfolioBars } from 'src/app/model/portfolio-bars';
-import { PortfolioService } from 'src/app/service/portfolio.service';
-import { ComparisonIndex } from 'src/app/service/quote.service';
+import { Component, Input, OnInit } from "@angular/core";
+import { DateTime, Duration } from "luxon";
+import { ChartBars, ChartBar } from "ngx-simple-charts/bar";
+import { Portfolio } from "src/app/model/portfolio";
+import { PortfolioBars } from "src/app/model/portfolio-bars";
+import { PortfolioService } from "src/app/service/portfolio.service";
+import { ComparisonIndex } from "src/app/service/quote.service";
 
-const enum ChartPeriodKey {Month, Months3, Months6, Year, Year3, Year5, Year10 }
+const enum ChartPeriodKey {
+  Month,
+  Months3,
+  Months6,
+  Year,
+  Year3,
+  Year5,
+  Year10,
+}
 
 interface ChartPeriod {
-	periodText: string;
-	periodDuration: any;
-	chartPeriodKey: ChartPeriodKey;
+  periodText: string;
+  periodDuration: any;
+  chartPeriodKey: ChartPeriodKey;
 }
 
 @Component({
-  selector: 'app-portfolio-comparison',
-  templateUrl: './portfolio-comparison.component.html',
-  styleUrls: ['./portfolio-comparison.component.scss']
+  selector: "app-portfolio-comparison",
+  templateUrl: "./portfolio-comparison.component.html",
+  styleUrls: ["./portfolio-comparison.component.scss"],
 })
 export class PortfolioComparisonComponent implements OnInit {
   localSelPortfolio: Portfolio;
@@ -39,55 +47,106 @@ export class PortfolioComparisonComponent implements OnInit {
   readonly ComparisonIndex = ComparisonIndex;
   showSP500 = false;
   showMsciCH = false;
-  showES50 = false;  
+  showES50 = false;
   selChartPeriod: ChartPeriod = null;
   chartBars!: ChartBars;
   selCompIndexes: ComparisonIndex[] = [];
 
-  constructor(private portfolioService: PortfolioService) { }
+  constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-	this.chartPeriods = [{ chartPeriodKey: ChartPeriodKey.Month, periodText: $localize`:@@month1:1 Month`, periodDuration:  {months: 1} },
-		{ chartPeriodKey: ChartPeriodKey.Months3, periodText: $localize`:@@month3:3 Months`, periodDuration:  {months: 3} },
-		{ chartPeriodKey: ChartPeriodKey.Months6, periodText: $localize`:@@month6:6 Months`, periodDuration:  {months: 6} },
-		{ chartPeriodKey: ChartPeriodKey.Year, periodText: $localize`:@@year1:1 Year`, periodDuration:  {years: 1} },
-		{ chartPeriodKey: ChartPeriodKey.Year3, periodText: $localize`:@@year3:3 Years`, periodDuration:  {years: 3} },
-		{ chartPeriodKey: ChartPeriodKey.Year5, periodText: $localize`:@@year5:5 Years`, periodDuration:  {years: 5} },
-		{ chartPeriodKey: ChartPeriodKey.Year10, periodText: $localize`:@@year10:10 Years`, periodDuration:  {years: 10} }];
-		this.selChartPeriod = this.chartPeriods[0];	
-	this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	this.chartPeriodChanged();
+    this.chartPeriods = [
+      {
+        chartPeriodKey: ChartPeriodKey.Month,
+        periodText: $localize`:@@month1:1 Month`,
+        periodDuration: { months: 1 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Months3,
+        periodText: $localize`:@@month3:3 Months`,
+        periodDuration: { months: 3 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Months6,
+        periodText: $localize`:@@month6:6 Months`,
+        periodDuration: { months: 6 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Year,
+        periodText: $localize`:@@year1:1 Year`,
+        periodDuration: { years: 1 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Year3,
+        periodText: $localize`:@@year3:3 Years`,
+        periodDuration: { years: 3 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Year5,
+        periodText: $localize`:@@year5:5 Years`,
+        periodDuration: { years: 5 },
+      },
+      {
+        chartPeriodKey: ChartPeriodKey.Year10,
+        periodText: $localize`:@@year10:10 Years`,
+        periodDuration: { years: 10 },
+      },
+    ];
+    this.selChartPeriod = this.chartPeriods[0];
+    this.startDate = DateTime.now()
+      .minus(this.selChartPeriod.periodDuration)
+      .toJSDate();
+    this.chartPeriodChanged();
   }
 
   get selPortfolio(): Portfolio {
-	return this.localSelPortfolio;
+    return this.localSelPortfolio;
   }
-  
+
   @Input()
   set selPortfolio(myPortfolio: Portfolio) {
-	this.localSelPortfolio = myPortfolio;
-	this.chartPeriodChanged();
+    this.localSelPortfolio = myPortfolio;
+    this.chartPeriodChanged();
   }
 
   chartPeriodChanged(): void {
-	if(!!this.selPortfolio?.id && !!this.selChartPeriod?.periodDuration) {
-	   this.chartsLoading = true;
-	   this.startDate = DateTime.now().minus(this.selChartPeriod.periodDuration).toJSDate();
-	   this.portfolioService.getPortfolioBarsByIdAndStart(this.selPortfolio.id, this.startDate, this.selCompIndexes).subscribe(result => this.updateChartData(result));
-	}	
+    if (!!this.selPortfolio?.id && !!this.selChartPeriod?.periodDuration) {
+      this.chartsLoading = true;
+      this.startDate = DateTime.now()
+        .minus(this.selChartPeriod.periodDuration)
+        .toJSDate();
+      this.portfolioService
+        .getPortfolioBarsByIdAndStart(
+          this.selPortfolio.id,
+          this.startDate,
+          this.selCompIndexes
+        )
+        .subscribe((result) => this.updateChartData(result));
+    }
   }
 
   private updateChartData(portfolioBars: PortfolioBars) {
-	this.chartsLoading = false;
-	//console.log(portfolioBars);	
-	const chartBars = portfolioBars.portfolioBars.map(value => ({x: value.name, y: value.value} as ChartBar));
-	this.chartBars = {title: portfolioBars.title, from: this.startDate.toLocaleDateString(), yScaleWidth: 50, xScaleHeight: 50, chartBars: chartBars } as ChartBars;
-	//console.log(this.chartBars);
+    this.chartsLoading = false;
+    //console.log(portfolioBars);
+    const chartBars = portfolioBars.portfolioBars.map(
+      (value) => ({ x: value.name, y: value.value } as ChartBar)
+    );
+    this.chartBars = {
+      title: portfolioBars.title,
+      from: this.startDate.toLocaleDateString(),
+      yScaleWidth: 50,
+      xScaleHeight: 50,
+      chartBars: chartBars,
+    } as ChartBars;
+    //console.log(this.chartBars);
   }
 
-  compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {	
-	this.selCompIndexes = !value ? this.selCompIndexes.filter(ci => comparisonIndex !== ci) : 
-		this.selCompIndexes.filter(ci => comparisonIndex !== ci).concat(comparisonIndex);
-	this.chartPeriodChanged();
+  compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
+    this.selCompIndexes = !value
+      ? this.selCompIndexes.filter((ci) => comparisonIndex !== ci)
+      : this.selCompIndexes
+          .filter((ci) => comparisonIndex !== ci)
+          .concat(comparisonIndex);
+    this.chartPeriodChanged();
   }
 }

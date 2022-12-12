@@ -10,31 +10,34 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { SpinnerComponent } from './spinner/spinner.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
-import { NgxServiceModule,SimpleChartsConfig } from 'ngx-simple-charts/base-service';
-
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component";
+import { SpinnerComponent } from "./spinner/spinner.component";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import {
+  NgxServiceModule,
+  SimpleChartsConfig,
+} from "ngx-simple-charts/base-service";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-	SpinnerComponent    
-  ],
+  declarations: [AppComponent, SpinnerComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-	MatProgressSpinnerModule,
-	BrowserAnimationsModule,
-	NgxServiceModule.forRoot({tokenRefreshPath: '/rest/auth/refreshToken', logoutPath: '/rest/auth/logout', loginRoute: '/login'})
-  ],  
-  bootstrap: [AppComponent]
+    MatProgressSpinnerModule,
+    BrowserAnimationsModule,
+    NgxServiceModule.forRoot({
+      tokenRefreshPath: "/rest/auth/refreshToken",
+      logoutPath: "/rest/auth/logout",
+      loginRoute: "/login",
+    }),
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

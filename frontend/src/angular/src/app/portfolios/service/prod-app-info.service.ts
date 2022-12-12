@@ -10,16 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class ProdAppInfoService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getClassName(): Observable<string> {
-	return this.http.get('/rest/prod/app-info/class-name', {responseType: 'text'});
+    return this.http.get("/rest/prod/app-info/class-name", {
+      responseType: "text",
+    });
   }
 }

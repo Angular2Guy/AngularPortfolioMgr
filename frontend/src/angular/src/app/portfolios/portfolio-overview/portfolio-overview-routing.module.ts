@@ -10,17 +10,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { PortfolioChartsComponent } from './components/portfolio-charts/portfolio-charts.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { PortfolioChartsComponent } from "./components/portfolio-charts/portfolio-charts.component";
 
 const routes: Routes = [
-	{ path: 'portfolio-charts/:portfolioId', component: PortfolioChartsComponent},	
-	{ path: '**', redirectTo: 'portfolio-charts' }
+  {
+    path: "portfolio-charts/:portfolioId",
+    component: PortfolioChartsComponent,
+  },
+  { path: "**", redirectTo: "portfolio-charts" },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PortfoliosOverviewRoutingModule { }
+export class PortfoliosOverviewRoutingModule {}

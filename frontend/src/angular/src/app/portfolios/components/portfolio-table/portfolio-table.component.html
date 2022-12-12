@@ -1,49 +1,116 @@
 <div>
-  	<table mat-table [dataSource]="portfolioElements">
-
+  <table mat-table [dataSource]="portfolioElements">
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef i18n="@@portfolioTableName"> Name </th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell symbol-name"> {{element.name}} </td>
+      <th mat-header-cell *matHeaderCellDef i18n="@@portfolioTableName">
+        Name
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell symbol-name"
+      >
+        {{ element.name }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="stocks">
-      <th mat-header-cell *matHeaderCellDef i18n="@@portfolioTableStocks"> Stocks </th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> 
-        {{ !element.symbols || element.id !== localPortfolio.id  ? (!!element?.weight ? element.weight : '--') : element.symbols.length -1}} 
+      <th mat-header-cell *matHeaderCellDef i18n="@@portfolioTableStocks">
+        Stocks
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{
+          !element.symbols || element.id !== localPortfolio.id
+            ? !!element?.weight
+              ? element.weight
+              : "--"
+            : element.symbols.length - 1
+        }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="month1">
       <th mat-header-cell *matHeaderCellDef i18n="@@month1">1 Month</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.month1 ? '--' : element.month1 | number: '1.2-5'}} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.month1 ? "--" : (element.month1 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="month6">
       <th mat-header-cell *matHeaderCellDef i18n="@@month6">6 Months</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.month6 ? '--' : element.month6 | number: '1.2-5'}} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.month6 ? "--" : (element.month6 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
-	<ng-container matColumnDef="year1">
+    <ng-container matColumnDef="year1">
       <th mat-header-cell *matHeaderCellDef i18n="@@year1">1 Year</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.year1 ? '--' : element.year1 | number: '1.2-5'}} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.year1 ? "--" : (element.year1 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
-	<ng-container matColumnDef="year2">
+    <ng-container matColumnDef="year2">
       <th mat-header-cell *matHeaderCellDef i18n="@@year2">2 Years</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.year2 ? '--' : element.year2 | number: '1.2-5'}} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.year2 ? "--" : (element.year2 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
-	<ng-container matColumnDef="year5">
+    <ng-container matColumnDef="year5">
       <th mat-header-cell *matHeaderCellDef i18n="@@year5">5 Years</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.year5 ? '--' : element.year5 | number: '1.2-5'}} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.year5 ? "--" : (element.year5 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
-	<ng-container matColumnDef="year10">
+    <ng-container matColumnDef="year10">
       <th mat-header-cell *matHeaderCellDef i18n="@@year10">10 Years</th>
-      <td mat-cell *matCellDef="let element" [class.portfolio-line]="element.id === localPortfolio.id" class="table-cell"> {{!element.year10 ? '--' : element.year10 | number: '1.2-5' }} </td>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.portfolio-line]="element.id === localPortfolio.id"
+        class="table-cell"
+      >
+        {{ !element.year10 ? "--" : (element.year10 | number: "1.2-5") }}
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selPortfolio(row)"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      (click)="selPortfolio(row)"
+    ></tr>
   </table>
 </div>

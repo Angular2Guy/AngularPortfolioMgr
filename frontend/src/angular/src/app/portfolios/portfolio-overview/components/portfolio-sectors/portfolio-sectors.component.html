@@ -1,21 +1,40 @@
 <div class="my-container">
-<div *ngIf="chartsLoading" class="center-div">
-	<mat-progress-spinner			  
-			mode="indeterminate"
-			color="primary"></mat-progress-spinner>
-</div>
-<div *ngIf="!chartsLoading" class="chart-container">
+  <div *ngIf="chartsLoading" class="center-div">
+    <mat-progress-spinner
+      mode="indeterminate"
+      color="primary"
+    ></mat-progress-spinner>
+  </div>
+  <div *ngIf="!chartsLoading" class="chart-container">
     <div class="chart-legend">
-       <h2 class="my-header" i18n="@@portfolioSectorsLegendTitle">Portfolio sector distribution</h2>
-       <ol type="1">
-       	 <li *ngFor="let chartSlice of chartSlices.chartSlices">
-       	    <span class="my-span">{{chartSlice.name}}: </span>
-       	    <span>{{(chartSlice.value / slicesSum * 100) | number: '1.0-2'}} %</span>
-       	    <span><mat-icon class="my-icon" [ngStyle]="{'color': chartSlice.color, 'padding-left': '10px'}">incomplete_circle</mat-icon></span>
-       	 </li>
-       </ol>
+      <h2 class="my-header" i18n="@@portfolioSectorsLegendTitle">
+        Portfolio sector distribution
+      </h2>
+      <ol type="1">
+        <li *ngFor="let chartSlice of chartSlices.chartSlices">
+          <span class="my-span">{{ chartSlice.name }}: </span>
+          <span
+            >{{
+              (chartSlice.value / slicesSum) * 100 | number: "1.0-2"
+            }}
+            %</span
+          >
+          <span
+            ><mat-icon
+              class="my-icon"
+              [ngStyle]="{ color: chartSlice.color, 'padding-left': '10px' }"
+              >incomplete_circle</mat-icon
+            ></span
+          >
+        </li>
+      </ol>
     </div>
     <div class="hide-me"><span #hideMe class="my-content"></span></div>
-	<sc-donut-chart class="donut-chart" #myDonutChart [chartState]="chartState" [chartSlices]="chartSlices"></sc-donut-chart>
-</div>
+    <sc-donut-chart
+      class="donut-chart"
+      #myDonutChart
+      [chartState]="chartState"
+      [chartSlices]="chartSlices"
+    ></sc-donut-chart>
+  </div>
 </div>

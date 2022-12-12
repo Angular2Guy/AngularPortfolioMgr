@@ -11,17 +11,17 @@
    limitations under the License.
  */
 export interface Symbol {
-	id: number;
-	symbol: string;
-	name: string;
-	weight?: number;
-	changedAt: string;
-	removedAt?: string;
-	source: string;
-    currencyKey: string;
-	sector?: string;
-	industry?: string;
-	description?: string;
-	address?: string;
-	country?: string;
+  id: number;
+  symbol: string;
+  name: string;
+  weight?: number;
+  changedAt: string;
+  removedAt?: string;
+  source: string;
+  currencyKey: string;
+  sector?: string;
+  industry?: string;
+  description?: string;
+  address?: string;
+  country?: string;
 }

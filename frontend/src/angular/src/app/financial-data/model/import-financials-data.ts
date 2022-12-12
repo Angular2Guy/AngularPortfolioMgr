@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
- 
- export interface ImportFinancialsData {
- 	filename: string;
- 	path?: string;
- }
+
+export interface ImportFinancialsData {
+  filename: string;
+  path?: string;
+}

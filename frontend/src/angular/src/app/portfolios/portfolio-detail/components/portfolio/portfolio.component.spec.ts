@@ -10,10 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 
-import { PortfolioComponent } from './portfolio.component';
-
+import { PortfolioComponent } from "./portfolio.component";
 
 /*describe('SymbolComponent', () => {
   let component: SymbolComponent;

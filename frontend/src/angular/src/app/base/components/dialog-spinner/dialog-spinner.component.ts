@@ -10,24 +10,26 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { Component, OnInit, Inject } from "@angular/core";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
 
 export interface SpinnerData {
-	title: string;
+  title: string;
 }
 
 @Component({
-  selector: 'app-dialog-spinner',
-  templateUrl: './dialog-spinner.component.html',
-  styleUrls: ['./dialog-spinner.component.scss']
+  selector: "app-dialog-spinner",
+  templateUrl: "./dialog-spinner.component.html",
+  styleUrls: ["./dialog-spinner.component.scss"],
 })
-export class DialogSpinnerComponent implements OnInit {  
-  
-  constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) { }
+export class DialogSpinnerComponent implements OnInit {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) {}
 
   ngOnInit(): void {
-	console.log('title: ' + this.data.title);
+    console.log("title: " + this.data.title);
   }
-
 }

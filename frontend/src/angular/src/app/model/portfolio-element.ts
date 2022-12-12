@@ -10,11 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { CommonValues } from './portfolio';
- 
+import { CommonValues } from "./portfolio";
+
 export interface PortfolioElement extends CommonValues {
-	symbol: string;
-	weight: number;
-	sector: string;
-	lastClose: number;
+  symbol: string;
+  weight: number;
+  sector: string;
+  lastClose: number;
 }

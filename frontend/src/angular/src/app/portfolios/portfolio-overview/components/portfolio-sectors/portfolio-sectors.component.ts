@@ -10,7 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from "@angular/core";
 import {
   trigger,
   state,
@@ -18,97 +25,133 @@ import {
   animate,
   transition,
   query,
-  group
-} from '@angular/animations';
-import { ChartSlices, ChartSlice } from 'ngx-simple-charts/donut';
-import { Portfolio } from 'src/app/model/portfolio';
+  group,
+} from "@angular/animations";
+import { ChartSlices, ChartSlice } from "ngx-simple-charts/donut";
+import { Portfolio } from "src/app/model/portfolio";
 
 interface CalcPortfolioElement {
-	name: string;
-	sector: string; 
-	value: number;
+  name: string;
+  sector: string;
+  value: number;
 }
 
 @Component({
-  selector: 'app-portfolio-sectors',
-  templateUrl: './portfolio-sectors.component.html',
-  styleUrls: ['./portfolio-sectors.component.scss'],
+  selector: "app-portfolio-sectors",
+  templateUrl: "./portfolio-sectors.component.html",
+  styleUrls: ["./portfolio-sectors.component.scss"],
   animations: [
-	trigger('fadeInGrow', [
-        transition('* => ready', [
-                style({ opacity: 0, transform: 'scale(0.1)'  }),
-                group([
-                    animate('300ms linear', style({ opacity: 1 })),
-                    animate('1000ms linear', style({ transform: 'scale(1)' }))
-                ])
-        ])
-    ])
-]
+    trigger("fadeInGrow", [
+      transition("* => ready", [
+        style({ opacity: 0, transform: "scale(0.1)" }),
+        group([
+          animate("300ms linear", style({ opacity: 1 })),
+          animate("1000ms linear", style({ transform: "scale(1)" })),
+        ]),
+      ]),
+    ]),
+  ],
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   localSelPortfolio: Portfolio;
-  chartSlices: ChartSlices = {title: '', from: '', xScaleHeight: 0, yScaleWidth: 0, chartSlices: []};
+  chartSlices: ChartSlices = {
+    title: "",
+    from: "",
+    xScaleHeight: 0,
+    yScaleWidth: 0,
+    chartSlices: [],
+  };
   chartsLoading = true;
-  @ViewChild('hideMe') 
+  @ViewChild("hideMe")
   divHideMe: ElementRef;
   afterViewInitCalled = false;
-  chartState: 'ready' | 'not-ready' = 'not-ready';
+  chartState: "ready" | "not-ready" = "not-ready";
   slicesSum = 1;
-   
-  private readonly colorKeys = ['--red','--purple', '--blue','-cyan','--green','--lime','--orange','--gray'];
-  
-  constructor() { }
 
-  ngOnInit(): void {	
-	this.chartSlices.title = this.selPortfolio.name;
-	this.chartSlices.chartSlices = [];
-	this.chartsLoading = false;
-	this.chartState = 'not-ready';
+  private readonly colorKeys = [
+    "--red",
+    "--purple",
+    "--blue",
+    "-cyan",
+    "--green",
+    "--lime",
+    "--orange",
+    "--gray",
+  ];
+
+  constructor() {}
+
+  ngOnInit(): void {
+    this.chartSlices.title = this.selPortfolio.name;
+    this.chartSlices.chartSlices = [];
+    this.chartsLoading = false;
+    this.chartState = "not-ready";
   }
 
   ngAfterViewInit(): void {
-	this.afterViewInitCalled = true;
-	this.drawDonut();
+    this.afterViewInitCalled = true;
+    this.drawDonut();
   }
-  
+
   private drawDonut(): void {
-	if(!this.afterViewInitCalled || !this.selPortfolio?.id) {
-		return;
-	}
-	const sliceColors = window.getComputedStyle(this.divHideMe.nativeElement,':before')['content']
-	   .replace('"', '').replace('\"','').split(',');
-	//console.log(sliceColors);	
-	const valueMap = this.selPortfolio.portfolioElements
-	  .map(pe => ({name: pe.name, sector: pe.sector, value: (pe.lastClose * pe.weight)} as CalcPortfolioElement))
-	  .reduce((myMap, cpe) => {
-		let myValue = myMap.get(cpe.sector);
-		myValue = !myValue ? 0 : myValue;
-		myMap.set(cpe.sector, myValue + cpe.value);
-		return myMap;  
-	},new Map<string,number>());
-	let calcColors = [];
-	while(calcColors.length < valueMap.size) {
-		calcColors = calcColors.concat(sliceColors);
-	}
-	let i = 0;
-	valueMap.forEach((myValue, myKey) => { 
-		i = i + 1;
-		this.chartSlices.chartSlices.push({name: myKey, value: myValue, color: calcColors[i]} as ChartSlice);
-	});
-	this.slicesSum = this.chartSlices.chartSlices.reduce((acc, mySlice) => acc = acc + mySlice.value, 0);
-	this.chartSlices.chartSlices = this.chartSlices.chartSlices.sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value).reverse();
-		setTimeout(() =>  {this.chartState = 'ready';});	
-	//console.log(this.chartSlices.chartSlices);
+    if (!this.afterViewInitCalled || !this.selPortfolio?.id) {
+      return;
+    }
+    const sliceColors = window
+      .getComputedStyle(this.divHideMe.nativeElement, ":before")
+      ["content"].replace('"', "")
+      .replace('"', "")
+      .split(",");
+    //console.log(sliceColors);
+    const valueMap = this.selPortfolio.portfolioElements
+      .map(
+        (pe) =>
+          ({
+            name: pe.name,
+            sector: pe.sector,
+            value: pe.lastClose * pe.weight,
+          } as CalcPortfolioElement)
+      )
+      .reduce((myMap, cpe) => {
+        let myValue = myMap.get(cpe.sector);
+        myValue = !myValue ? 0 : myValue;
+        myMap.set(cpe.sector, myValue + cpe.value);
+        return myMap;
+      }, new Map<string, number>());
+    let calcColors = [];
+    while (calcColors.length < valueMap.size) {
+      calcColors = calcColors.concat(sliceColors);
+    }
+    let i = 0;
+    valueMap.forEach((myValue, myKey) => {
+      i = i + 1;
+      this.chartSlices.chartSlices.push({
+        name: myKey,
+        value: myValue,
+        color: calcColors[i],
+      } as ChartSlice);
+    });
+    this.slicesSum = this.chartSlices.chartSlices.reduce(
+      (acc, mySlice) => (acc = acc + mySlice.value),
+      0
+    );
+    this.chartSlices.chartSlices = this.chartSlices.chartSlices
+      .sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value)
+      .reverse();
+    setTimeout(() => {
+      this.chartState = "ready";
+    });
+    //console.log(this.chartSlices.chartSlices);
   }
-  
+
   get selPortfolio(): Portfolio {
-	return this.localSelPortfolio;
+    return this.localSelPortfolio;
   }
-  
+
   @Input()
   set selPortfolio(myPortfolio: Portfolio) {
-	this.localSelPortfolio = myPortfolio;
-	this.chartState = 'not-ready';
-	this.drawDonut();
+    this.localSelPortfolio = myPortfolio;
+    this.chartState = "not-ready";
+    this.drawDonut();
   }
 }

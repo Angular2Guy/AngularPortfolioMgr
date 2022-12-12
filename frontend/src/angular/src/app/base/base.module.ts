@@ -10,28 +10,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { HttpClientModule }    from '@angular/common/http';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { DialogSpinnerComponent } from './components/dialog-spinner/dialog-spinner.component';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule, FormsModule } from "@angular/forms";
+import { HttpClientModule } from "@angular/common/http";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { DialogSpinnerComponent } from "./components/dialog-spinner/dialog-spinner.component";
 
 @NgModule({
-	declarations: [DialogSpinnerComponent],
-	imports: [
-		CommonModule,
-		HttpClientModule,
-		FormsModule,
-		ReactiveFormsModule,
-		MatProgressSpinnerModule
-	],
-	exports: [		
-		CommonModule,
-		HttpClientModule,
-		FormsModule,
-		ReactiveFormsModule,
-		DialogSpinnerComponent
-		]
+  declarations: [DialogSpinnerComponent],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+  ],
+  exports: [
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    DialogSpinnerComponent,
+  ],
 })
-export class BaseModule { }
+export class BaseModule {}

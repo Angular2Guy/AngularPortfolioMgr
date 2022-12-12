@@ -11,14 +11,14 @@
    limitations under the License.
  */
 
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 .mat-mdc-table {
-  overflow: auto;  
+  overflow: auto;
 }
 
 .table-cell {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 table {
@@ -34,6 +34,6 @@ table {
 }
 
 .portfolio-line {
-	$blue: mat.get-color-from-palette(mat.$blue-palette, 900);
-	color: #{$blue};
+  $blue: mat.get-color-from-palette(mat.$blue-palette, 900);
+  color: #{$blue};
 }

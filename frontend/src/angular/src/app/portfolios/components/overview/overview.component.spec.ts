@@ -10,9 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 
-import { OverviewComponent } from './overview.component';
+import { OverviewComponent } from "./overview.component";
 
 /*
 describe('OverviewComponent', () => {

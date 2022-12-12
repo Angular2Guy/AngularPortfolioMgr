@@ -1,54 +1,54 @@
 .invisible-div {
-	display: none;
+  display: none;
 }
 
 .my-radio-group {
-	margin: 0 10px;
+  margin: 0 10px;
 }
 
 .my-radio-button {
-//	margin: 0 10px;
+  //	margin: 0 10px;
 }
 .my-checkbox {
-//	margin-left: 10px;
+  //	margin-left: 10px;
 }
 .symbol-data {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 
 .text-container {
-//	margin-bottom: 10px;
+  //	margin-bottom: 10px;
 }
 
 .chart-container {
-	height: calc(100% - 160px);
-	width: 100%;
+  height: calc(100% - 160px);
+  width: 100%;
 }
 
 .base-container {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  width: 100%;
 }
 .center-div {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 ::ng-deep .line-sxrt {
-    fill: none !important;
-    stroke: #7CFC00 !important;
-    stroke-width: 2 !important;
+  fill: none !important;
+  stroke: #7cfc00 !important;
+  stroke-width: 2 !important;
 }
 
 ::ng-deep .line-icga {
-    fill: none !important;
-    stroke: #eff542 !important;
-    stroke-width: 2 !important;
+  fill: none !important;
+  stroke: #eff542 !important;
+  stroke-width: 2 !important;
 }
 
 ::ng-deep .line-ivv {
-    fill: none !important;
-    stroke: #ff0000 !important;
-    stroke-width: 2 !important;
+  fill: none !important;
+  stroke: #ff0000 !important;
+  stroke-width: 2 !important;
 }

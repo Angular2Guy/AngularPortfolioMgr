@@ -10,25 +10,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Symbol } from './symbol';
+import { Symbol } from "./symbol";
 
-enum QuoteSource { ALPHAVANTAGE = 'ALPHAVANTAGE', YAHOO = 'YAHOO', PORTFOLIO = 'PORTFOLIO' }
+enum QuoteSource {
+  ALPHAVANTAGE = "ALPHAVANTAGE",
+  YAHOO = "YAHOO",
+  PORTFOLIO = "PORTFOLIO",
+}
 
 export class ServiceUtils {
-	public static readonly PORTFOLIO_MARKER = 'V8yXhrg';
-	public static readonly QuoteSource = QuoteSource;
-	private static readonly symbolIdTranslation = $localize`:@@symbolId:SymbolId`;
-	
-	public static isPortfolioSymbol(symbol: string | Symbol): boolean {		
-		return (typeof symbol === 'string') ? symbol.includes(ServiceUtils.PORTFOLIO_MARKER) 
-		  : symbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER);
-	}
-	
-	public static isIntraDayDataAvailiable(symbol: Symbol): boolean {
-		return symbol && symbol?.source === QuoteSource.ALPHAVANTAGE;
-	}
-	
-	public static replacePortfolioSymbol(symbolStr: string): string {
-		return !symbolStr || ServiceUtils.isPortfolioSymbol(symbolStr) ? ServiceUtils.symbolIdTranslation : symbolStr;
-	}
+  public static readonly PORTFOLIO_MARKER = "V8yXhrg";
+  public static readonly QuoteSource = QuoteSource;
+  private static readonly symbolIdTranslation = $localize`:@@symbolId:SymbolId`;
+
+  public static isPortfolioSymbol(symbol: string | Symbol): boolean {
+    return typeof symbol === "string"
+      ? symbol.includes(ServiceUtils.PORTFOLIO_MARKER)
+      : symbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER);
+  }
+
+  public static isIntraDayDataAvailiable(symbol: Symbol): boolean {
+    return symbol && symbol?.source === QuoteSource.ALPHAVANTAGE;
+  }
+
+  public static replacePortfolioSymbol(symbolStr: string): string {
+    return !symbolStr || ServiceUtils.isPortfolioSymbol(symbolStr)
+      ? ServiceUtils.symbolIdTranslation
+      : symbolStr;
+  }
 }

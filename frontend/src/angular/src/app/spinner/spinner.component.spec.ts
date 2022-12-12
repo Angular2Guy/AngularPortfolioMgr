@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 
-import { SpinnerComponent } from './spinner.component';
+import { SpinnerComponent } from "./spinner.component";
 
 /*
 describe('SpinnerComponent', () => {

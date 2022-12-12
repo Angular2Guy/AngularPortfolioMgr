@@ -10,38 +10,38 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { BaseModule } from '../../base/base.module';
-import { PortfolioComponent } from './components/portfolio/portfolio.component';
-import { SymbolComponent } from './components/symbol/symbol.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatListModule } from '@angular/material/list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { NgxLineChartsModule } from 'ngx-simple-charts/line';
-import { PortfolioDetailRoutingModule } from './portfolio-detail-routing.module';
-import { SymbolOverviewComponent } from './components/symbol-overview/symbol-overview.component';
+import { NgModule } from "@angular/core";
+import { BaseModule } from "../../base/base.module";
+import { PortfolioComponent } from "./components/portfolio/portfolio.component";
+import { SymbolComponent } from "./components/symbol/symbol.component";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatRadioModule } from "@angular/material/radio";
+import { MatListModule } from "@angular/material/list";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatIconModule } from "@angular/material/icon";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatButtonModule } from "@angular/material/button";
+import { NgxLineChartsModule } from "ngx-simple-charts/line";
+import { PortfolioDetailRoutingModule } from "./portfolio-detail-routing.module";
+import { SymbolOverviewComponent } from "./components/symbol-overview/symbol-overview.component";
 
 @NgModule({
-	declarations: [PortfolioComponent,	SymbolComponent, SymbolOverviewComponent],
-	imports: [
-		BaseModule,
-		NgxLineChartsModule,
-		MatCheckboxModule,
-		MatRadioModule,
-		MatListModule,
-		MatProgressSpinnerModule,
-		MatSidenavModule,
-		MatToolbarModule,
-		MatIconModule,
-		MatFormFieldModule,
-		MatButtonModule,
-		PortfolioDetailRoutingModule,
-	],
+  declarations: [PortfolioComponent, SymbolComponent, SymbolOverviewComponent],
+  imports: [
+    BaseModule,
+    NgxLineChartsModule,
+    MatCheckboxModule,
+    MatRadioModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    PortfolioDetailRoutingModule,
+  ],
 })
-export class PortfolioDetailModule { }
+export class PortfolioDetailModule {}

@@ -11,11 +11,11 @@
    limitations under the License.
  */
 export interface Quote {
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-	volume: number;
-	timestamp: string;
-	symbol: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  timestamp: string;
+  symbol: string;
 }

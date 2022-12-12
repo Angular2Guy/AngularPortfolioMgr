@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { DevConfigComponent } from './dev-config.component';
+import { DevConfigComponent } from "./dev-config.component";
 
 /*
 describe('DevConfigComponent', () => {

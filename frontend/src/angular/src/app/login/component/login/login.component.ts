@@ -10,109 +10,136 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MainComponent } from '../main/main.component';
-import { LoginService } from '../../service/login.service';
-import { Login } from '../../model/login';
-import { TokenService } from 'ngx-simple-charts/base-service';
+import { Component, OnInit, Inject } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MainComponent } from "../main/main.component";
+import { LoginService } from "../../service/login.service";
+import { Login } from "../../model/login";
+import { TokenService } from "ngx-simple-charts/base-service";
 
 enum FormFields {
-	Username = 'username',
-	Password = 'password',
-	Password2 = 'password2',
-	Email = 'email'
+  Username = "username",
+  Password = "password",
+  Password2 = "password2",
+  Email = "email",
 }
 
 @Component({
-	selector: 'app-login',
-	templateUrl: './login.component.html',
-	styleUrls: ['./login.component.scss']
+  selector: "app-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.scss"],
 })
 export class LoginComponent implements OnInit {
-	signinForm: FormGroup;
-	loginForm: FormGroup;
-	loginFailed = false;
-	signinFailed = false;
-	pwMatching = true;
-	FormFields = FormFields;
+  signinForm: FormGroup;
+  loginForm: FormGroup;
+  loginFailed = false;
+  signinFailed = false;
+  pwMatching = true;
+  FormFields = FormFields;
 
-	constructor(public dialogRef: MatDialogRef<MainComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: any,
-		private loginService: LoginService,
-		private tokenService: TokenService,
-		fb: FormBuilder) {
-		this.signinForm = fb.group({
-			[FormFields.Username]: ['', Validators.required],
-			[FormFields.Password]: ['', Validators.required],
-			[FormFields.Password2]: ['', Validators.required],
-			[FormFields.Email]: ['', Validators.required]
-		}, {
-				validator: this.validate.bind(this)
-			});
-		this.loginForm = fb.group({
-			[FormFields.Username]: ['', Validators.required],
-		    [FormFields.Password]: ['', Validators.required]
-		});
-	}
+  constructor(
+    public dialogRef: MatDialogRef<MainComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private loginService: LoginService,
+    private tokenService: TokenService,
+    fb: FormBuilder
+  ) {
+    this.signinForm = fb.group(
+      {
+        [FormFields.Username]: ["", Validators.required],
+        [FormFields.Password]: ["", Validators.required],
+        [FormFields.Password2]: ["", Validators.required],
+        [FormFields.Email]: ["", Validators.required],
+      },
+      {
+        validator: this.validate.bind(this),
+      }
+    );
+    this.loginForm = fb.group({
+      [FormFields.Username]: ["", Validators.required],
+      [FormFields.Password]: ["", Validators.required],
+    });
+  }
 
-	ngOnInit() {
-		console.log(this.data);
-	}
+  ngOnInit() {
+    console.log(this.data);
+  }
 
-	validate(group: FormGroup) {
-		if (group.get(FormFields.Password).touched || group.get(FormFields.Password2).touched) {
-			this.pwMatching = group.get(FormFields.Password).value === group.get(FormFields.Password2).value && group.get(FormFields.Password).value !== '';
-			if (!this.pwMatching) {
-				group.get(FormFields.Password).setErrors({ MatchPassword: true });
-				group.get(FormFields.Password2).setErrors({ MatchPassword: true });
-			} else {
-				group.get(FormFields.Password).setErrors(null);
-				group.get(FormFields.Password2).setErrors(null);
-			}
-		}
-		return this.pwMatching;
-	}
+  validate(group: FormGroup) {
+    if (
+      group.get(FormFields.Password).touched ||
+      group.get(FormFields.Password2).touched
+    ) {
+      this.pwMatching =
+        group.get(FormFields.Password).value ===
+          group.get(FormFields.Password2).value &&
+        group.get(FormFields.Password).value !== "";
+      if (!this.pwMatching) {
+        group.get(FormFields.Password).setErrors({ MatchPassword: true });
+        group.get(FormFields.Password2).setErrors({ MatchPassword: true });
+      } else {
+        group.get(FormFields.Password).setErrors(null);
+        group.get(FormFields.Password2).setErrors(null);
+      }
+    }
+    return this.pwMatching;
+  }
 
-	onSigninClick(): void {
-		const login: Login = { emailAddress: null, token: null, password: null, username: null };
-		login.username = this.signinForm.get(FormFields.Username).value;
-		login.password = this.signinForm.get(FormFields.Password).value;
-		login.emailAddress = this.signinForm.get(FormFields.Email).value;
-		this.loginService.postSignin(login).subscribe(res => this.signin(res), err => console.log(err));
-	}
+  onSigninClick(): void {
+    const login: Login = {
+      emailAddress: null,
+      token: null,
+      password: null,
+      username: null,
+    };
+    login.username = this.signinForm.get(FormFields.Username).value;
+    login.password = this.signinForm.get(FormFields.Password).value;
+    login.emailAddress = this.signinForm.get(FormFields.Email).value;
+    this.loginService.postSignin(login).subscribe(
+      (res) => this.signin(res),
+      (err) => console.log(err)
+    );
+  }
 
-	onLoginClick(): void {
-		const login: Login = {emailAddress: null, token: null, password: null, username: null}; 
-		login.username = this.loginForm.get(FormFields.Username).value;
-		login.password = this.loginForm.get(FormFields.Password).value;
-		this.loginService.postLogin(login).subscribe(res => this.login(res), err => console.log(err));		
-	}
+  onLoginClick(): void {
+    const login: Login = {
+      emailAddress: null,
+      token: null,
+      password: null,
+      username: null,
+    };
+    login.username = this.loginForm.get(FormFields.Username).value;
+    login.password = this.loginForm.get(FormFields.Password).value;
+    this.loginService.postLogin(login).subscribe(
+      (res) => this.login(res),
+      (err) => console.log(err)
+    );
+  }
 
-	private signin(login: boolean): void {
-		this.data.login = null;
-		if (login) {
-			this.signinFailed = false;
-			this.dialogRef.close();
-		} else {
-			this.signinFailed = true;
-		}
-	}
+  private signin(login: boolean): void {
+    this.data.login = null;
+    if (login) {
+      this.signinFailed = false;
+      this.dialogRef.close();
+    } else {
+      this.signinFailed = true;
+    }
+  }
 
-	private login(login: Login): void {
-		if (login && login.token && login.id) {
-			this.tokenService.token = login.token;
-			this.tokenService.userId = login.id;
-			this.data.login = login;
-			this.loginFailed = false;
-			this.dialogRef.close(this.data.login);
-		} else {
-			this.loginFailed = true;
-		}
-	}
+  private login(login: Login): void {
+    if (login && login.token && login.id) {
+      this.tokenService.token = login.token;
+      this.tokenService.userId = login.id;
+      this.data.login = login;
+      this.loginFailed = false;
+      this.dialogRef.close(this.data.login);
+    } else {
+      this.loginFailed = true;
+    }
+  }
 
-	onCancelClick(): void {
-		this.dialogRef.close();
-	}
+  onCancelClick(): void {
+    this.dialogRef.close();
+  }
 }

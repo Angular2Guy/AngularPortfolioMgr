@@ -1,23 +1,46 @@
 <div mat-dialog-content class="mat-typography">
-    <form [formGroup]="financialsForm" novalidate>        
-			<ul class="list-style">
-				<li>
-					<h1 class="mat-h1" i18n="@@financialDataImport">Financialdata import</h1>
-				</li>				
-				<li class="file-path">
-					<span class="mat-body" i18n="@@filepath">Filepath: </span><span class="mat-body">{{filepath}}</span>
-				</li>
-				<li>
-					<mat-form-field class="form-field"> 
-					    <mat-label i18n="@@filename">Filename</mat-label>
-						<input matInput type="text" formControlName="{{FormFields.Filename}}"  
-							i18n-placeholder="@@filename" placeholder="Filename">
-					</mat-form-field>
-				</li>
-				<li>
-					<button mat-button (click)="okClick()" [disabled]="!filepath || financialsForm.invalid" tabindex="-1" i18n="@@ok">Ok</button>
-					<button mat-button (click)="cancelClick()" tabindex="-1" i18n="@@cancel">Cancel</button>
-				</li>
-			</ul>
-	</form>
+  <form [formGroup]="financialsForm" novalidate>
+    <ul class="list-style">
+      <li>
+        <h1 class="mat-h1" i18n="@@financialDataImport">
+          Financialdata import
+        </h1>
+      </li>
+      <li class="file-path">
+        <span class="mat-body" i18n="@@filepath">Filepath: </span
+        ><span class="mat-body">{{ filepath }}</span>
+      </li>
+      <li>
+        <mat-form-field class="form-field">
+          <mat-label i18n="@@filename">Filename</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="{{ FormFields.Filename }}"
+            i18n-placeholder="@@filename"
+            placeholder="Filename"
+          />
+        </mat-form-field>
+      </li>
+      <li>
+        <button
+          mat-button
+          (click)="okClick()"
+          [disabled]="!filepath || financialsForm.invalid"
+          tabindex="-1"
+          i18n="@@ok"
+        >
+          Ok
+        </button>
+        <button
+          mat-button
+          (click)="cancelClick()"
+          tabindex="-1"
+          i18n="@@cancel"
+        >
+          Cancel
+        </button>
+      </li>
+    </ul>
+  </form>
 </div>

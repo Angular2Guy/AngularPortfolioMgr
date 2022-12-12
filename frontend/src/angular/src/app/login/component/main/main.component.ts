@@ -10,36 +10,41 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Login } from '../../model/login';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { LoginComponent } from '../login/login.component';
-import { TokenService } from 'ngx-simple-charts/base-service';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Login } from "../../model/login";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { LoginComponent } from "../login/login.component";
+import { TokenService } from "ngx-simple-charts/base-service";
+import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-main',
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss']
+  selector: "app-main",
+  templateUrl: "./main.component.html",
+  styleUrls: ["./main.component.scss"],
 })
-export class MainComponent {	
+export class MainComponent {
   login: Login = null;
 
-  constructor(private dialog: MatDialog, 
-		private tokenService: TokenService,
-		private router: Router) { }
+  constructor(
+    private dialog: MatDialog,
+    private tokenService: TokenService,
+    private router: Router
+  ) {}
 
-  openLoginDialog():void {
-	const dialogRef = this.dialog.open(LoginComponent, { width: '600px', data: {login: this.login}});
-	dialogRef.afterClosed().subscribe( result => {
-		this.login = typeof result == 'undefined' ? null : result;	
-		if(this.login) {
-			this.router.navigate(['/portfolios/overview']);
-		}
-	});
+  openLoginDialog(): void {
+    const dialogRef = this.dialog.open(LoginComponent, {
+      width: "600px",
+      data: { login: this.login },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      this.login = typeof result == "undefined" ? null : result;
+      if (this.login) {
+        this.router.navigate(["/portfolios/overview"]);
+      }
+    });
   }
 
-  logout():void {
-	this.tokenService.logout();
+  logout(): void {
+    this.tokenService.logout();
   }
 }

@@ -10,16 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { PortfolioComponent } from './components/portfolio/portfolio.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { PortfolioComponent } from "./components/portfolio/portfolio.component";
 
 const routes: Routes = [
-	{ path: 'portfolio/:portfolioId', component: PortfolioComponent},
+  { path: "portfolio/:portfolioId", component: PortfolioComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PortfolioDetailRoutingModule { }
+export class PortfolioDetailRoutingModule {}

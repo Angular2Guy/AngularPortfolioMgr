@@ -1,27 +1,58 @@
 <div mat-dialog-content>
-		<form [formGroup]="portfolioForm" novalidate>  
-			<ul>
-				<li>
-					<mat-form-field> 
-						<input matInput
-							i18n-placeholder="@@newPortfolioPortfolioName" placeholder="Portfolioname" tabindex="1" formControlName="{{FormFields.PortfolioName}}"> 
-					</mat-form-field>
-				</li>
-				<li>
-					<mat-form-field> 
-						<mat-label i18n="@@newPortfolioCreationDate">Creation date</mat-label>
-  						<input matInput [matDatepicker]="picker1" formControlName="{{FormFields.CreatedAt}}">
-  						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-  						<mat-datepicker #picker1></mat-datepicker>
-					</mat-form-field>
-				</li>
-				<li *ngIf="!formValid" i18n="@@newPortfolioInputInvalid" class="errorText">
-					Input invalid
-				</li>
-				<li>
-					<button mat-button (click)="onAddClick()" [disabled]="!formValid" tabindex="-1" i18n="@@ok">Ok</button>
-					<button mat-button (click)="onCancelClick()" tabindex="-1" i18n="@@cancel">Cancel</button>
-				</li>
-			</ul>
-		</form>
+  <form [formGroup]="portfolioForm" novalidate>
+    <ul>
+      <li>
+        <mat-form-field>
+          <input
+            matInput
+            i18n-placeholder="@@newPortfolioPortfolioName"
+            placeholder="Portfolioname"
+            tabindex="1"
+            formControlName="{{ FormFields.PortfolioName }}"
+          />
+        </mat-form-field>
+      </li>
+      <li>
+        <mat-form-field>
+          <mat-label i18n="@@newPortfolioCreationDate">Creation date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker1"
+            formControlName="{{ FormFields.CreatedAt }}"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker1"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+      </li>
+      <li
+        *ngIf="!formValid"
+        i18n="@@newPortfolioInputInvalid"
+        class="errorText"
+      >
+        Input invalid
+      </li>
+      <li>
+        <button
+          mat-button
+          (click)="onAddClick()"
+          [disabled]="!formValid"
+          tabindex="-1"
+          i18n="@@ok"
+        >
+          Ok
+        </button>
+        <button
+          mat-button
+          (click)="onCancelClick()"
+          tabindex="-1"
+          i18n="@@cancel"
+        >
+          Cancel
+        </button>
+      </li>
+    </ul>
+  </form>
 </div>

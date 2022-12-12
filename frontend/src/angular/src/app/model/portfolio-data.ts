@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Portfolio } from './portfolio';
+import { Portfolio } from "./portfolio";
 
 export interface PortfolioData {
-	portfolio: Portfolio
+  portfolio: Portfolio;
 }

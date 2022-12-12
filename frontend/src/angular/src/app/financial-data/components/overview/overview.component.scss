@@ -1,25 +1,25 @@
 .header-space {
-	margin-left: 20px;
-}	
-	
+  margin-left: 20px;
+}
+
 .example-fill-remaining-space {
-  // This fills the remaining space, by using flexbox. 
+  // This fills the remaining space, by using flexbox.
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }
 
 .base-container {
-	display: flex;
-	flex: 1 1 auto;
-	align-items: stretch;
-	height: calc(100vh - 80px);
-	width: 100%;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  height: calc(100vh - 80px);
+  width: 100%;
 }
 
 .query-container {
-	width: 100%;
+  width: 100%;
 }
 
 .result-container {
-	width: 100%;
+  width: 100%;
 }

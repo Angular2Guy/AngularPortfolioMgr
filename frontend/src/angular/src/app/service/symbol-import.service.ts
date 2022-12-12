@@ -10,28 +10,29 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: "root" })
 export class SymbolImportService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getSymbolImportUs(): Observable<string> {
-	return this.http.get('/rest/symbol/importus/all', {responseType: 'text'});
+    return this.http.get("/rest/symbol/importus/all", { responseType: "text" });
   }
 
   getSymbolImportHk(): Observable<string> {
-	return this.http.get('/rest/symbol/importhk/all', {responseType: 'text'});
+    return this.http.get("/rest/symbol/importhk/all", { responseType: "text" });
   }
 
   getSymbolImportDe(): Observable<string> {
-	return this.http.get('/rest/symbol/importde/all', {responseType: 'text'});
+    return this.http.get("/rest/symbol/importde/all", { responseType: "text" });
   }
-  
+
   getIndexSymbols(): Observable<string> {
-	return this.http.get('/rest/symbol/importindex/all', {responseType: 'text'});
+    return this.http.get("/rest/symbol/importindex/all", {
+      responseType: "text",
+    });
   }
 }

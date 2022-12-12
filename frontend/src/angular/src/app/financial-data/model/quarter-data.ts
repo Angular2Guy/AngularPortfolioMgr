@@ -11,6 +11,6 @@
    limitations under the License.
  */
 export interface QuarterData {
-	quarter: string;
-	timesFound: number;
+  quarter: string;
+  timesFound: number;
 }

@@ -10,45 +10,85 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
-import { Portfolio } from '../model/portfolio';
-import { PortfolioBars } from '../model/portfolio-bars';
-import { HttpClient } from '@angular/common/http';
-import { ComparisonIndex } from './quote.service';
+import { Injectable } from "@angular/core";
+import { Observable, shareReplay } from "rxjs";
+import { Portfolio } from "../model/portfolio";
+import { PortfolioBars } from "../model/portfolio-bars";
+import { HttpClient } from "@angular/common/http";
+import { ComparisonIndex } from "./quote.service";
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: "root" })
 export class PortfolioService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
+  getPortfolioByUserId(userId: number): Observable<Portfolio[]> {
+    return this.http
+      .get<Portfolio[]>(`/rest/portfolio/userid/${userId}`)
+      .pipe(shareReplay(1));
+  }
 
-  	getPortfolioByUserId(userId: number): Observable<Portfolio[]> {
-		return this.http.get<Portfolio[]>(`/rest/portfolio/userid/${userId}`).pipe(shareReplay(1));
-	}
-	
-	getPortfolioById(portfolioId: number): Observable<Portfolio> {
-		return this.http.get<Portfolio>(`/rest/portfolio/id/${portfolioId}`).pipe(shareReplay(1));
-	}
-	
-	getPortfolioBarsByIdAndStart(portfolioId: number, start: Date, compSyms: ComparisonIndex[]): Observable<PortfolioBars> {
-		const compSymStrs = compSyms.length === 0 ? '' : ('?compSymbols=' + compSyms.join(','));
-		return this.http.get<PortfolioBars>(`/rest/portfolio/id/${portfolioId}/start/${start.toISOString().split('T')[0]}${compSymStrs}`);
-	}	
-	
-	postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
-		return this.http.post<Portfolio>('/rest/portfolio', portfolio);
-	}
-	
-	postSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number, changedAt: string): Observable<Portfolio> {
-		return this.http.post<Portfolio>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(changedAt)}`, portfolio);
-	}
-	
-	putSymbolToPortfolio(portfolio: Portfolio, symbolId: number, weight: number, changedAt: string): Observable<Portfolio> {
-		return this.http.put<Portfolio>(`/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(changedAt)}`, portfolio);
-	}
-	
-	deleteSymbolFromPortfolio(portfolio: Portfolio, symbolId: number, removedAt: string): Observable<Portfolio> {
-		const id = portfolio.id;
-		return this.http.delete<Portfolio>(`/rest/portfolio/${id}/symbol/${symbolId}?removedAt=${encodeURI(removedAt)}`);
-	}
+  getPortfolioById(portfolioId: number): Observable<Portfolio> {
+    return this.http
+      .get<Portfolio>(`/rest/portfolio/id/${portfolioId}`)
+      .pipe(shareReplay(1));
+  }
+
+  getPortfolioBarsByIdAndStart(
+    portfolioId: number,
+    start: Date,
+    compSyms: ComparisonIndex[]
+  ): Observable<PortfolioBars> {
+    const compSymStrs =
+      compSyms.length === 0 ? "" : "?compSymbols=" + compSyms.join(",");
+    return this.http.get<PortfolioBars>(
+      `/rest/portfolio/id/${portfolioId}/start/${
+        start.toISOString().split("T")[0]
+      }${compSymStrs}`
+    );
+  }
+
+  postPortfolio(portfolio: Portfolio): Observable<Portfolio> {
+    return this.http.post<Portfolio>("/rest/portfolio", portfolio);
+  }
+
+  postSymbolToPortfolio(
+    portfolio: Portfolio,
+    symbolId: number,
+    weight: number,
+    changedAt: string
+  ): Observable<Portfolio> {
+    return this.http.post<Portfolio>(
+      `/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(
+        changedAt
+      )}`,
+      portfolio
+    );
+  }
+
+  putSymbolToPortfolio(
+    portfolio: Portfolio,
+    symbolId: number,
+    weight: number,
+    changedAt: string
+  ): Observable<Portfolio> {
+    return this.http.put<Portfolio>(
+      `/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(
+        changedAt
+      )}`,
+      portfolio
+    );
+  }
+
+  deleteSymbolFromPortfolio(
+    portfolio: Portfolio,
+    symbolId: number,
+    removedAt: string
+  ): Observable<Portfolio> {
+    const id = portfolio.id;
+    return this.http.delete<Portfolio>(
+      `/rest/portfolio/${id}/symbol/${symbolId}?removedAt=${encodeURI(
+        removedAt
+      )}`
+    );
+  }
 }

@@ -1,66 +1,116 @@
 <div class="container">
-		<form [formGroup]="queryForm" novalidate>
-	<div>
-		<div class="search-header">
-			<h2 i18n="@@createQueryCompanyQuery">Company Query</h2>
-			<button mat-raised-button color="primary" (click)="search()" i18n="@@search">Search</button>
-		</div>
-			<div class="symbol-financials-container">
-				<mat-form-field> 
-				   <mat-label i18n="@@operator">Operator</mat-label> 
-				   <mat-select [formControlName]="FormFields.YearOperator" name="YearOperator">
-				      <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{item}}</mat-option> 
-				   </mat-select>
-				</mat-form-field>
-				<mat-form-field class="form-field">
-				<mat-label i18n="@@year">Year</mat-label>  
-				   <input matInput type="text" formControlName="{{FormFields.Year}}">
-				</mat-form-field>
-			</div>
-			<div class="symbol-financials-container">
-				<mat-form-field class="form-field">
-				<mat-label i18n="@@createQuerySymbol">Symbol</mat-label> 
-						<input matInput type="text" [matAutocomplete]="autoSymbol" formControlName="{{FormFields.Symbol}}"
-							i18n-placeholder="@@phSymbol" placeholder="symbol">
-						<mat-autocomplete #autoSymbol="matAutocomplete" autoActiveFirstOption>
-      						<mat-option *ngFor="let symbol of symbols" [value]="symbol.symbol">
-        						{{ symbol.symbol }}
-      						</mat-option>
-    					</mat-autocomplete> 
-				</mat-form-field>
-				<mat-form-field class="form-field"> 
-				   <mat-label i18n="@@quarter">Quarter</mat-label> 
-				   <mat-select [formControlName]="FormFields.Quarter" name="Quarter" multiple>
-				      <mat-option *ngFor="let item of quarterQueryItems" [value]="item">{{item}}</mat-option> 
-				   </mat-select>
-				</mat-form-field>
-				</div>
-	</div>
-	<div cdkDropListGroup>
-		<div class="query-container">
-			<h2 i18n="@@createQueryAvailableSecQueryItems">Available Sec Query Items</h2>
-			<h3 i18n="@@createQueryAddQueryItems">To add a Query Item. Drag it down.</h3>
+  <form [formGroup]="queryForm" novalidate>
+    <div>
+      <div class="search-header">
+        <h2 i18n="@@createQueryCompanyQuery">Company Query</h2>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="search()"
+          i18n="@@search"
+        >
+          Search
+        </button>
+      </div>
+      <div class="symbol-financials-container">
+        <mat-form-field>
+          <mat-label i18n="@@operator">Operator</mat-label>
+          <mat-select
+            [formControlName]="FormFields.YearOperator"
+            name="YearOperator"
+          >
+            <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{
+              item
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="form-field">
+          <mat-label i18n="@@year">Year</mat-label>
+          <input matInput type="text" formControlName="{{ FormFields.Year }}" />
+        </mat-form-field>
+      </div>
+      <div class="symbol-financials-container">
+        <mat-form-field class="form-field">
+          <mat-label i18n="@@createQuerySymbol">Symbol</mat-label>
+          <input
+            matInput
+            type="text"
+            [matAutocomplete]="autoSymbol"
+            formControlName="{{ FormFields.Symbol }}"
+            i18n-placeholder="@@phSymbol"
+            placeholder="symbol"
+          />
+          <mat-autocomplete #autoSymbol="matAutocomplete" autoActiveFirstOption>
+            <mat-option *ngFor="let symbol of symbols" [value]="symbol.symbol">
+              {{ symbol.symbol }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="form-field">
+          <mat-label i18n="@@quarter">Quarter</mat-label>
+          <mat-select
+            [formControlName]="FormFields.Quarter"
+            name="Quarter"
+            multiple
+          >
+            <mat-option *ngFor="let item of quarterQueryItems" [value]="item">{{
+              item
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div cdkDropListGroup>
+      <div class="query-container">
+        <h2 i18n="@@createQueryAvailableSecQueryItems">
+          Available Sec Query Items
+        </h2>
+        <h3 i18n="@@createQueryAddQueryItems">
+          To add a Query Item. Drag it down.
+        </h3>
 
-			<div cdkDropList [cdkDropListData]="availableItems"
-				class="query-list" (cdkDropListDropped)="drop($event)">
-				<app-query *ngFor="let item of availableItems" cdkDrag [queryItemType]="item.queryItemType" 
-				   [baseFormArray]="availableItemParams.formArray" [formArrayIndex]="availableItemParams.formArrayIndex" 
-				   [showType]="availableItemParams.showType" ></app-query>
-			</div>
-		</div>
+        <div
+          cdkDropList
+          [cdkDropListData]="availableItems"
+          class="query-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <app-query
+            *ngFor="let item of availableItems"
+            cdkDrag
+            [queryItemType]="item.queryItemType"
+            [baseFormArray]="availableItemParams.formArray"
+            [formArrayIndex]="availableItemParams.formArrayIndex"
+            [showType]="availableItemParams.showType"
+          ></app-query>
+        </div>
+      </div>
 
-		<div class="query-container">
-			<h2 i18n="@@createQuerySecQueryItems">Sec Query Items</h2>
-			<h3 i18n="@@createQueryRemoveQueryItems">To remove a Query Item. Drag it up.</h3>
+      <div class="query-container">
+        <h2 i18n="@@createQuerySecQueryItems">Sec Query Items</h2>
+        <h3 i18n="@@createQueryRemoveQueryItems">
+          To remove a Query Item. Drag it up.
+        </h3>
 
-			<div cdkDropList [cdkDropListData]="queryItems" class="query-list"
-				(cdkDropListDropped)="drop($event)">
-				<app-query class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag [queryItemType]="item.queryItemType" 
-				   [baseFormArray]="queryItemParams.formArray" [formArrayIndex]="i" (removeItem)="removeItem($event)"
-				   [showType]="queryItemParams.showType" ></app-query>
-				<!-- <div class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag>{{item.title}}</div> -->
-			</div>
-		</div>
-	</div>
-   </form>
+        <div
+          cdkDropList
+          [cdkDropListData]="queryItems"
+          class="query-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <app-query
+            class="query-item"
+            *ngFor="let item of queryItems; let i = index"
+            cdkDrag
+            [queryItemType]="item.queryItemType"
+            [baseFormArray]="queryItemParams.formArray"
+            [formArrayIndex]="i"
+            (removeItem)="removeItem($event)"
+            [showType]="queryItemParams.showType"
+          ></app-query>
+          <!-- <div class="query-item" *ngFor="let item of queryItems; let i = index" cdkDrag>{{item.title}}</div> -->
+        </div>
+      </div>
+    </div>
+  </form>
 </div>

@@ -10,56 +10,65 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { PortfoliosRoutingModule } from './portfolios-routing.module';
-import { BaseModule } from '../base/base.module';
-import { OverviewComponent } from './components/overview/overview.component';
-import { NewPortfolioComponent } from './components/new-portfolio/new-portfolio.component';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AddSymbolComponent } from './components/add-symbol/add-symbol.component';
-import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
-import { MatListModule } from '@angular/material/list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
-import { MatInputModule } from '@angular/material/input';
-import { DevAppInfoService } from './service/dev-app-info.service';
-import { ProdAppInfoService } from './service/prod-app-info.service';
-import { ProdConfigComponent } from './components/prod-config/prod-config.component';
-import { DevConfigComponent } from './components/dev-config/dev-config.component';
-import { TokenInterceptor } from 'ngx-simple-charts/base-service';
+import { NgModule } from "@angular/core";
+import { PortfoliosRoutingModule } from "./portfolios-routing.module";
+import { BaseModule } from "../base/base.module";
+import { OverviewComponent } from "./components/overview/overview.component";
+import { NewPortfolioComponent } from "./components/new-portfolio/new-portfolio.component";
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
+import { AddSymbolComponent } from "./components/add-symbol/add-symbol.component";
+import { PortfolioTableComponent } from "./components/portfolio-table/portfolio-table.component";
+import { MatListModule } from "@angular/material/list";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatIconModule } from "@angular/material/icon";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatSelectModule } from "@angular/material/select";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatTableModule } from "@angular/material/table";
+import { MatButtonModule } from "@angular/material/button";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatLuxonDateModule } from "@angular/material-luxon-adapter";
+import { MatInputModule } from "@angular/material/input";
+import { DevAppInfoService } from "./service/dev-app-info.service";
+import { ProdAppInfoService } from "./service/prod-app-info.service";
+import { ProdConfigComponent } from "./components/prod-config/prod-config.component";
+import { DevConfigComponent } from "./components/dev-config/dev-config.component";
+import { TokenInterceptor } from "ngx-simple-charts/base-service";
 
 @NgModule({
-    declarations: [OverviewComponent, NewPortfolioComponent, AddSymbolComponent, 
-        PortfolioTableComponent, ProdConfigComponent, DevConfigComponent],
-    imports: [
-        BaseModule,
-        MatListModule,
-        MatProgressSpinnerModule,
-        MatSidenavModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatDatepickerModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        MatAutocompleteModule,
-        MatTableModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatLuxonDateModule,
-        MatInputModule,
-        PortfoliosRoutingModule,
-    ],
-    providers: [DevAppInfoService, ProdAppInfoService, 
-       { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
+  declarations: [
+    OverviewComponent,
+    NewPortfolioComponent,
+    AddSymbolComponent,
+    PortfolioTableComponent,
+    ProdConfigComponent,
+    DevConfigComponent,
+  ],
+  imports: [
+    BaseModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatTableModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatLuxonDateModule,
+    MatInputModule,
+    PortfoliosRoutingModule,
+  ],
+  providers: [
+    DevAppInfoService,
+    ProdAppInfoService,
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+  ],
 })
-export class PortfoliosModule { }
+export class PortfoliosModule {}

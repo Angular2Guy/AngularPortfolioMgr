@@ -10,24 +10,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Symbol } from './symbol';
-import { PortfolioElement } from './portfolio-element';
+import { Symbol } from "./symbol";
+import { PortfolioElement } from "./portfolio-element";
 
 export interface Portfolio extends CommonValues {
-	userId: number;
-	symbols: Symbol[];
-	portfolioElements: PortfolioElement[];
+  userId: number;
+  symbols: Symbol[];
+  portfolioElements: PortfolioElement[];
 }
 
 export interface CommonValues {
-	id: number;
-	currencyKey: string;
-	name: string;
-	createdAt: string;
-	month1: number;
-	month6: number;
-	year1: number;
-	year2: number;
-	year5: number;
-	year10: number;
+  id: number;
+  currencyKey: string;
+  name: string;
+  createdAt: string;
+  month1: number;
+  month6: number;
+  year1: number;
+  year2: number;
+  year5: number;
+  year10: number;
 }

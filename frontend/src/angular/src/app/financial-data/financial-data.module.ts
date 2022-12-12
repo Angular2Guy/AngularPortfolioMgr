@@ -10,32 +10,35 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BaseModule } from '../base/base.module';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import {MatSelectModule} from '@angular/material/select'; 
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import {DragDropModule} from '@angular/cdk/drag-drop';
-import { FinancialDataRoutingModule } from './financial-data-routing.module';
-import { OverviewComponent } from './components/overview/overview.component';
-import { ImportFinancialsComponent } from './components/import-financials/import-financials.component';
-import { CreateQueryComponent } from './components/create-query/create-query.component';
-import { QueryResultsComponent } from './components/query-results/query-results.component';
-import { QueryComponent } from './components/query/query.component';
-import { FinancialDataService } from './service/financial-data.service';
-import { TokenInterceptor } from 'ngx-simple-charts/base-service';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { BaseModule } from "../base/base.module";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatButtonModule } from "@angular/material/button";
+import { MatInputModule } from "@angular/material/input";
+import { MatIconModule } from "@angular/material/icon";
+import { MatSelectModule } from "@angular/material/select";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { FinancialDataRoutingModule } from "./financial-data-routing.module";
+import { OverviewComponent } from "./components/overview/overview.component";
+import { ImportFinancialsComponent } from "./components/import-financials/import-financials.component";
+import { CreateQueryComponent } from "./components/create-query/create-query.component";
+import { QueryResultsComponent } from "./components/query-results/query-results.component";
+import { QueryComponent } from "./components/query/query.component";
+import { FinancialDataService } from "./service/financial-data.service";
+import { TokenInterceptor } from "ngx-simple-charts/base-service";
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
 
 @NgModule({
   declarations: [
-    OverviewComponent,ImportFinancialsComponent, CreateQueryComponent, QueryResultsComponent, QueryComponent
+    OverviewComponent,
+    ImportFinancialsComponent,
+    CreateQueryComponent,
+    QueryResultsComponent,
+    QueryComponent,
   ],
   imports: [
     CommonModule,
@@ -49,9 +52,11 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     MatAutocompleteModule,
     DragDropModule,
     BaseModule,
-    FinancialDataRoutingModule
+    FinancialDataRoutingModule,
   ],
-  providers: [FinancialDataService,  
-       { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }]
+  providers: [
+    FinancialDataService,
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+  ],
 })
-export class FinancialDataModule { }
+export class FinancialDataModule {}

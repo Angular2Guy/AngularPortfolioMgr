@@ -10,24 +10,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: "root" })
 export class QuoteImportService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   importDailyQuotes(symbol: string): Observable<number> {
-	return this.http.get<number>(`/rest/quote/import/daily/symbol/${symbol}`);
-  }  
+    return this.http.get<number>(`/rest/quote/import/daily/symbol/${symbol}`);
+  }
 
   importIntraDayQuotes(symbol: string): Observable<number> {
-	return this.http.get<number>(`/rest/quote/import/intraday/symbol/${symbol}`);
+    return this.http.get<number>(
+      `/rest/quote/import/intraday/symbol/${symbol}`
+    );
   }
 
   importFxDailyQuotes(to_curr: string): Observable<number> {
-	return this.http.get<number>(`/rest/quote/import/daily/currency/${to_curr}`)
+    return this.http.get<number>(
+      `/rest/quote/import/daily/currency/${to_curr}`
+    );
   }
 }

@@ -10,51 +10,51 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@use '@angular/material' as mat;
-    
-.my-container{
-	background: #ffffff;
-	height: 100%;
-	width: 100%;
+@use "@angular/material" as mat;
+
+.my-container {
+  background: #ffffff;
+  height: 100%;
+  width: 100%;
 }
 .my-span {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 .my-radio-group {
-	margin: 0 10px;
+  margin: 0 10px;
 }
 .my-radio-button {
-//	margin: 0 10px;
+  //	margin: 0 10px;
 }
 .my-checkbox {
-//	margin-left: 10px;
+  //	margin-left: 10px;
 }
 .text-container {
-//	margin-bottom: 10px;
+  //	margin-bottom: 10px;
 }
 .center-div {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: calc(100% - 94px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(100% - 94px);
 }
 .example-margin {
   margin: 0 10px;
 }
 .chart-container {
-	height: calc(100% - 94px);
-	width: 100%;
+  height: calc(100% - 94px);
+  width: 100%;
 }
 ::ng-deep .bar-sxrt {
-	$green: mat.get-color-from-palette(mat.$green-palette, 900);
-    fill: $green !important;
+  $green: mat.get-color-from-palette(mat.$green-palette, 900);
+  fill: $green !important;
 }
 ::ng-deep .bar-icga {
-	$lime: mat.get-color-from-palette(mat.$lime-palette, 900);
-    fill: $lime !important;
+  $lime: mat.get-color-from-palette(mat.$lime-palette, 900);
+  fill: $lime !important;
 }
 ::ng-deep .bar-ivv {
-	$red: mat.get-color-from-palette(mat.$red-palette, 900);
-    fill: $red !important;
+  $red: mat.get-color-from-palette(mat.$red-palette, 900);
+  fill: $red !important;
 }

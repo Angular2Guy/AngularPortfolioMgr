@@ -11,10 +11,10 @@
    limitations under the License.
  */
 export interface Login {
-	id?: number;
-	username: string;
-	password: string;
-	emailAddress: string;
-	token: string;
-	secUntilNexLogin?: number;
+  id?: number;
+  username: string;
+  password: string;
+  emailAddress: string;
+  token: string;
+  secUntilNexLogin?: number;
 }

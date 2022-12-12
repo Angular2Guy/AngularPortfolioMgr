@@ -1,43 +1,44 @@
-.container {		
+.container {
 }
 
 table {
   width: 100%;
 }
 
-.symbol-list {	
-	width: 300px;
-	overflow-x: hidden;
-	overflow-y: auto;	
-	.symbol-line {
-		display: flex;	
-		align-items: center;
-		.add-button {
-			width: 56px;
-		}		
-	}
+.symbol-list {
+  width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  .symbol-line {
+    display: flex;
+    align-items: center;
+    .add-button {
+      width: 56px;
+    }
+  }
 }
 
 .example-container {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
 }
 
-.custom-spinner ::ng-deep .mat-mdc-progress-spinner circle, .mat-mdc-progress-spinner circle {
-	stroke: #ffffff !important;
+.custom-spinner ::ng-deep .mat-mdc-progress-spinner circle,
+.mat-mdc-progress-spinner circle {
+  stroke: #ffffff !important;
 }
 
-.spinner-text{
-	font-size: 14px;
-	margin-left: 20px;
+.spinner-text {
+  font-size: 14px;
+  margin-left: 20px;
 }
-	
+
 .mat-mdc-table {
-  overflow: auto;  
+  overflow: auto;
 }
 
 .example-fill-remaining-space {
-  // This fills the remaining space, by using flexbox. 
+  // This fills the remaining space, by using flexbox.
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }

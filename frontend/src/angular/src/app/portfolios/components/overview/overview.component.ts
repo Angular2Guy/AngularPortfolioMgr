@@ -10,174 +10,247 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
-import { TokenService } from 'ngx-simple-charts/base-service';
-import { Router } from '@angular/router';
-import { PortfolioService } from '../../../service/portfolio.service';
-import { Portfolio } from '../../../model/portfolio';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { NewPortfolioComponent } from '../new-portfolio/new-portfolio.component';
-import { PortfolioData } from '../../../model/portfolio-data';
-import { SymbolImportService } from '../../../service/symbol-import.service';
-import { forkJoin, Subscription } from 'rxjs';
-import { switchMap,tap } from 'rxjs/operators';
-import { AddSymbolComponent } from '../add-symbol/add-symbol.component';
-import { Symbol } from '../../../model/symbol';
-import { QuoteImportService } from '../../../service/quote-import.service';
-import { ConfigService } from 'src/app/service/config.service';
-import { ProdConfigComponent } from '../prod-config/prod-config.component';
-import { DevConfigComponent } from '../dev-config/dev-config.component';
-import { SpinnerData, DialogSpinnerComponent } from 'src/app/base/components/dialog-spinner/dialog-spinner.component';
+import { Component, OnInit, HostListener, OnDestroy } from "@angular/core";
+import { TokenService } from "ngx-simple-charts/base-service";
+import { Router } from "@angular/router";
+import { PortfolioService } from "../../../service/portfolio.service";
+import { Portfolio } from "../../../model/portfolio";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { NewPortfolioComponent } from "../new-portfolio/new-portfolio.component";
+import { PortfolioData } from "../../../model/portfolio-data";
+import { SymbolImportService } from "../../../service/symbol-import.service";
+import { forkJoin, Subscription } from "rxjs";
+import { switchMap, tap } from "rxjs/operators";
+import { AddSymbolComponent } from "../add-symbol/add-symbol.component";
+import { Symbol } from "../../../model/symbol";
+import { QuoteImportService } from "../../../service/quote-import.service";
+import { ConfigService } from "src/app/service/config.service";
+import { ProdConfigComponent } from "../prod-config/prod-config.component";
+import { DevConfigComponent } from "../dev-config/dev-config.component";
+import {
+  SpinnerData,
+  DialogSpinnerComponent,
+} from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 
 @Component({
-	selector: 'app-overview',
-	templateUrl: './overview.component.html',
-	styleUrls: ['./overview.component.scss']
+  selector: "app-overview",
+  templateUrl: "./overview.component.html",
+  styleUrls: ["./overview.component.scss"],
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-	protected windowHeight: number = null;
-	portfolios: Portfolio[] = [];
-	myPortfolio!: Portfolio;
-	displayedColumns = ['name', 'stocks', 'month1', 'month6', 'year1', 'year2', 'year5', 'year10'];
-	importingSymbols = false;
-	private timeoutId = -1;
-	private dialogSubscription: Subscription;
-	private profiles: string = null;
-	private showPortfolioTable = true;
+  protected windowHeight: number = null;
+  portfolios: Portfolio[] = [];
+  myPortfolio!: Portfolio;
+  displayedColumns = [
+    "name",
+    "stocks",
+    "month1",
+    "month6",
+    "year1",
+    "year2",
+    "year5",
+    "year10",
+  ];
+  importingSymbols = false;
+  private timeoutId = -1;
+  private dialogSubscription: Subscription;
+  private profiles: string = null;
+  private showPortfolioTable = true;
 
-	constructor(private tokenService: TokenService, private configService: ConfigService,
-		private router: Router,		
-		private portfolioService: PortfolioService,
-		private symbolImportService: SymbolImportService,
-		private quoteImportService: QuoteImportService,
-		private dialog: MatDialog) { }
+  constructor(
+    private tokenService: TokenService,
+    private configService: ConfigService,
+    private router: Router,
+    private portfolioService: PortfolioService,
+    private symbolImportService: SymbolImportService,
+    private quoteImportService: QuoteImportService,
+    private dialog: MatDialog
+  ) {}
 
-	ngOnInit() {
-		this.windowHeight = window.innerHeight - 84;
-		this.refreshPortfolios();
-		this.configService.getProfiles().subscribe(value => this.profiles = !value ? 'dev' : value);
-	}
+  ngOnInit() {
+    this.windowHeight = window.innerHeight - 84;
+    this.refreshPortfolios();
+    this.configService
+      .getProfiles()
+      .subscribe((value) => (this.profiles = !value ? "dev" : value));
+  }
 
-    ngOnDestroy(): void {		
-		this.cleanupDialogSubcription();
+  ngOnDestroy(): void {
+    this.cleanupDialogSubcription();
+  }
+
+  @HostListener("window:resize", ["$event"])
+  onResize(event: any) {
+    this.windowHeight = event.target.innerHeight - 84;
+  }
+
+  newPortfolio() {
+    this.cleanupDialogSubcription();
+    const portfolio: Portfolio = {
+      id: null,
+      createdAt: new Date().toISOString(),
+      month1: null,
+      month6: null,
+      name: null,
+      symbols: [],
+      currencyKey: null,
+      portfolioElements: [],
+      userId: this.tokenService.userId as number,
+      year1: null,
+      year10: null,
+      year2: null,
+      year5: null,
+    };
+    const newPortfolioData: PortfolioData = { portfolio: portfolio };
+    const dialogRef = this.dialog.open(NewPortfolioComponent, {
+      width: "500px",
+      data: newPortfolioData,
+    });
+    this.dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.portfolioService.postPortfolio(result).subscribe((myPortfolio) => {
+          this.portfolios = [...this.portfolios, myPortfolio];
+          this.myPortfolio = myPortfolio;
+          this.selPortfolio(myPortfolio, true);
+        });
+      }
+    });
+  }
+
+  selPortfolio(portfolio: Portfolio, showPortTab = false) {
+    this.myPortfolio = portfolio;
+    this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
+    const myPath = !this.showPortfolioTable
+      ? "portfolio-overview/portfolio-charts"
+      : "table";
+    //console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
+    //the -1 portfolioId is filtered out and forces a update of the route
+    if (showPortTab) {
+      this.router
+        .navigate([`/portfolios/overview/${myPath}`, -1])
+        .then(() =>
+          this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id])
+        );
+    } else {
+      this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
     }
+  }
 
-	@HostListener('window:resize', ['$event'])
-	onResize(event: any) {
-		this.windowHeight = event.target.innerHeight - 84;
-	}
+  showFinancialData() {
+    this.router.navigate([`/financialdata`]);
+  }
 
-	newPortfolio() {
-		this.cleanupDialogSubcription();
-		const portfolio: Portfolio = {
-			id: null, createdAt: new Date().toISOString(), month1: null, month6: null, name: null, symbols: [], currencyKey: null,
-			portfolioElements: [], userId: (this.tokenService.userId as number), year1: null, year10: null, year2: null, year5: null
-		};
-		const newPortfolioData: PortfolioData = { portfolio: portfolio };
-		const dialogRef = this.dialog.open(NewPortfolioComponent, { width: '500px', data: newPortfolioData });
-		this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
-			if (result) {
-				this.portfolioService.postPortfolio(result)
-					.subscribe(myPortfolio => {
-						this.portfolios = [...this.portfolios, myPortfolio];
-						this.myPortfolio = myPortfolio;
-						this.selPortfolio(myPortfolio, true);
-					});
-			}
-		});
-	}
+  private refreshPortfolios() {
+    this.portfolioService
+      .getPortfolioByUserId(this.tokenService.userId as number)
+      .subscribe((myPortfolios) => {
+        myPortfolios.forEach(
+          (port) => (port.symbols = !port.symbols ? [] : port.symbols)
+        );
+        this.portfolios = myPortfolios;
+        this.myPortfolio =
+          myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
+        if (!!this.myPortfolio) {
+          this.selPortfolio(this.myPortfolio, true);
+        }
+      });
+  }
 
-	selPortfolio(portfolio: Portfolio, showPortTab = false) {
-		this.myPortfolio = portfolio;
-		this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
-		const myPath = !this.showPortfolioTable ? 'portfolio-overview/portfolio-charts' : 'table';  
-		//console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
-		//the -1 portfolioId is filtered out and forces a update of the route
-		if(showPortTab) {
-		   this.router.navigate([`/portfolios/overview/${myPath}`, -1])
-		      .then(() => this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]));
-		   } else {
-			  this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
-		}
-	}
+  addSymbol(portfolio: Portfolio) {
+    const portfolioData: PortfolioData = { portfolio: portfolio };
+    this.cleanupDialogSubcription();
+    const dialogRef = this.dialog.open(AddSymbolComponent, {
+      width: "500px",
+      disableClose: true,
+      hasBackdrop: true,
+      data: portfolioData,
+    });
+    this.dialogSubscription = dialogRef
+      .afterClosed()
+      .subscribe((symbol: Symbol) => {
+        if (symbol) {
+          const dialogSpinnerRef = this.dialog.open(DialogSpinnerComponent, {
+            width: "500px",
+            disableClose: true,
+            hasBackdrop: true,
+            enterAnimationDuration: "500ms",
+            exitAnimationDuration: "500ms",
+            data: {
+              title: $localize`:@@overviewPortfolioCalc:Portfolio Calculation`,
+            } as SpinnerData,
+          });
+          symbol.weight = !symbol.weight ? 0 : symbol.weight;
+          this.portfolioService
+            .postSymbolToPortfolio(
+              portfolio,
+              symbol.id,
+              symbol.weight,
+              symbol.changedAt
+            )
+            .subscribe((result) => {
+              if (result) {
+                const filteredPortfolios = this.portfolios.filter(
+                  (port) => port.id !== result.id
+                );
+                this.portfolios = [...filteredPortfolios, result];
+                this.myPortfolio = result;
+                this.selPortfolio(result, true);
+                dialogSpinnerRef.close();
+              }
+            });
+        }
+      });
+  }
 
-    showFinancialData() {
-		this.router.navigate([`/financialdata`]);
+  importSymbols(): void {
+    this.importingSymbols = true;
+    if (this.timeoutId >= 0) {
+      clearTimeout(this.timeoutId);
     }
+    forkJoin(
+      this.symbolImportService.getSymbolImportUs(),
+      this.symbolImportService.getSymbolImportHk(),
+      this.symbolImportService.getSymbolImportDe(),
+      this.quoteImportService.importFxDailyQuotes("USD"),
+      this.quoteImportService.importFxDailyQuotes("HKD")
+    ).subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
+      console.log(
+        `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
+      );
+      setTimeout(
+        () =>
+          this.symbolImportService
+            .getIndexSymbols()
+            .subscribe((resultIndex) => {
+              console.log(`Index Symbols: ${resultIndex}`);
+              this.importingSymbols = false;
+            }),
+        60000
+      );
+    });
+  }
 
-	private refreshPortfolios() {
-		this.portfolioService.getPortfolioByUserId((this.tokenService.userId as number)).subscribe(myPortfolios => {
-			myPortfolios.forEach(port => port.symbols = !port.symbols ? [] : port.symbols);
-			this.portfolios = myPortfolios;
-			this.myPortfolio = myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
-			if(!!this.myPortfolio) {
-				this.selPortfolio(this.myPortfolio, true);
-			}
-		});
-	}
+  logout(): void {
+    this.tokenService.logout();
+  }
 
-	addSymbol(portfolio: Portfolio) {
-		const portfolioData: PortfolioData = { portfolio: portfolio };
-		this.cleanupDialogSubcription();
-		const dialogRef = this.dialog.open(AddSymbolComponent, { width: '500px', disableClose: true, hasBackdrop: true, data: portfolioData });
-		this.dialogSubscription = dialogRef.afterClosed().subscribe((symbol: Symbol) => {
-			if (symbol) {
-				const dialogSpinnerRef = this.dialog.open(DialogSpinnerComponent, { width: '500px', disableClose: true, hasBackdrop: true, 
-				   enterAnimationDuration: '500ms', exitAnimationDuration: '500ms', data: {title: $localize`:@@overviewPortfolioCalc:Portfolio Calculation`} as SpinnerData  });
-				symbol.weight = !symbol.weight ? 0 : symbol.weight;
-				this.portfolioService.postSymbolToPortfolio(portfolio, symbol.id, symbol.weight, symbol.changedAt)
-					.subscribe(result => {
-						if (result) {
-							const filteredPortfolios = this.portfolios.filter(port => port.id !== result.id);
-							this.portfolios = [...filteredPortfolios, result];
-							this.myPortfolio = result;
-							this.selPortfolio(result, true);
-							dialogSpinnerRef.close();
-						}
-					});
-			}
-		});
-	}
-
-	importSymbols(): void {
-		this.importingSymbols = true;
-		if (this.timeoutId >= 0) {
-			clearTimeout(this.timeoutId);
-		}
-		forkJoin(
-			this.symbolImportService.getSymbolImportUs(),
-			this.symbolImportService.getSymbolImportHk(),
-			this.symbolImportService.getSymbolImportDe(),
-			this.quoteImportService.importFxDailyQuotes('USD'),
-			this.quoteImportService.importFxDailyQuotes('HKD'))
-			.subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
-				console.log(`Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`);
-				setTimeout(() => this.symbolImportService.getIndexSymbols()
-					.subscribe(resultIndex => {
-						console.log(`Index Symbols: ${resultIndex}`);
-						this.importingSymbols = false;
-					}), 60000);
-			});
-	}
-
-	logout(): void {
-		this.tokenService.logout();
-	}
-
-	showConfig(): void {
-		if (this.profiles) {
-			this.cleanupDialogSubcription();
-			const myOptions = { width: '700px' };
-			let dialogRef = this.profiles.toLowerCase().includes('prod') ? 
-				this.dialog.open(ProdConfigComponent, myOptions) : this.dialog.open(DevConfigComponent, myOptions);
-			this.dialogSubscription = dialogRef.afterClosed().subscribe(() => dialogRef = null);
-		}
-	}
-	
-	private cleanupDialogSubcription(): void {
-	   if(!!this.dialogSubscription) {
-			this.dialogSubscription.unsubscribe();
-			this.dialogSubscription = null;
-		}
+  showConfig(): void {
+    if (this.profiles) {
+      this.cleanupDialogSubcription();
+      const myOptions = { width: "700px" };
+      let dialogRef = this.profiles.toLowerCase().includes("prod")
+        ? this.dialog.open(ProdConfigComponent, myOptions)
+        : this.dialog.open(DevConfigComponent, myOptions);
+      this.dialogSubscription = dialogRef
+        .afterClosed()
+        .subscribe(() => (dialogRef = null));
     }
+  }
+
+  private cleanupDialogSubcription(): void {
+    if (!!this.dialogSubscription) {
+      this.dialogSubscription.unsubscribe();
+      this.dialogSubscription = null;
+    }
+  }
 }

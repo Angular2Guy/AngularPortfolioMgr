@@ -10,29 +10,42 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { OverviewComponent } from './components/overview/overview.component';
-import { PortfolioTableComponent } from './components/portfolio-table/portfolio-table.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { OverviewComponent } from "./components/overview/overview.component";
+import { PortfolioTableComponent } from "./components/portfolio-table/portfolio-table.component";
 
 const routes: Routes = [
-	{ path: 'overview', component: OverviewComponent, children: [
-        {
-           path: 'table/:portfolioId',
-           component: PortfolioTableComponent
-        },
-        {
-           path: 'portfolio-overview',
-           loadChildren: () => import('./portfolio-overview/portfolio-overview.module').then(m => m.PortfolioOverviewModule)
-        },
-        {  path: '**', redirectTo: 'table'}
-    ] },	
-	{ path: 'portfolio-detail', loadChildren: () => import('./portfolio-detail/portfolio-detail.module').then(m => m.PortfolioDetailModule) },
-	{ path: '**', redirectTo: 'overview' }
+  {
+    path: "overview",
+    component: OverviewComponent,
+    children: [
+      {
+        path: "table/:portfolioId",
+        component: PortfolioTableComponent,
+      },
+      {
+        path: "portfolio-overview",
+        loadChildren: () =>
+          import("./portfolio-overview/portfolio-overview.module").then(
+            (m) => m.PortfolioOverviewModule
+          ),
+      },
+      { path: "**", redirectTo: "table" },
+    ],
+  },
+  {
+    path: "portfolio-detail",
+    loadChildren: () =>
+      import("./portfolio-detail/portfolio-detail.module").then(
+        (m) => m.PortfolioDetailModule
+      ),
+  },
+  { path: "**", redirectTo: "overview" },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PortfoliosRoutingModule { }
+export class PortfoliosRoutingModule {}

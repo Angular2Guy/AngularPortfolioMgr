@@ -1,91 +1,92 @@
 .icon {
-	display: flex;
-	align-items: center;
-    justify-content: center;
-    width: 100px;
-    height: 100%;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100%;
+  cursor: pointer;
 }
 
 .new-portfolio {
-	width: 100%;
-	height: 56px;
-	display: flex;
-	align-items: center;
-    justify-content: space-around;
-	cursor: pointer;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  cursor: pointer;
 }
 
 .button-margin {
-	margin: 0 5px 0 5px;
-	padding: 5px 10px 5px 10px;
+  margin: 0 5px 0 5px;
+  padding: 5px 10px 5px 10px;
 }
 
-.container {		
+.container {
 }
 
 table {
   width: 100%;
 }
 
-.portfolio-list {	
-	width: 300px;
-	overflow-x: hidden;
-	overflow-y: auto;	
-	.portfolio-line {
-		display: flex;	
-		align-items: center;
-		.add-button {
-			width: 56px;
-		}		
-	}
+.portfolio-list {
+  width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  .portfolio-line {
+    display: flex;
+    align-items: center;
+    .add-button {
+      width: 56px;
+    }
+  }
 }
 
 .popup {
-	display: none;
+  display: none;
 }
 
 .table-cell {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .cell:hover {
-	.popup {		
-		display: block;		    
-    	width: 160px;
-    	margin-top: 0px;
-    	margin-left: 100px;
-    	background: #FFFFFF;    				  	
-    	border-radius: 6px;
-    	padding: 8px 0;
-    	position: absolute;
-    	z-index: 1;       
-		color: blue;
-		border: solid 1px black;		
-	}
-	color: blue;
-	cursor: pointer;
+  .popup {
+    display: block;
+    width: 160px;
+    margin-top: 0px;
+    margin-left: 100px;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    color: blue;
+    border: solid 1px black;
+  }
+  color: blue;
+  cursor: pointer;
 }
 
 .example-container {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
 }
 
-.custom-spinner ::ng-deep .mat-mdc-progress-spinner circle, .mat-mdc-progress-spinner circle {
-	stroke: #ffffff !important;
+.custom-spinner ::ng-deep .mat-mdc-progress-spinner circle,
+.mat-mdc-progress-spinner circle {
+  stroke: #ffffff !important;
 }
-	
+
 .header-space {
-	margin-left: 20px;
-}	
-	
+  margin-left: 20px;
+}
+
 .mat-mdc-table {
-  overflow: auto;  
+  overflow: auto;
 }
 
 .example-fill-remaining-space {
-  // This fills the remaining space, by using flexbox. 
+  // This fills the remaining space, by using flexbox.
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }

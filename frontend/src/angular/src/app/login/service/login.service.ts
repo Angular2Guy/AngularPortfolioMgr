@@ -10,41 +10,52 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Observable, of } from 'rxjs';
-import { Login } from '../model/login';
-import { catchError, map, tap } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TokenService } from 'ngx-simple-charts/base-service';
+import { Observable, of } from "rxjs";
+import { Login } from "../model/login";
+import { catchError, map, tap } from "rxjs/operators";
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { TokenService } from "ngx-simple-charts/base-service";
 
 @Injectable()
 export class LoginService {
+  constructor(private http: HttpClient, private tokenService: TokenService) {}
 
-	constructor(private http: HttpClient, private tokenService: TokenService) { }
+  postLogin(login: Login): Observable<Login> {
+    return this.http
+      .post<Login>("/rest/auth/login", login, {
+        headers: this.tokenService.createTokenHeader(),
+      })
+      .pipe(
+        map((res) => res, this.handleError("postLogin")),
+        tap(
+          (res) =>
+            (this.tokenService.secUntilNextLogin = !!res?.secUntilNexLogin
+              ? res?.secUntilNexLogin
+              : 24 * 60 * 60)
+        )
+      );
+  }
 
-	postLogin(login: Login): Observable<Login> {
-		return this.http.post<Login>('/rest/auth/login', login, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('postLogin')), 
-				tap(res => this.tokenService.secUntilNextLogin = !!res?.secUntilNexLogin ? res?.secUntilNexLogin : 24 * 60 * 60));
-	}
+  postSignin(login: Login): Observable<boolean> {
+    return this.http
+      .post<boolean>("/rest/auth/signin", login, {
+        headers: this.tokenService.createTokenHeader(),
+      })
+      .pipe(map((res) => res, this.handleError("postSignin")));
+  }
 
-	postSignin(login: Login): Observable<boolean> {
-		return this.http.post<boolean>('/rest/auth/signin', login, { headers: this.tokenService.createTokenHeader() })
-			.pipe(map(res => res, this.handleError('postSignin')));
-	}	
+  private handleError<T>(operation = "operation", result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error); // log to console instead
 
-	private handleError<T>(operation = 'operation', result?: T) {
-		return (error: any): Observable<T> => {
+      this.log(`${operation} failed: ${error.message}`);
 
-			console.error(error); // log to console instead
+      return of(result as T);
+    };
+  }
 
-			this.log(`${operation} failed: ${error.message}`);
-
-			return of(result as T);
-		};
-	}
-	
-	private log(message: string) {
-		console.log(message);
-	}
+  private log(message: string) {
+    console.log(message);
+  }
 }

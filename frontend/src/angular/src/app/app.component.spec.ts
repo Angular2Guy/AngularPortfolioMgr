@@ -10,23 +10,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { AppComponent } from './app.component';
+import { TestBed, waitForAsync } from "@angular/core/testing";
+import { RouterTestingModule } from "@angular/router/testing";
+import { AppComponent } from "./app.component";
 
-describe('AppComponent', () => {
+describe("AppComponent", () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule.withRoutes([])
-      ],
-      declarations: [
-        AppComponent
-      ],
+      imports: [RouterTestingModule.withRoutes([])],
+      declarations: [AppComponent],
     }).compileComponents();
   }));
 
-  it('should create the app', () => {
+  it("should create the app", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
@@ -35,6 +31,6 @@ describe('AppComponent', () => {
   it(`should have as title 'manager'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('manager');
+    expect(app.title).toEqual("manager");
   });
 });

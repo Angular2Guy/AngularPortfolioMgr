@@ -11,26 +11,26 @@
    limitations under the License.
  */
 export interface FilterBase {
-    operation: string;
+  operation: string;
 }
 export interface FilterNumber extends FilterBase {
-	value: number;
+  value: number;
 }
 
 export interface FilterString extends FilterBase {
-	value: string;
+  value: string;
 }
- 
+
 export interface FinancialElementParams {
-	conceptFilter?: FilterString;
-	valueFilter?: FilterNumber;
-	operation?: string;
-	termType: string;
+  conceptFilter?: FilterString;
+  valueFilter?: FilterNumber;
+  operation?: string;
+  termType: string;
 }
- 
+
 export interface SymbolFinancialsQueryParams {
-	yearFilter: FilterNumber;
-	quarters: string[];
-	symbol: string;
-	financialElementParams: FinancialElementParams[];
+  yearFilter: FilterNumber;
+  quarters: string[];
+  symbol: string;
+  financialElementParams: FinancialElementParams[];
 }

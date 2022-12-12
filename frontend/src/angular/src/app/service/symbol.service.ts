@@ -10,21 +10,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Symbol } from '../model/symbol';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Symbol } from "../model/symbol";
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: "root" })
 export class SymbolService {
+  constructor(private http: HttpClient) {}
 
-	constructor(private http: HttpClient) { }
+  getSymbolBySymbol(symbol: string): Observable<Symbol[]> {
+    return this.http.get<Symbol[]>(`/rest/symbol/symbol/${symbol}`);
+  }
 
-	getSymbolBySymbol(symbol: string): Observable<Symbol[]> {
-		return this.http.get<Symbol[]>(`/rest/symbol/symbol/${symbol}`);
-	}
-
-	getSymbolByName(name: string): Observable<Symbol[]> {
-		return this.http.get<Symbol[]>(`/rest/symbol/name/${name}`);
-	}
+  getSymbolByName(name: string): Observable<Symbol[]> {
+    return this.http.get<Symbol[]>(`/rest/symbol/name/${name}`);
+  }
 }
