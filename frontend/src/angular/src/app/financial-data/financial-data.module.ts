@@ -20,6 +20,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
+import {MatTooltipModule} from '@angular/material/tooltip'; 
 import { MatSelectModule } from "@angular/material/select";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { DragDropModule } from "@angular/cdk/drag-drop";
@@ -45,6 +46,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http";
     CommonModule,
     MatDialogModule,
     MatToolbarModule,
+    MatTooltipModule,
     MatFormFieldModule,
     MatButtonModule,
     MatInputModule,

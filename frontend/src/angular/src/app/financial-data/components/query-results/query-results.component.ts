@@ -23,7 +23,7 @@ import { MatTableDataSource } from "@angular/material/table";
 export class QueryResultsComponent {
   @Input()
   symbolFinancials: SymbolFinancials[] = [];
-  protected displayedColumns: string[] = ['concept', 'currency', 'value', 'year', 'quarter', 'symbol'];
+  protected displayedColumns: string[] = ['concept', 'value', 'currency', 'year', 'quarter', 'symbol'];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
   private _financialElements: FinancialElementExt[] = [];
   
