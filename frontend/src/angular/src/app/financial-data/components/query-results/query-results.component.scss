@@ -1,5 +1,12 @@
 .container {
-  background-color: #0000ff;
-  width: 100%;
+  //background-color: #0000ff;
+  width: calc(50vw - 15px);
   height: 100%;
+}
+.mytable {
+	width: 100%;
+}
+
+.mat-column-concept {
+	overflow: hidden;
 }

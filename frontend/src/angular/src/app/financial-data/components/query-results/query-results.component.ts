@@ -13,6 +13,7 @@
 import { Component, Input } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
+import { MatTableDataSource } from "@angular/material/table";
 
 @Component({
   selector: "app-query-results",
@@ -22,6 +23,17 @@ import { FinancialElementExt } from "../../model/financial-element";
 export class QueryResultsComponent {
   @Input()
   symbolFinancials: SymbolFinancials[] = [];
+  protected displayedColumns: string[] = ['concept', 'currency', 'value', 'year', 'quarter', 'symbol'];
+  protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
+  private _financialElements: FinancialElementExt[] = [];
+  
+  get financialElements(): FinancialElementExt[] {
+	  return this._financialElements;
+  }
+  
   @Input()
-  financialElements: FinancialElementExt[] = [];
+  set financialElements(financialElementExt: FinancialElementExt[]) {
+	  this.dataSource.data = financialElementExt;	  
+	  this._financialElements = financialElementExt;
+  }
 }
