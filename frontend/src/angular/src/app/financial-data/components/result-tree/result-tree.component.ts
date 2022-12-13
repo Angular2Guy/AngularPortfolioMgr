@@ -12,6 +12,7 @@
  */
 import { Component, Input } from "@angular/core";
 import { FinancialElementExt } from "../../model/financial-element";
+import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 
 interface ByYearElements {
@@ -22,14 +23,11 @@ interface ByYearElements {
 interface BySymbolElements {
 	symbol: string;
 	byYearElements: ByYearElements[];
+	
 }
 
-function groupByKey<A,B>(array: A[], key: string): B[] {
-   return array
-     .reduce((hash, obj) => {
-       if(obj[key] === undefined || obj[key] === null) return hash; 
-       return Object.assign(hash, { [obj[key]]:( hash[obj[key]] || [] ).concat(obj)})
-     }, {}) as B[];
+interface BySymbolElementsExt extends BySymbolElements {
+	finanicalElementExts: FinancialElementExt[];
 }
 
 @Component({
@@ -48,6 +46,11 @@ export class ResultTreeComponent {
   @Input()
   set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
 	  this._symbolFinancials = symbolFinancials;
-	  
+	  console.log(symbolFinancials);
+	  const mySymbolFinancialsExts =  FinancialsDataUtils.toFinancialElementsExt(symbolFinancials);
+	  //const byYearElements = groupByKey<FinancialElementExt, ByYearElements>(mySymbolFinancialsExts, 'year');
+	  const bySymbolElementExts = FinancialsDataUtils.groupByKey<FinancialElementExt, BySymbolElementsExt>(mySymbolFinancialsExts, 'symbol');
+	  console.log(bySymbolElementExts);
+	    
   }
 }

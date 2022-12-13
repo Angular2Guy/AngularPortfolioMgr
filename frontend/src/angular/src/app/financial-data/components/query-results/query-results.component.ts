@@ -28,7 +28,7 @@ import { MatSort } from "@angular/material/sort";
   styleUrls: ["./query-results.component.scss"],
 })
 export class QueryResultsComponent implements AfterViewInit {
-  @Input()
+  treeSymbolFinancials:  SymbolFinancials[] = [];
   private _symbolFinancials: SymbolFinancials[] = [];
   @ViewChild(MatSort) tableSort: MatSort;
   protected displayedColumns: string[] = [
@@ -74,5 +74,6 @@ export class QueryResultsComponent implements AfterViewInit {
   set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
     this._financialElements = [];
     this._symbolFinancials = symbolFinancials;
+    this.treeSymbolFinancials = symbolFinancials;
   }
 }

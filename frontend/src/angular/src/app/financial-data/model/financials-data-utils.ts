@@ -20,6 +20,14 @@ export enum ItemType {
 }
 
 export class FinancialsDataUtils {
+  public static groupByKey<A,B>(array: A[], key: string): B[] {
+     return array
+     .reduce((hash, obj) => {
+       if(obj[key] === undefined || obj[key] === null) return hash; 
+       return Object.assign(hash, { [obj[key]]:( hash[obj[key]] || [] ).concat(obj)})
+     }, {}) as B[];
+  }	
+	
   public static toFinancialElementsExt(symbolFiancials: SymbolFinancials[]): FinancialElementExt[] {
 	   const myResult = symbolFiancials.map((mySymbolFinancials) =>
             mySymbolFinancials.financialElements.map((myFinancialElement) => {
