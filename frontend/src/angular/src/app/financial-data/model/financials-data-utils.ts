@@ -20,12 +20,13 @@ export enum ItemType {
 }
 
 export class FinancialsDataUtils {
-  public static groupByKey<A,B>(array: A[], key: string): B[] {
-     return array
+  public static groupByKey<A,B>(array: A[], key: string): Map<B,A[]> {
+     const resultObj = array
      .reduce((hash, obj) => {
        if(obj[key] === undefined || obj[key] === null) return hash; 
        return Object.assign(hash, { [obj[key]]:( hash[obj[key]] || [] ).concat(obj)})
-     }, {}) as B[];
+     }, {});
+     return new Map(Object.entries(resultObj)) as Map<B,A[]>;
   }	
 	
   public static toFinancialElementsExt(symbolFiancials: SymbolFinancials[]): FinancialElementExt[] {

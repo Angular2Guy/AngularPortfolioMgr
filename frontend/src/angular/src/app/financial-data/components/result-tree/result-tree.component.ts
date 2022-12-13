@@ -26,10 +26,6 @@ interface BySymbolElements {
 	
 }
 
-interface BySymbolElementsExt extends BySymbolElements {
-	finanicalElementExts: FinancialElementExt[];
-}
-
 @Component({
   selector: "app-result-tree",
   templateUrl: "./result-tree.component.html",
@@ -49,8 +45,26 @@ export class ResultTreeComponent {
 	  console.log(symbolFinancials);
 	  const mySymbolFinancialsExts =  FinancialsDataUtils.toFinancialElementsExt(symbolFinancials);
 	  //const byYearElements = groupByKey<FinancialElementExt, ByYearElements>(mySymbolFinancialsExts, 'year');
-	  const bySymbolElementExts = FinancialsDataUtils.groupByKey<FinancialElementExt, BySymbolElementsExt>(mySymbolFinancialsExts, 'symbol');
-	  console.log(bySymbolElementExts);
-	    
+	  const bySymbolElementExtsMap = FinancialsDataUtils.groupByKey<FinancialElementExt,string>(mySymbolFinancialsExts, 'symbol');
+	  console.log(bySymbolElementExtsMap);
+	  const myBySymbolElements: BySymbolElements[] = [];
+	  bySymbolElementExtsMap.forEach((value, key) => {
+		  const byYearElementsMap = FinancialsDataUtils.groupByKey<FinancialElementExt,number>(value, 'year');
+		  const byYearElements: ByYearElements[] = [];
+		  byYearElementsMap.forEach((value, key) => {
+			  const element = {
+				  year: key,
+				  finanicalElementExts: value
+			  } as ByYearElements;
+			  byYearElements.push(element);
+		  });
+		  const myBySymbolElement = {
+			  symbol: key,
+			  byYearElements: byYearElements
+		  } as BySymbolElements;
+		  myBySymbolElements.push(myBySymbolElement);
+	  });
+	  console.log(myBySymbolElements);
+	  this.bySymbolElements = myBySymbolElements;
   }
 }
