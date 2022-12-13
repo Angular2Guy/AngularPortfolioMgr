@@ -252,18 +252,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         ) {
           console.log(result.length);
           this.symbolFinancials.emit([]);
-          const myResult = result.map((mySymbolFinancials) =>
-            mySymbolFinancials.financialElements.map((myFinancialElement) => {
-              const financialElementExt = new FinancialElementExt(
-                myFinancialElement
-              );
-              financialElementExt.year = mySymbolFinancials.year;
-              financialElementExt.quarter = mySymbolFinancials.quarter;
-              financialElementExt.symbol = mySymbolFinancials.symbol;
-              return financialElementExt;
-            })
-          );
-          this.financialElements.emit([].concat.apply([], myResult));
+          this.financialElements.emit(FinancialsDataUtils.toFinancialElementsExt(result));
         } else {
           console.log(result);
           this.symbolFinancials.emit([]);

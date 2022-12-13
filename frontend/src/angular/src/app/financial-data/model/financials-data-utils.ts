@@ -1,3 +1,6 @@
+import { FinancialElementExt } from "./financial-element";
+import { SymbolFinancials } from "./symbol-financials";
+
 /**
  *    Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +20,21 @@ export enum ItemType {
 }
 
 export class FinancialsDataUtils {
+  public static toFinancialElementsExt(symbolFiancials: SymbolFinancials[]): FinancialElementExt[] {
+	   const myResult = symbolFiancials.map((mySymbolFinancials) =>
+            mySymbolFinancials.financialElements.map((myFinancialElement) => {
+              const financialElementExt = new FinancialElementExt(
+                myFinancialElement
+              );
+              financialElementExt.year = mySymbolFinancials.year;
+              financialElementExt.quarter = mySymbolFinancials.quarter;
+              financialElementExt.symbol = mySymbolFinancials.symbol;
+              return financialElementExt;
+            })
+          );
+      return [].concat.apply([], myResult);
+  }	
+	
   public static compareNumbers(
     valueA: number,
     valueB: number,

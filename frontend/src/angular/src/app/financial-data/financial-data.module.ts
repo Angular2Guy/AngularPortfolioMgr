@@ -24,6 +24,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatSortModule } from "@angular/material/sort";
 import { MatSelectModule } from "@angular/material/select";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import {MatTreeModule} from '@angular/material/tree'; 
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { FinancialDataRoutingModule } from "./financial-data-routing.module";
 import { OverviewComponent } from "./components/overview/overview.component";
@@ -57,6 +58,7 @@ import { ResultTreeComponent } from "./components/result-tree/result-tree.compon
     MatIconModule,
     MatSelectModule,
     MatTableModule,
+    MatTreeModule,
     MatAutocompleteModule,
     DragDropModule,
     BaseModule,

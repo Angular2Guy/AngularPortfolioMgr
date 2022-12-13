@@ -11,14 +11,43 @@
    limitations under the License.
  */
 import { Component, Input } from "@angular/core";
+import { FinancialElementExt } from "../../model/financial-element";
 import { SymbolFinancials } from "../../model/symbol-financials";
+
+interface ByYearElements {
+	year: number;
+	finanicalElementExts: FinancialElementExt[];
+}
+
+interface BySymbolElements {
+	symbol: string;
+	byYearElements: ByYearElements[];
+}
+
+function groupByKey<A,B>(array: A[], key: string): B[] {
+   return array
+     .reduce((hash, obj) => {
+       if(obj[key] === undefined || obj[key] === null) return hash; 
+       return Object.assign(hash, { [obj[key]]:( hash[obj[key]] || [] ).concat(obj)})
+     }, {}) as B[];
+}
 
 @Component({
   selector: "app-result-tree",
   templateUrl: "./result-tree.component.html",
   styleUrls: ["./result-tree.component.scss"],
 })
-export class ResultTreeComponent {
+export class ResultTreeComponent {  
+  private _symbolFinancials: SymbolFinancials[] = [];
+  private bySymbolElements: BySymbolElements[] = [];
+  
+  get symbolFinancials(): SymbolFinancials[] {
+	  return this._symbolFinancials; 
+  }
+  
   @Input()
-  symbolFinancials: SymbolFinancials[] = [];
+  set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
+	  this._symbolFinancials = symbolFinancials;
+	  
+  }
 }
