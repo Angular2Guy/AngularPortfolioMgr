@@ -4,29 +4,31 @@
   height: 100%;
 }
 .mytable {
-	width: 100%;
+  width: 100%;
 }
 .no-display {
-	display: none;
+  display: none;
 }
 
 .mat-column-concept {
-	overflow: hidden;
-	flex: 1 1 auto;	
+  overflow: hidden;
+  flex: 1 1 auto;
 }
 
 .mat-column-value {
-	min-width: 50px;
-	flex: 1 0 auto;
-	justify-content: right;
+  min-width: 50px;
+  flex: 1 0 auto;
+  justify-content: right;
 }
 
 .mat-column-symbol {
-	min-width: 100px;
-	flex: 0 0 auto;
+  min-width: 100px;
+  flex: 0 0 auto;
 }
 
-.mat-column-year, .mat-column-quarter, .mat-column-currency {	
-	min-width: 50px;
-	flex: 0 0 auto;
+.mat-column-year,
+.mat-column-quarter,
+.mat-column-currency {
+  min-width: 50px;
+  flex: 0 0 auto;
 }

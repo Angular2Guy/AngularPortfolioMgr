@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
-import { SymbolFinancials } from '../../model/symbol-financials';
+import { Component, Input } from "@angular/core";
+import { SymbolFinancials } from "../../model/symbol-financials";
 
 @Component({
-  selector: 'app-result-tree',
-  templateUrl: './result-tree.component.html',
-  styleUrls: ['./result-tree.component.scss']
+  selector: "app-result-tree",
+  templateUrl: "./result-tree.component.html",
+  styleUrls: ["./result-tree.component.scss"],
 })
 export class ResultTreeComponent {
   @Input()

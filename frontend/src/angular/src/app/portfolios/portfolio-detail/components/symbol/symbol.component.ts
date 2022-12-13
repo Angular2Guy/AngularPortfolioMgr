@@ -199,15 +199,13 @@ export class SymbolComponent implements OnInit {
   }
 
   private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {
-    return this.compIndexes
-      .get(comparisonIndex)
-      .map(
-        (myQuote) =>
-          ({
-            x: new Date(Date.parse(myQuote.timestamp)),
-            y: myQuote.close,
-          } as ChartPoint)
-      );
+    return this.compIndexes.get(comparisonIndex).map(
+      (myQuote) =>
+        ({
+          x: new Date(Date.parse(myQuote.timestamp)),
+          y: myQuote.close,
+        } as ChartPoint)
+    );
   }
 
   private updateSymbolData(): void {

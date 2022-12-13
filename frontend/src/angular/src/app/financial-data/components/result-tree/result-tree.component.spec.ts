@@ -10,9 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { ResultTreeComponent } from './result-tree.component';
+import { ResultTreeComponent } from "./result-tree.component";
 /*
 describe('ResultTreeComponent', () => {
   let component: ResultTreeComponent;

@@ -20,8 +20,8 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
-import {MatTooltipModule} from '@angular/material/tooltip'; 
-import {MatSortModule} from '@angular/material/sort';
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatSortModule } from "@angular/material/sort";
 import { MatSelectModule } from "@angular/material/select";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { DragDropModule } from "@angular/cdk/drag-drop";
@@ -34,7 +34,7 @@ import { QueryComponent } from "./components/query/query.component";
 import { FinancialDataService } from "./service/financial-data.service";
 import { TokenInterceptor } from "ngx-simple-charts/base-service";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
-import { ResultTreeComponent } from './components/result-tree/result-tree.component';
+import { ResultTreeComponent } from "./components/result-tree/result-tree.component";
 
 @NgModule({
   declarations: [

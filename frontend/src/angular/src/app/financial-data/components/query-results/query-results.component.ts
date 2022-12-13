@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { MatTableDataSource } from "@angular/material/table";
@@ -25,38 +31,48 @@ export class QueryResultsComponent implements AfterViewInit {
   @Input()
   private _symbolFinancials: SymbolFinancials[] = [];
   @ViewChild(MatSort) tableSort: MatSort;
-  protected displayedColumns: string[] = ['concept', 'value', 'currency', 'year', 'quarter', 'symbol'];
+  protected displayedColumns: string[] = [
+    "concept",
+    "value",
+    "currency",
+    "year",
+    "quarter",
+    "symbol",
+  ];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
   private _financialElements: FinancialElementExt[] = [];
-  
+
   ngAfterViewInit(): void {
-    this.dataSource.filterPredicate = (data: FinancialElementExt, filter: string) => data?.symbol?.trim().toLowerCase().includes(filter);
+    this.dataSource.filterPredicate = (
+      data: FinancialElementExt,
+      filter: string
+    ) => data?.symbol?.trim().toLowerCase().includes(filter);
     this.dataSource.sort = this.tableSort;
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();    
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-  
+
   get financialElements(): FinancialElementExt[] {
-	  return this._financialElements;
+    return this._financialElements;
   }
-  
+
   @Input()
   set financialElements(financialElementExt: FinancialElementExt[]) {
-	  this._symbolFinancials = [];
-	  this.dataSource.data = financialElementExt;	  
-	  this._financialElements = financialElementExt;	  
+    this._symbolFinancials = [];
+    this.dataSource.data = financialElementExt;
+    this._financialElements = financialElementExt;
   }
-  
+
   get symbolFinancials(): SymbolFinancials[] {
-	  return this._symbolFinancials;
+    return this._symbolFinancials;
   }
-  
+
   @Input()
   set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
-	this._financialElements = [];
-	this._symbolFinancials = symbolFinancials;
+    this._financialElements = [];
+    this._symbolFinancials = symbolFinancials;
   }
 }
