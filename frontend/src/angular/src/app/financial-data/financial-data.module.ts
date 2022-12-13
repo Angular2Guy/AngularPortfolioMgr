@@ -34,6 +34,7 @@ import { QueryComponent } from "./components/query/query.component";
 import { FinancialDataService } from "./service/financial-data.service";
 import { TokenInterceptor } from "ngx-simple-charts/base-service";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
+import { ResultTreeComponent } from './components/result-tree/result-tree.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http";
     CreateQueryComponent,
     QueryResultsComponent,
     QueryComponent,
+    ResultTreeComponent,
   ],
   imports: [
     CommonModule,

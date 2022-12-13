@@ -23,20 +23,20 @@ import { MatSort } from "@angular/material/sort";
 })
 export class QueryResultsComponent implements AfterViewInit {
   @Input()
-  symbolFinancials: SymbolFinancials[] = [];
-  @ViewChild(MatSort) sort: MatSort;
+  private _symbolFinancials: SymbolFinancials[] = [];
+  @ViewChild(MatSort) tableSort: MatSort;
   protected displayedColumns: string[] = ['concept', 'value', 'currency', 'year', 'quarter', 'symbol'];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
   private _financialElements: FinancialElementExt[] = [];
   
   ngAfterViewInit(): void {
     this.dataSource.filterPredicate = (data: FinancialElementExt, filter: string) => data?.symbol?.trim().toLowerCase().includes(filter);
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.tableSort;
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.dataSource.filter = filterValue.trim().toLowerCase();    
   }
   
   get financialElements(): FinancialElementExt[] {
@@ -45,7 +45,18 @@ export class QueryResultsComponent implements AfterViewInit {
   
   @Input()
   set financialElements(financialElementExt: FinancialElementExt[]) {
+	  this._symbolFinancials = [];
 	  this.dataSource.data = financialElementExt;	  
-	  this._financialElements = financialElementExt;
+	  this._financialElements = financialElementExt;	  
+  }
+  
+  get symbolFinancials(): SymbolFinancials[] {
+	  return this._symbolFinancials;
+  }
+  
+  @Input()
+  set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
+	this._financialElements = [];
+	this._symbolFinancials = symbolFinancials;
   }
 }

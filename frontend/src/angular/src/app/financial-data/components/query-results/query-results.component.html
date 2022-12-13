@@ -1,8 +1,13 @@
 <div class="container">
 
+<div *ngIf="!!symbolFinancials && symbolFinancials.length > 0">
+symbolFinancials
+</div>
+
+<div [class.no-display]="!financialElements || financialElements.length <= 0">
 <mat-form-field>
   <mat-label>Filter</mat-label>
-  <input matInput (keyup)="applyFilter($event)" placeholder="symbol" #input>
+  <input matInput (keyup)="applyFilter($event)" placeholder="symbol" #myInput>  
 </mat-form-field>
 
 <mat-table [dataSource]="dataSource" class="mytable" matSort>
@@ -38,13 +43,14 @@
 
  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
   <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-
-<mat-row class="mat-row" *matNoDataRow>
-    <!-- <td class="mat-cell" colspan="4" i18n="@@queryResultsNoMatchingData">No data matching the filter "{{input.value}}"</td> -->
-  </mat-row>
 </mat-table>
+
+<div *ngIf="dataSource?.filteredData?.length <= 0">
+<span i18n="@@queryResultsNoMatchingData">No data matching data found for filter: "{{ myInput.value }}"</span>
+</div>
 <!-- 
   {{ symbolFinancials | json }}
   {{ financialElements | json }}
    -->
+   </div>
 </div>
