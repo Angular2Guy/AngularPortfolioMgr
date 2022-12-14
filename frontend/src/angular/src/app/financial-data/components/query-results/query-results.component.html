@@ -1,6 +1,8 @@
 <div class="container">
   <div *ngIf="!!treeSymbolFinancials && treeSymbolFinancials.length > 0">
-    <app-result-tree [symbolFinancials]="treeSymbolFinancials"></app-result-tree>
+    <app-result-tree
+      [symbolFinancials]="treeSymbolFinancials"
+    ></app-result-tree>
   </div>
 
   <div [class.no-display]="!financialElements || financialElements.length <= 0">

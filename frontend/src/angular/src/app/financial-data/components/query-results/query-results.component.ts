@@ -28,7 +28,7 @@ import { MatSort } from "@angular/material/sort";
   styleUrls: ["./query-results.component.scss"],
 })
 export class QueryResultsComponent implements AfterViewInit {
-  treeSymbolFinancials:  SymbolFinancials[] = [];
+  treeSymbolFinancials: SymbolFinancials[] = [];
   private _symbolFinancials: SymbolFinancials[] = [];
   @ViewChild(MatSort) tableSort: MatSort;
   protected displayedColumns: string[] = [
@@ -76,13 +76,21 @@ export class QueryResultsComponent implements AfterViewInit {
     this._symbolFinancials = symbolFinancials;
     this.treeSymbolFinancials = symbolFinancials;
   }
-  
-  private removeFetDublicates(financialElementExts: FinancialElementExt[]): FinancialElementExt[] {
-	  const financialElementExtMap = new Map<string, FinancialElementExt>();
-	  financialElementExts.forEach(myElement => {
-		  const key: string = myElement?.concept + myElement?.currency + myElement?.quarter + myElement?.symbol + myElement?.value + myElement?.year;
-		  financialElementExtMap.set(key, myElement);
-	  });
-	  return Array.from(financialElementExtMap.values());
+
+  private removeFetDublicates(
+    financialElementExts: FinancialElementExt[]
+  ): FinancialElementExt[] {
+    const financialElementExtMap = new Map<string, FinancialElementExt>();
+    financialElementExts.forEach((myElement) => {
+      const key: string =
+        myElement?.concept +
+        myElement?.currency +
+        myElement?.quarter +
+        myElement?.symbol +
+        myElement?.value +
+        myElement?.year;
+      financialElementExtMap.set(key, myElement);
+    });
+    return Array.from(financialElementExtMap.values());
   }
 }

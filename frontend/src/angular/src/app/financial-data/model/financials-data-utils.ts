@@ -20,30 +20,31 @@ export enum ItemType {
 }
 
 export class FinancialsDataUtils {
-  public static groupByKey<A,B>(array: A[], key: string): Map<B,A[]> {
-     const resultObj = array
-     .reduce((hash, obj) => {
-       if(obj[key] === undefined || obj[key] === null) return hash; 
-       return Object.assign(hash, { [obj[key]]:( hash[obj[key]] || [] ).concat(obj)})
-     }, {});
-     return new Map(Object.entries(resultObj)) as Map<B,A[]>;
-  }	
-	
-  public static toFinancialElementsExt(symbolFiancials: SymbolFinancials[]): FinancialElementExt[] {
-	   const myResult = symbolFiancials.map((mySymbolFinancials) =>
-            mySymbolFinancials.financialElements.map((myFinancialElement) => {
-              const financialElementExt = new FinancialElementExt(
-                myFinancialElement
-              );
-              financialElementExt.year = mySymbolFinancials.year;
-              financialElementExt.quarter = mySymbolFinancials.quarter;
-              financialElementExt.symbol = mySymbolFinancials.symbol;
-              return financialElementExt;
-            })
-          );
-      return [].concat.apply([], myResult);
-  }	
-	
+  public static groupByKey<A, B>(array: A[], key: string): Map<B, A[]> {
+    const resultObj = array.reduce((hash, obj) => {
+      if (obj[key] === undefined || obj[key] === null) return hash;
+      return Object.assign(hash, {
+        [obj[key]]: (hash[obj[key]] || []).concat(obj),
+      });
+    }, {});
+    return new Map(Object.entries(resultObj)) as Map<B, A[]>;
+  }
+
+  public static toFinancialElementsExt(
+    symbolFiancials: SymbolFinancials[]
+  ): FinancialElementExt[] {
+    const myResult = symbolFiancials.map((mySymbolFinancials) =>
+      mySymbolFinancials.financialElements.map((myFinancialElement) => {
+        const financialElementExt = new FinancialElementExt(myFinancialElement);
+        financialElementExt.year = mySymbolFinancials.year;
+        financialElementExt.quarter = mySymbolFinancials.quarter;
+        financialElementExt.symbol = mySymbolFinancials.symbol;
+        return financialElementExt;
+      })
+    );
+    return [].concat.apply([], myResult);
+  }
+
   public static compareNumbers(
     valueA: number,
     valueB: number,

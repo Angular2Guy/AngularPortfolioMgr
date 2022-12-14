@@ -252,7 +252,9 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         ) {
           console.log(result.length);
           this.symbolFinancials.emit([]);
-          this.financialElements.emit(FinancialsDataUtils.toFinancialElementsExt(result));
+          this.financialElements.emit(
+            FinancialsDataUtils.toFinancialElementsExt(result)
+          );
         } else {
           console.log(result);
           this.symbolFinancials.emit([]);
