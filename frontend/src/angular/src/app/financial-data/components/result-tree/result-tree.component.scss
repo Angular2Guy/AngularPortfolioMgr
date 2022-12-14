@@ -16,3 +16,30 @@
 .example-tree div[role=group] > .mat-tree-node {
   padding-left: 40px;
 }
+
+.mytable {
+  width: 100%;
+}
+
+.mat-column-concept {
+  overflow: hidden;
+  flex: 1 1 auto;
+}
+
+.mat-column-value {
+  min-width: 50px;
+  flex: 1 0 auto;
+  justify-content: right;
+}
+
+.mat-column-symbol {
+  min-width: 100px;
+  flex: 0 0 auto;
+}
+
+.mat-column-year,
+.mat-column-quarter,
+.mat-column-currency {
+  min-width: 50px;
+  flex: 0 0 auto;
+}

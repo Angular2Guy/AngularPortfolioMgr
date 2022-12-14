@@ -22,9 +22,13 @@ interface ElementNode {
   children?: ElementNode[];
 }
 
+interface ByElements extends ElementNode {
+	finanicalElementExts: FinancialElementExt[];
+}
+
 interface ByYearElements extends ElementNode {
   year: number;
-  finanicalElementExts: FinancialElementExt[];
+  byElements: ByElements[];   
 }
 
 interface BySymbolElements extends ElementNode {
@@ -44,6 +48,12 @@ export class ResultTreeComponent {
     (node) => node.children
   );
   protected dataSource = new MatTreeNestedDataSource<ElementNode>();
+  protected displayedColumns: string[] = [
+    "concept",
+    "value",
+    "currency",
+    "quarter",
+  ];
 
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
@@ -76,10 +86,15 @@ export class ResultTreeComponent {
       >(value, "year");
       const byYearElements: ByYearElements[] = [];
       byYearElementsMap.forEach((value, key) => {
+		const myByElements = {
+			  name: 'Elements',
+			  finanicalElementExts: value
+		  } as ByElements;
         const element = {
           year: key,
           name: key.toString(),
-          finanicalElementExts: value,
+          children: [myByElements],
+          byElements: [myByElements]
         } as ByYearElements;
         byYearElements.push(element);
       });
