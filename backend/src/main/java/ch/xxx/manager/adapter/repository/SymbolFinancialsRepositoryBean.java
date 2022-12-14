@@ -111,12 +111,13 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates,
 				Optional.of(symbolFinancials_));
 		if (!predicates.isEmpty()) {
-			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
+			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true)
+					.orderBy(this.entityManager.getCriteriaBuilder().asc(root.get("symbol")));
 		} else {
 			return new LinkedList<>();
 		}
 		LocalTime start1 = LocalTime.now();
-		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(200)
+		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(100)
 				.collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		result = myResult;
