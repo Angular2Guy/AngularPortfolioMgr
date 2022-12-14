@@ -65,7 +65,7 @@ export class ResultTreeComponent {
   @Input()
   set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
     this._symbolFinancials = symbolFinancials;
-    console.log(symbolFinancials);
+    //console.log(symbolFinancials);
     this.bySymbolElements = this.createElementNodeTree(symbolFinancials);
     this.dataSource.data = this.bySymbolElements;
   }
@@ -77,7 +77,7 @@ export class ResultTreeComponent {
       FinancialElementExt,
       string
     >(FinancialsDataUtils.toFinancialElementsExt(symbolFinancials), "symbol");
-    console.log(bySymbolElementExtsMap);
+    //console.log(bySymbolElementExtsMap);
     const myBySymbolElements: BySymbolElements[] = [];
     bySymbolElementExtsMap.forEach((value, key) => {
       const byYearElementsMap = FinancialsDataUtils.groupByKey<

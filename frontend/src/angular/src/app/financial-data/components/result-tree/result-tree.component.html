@@ -3,8 +3,8 @@
   <!-- There is inline padding applied to this node using styles.
     This padding value depends on the mat-icon-button width. -->
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-      {{node.name}}    
-          <mat-table [dataSource]="node.finanicalElementExts" class="mytable">
+    <div *ngIf="!node?.finanicalElementExts">{{node.name}}</div>    
+    <mat-table [dataSource]="node.finanicalElementExts" class="mytable">
       <ng-container matColumnDef="concept">
         <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept"
           >Concept</mat-header-cell

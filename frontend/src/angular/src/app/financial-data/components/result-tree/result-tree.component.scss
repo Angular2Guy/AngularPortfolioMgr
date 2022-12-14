@@ -14,11 +14,11 @@
 }
 
 .example-tree div[role=group] > .mat-tree-node {
-  padding-left: 40px;
+ // padding-left: 40px;
 }
 
 .mytable {
-  width: 100%;
+  width: calc(100% - 40px);
 }
 
 .mat-column-concept {
