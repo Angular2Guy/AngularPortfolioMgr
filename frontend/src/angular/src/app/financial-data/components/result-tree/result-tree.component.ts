@@ -24,6 +24,7 @@ interface ElementNode {
 
 interface ByElements extends ElementNode {
 	finanicalElementExts: FinancialElementExt[];
+	isOpen: boolean;
 }
 
 interface ByYearElements extends ElementNode {
@@ -58,6 +59,16 @@ export class ResultTreeComponent {
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
 
+  toggleNode(node: ElementNode): void {
+	  this.treeControl.toggle(node);
+	  node.children.forEach(childNode => {
+		  if(!childNode || !childNode?.children?.length) {
+			  const myByElements = childNode as ByElements;
+			  myByElements.isOpen = this.treeControl.isExpanded(node); 
+		  }
+	  });
+  }
+
   get symbolFinancials(): SymbolFinancials[] {
     return this._symbolFinancials;
   }
@@ -88,6 +99,7 @@ export class ResultTreeComponent {
       byYearElementsMap.forEach((value, key) => {
 		const myByElements = {
 			  name: 'Elements',
+			  isOpen: false,
 			  finanicalElementExts: value
 		  } as ByElements;
         const element = {
