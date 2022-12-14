@@ -39,7 +39,7 @@ interface BySymbolElements extends ElementNode {
 })
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];
-  private bySymbolElements: BySymbolElements[] = [];
+  protected bySymbolElements: BySymbolElements[] = [];
   protected treeControl = new NestedTreeControl<ElementNode>(
     (node) => node.children
   );
@@ -57,6 +57,7 @@ export class ResultTreeComponent {
     this._symbolFinancials = symbolFinancials;
     console.log(symbolFinancials);
     this.bySymbolElements = this.createElementNodeTree(symbolFinancials);
+    this.dataSource.data = this.bySymbolElements;
   }
 
   private createElementNodeTree(
