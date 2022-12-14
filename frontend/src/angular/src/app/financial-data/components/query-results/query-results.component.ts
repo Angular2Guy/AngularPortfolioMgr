@@ -62,8 +62,8 @@ export class QueryResultsComponent implements AfterViewInit {
   @Input()
   set financialElements(financialElementExt: FinancialElementExt[]) {
     this._symbolFinancials = [];
-    this.dataSource.data = financialElementExt;
-    this._financialElements = financialElementExt;
+    this._financialElements = this.removeFetDublicates(financialElementExt);
+    this.dataSource.data = this._financialElements;
   }
 
   get symbolFinancials(): SymbolFinancials[] {
@@ -75,5 +75,14 @@ export class QueryResultsComponent implements AfterViewInit {
     this._financialElements = [];
     this._symbolFinancials = symbolFinancials;
     this.treeSymbolFinancials = symbolFinancials;
+  }
+  
+  private removeFetDublicates(financialElementExts: FinancialElementExt[]): FinancialElementExt[] {
+	  const financialElementExtMap = new Map<string, FinancialElementExt>();
+	  financialElementExts.forEach(myElement => {
+		  const key: string = myElement?.concept + myElement?.currency + myElement?.quarter + myElement?.symbol + myElement?.value + myElement?.year;
+		  financialElementExtMap.set(key, myElement);
+	  });
+	  return Array.from(financialElementExtMap.values());
   }
 }
