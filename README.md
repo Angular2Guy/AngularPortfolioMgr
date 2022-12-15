@@ -23,7 +23,16 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation. The error handling for problems with Kafka events is implemented with transaction rollback.
 * The Angular fronted displays different D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
 * The import for the Kaggle SEC Filings dataset is implemented. 
-* The UI for the search in the SEC Filing uses Drag and Drop.
+* The UI for the search in the SEC Filings uses Drag and Drop and displays the results in a table or in a tree of tables if company filters are used.
+* The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query.
+
+## Portfolio Manager setup
+To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
+* the Alphavatage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and need to be put in the property file with key: api.key=
+* the RapidApi Apikey ist availabe [here](https://rapidapi.com/apidojo/api/yh-finance/) (An account with a valid email address can be created.) and need to be  put in the property file with the key: api.key.rapidapi=
+That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered. 
+The Portfolio Manager starts with a H2 in memory database that will lose its content with each application termination. To have persistent data in the database the postgresql support needs to be used. It is activated in the 'prod' profile and needs a local [postgresql database](https://www.postgresql.org/) or an available [docker image](https://hub.docker.com/_/postgres) of the database. The properties to setup the database access are in the [application-prod.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod.properties) or the [application-prod-kafka.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod-kafka.properties). 
+
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
