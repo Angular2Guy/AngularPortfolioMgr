@@ -33,6 +33,8 @@ To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and
 That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered. 
 The Portfolio Manager starts with a H2 in memory database that will lose its content with each application termination. To have persistent data in the database the postgresql support needs to be used. It is activated in the 'prod' profile and needs a local [postgresql database](https://www.postgresql.org/) or an available [docker image](https://hub.docker.com/_/postgres) of the database. The properties to setup the database access are in the [application-prod.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod.properties) or the [application-prod-kafka.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod-kafka.properties). 
 
+## SEC Filings analysis setup
+To use the Portfolio Manager for Sec Filings analysis. The data has to be imported first. It can be downloaded(large download) [here](https://www.kaggle.com/datasets/finnhub/reported-financials). Then the the 'path.financial-data=' property in the [application.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application.properties) file needs to point to a directory(like '/tmp/') where the application can find/access the zip file. The downloaded file has to be copied in that directory.
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
