@@ -112,6 +112,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   symbolFinancials = new EventEmitter<SymbolFinancials[]>();
   @Output()
   financialElements = new EventEmitter<FinancialElementExt[]>();
+  @Output()
+  showSpinner = new EventEmitter<boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -230,6 +232,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         : [],
     } as SymbolFinancialsQueryParams;
     //console.log(symbolFinancials);
+    this.showSpinner.emit(true);
     this.financialDataService
       .postSymbolFinancialsParam(symbolFinancialsParams)
       .subscribe((result) => {
@@ -260,6 +263,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
           this.symbolFinancials.emit([]);
           this.financialElements.emit([]);
         }
+        this.showSpinner.emit(false);
       });
   }
 

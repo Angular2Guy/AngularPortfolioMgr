@@ -33,6 +33,7 @@
       <app-create-query
         (symbolFinancials)="updateSymbolFinancials($event)"
         (financialElements)="updateFinancialElements($event)"
+        (showSpinner)="showSpinner($event)"
       ></app-create-query>
     </div>
     <div class="result-container">
@@ -42,4 +43,5 @@
       ></app-query-results>
     </div>
   </div>
+  
 </div>
