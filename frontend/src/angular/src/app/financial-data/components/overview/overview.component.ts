@@ -22,7 +22,10 @@ import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { ConfigService } from "src/app/service/config.service";
-import { DialogSpinnerComponent, SpinnerData } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
+import {
+  DialogSpinnerComponent,
+  SpinnerData,
+} from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 
 @Component({
   selector: "app-overview",
@@ -53,7 +56,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   private cleanupDialogSubcription(): void {
-    if (!!this.dialogSubscription) {	  
+    if (!!this.dialogSubscription) {
       this.dialogSubscription.unsubscribe();
       this.dialogSubscription = null;
     }
@@ -65,19 +68,19 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   showSpinner(show: boolean): void {
-	  if(!this.spinnerDialogRef && show) {
-	const fetchDatai18n = $localize `:@@overviewFetchingData:Fetching Data`;
-	  this.spinnerDialogRef = this.dialog.open(DialogSpinnerComponent, {
+    if (!this.spinnerDialogRef && show) {
+      const fetchDatai18n = $localize`:@@overviewFetchingData:Fetching Data`;
+      this.spinnerDialogRef = this.dialog.open(DialogSpinnerComponent, {
         width: "500px",
         disableClose: true,
         hasBackdrop: true,
         data: { title: fetchDatai18n } as SpinnerData,
       });
-	  }	 
-	  if(!!this.spinnerDialogRef && !show) {
-		  this.spinnerDialogRef.close();
-		  this.spinnerDialogRef = null;
-	  } 	
+    }
+    if (!!this.spinnerDialogRef && !show) {
+      this.spinnerDialogRef.close();
+      this.spinnerDialogRef = null;
+    }
   }
 
   updateSymbolFinancials(event: SymbolFinancials[]): void {

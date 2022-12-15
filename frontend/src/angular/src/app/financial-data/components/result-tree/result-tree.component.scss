@@ -9,12 +9,12 @@
   list-style-type: none;
 }
 
-.example-tree .mat-nested-tree-node div[role=group] {
+.example-tree .mat-nested-tree-node div[role="group"] {
   padding-left: 40px;
 }
 
-.example-tree div[role=group] > .mat-tree-node {
- // padding-left: 40px;
+.example-tree div[role="group"] > .mat-tree-node {
+  // padding-left: 40px;
 }
 
 .mytable {

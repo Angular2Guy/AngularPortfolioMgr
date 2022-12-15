@@ -23,13 +23,13 @@ interface ElementNode {
 }
 
 interface ByElements extends ElementNode {
-	finanicalElementExts: FinancialElementExt[];
-	isOpen: boolean;
+  finanicalElementExts: FinancialElementExt[];
+  isOpen: boolean;
 }
 
 interface ByYearElements extends ElementNode {
   year: number;
-  byElements: ByElements[];   
+  byElements: ByElements[];
 }
 
 interface BySymbolElements extends ElementNode {
@@ -60,13 +60,13 @@ export class ResultTreeComponent {
     !!node.children && node.children.length > 0;
 
   toggleNode(node: ElementNode): void {
-	  this.treeControl.toggle(node);
-	  node.children.forEach(childNode => {
-		  if(!childNode || !childNode?.children?.length) {
-			  const myByElements = childNode as ByElements;
-			  myByElements.isOpen = this.treeControl.isExpanded(node); 
-		  }
-	  });
+    this.treeControl.toggle(node);
+    node.children.forEach((childNode) => {
+      if (!childNode || !childNode?.children?.length) {
+        const myByElements = childNode as ByElements;
+        myByElements.isOpen = this.treeControl.isExpanded(node);
+      }
+    });
   }
 
   get symbolFinancials(): SymbolFinancials[] {
@@ -97,16 +97,16 @@ export class ResultTreeComponent {
       >(value, "year");
       const byYearElements: ByYearElements[] = [];
       byYearElementsMap.forEach((value, key) => {
-		const myByElements = {
-			  name: 'Elements',
-			  isOpen: false,
-			  finanicalElementExts: value
-		  } as ByElements;
+        const myByElements = {
+          name: "Elements",
+          isOpen: false,
+          finanicalElementExts: value,
+        } as ByElements;
         const element = {
           year: key,
           name: key.toString(),
           children: [myByElements],
-          byElements: [myByElements]
+          byElements: [myByElements],
         } as ByYearElements;
         byYearElements.push(element);
       });
