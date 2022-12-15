@@ -28,13 +28,19 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 
 ## Portfolio Manager setup
 To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
-* the Alphavatage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and need to be put in the property file with key: api.key=
+* the Alphavatage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
 * the RapidApi Apikey ist availabe [here](https://rapidapi.com/apidojo/api/yh-finance/) (An account with a valid email address can be created.) and need to be  put in the property file with the key: api.key.rapidapi=
-That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered. 
+
+That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered! 
 The Portfolio Manager starts with a H2 in memory database that will lose its content with each application termination. To have persistent data in the database the postgresql support needs to be used. It is activated in the 'prod' profile and needs a local [postgresql database](https://www.postgresql.org/) or an available [docker image](https://hub.docker.com/_/postgres) of the database. The properties to setup the database access are in the [application-prod.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod.properties) or the [application-prod-kafka.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod-kafka.properties). 
 
 ## SEC Filings analysis setup
 To use the Portfolio Manager for Sec Filings analysis. The data has to be imported first. It can be downloaded(large download) [here](https://www.kaggle.com/datasets/finnhub/reported-financials). Then the the 'path.financial-data=' property in the [application.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application.properties) file needs to point to a directory(like '/tmp/') where the application can find/access the zip file. The downloaded file has to be copied in that directory.
+
+## Usage of the Portfolio Manager
+The Portfolio Manage imports the stock symbols and comparision indexes every night. To trigger the import the 'Import Symbols' button in the header can be used. During the import a new Portfolio can be created. The portfolio elements can be added after the import is finished. 
+
+The different portfolios are shown in a table with their stocks and perfomance data. A click on the portfolio name in the side bar opens the portfolio statistics component. A click on the table opens the portfolio details component with charts of the portfolio and its stocks with comparison indexes. The company info for each stock is shown after a second click on the portfolio stock. 
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
