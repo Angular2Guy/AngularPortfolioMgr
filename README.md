@@ -26,6 +26,8 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The UI for the search in the SEC Filings uses Drag and Drop and displays the results in a table or in a tree of tables if company filters are used.
 * The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query.
 
+The current state is that the features are implemented and will continue to be improved. 
+
 ## Portfolio Manager setup
 To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
 * the Alphavatage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
@@ -41,6 +43,13 @@ To use the Portfolio Manager for Sec Filings analysis. The data has to be import
 The Portfolio Manage imports the stock symbols and comparision indexes every night. To trigger the import the 'Import Symbols' button in the header can be used. During the import a new Portfolio can be created. The portfolio elements can be added after the import is finished. 
 
 The different portfolios are shown in a table with their stocks and perfomance data. A click on the portfolio name in the side bar opens the portfolio statistics component. A click on the table opens the portfolio details component with charts of the portfolio and its stocks with comparison indexes. The company info for each stock is shown after a second click on the portfolio stock. 
+
+## Usage of the SEC Filings analysis
+The SEC Filings analysis can be opened with the 'To Financial Data' button. To import the zip file with the financial data the 'Import Financials' button can be used. A dialog opens and the name of the file can be entered and the import starts. The process will take a long time(perhaps an hour but that depends on the Db version and the IO system) due to the large amount of data. The progress/finish is shown in the logs. 
+
+After the data import the form for the company query to select a period, symbol or quarter can be used. The items of the filings can be queried with the query items where the 'concept' is the query filing name(like 'revenue') and the value is the 'concept'. By default the query items have a 'and' relation. Different relations are available if the query items are enclosed with 'Term Start' and 'Term End' items where 'Term Start' item specifies the relation. Adding and removing query items works with Drag and Drop between the boxes. Both can be combined.
+
+The results are show next to the query in a table or in a tree component. The results are limited if a large amount of entries match the query. Due to the large amount of data the queries can take long (again depends on Db version and IO system).
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
