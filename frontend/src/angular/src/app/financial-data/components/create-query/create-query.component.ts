@@ -212,7 +212,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   }
 
   public search(): void {
-    console.log(this.queryForm.controls[FormFields.QueryItems].value);
+    //console.log(this.queryForm.controls[FormFields.QueryItems].value);
     const symbolFinancialsParams = {
       yearFilter: {
         operation: this.queryForm.controls[FormFields.YearOperator].value,
@@ -236,35 +236,44 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     this.financialDataService
       .postSymbolFinancialsParam(symbolFinancialsParams)
       .subscribe((result) => {
-        if (
-          result.length > 0 &&
-          (!!symbolFinancialsParams?.yearFilter?.value ||
+        this.processQueryResult(result, symbolFinancialsParams);
+        this.showSpinner.emit(false);
+      });
+  }
+
+  private processQueryResult(result: SymbolFinancials[], symbolFinancialsParams: SymbolFinancialsQueryParams): void {
+	  const logResults = false;
+	  const symbolFinancialsFilter = !!symbolFinancialsParams?.yearFilter?.value ||
             !!symbolFinancialsParams?.quarters?.length ||
-            !!symbolFinancialsParams?.symbol)
+            !!symbolFinancialsParams?.symbol;
+	   if (
+          result.length > 0 && symbolFinancialsFilter
+      
         ) {
+			if(!!logResults) {
           console.log(result.length);
+          }
           this.symbolFinancials.emit(result);
           this.financialElements.emit([]);
         } else if (
           result.length > 0 &&
-          !(
-            !!symbolFinancialsParams?.yearFilter?.value ||
-            !!symbolFinancialsParams?.quarters?.length ||
-            !!symbolFinancialsParams?.symbol
+          !(symbolFinancialsFilter
           )
         ) {
+			if(!!logResults) {
           console.log(result.length);
+          }
           this.symbolFinancials.emit([]);
           this.financialElements.emit(
             FinancialsDataUtils.toFinancialElementsExt(result)
           );
         } else {
+			if(!!logResults) {
           console.log(result);
+          }
           this.symbolFinancials.emit([]);
           this.financialElements.emit([]);
         }
-        this.showSpinner.emit(false);
-      });
   }
 
   private createFinancialElementParam(
