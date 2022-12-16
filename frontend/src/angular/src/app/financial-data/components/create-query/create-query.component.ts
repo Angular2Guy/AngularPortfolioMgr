@@ -48,7 +48,7 @@ import {
   FilterString,
 } from "../../model/symbol-financials-query-params";
 import { Subscription, Observable } from "rxjs";
-import { switchMap, debounceTime } from "rxjs/operators";
+import { switchMap, debounceTime, delay, startWith } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
@@ -108,6 +108,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   protected quarterQueryItems: string[] = [];
   protected symbols: Symbol[] = [];
   protected FormFields = FormFields;
+  protected formStatus = '';
   @Output()
   symbolFinancials = new EventEmitter<SymbolFinancials[]>();
   @Output()
@@ -135,10 +136,12 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
 			} 
 			as AbstractControlOptions
 			*/
-    );
+    );    
     this.queryItemParams.formArray = this.queryForm.controls[
       FormFields.QueryItems
     ] as FormArray;
+    //delay(0) fixes "NG0100: Expression has changed after it was checked" exception
+    this.queryForm.statusChanges.pipe(delay(0)).subscribe(result => this.formStatus = result);
   }
 
   ngOnInit(): void {
