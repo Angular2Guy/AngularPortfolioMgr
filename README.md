@@ -21,12 +21,12 @@ The goal is to provide an Angular based Web App with a Jpa backend server. The b
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
 * The Gradle build is done. 
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation. The error handling for problems with Kafka events is implemented with transaction rollback.
-* The Angular fronted displays different D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
-* The import for the Kaggle SEC Filings dataset is implemented. 
-* The UI for the search in the SEC Filings uses Drag and Drop and displays the results in a table or in a tree of tables if company filters are used.
-* The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query.
+* The Angular fronted displays several D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
+* The import of the Kaggle SEC Filings dataset is implemented and optimized. 
+* The UI for the search in the SEC Filings data set uses Drag and Drop and displays the results in a Angular Components table or in an Angular Components tree of Angular Components tables.
+* The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query requested by the frontend.
 
-The current state is that the features are implemented and will continue to be improved. 
+The current state is that the features are implemented and it will continue to be improved. 
 
 ## Portfolio Manager setup
 To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
@@ -37,10 +37,10 @@ That will enable the Portfolio Manager to import the stock quotes for the portfo
 The Portfolio Manager starts with a H2 in memory database that will lose its content with each application termination. To have persistent data in the database the postgresql support needs to be used. It is activated in the 'prod' profile and needs a local [postgresql database](https://www.postgresql.org/) or an available [docker image](https://hub.docker.com/_/postgres) of the database. The properties to setup the database access are in the [application-prod.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod.properties) or the [application-prod-kafka.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod-kafka.properties). 
 
 ## SEC Filings analysis setup
-To use the Portfolio Manager for Sec Filings analysis. The data has to be imported first. It can be downloaded(large download) [here](https://www.kaggle.com/datasets/finnhub/reported-financials). Then the the 'path.financial-data=' property in the [application.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application.properties) file needs to point to a directory(like '/tmp/') where the application can find/access the zip file. The downloaded file has to be copied in that directory.
+To use the Portfolio Manager for Sec Filings analysis. The data has to be imported first. It can be downloaded(large download) [here](https://www.kaggle.com/datasets/finnhub/reported-financials). Then the 'path.financial-data=' property in the [application.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application.properties) file needs to point to a directory(like '/tmp/') where the application can find/access the zip file. The downloaded file has to be copied in that directory.
 
 ## Usage of the Portfolio Manager
-The Portfolio Manage imports the stock symbols and comparision indexes every night. To trigger the import the 'Import Symbols' button in the header can be used. During the import a new Portfolio can be created. The portfolio elements can be added after the import is finished. 
+The Portfolio Manage imports the stock symbols and comparision indexes every night. To trigger the import the 'Import Symbols' button in the header can be used. During the import a new Portfolio can be created. The portfolio elements can be added after the symbols import is finished. 
 
 The different portfolios are shown in a table with their stocks and perfomance data. A click on the portfolio name in the side bar opens the portfolio statistics component. A click on the table opens the portfolio details component with charts of the portfolio and its stocks with comparison indexes. The company info for each stock is shown after a second click on the portfolio stock. 
 
@@ -49,7 +49,7 @@ The SEC Filings analysis can be opened with the 'To Financial Data' button. To i
 
 After the data import the form for the company query to select a period, symbol or quarter can be used. The items of the filings can be queried with the query items where the 'concept' is the query filing name(like 'revenue') and the value is the 'concept' monetary amount. By default the query items have an 'and' relation. Different relations are available if the query items are enclosed with 'Term Start' and 'Term End' items where 'Term Start' item specifies the relation. Adding and removing query items works with Drag and Drop between the boxes. Both queries can be combined.
 
-The results are show next to the query in a table or in a tree component. The results are limited if a large amount of entries match the query. Due to the large amount of data the queries can take long (again depends on Db version and IO system).
+The results are show next to the query in a table or in a tree component. The results are limited if a large amount of entries match the query. Due to the large amount of data the queries can take long (again depends on Db version and IO system). Be patient with the spinner.
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
