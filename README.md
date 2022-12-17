@@ -31,7 +31,7 @@ The current state of the project is that the main features are implemented and i
 
 ## Portfolio Manager setup
 To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
-* the Alphavatage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
+* the Alphavantage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
 * the RapidApi Apikey ist availabe [here](https://rapidapi.com/apidojo/api/yh-finance/) (An account with a valid email address can be created.) and need to be  put in the property file with the key: api.key.rapidapi=
 
 That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered! 
@@ -51,6 +51,11 @@ The SEC Filings analysis can be opened with the 'To Financial Data' button. To i
 After the data import the form for the company query to select a period, symbol or quarter can be used. The items of the filings can be queried with the query items where the 'concept' is the query filing name(like 'revenue') and the value is the 'concept' monetary amount. By default the query items have an 'and' relation. Different relations are available if the query items are enclosed with 'Term Start' and 'Term End' items where 'Term Start' item specifies the relation. Adding and removing query items works with Drag and Drop between the boxes. Both queries can be combined.
 
 The results are show next to the query in a table or in a tree component. The results are limited if a large amount of entries match the query. Due to the large amount of data the queries can take long (again depends on Db version and IO system). Be patient with the spinner.
+
+## Kubernetes deployment
+The project has a Docker image that can be deployed on Kubernetes. It has been tested in Minikube. The Helm chart for the deployment can be found in the directory [angularportfoliomgr](https://github.com/Angular2Guy/AngularPortfolioMgr/tree/master/helm/angularportfoliomgr). Commands for the Minikube setup can be found in the [minikubeSetup.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/minikubeSetup.sh) script. The commands for the Helm chart are in the [helmCommand.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/helmCommand.sh) script. 
+
+The 'angularportfoliomgr' Helm chart will deploy Kafka, Zookeeper, Postgresql and the PortfolioMgr. Kafka is used to provide a horizontaly scalable secure logout. The Kafka usage will grow in the future for nightly quote imports and other distributed data. Zookeeper is deployed for Kafka. The Postgresql Database provides persistence for the AngularPortfolio project. 
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
