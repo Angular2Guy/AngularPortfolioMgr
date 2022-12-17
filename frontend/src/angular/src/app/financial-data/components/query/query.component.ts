@@ -125,6 +125,12 @@ export class QueryComponent implements OnInit, OnDestroy {
     this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(
       this.queryItemType
     );
+    if(this.queryItemType === ItemType.TermStart || this.queryItemType === ItemType.TermEnd) {
+		this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue('=');
+		this.itemFormGroup.controls[QueryFormFields.Concept].patchValue('xxx');
+		this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue('=');
+		this.itemFormGroup.controls[QueryFormFields.NumberValue].patchValue(0);
+	}
     //make service caching work
     if (this.formArrayIndex === 0) {
       this.getOperators(0);

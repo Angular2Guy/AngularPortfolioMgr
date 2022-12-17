@@ -6,6 +6,7 @@
         <button
           mat-raised-button
           color="primary"
+          [disabled]="queryForm.invalid"
           (click)="search()"
           i18n="@@search"
         >
