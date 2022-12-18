@@ -30,6 +30,7 @@ import {
   Validators,
   ValidationErrors,
   FormControl,
+  ValidatorFn,
 } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import {
@@ -130,12 +131,9 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         [FormFields.Quarter]: [""],
         [FormFields.QueryItems]: fb.array([]),
       }
-      /*
 			, {
-				validators: [this.validate]
+				validators: [this.validateItemTypes()]
 			} 
-			as AbstractControlOptions
-			*/
     );    
     this.queryItemParams.formArray = this.queryForm.controls[
       FormFields.QueryItems
@@ -297,5 +295,11 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     } as FinancialElementParams;
   }
 
-  private validate(): void {}
+  private validateItemTypes(): ValidatorFn {
+	  return (form: FormGroup): ValidationErrors | null => {
+	  let termStartCount = this.queryItems.filter(myTerm => myTerm.queryItemType === ItemType.TermStart).length;
+	  let termEndCount = this.queryItems.filter(myTerm => myTerm.queryItemType === ItemType.TermEnd).length;
+	  return termStartCount != termEndCount ? {termItemsValid: false} : null;
+	  };
+  }
 }
