@@ -21,6 +21,7 @@
     "importFinancials": "Import Financials",
     "back": "Back",
     "logout": "Logout",
+    "overviewFetchingData": "Fetching Data",
     "queryResultsConcept": "Concept",
     "queryResultsSymbol": "Symbol",
     "queryResultsYear": "Year",
