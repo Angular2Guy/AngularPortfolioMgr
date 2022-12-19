@@ -1,6 +1,3 @@
-import { FinancialElementExt } from "./financial-element";
-import { SymbolFinancials } from "./symbol-financials";
-
 /**
  *    Copyright 2019 Sven Loesekann
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +10,9 @@ import { SymbolFinancials } from "./symbol-financials";
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+import { FinancialElementExt } from "./financial-element";
+import { SymbolFinancials } from "./symbol-financials";
+
 export enum ItemType {
   Query = "Query",
   TermStart = "TermStart",

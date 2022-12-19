@@ -26,13 +26,10 @@ import {
   FormArray,
   FormGroup,
   FormBuilder,
-  AbstractControl,
-  AbstractControlOptions,
   Validators,
-  ValidationErrors,
 } from "@angular/forms";
 import { Subscription } from "rxjs";
-import { switchMap, debounceTime } from "rxjs/operators";
+import { debounceTime } from "rxjs/operators";
 import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { FeConcept } from "../../model/fe-concept";
@@ -52,6 +49,7 @@ export enum QueryFormFields {
   styleUrls: ["./query.component.scss"],
 })
 export class QueryComponent implements OnInit, OnDestroy {
+  protected readonly containsOperator = '*=*';
   @Input()
   public baseFormArray: FormArray;
   @Input()
@@ -126,7 +124,7 @@ export class QueryComponent implements OnInit, OnDestroy {
       this.queryItemType
     );
     if(this.queryItemType === ItemType.TermStart || this.queryItemType === ItemType.TermEnd) {
-		this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue('=');
+		this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(this.containsOperator);
 		this.itemFormGroup.controls[QueryFormFields.Concept].patchValue('xxx');
 		this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue('=');
 		this.itemFormGroup.controls[QueryFormFields.NumberValue].patchValue(0);
@@ -156,7 +154,7 @@ export class QueryComponent implements OnInit, OnDestroy {
         this.configService.getNumberOperators().subscribe((values) => {
           this.numberQueryItems = values;
           this.itemFormGroup.controls[
-            QueryFormFields.ConceptOperator
+            QueryFormFields.NumberOperator
           ].patchValue(values.filter((myValue) => "=" === myValue)[0]);
         })
       );
@@ -164,8 +162,8 @@ export class QueryComponent implements OnInit, OnDestroy {
         this.configService.getStringOperators().subscribe((values) => {
           this.stringQueryItems = values;
           this.itemFormGroup.controls[
-            QueryFormFields.NumberOperator
-          ].patchValue(values.filter((myValue) => "=" === myValue)[0]);
+            QueryFormFields.ConceptOperator
+          ].patchValue(values.filter((myValue) => this.containsOperator === myValue)[0]);
         })
       );
       if (ItemType.TermEnd === this.queryItemType) {

@@ -26,13 +26,11 @@ import {
   FormGroup,
   FormArray,
   FormBuilder,
-  AbstractControlOptions,
   Validators,
   ValidationErrors,
   FormControl,
   ValidatorFn,
 } from "@angular/forms";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import {
   FinancialsDataUtils,
   ItemType,
@@ -48,8 +46,8 @@ import {
   FilterNumber,
   FilterString,
 } from "../../model/symbol-financials-query-params";
-import { Subscription, Observable } from "rxjs";
-import { switchMap, debounceTime, delay, startWith } from "rxjs/operators";
+import { Subscription } from "rxjs";
+import { switchMap, debounceTime, delay } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
@@ -88,7 +86,6 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     { queryItemType: ItemType.TermStart, title: "Term Start" },
     { queryItemType: ItemType.TermEnd, title: "Term End" },
   ];
-  private symbolSubscription: Subscription;
   private subscriptions: Subscription[] = [];
   protected readonly availableItemParams = {
     showType: true,

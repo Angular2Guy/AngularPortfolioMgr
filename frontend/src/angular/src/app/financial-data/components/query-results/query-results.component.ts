@@ -14,7 +14,6 @@ import {
   AfterViewInit,
   Component,
   Input,
-  OnInit,
   ViewChild,
 } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
