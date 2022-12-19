@@ -46,7 +46,7 @@ import {
   FilterNumber,
   FilterString,
 } from "../../model/symbol-financials-query-params";
-import { Subscription } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { switchMap, debounceTime, delay } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
