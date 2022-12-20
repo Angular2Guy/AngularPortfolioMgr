@@ -87,6 +87,10 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     { queryItemType: ItemType.TermEnd, title: "Term End" },
   ];
   private subscriptions: Subscription[] = [];
+  protected availableItems: MyItem[] = [];
+  protected queryItems: MyItem[] = [
+    { queryItemType: ItemType.Query, title: "Query" },
+  ];
   protected readonly availableItemParams = {
     showType: true,
     formArray: null,
@@ -98,15 +102,11 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     formArrayIndex: -1,
   } as ItemParams;
   protected queryForm: FormGroup;
-  protected availableItems: MyItem[] = [];
-  protected queryItems: MyItem[] = [
-    { queryItemType: ItemType.Query, title: "Query" },
-  ];
-  protected numberQueryItems: string[] = [];
+  protected yearOperators: string[] = [];
   protected quarterQueryItems: string[] = [];
   protected symbols: Symbol[] = [];
   protected FormFields = FormFields;
-  protected formStatus = '';
+  protected formStatus = "";
   @Output()
   symbolFinancials = new EventEmitter<SymbolFinancials[]>();
   @Output()
@@ -127,16 +127,18 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         [FormFields.Symbol]: "",
         [FormFields.Quarter]: [""],
         [FormFields.QueryItems]: fb.array([]),
+      },
+      {
+        validators: [this.validateItemTypes()],
       }
-			, {
-				validators: [this.validateItemTypes()]
-			} 
-    );    
+    );
     this.queryItemParams.formArray = this.queryForm.controls[
       FormFields.QueryItems
     ] as FormArray;
     //delay(0) fixes "NG0100: Expression has changed after it was checked" exception
-    this.queryForm.statusChanges.pipe(delay(0)).subscribe(result => this.formStatus = result);
+    this.queryForm.statusChanges
+      .pipe(delay(0))
+      .subscribe((result) => (this.formStatus = result));
   }
 
   ngOnInit(): void {
@@ -153,7 +155,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     );
     this.subscriptions.push(
       this.configService.getNumberOperators().subscribe((values) => {
-        this.numberQueryItems = values;
+        this.yearOperators = values;
         this.queryForm.controls[FormFields.YearOperator].patchValue(
           values.filter((myValue) => myValue === "=")[0]
         );
@@ -239,39 +241,36 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
       });
   }
 
-  private processQueryResult(result: SymbolFinancials[], symbolFinancialsParams: SymbolFinancialsQueryParams): void {
-	  const logResults = false;
-	  const symbolFinancialsFilter = !!symbolFinancialsParams?.yearFilter?.value ||
-            !!symbolFinancialsParams?.quarters?.length ||
-            !!symbolFinancialsParams?.symbol;
-	   if (
-          result.length > 0 && symbolFinancialsFilter
-      
-        ) {
-			if(!!logResults) {
-          console.log(result.length);
-          }
-          this.symbolFinancials.emit(result);
-          this.financialElements.emit([]);
-        } else if (
-          result.length > 0 &&
-          !(symbolFinancialsFilter
-          )
-        ) {
-			if(!!logResults) {
-          console.log(result.length);
-          }
-          this.symbolFinancials.emit([]);
-          this.financialElements.emit(
-            FinancialsDataUtils.toFinancialElementsExt(result)
-          );
-        } else {
-			if(!!logResults) {
-          console.log(result);
-          }
-          this.symbolFinancials.emit([]);
-          this.financialElements.emit([]);
-        }
+  private processQueryResult(
+    result: SymbolFinancials[],
+    symbolFinancialsParams: SymbolFinancialsQueryParams
+  ): void {
+    const logResults = false;
+    const symbolFinancialsFilter =
+      !!symbolFinancialsParams?.yearFilter?.value ||
+      !!symbolFinancialsParams?.quarters?.length ||
+      !!symbolFinancialsParams?.symbol;
+    if (result.length > 0 && symbolFinancialsFilter) {
+      if (!!logResults) {
+        console.log(result.length);
+      }
+      this.symbolFinancials.emit(result);
+      this.financialElements.emit([]);
+    } else if (result.length > 0 && !symbolFinancialsFilter) {
+      if (!!logResults) {
+        console.log(result.length);
+      }
+      this.symbolFinancials.emit([]);
+      this.financialElements.emit(
+        FinancialsDataUtils.toFinancialElementsExt(result)
+      );
+    } else {
+      if (!!logResults) {
+        console.log(result);
+      }
+      this.symbolFinancials.emit([]);
+      this.financialElements.emit([]);
+    }
   }
 
   private createFinancialElementParam(
@@ -293,10 +292,14 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   }
 
   private validateItemTypes(): ValidatorFn {
-	  return (form: FormGroup): ValidationErrors | null => {
-	  let termStartCount = this.queryItems.filter(myTerm => myTerm.queryItemType === ItemType.TermStart).length;
-	  let termEndCount = this.queryItems.filter(myTerm => myTerm.queryItemType === ItemType.TermEnd).length;
-	  return termStartCount != termEndCount ? {termItemsValid: false} : null;
-	  };
+    return (form: FormGroup): ValidationErrors | null => {
+      let termStartCount = this.queryItems.filter(
+        (myTerm) => myTerm.queryItemType === ItemType.TermStart
+      ).length;
+      let termEndCount = this.queryItems.filter(
+        (myTerm) => myTerm.queryItemType === ItemType.TermEnd
+      ).length;
+      return termStartCount != termEndCount ? { termItemsValid: false } : null;
+    };
   }
 }

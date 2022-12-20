@@ -20,7 +20,7 @@
             [formControlName]="FormFields.YearOperator"
             name="YearOperator"
           >
-            <mat-option *ngFor="let item of numberQueryItems" [value]="item">{{
+            <mat-option *ngFor="let item of yearOperators" [value]="item">{{
               item
             }}</mat-option>
           </mat-select>
@@ -114,5 +114,5 @@
       </div>
     </div>
   </form>
-    {{ formStatus }}
+  {{ formStatus }}
 </div>

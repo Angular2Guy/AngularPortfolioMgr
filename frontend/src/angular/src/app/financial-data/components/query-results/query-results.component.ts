@@ -10,12 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  ViewChild,
-} from "@angular/core";
+import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { MatTableDataSource } from "@angular/material/table";

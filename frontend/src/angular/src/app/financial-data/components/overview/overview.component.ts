@@ -13,7 +13,7 @@
 import { Component, OnInit, HostListener, OnDestroy } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { switchMap} from "rxjs/operators";
+import { switchMap } from "rxjs/operators";
 import { Subscription } from "rxjs";
 import { ImportFinancialsComponent } from "../import-financials/import-financials.component";
 import { FinancialDataService } from "../../service/financial-data.service";
