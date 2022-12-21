@@ -83,19 +83,10 @@ export class QueryComponent implements OnInit, OnDestroy {
         ],
         [QueryFormFields.ItemType]: ItemType.Query,
       }
-      /*
-			, {
-				validators: [this.validate]
-			} 
-			as AbstractControlOptions
-			*/
     );
   }
 
   ngOnInit(): void {
-    if (!this.showType) {
-      this.baseFormArray.insert(this.formArrayIndex, this.itemFormGroup);
-    }
     this.subscriptions.push(
       this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges
         .pipe(debounceTime(200))
@@ -139,9 +130,6 @@ export class QueryComponent implements OnInit, OnDestroy {
     }
   }
 
-  itemRemove(): void {
-    this.removeItem.emit(this.formArrayIndex);
-  }
 
   private getOperators(delayMillis: number): void {
     setTimeout(() => {
@@ -196,6 +184,10 @@ export class QueryComponent implements OnInit, OnDestroy {
     this.subscriptions = null;
   }
 
+  itemRemove(): void {
+    this.removeItem.emit(this.formArrayIndex);
+  }
+  
   get showType(): boolean {
     return this._showType;
   }
@@ -203,12 +195,13 @@ export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   set showType(showType: boolean) {
     this._showType = showType;
-    if (!this.showType) {
+    if (!this.showType) {		
       const formIndex =
         this?.baseFormArray?.controls?.findIndex(
           (myControl) => myControl === this.itemFormGroup
         ) || -1;
-      if (formIndex >= 0) {
+      if (formIndex < 0) {
+		  console.log('showType showType(...)');
         this.baseFormArray.insert(this.formArrayIndex, this.itemFormGroup);
       }
     } else {
@@ -217,6 +210,7 @@ export class QueryComponent implements OnInit, OnDestroy {
           (myControl) => myControl === this.itemFormGroup
         ) || -1;
       if (formIndex >= 0) {
+		  console.log('showType remove showType(...)');
         this.baseFormArray.removeAt(formIndex);
       }
     }
