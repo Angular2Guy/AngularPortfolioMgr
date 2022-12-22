@@ -52,6 +52,12 @@ import jakarta.persistence.metamodel.Metamodel;
 public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean
 		implements SymbolFinancialsRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
+	private static final String SYMBOL = "symbol";
+	private static final String FINANCIAL_ELEMENTS = "financialElements";
+	private static final String QUARTER = "quarter";
+	private static final String FISCAL_YEAR = "fiscalYear";
+	private static final String VALUE = "value";
+	private static final String CONCEPT = "concept";
 	private final EntityManager entityManager;
 
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
@@ -106,13 +112,13 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 		Metamodel m = this.entityManager.getMetamodel();
 		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
-		root.fetch("financialElements");
-		Path<FinancialElement> fePath = root.get("financialElements");
+		root.fetch(FINANCIAL_ELEMENTS);
+		Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
 		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates,
 				Optional.of(symbolFinancials_));
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true)
-					.orderBy(this.entityManager.getCriteriaBuilder().asc(root.get("symbol")));
+					.orderBy(this.entityManager.getCriteriaBuilder().asc(root.get(SYMBOL)));
 		} else {
 			return new LinkedList<>();
 		}
@@ -133,11 +139,11 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		final List<Predicate> predicates = new ArrayList<>();
 		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().equal(
-					this.entityManager.getCriteriaBuilder().lower(root.get("symbol")),
+					this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL)),
 					symbolFinancialsQueryParams.getSymbol().trim().toLowerCase()));
 		}
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get("quarter"))
+			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
 		}
 		if (symbolFinancialsQueryParams.getYearFilter() != null
@@ -146,11 +152,11 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
 			switch (symbolFinancialsQueryParams.getYearFilter().getOperation()) {
 			case SmallerEqual -> predicates.add(this.entityManager.getCriteriaBuilder()
-					.lessThanOrEqualTo(root.get("fiscalYear"), symbolFinancialsQueryParams.getYearFilter().getValue()));
+					.lessThanOrEqualTo(root.get(FISCAL_YEAR), symbolFinancialsQueryParams.getYearFilter().getValue()));
 			case LargerEqual ->
-				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get("fiscalYear"),
+				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get(FISCAL_YEAR),
 						symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case Equal -> predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get("fiscalYear"),
+			case Equal -> predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get(FISCAL_YEAR),
 					symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
@@ -242,7 +248,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				&& myDto.getValueFilter().getValue() != null
 				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
 						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
-			Expression<BigDecimal> joinPath = fePath.get("value");
+			Expression<BigDecimal> joinPath = fePath.get(VALUE);
 			result = Optional.of(switch (myDto.getValueFilter().getOperation()) {
 			case Equal -> this.entityManager.getCriteriaBuilder().equal(joinPath, myDto.getValueFilter().getValue());
 			case SmallerEqual ->
@@ -259,7 +265,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		Optional<Predicate> result = Optional.empty();
 		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
 				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
-			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder().lower(fePath.get("concept"));
+			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder().lower(fePath.get(CONCEPT));
 			if (!myDto.getConceptFilter().getOperation().equals(FilterStringDto.Operation.Equal)) {
 				String filterStr = switch (myDto.getConceptFilter().getOperation()) {
 				case Contains -> String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
