@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
@@ -118,9 +120,25 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			return new LinkedList<>();
 		}
 		LocalTime start1 = LocalTime.now();
-		result = this.entityManager.createQuery(createQuery).getResultStream().limit(100).collect(Collectors.toList());
+		result = this.entityManager.createQuery(createQuery).getResultStream().map(
+				mySymbolFinancials -> removeDublicates(mySymbolFinancials)).limit(100).collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		return result;
+	}
+
+	private SymbolFinancials removeDublicates(SymbolFinancials mySymbolFinancials) {
+		this.entityManager.detach(mySymbolFinancials);
+		List<FinancialElement> myfilteredFinancialElements = mySymbolFinancials.getFinancialElements().stream()
+				.peek(myFinancialElement -> this.entityManager.detach(myFinancialElement))
+				.filter(StreamHelpers.distinctByKey(myFinancialElement -> ""
+						+ Optional.ofNullable(myFinancialElement.getConcept()).orElse("").trim()
+						+ myFinancialElement.getCurrency() + myFinancialElement.getValue() != null
+								? myFinancialElement.getValue().toString().trim()
+								: ""))
+				.collect(Collectors.toList());
+		mySymbolFinancials.getFinancialElements().clear();
+		mySymbolFinancials.getFinancialElements().addAll(myfilteredFinancialElements);
+		return mySymbolFinancials;
 	}
 
 	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
