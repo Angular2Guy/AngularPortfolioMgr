@@ -45,8 +45,6 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
 public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean
@@ -110,12 +108,9 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 		final List<Predicate> predicates = createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root);
 
-		Metamodel m = this.entityManager.getMetamodel();
-		EntityType<SymbolFinancials> symbolFinancials_ = m.entity(SymbolFinancials.class);
 		root.fetch(FINANCIAL_ELEMENTS);
 		Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
-		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates,
-				Optional.of(symbolFinancials_));
+		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates);
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true)
 					.orderBy(this.entityManager.getCriteriaBuilder().asc(root.get(SYMBOL)));
@@ -123,14 +118,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			return new LinkedList<>();
 		}
 		LocalTime start1 = LocalTime.now();
-		final List<SymbolFinancials> myResult = this.entityManager.createQuery(createQuery).getResultStream().limit(100)
-				.collect(Collectors.toList());
+		result = this.entityManager.createQuery(createQuery).getResultStream().limit(100).collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
-		result = myResult;
-//		LocalTime start2 = LocalTime.now();
-//		result = this.jpaSymbolFinancialsRepository
-//				.findAllByIdFetchEager(myResult.stream().map(SymbolFinancials::getId).collect(Collectors.toList()));
-//		LOGGER.info("Query2: {} ms", Duration.between(start2, LocalTime.now()).toMillis());
 		return result;
 	}
 
@@ -164,24 +153,24 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	}
 
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
-			final Path<FinancialElement> fePath, final List<Predicate> predicates,
-			final Optional<EntityType<SymbolFinancials>> symbolFinancialsOpt) {
-		final LinkedBlockingQueue<Collection<Predicate>> subTermCollection = new LinkedBlockingQueue<>();
-		final LinkedBlockingQueue<DataHelper.Operation> operationArr = new LinkedBlockingQueue<>();
+			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
+		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {
+		}
+		final LinkedBlockingQueue<SubTerm> subTermCollection = new LinkedBlockingQueue<>();
 		final Collection<Predicate> result = new LinkedList<>();
 		if (financialElementParamDtos != null) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
 				case TermStart -> {
 					try {
-						operationArr.put(myDto.getOperation());
-						subTermCollection.put(new ArrayList<>());
+						subTermCollection.put(new SubTerm(myDto.getOperation(), new ArrayList<>()));
 					} catch (InterruptedException e) {
 						new RuntimeException(e);
 					}
 				}
 				case Query -> {
-					Collection<Predicate> localResult = operationArr.isEmpty() ? result : subTermCollection.peek();
+					Collection<Predicate> localResult = subTermCollection.isEmpty() ? result
+							: subTermCollection.peek().subTerms();
 					Optional<Predicate> conceptClauseOpt = financialElementConceptClause(fePath, myDto);
 					Optional<Predicate> valueClauseOpt = financialElementValueClause(fePath, myDto);
 					List<Predicate> myPredicates = List.of(conceptClauseOpt, valueClauseOpt).stream()
@@ -194,14 +183,14 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					}
 				}
 				case TermEnd -> {
-					if (operationArr.isEmpty() || subTermCollection.isEmpty()) {
-						throw new RuntimeException(String.format("operationArr: %d, subPredicates: %d",
-								operationArr.size(), subTermCollection.size()));
+					if (subTermCollection.isEmpty()) {
+						throw new RuntimeException(String.format("subPredicates: %d", subTermCollection.size()));
 					}
-					Collection<Predicate> myPredicates = subTermCollection.poll();
+					SubTerm subTermColl = subTermCollection.poll();
+					Collection<Predicate> myPredicates = subTermColl.subTerms();
 					Collection<Predicate> baseTermCollection = subTermCollection.peek() == null ? result
-							: subTermCollection.peek();
-					DataHelper.Operation operation = operationArr.poll();
+							: subTermCollection.peek().subTerms();
+					DataHelper.Operation operation = subTermColl.operation();
 					Collection<Predicate> resultPredicates = operation == null ? myPredicates : switch (operation) {
 					case And ->
 						List.of(this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0])));
@@ -212,16 +201,14 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					case OrNot -> List.of(this.entityManager.getCriteriaBuilder()
 							.not(this.entityManager.getCriteriaBuilder().or(myPredicates.toArray(new Predicate[0]))));
 					};
-
 					baseTermCollection.addAll(resultPredicates);
 				}
 				}
 			});
 		}
 		// validate terms
-		if (!operationArr.isEmpty() || !subTermCollection.isEmpty()) {
-			throw new RuntimeException(String.format("operationArr: %d, subPredicates: %d", operationArr.size(),
-					subTermCollection.size()));
+		if (!subTermCollection.isEmpty()) {
+			throw new RuntimeException(String.format("subPredicates: %d", subTermCollection.size()));
 		}
 		predicates.addAll(result);
 	}
@@ -232,7 +219,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		final Root<FinancialElement> root = createQuery.from(FinancialElement.class);
 		root.fetch("symbolFinancials");
 		final List<Predicate> predicates = new ArrayList<>();
-		this.createFinancialElementClauses(financialElementParams, root, predicates, Optional.empty());
+		this.createFinancialElementClauses(financialElementParams, root, predicates);
 		if (!predicates.isEmpty()) {
 			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
 		} else {
