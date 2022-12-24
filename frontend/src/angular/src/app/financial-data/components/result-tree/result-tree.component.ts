@@ -116,7 +116,7 @@ export class ResultTreeComponent {
       } as BySymbolElements;
       myBySymbolElements.push(myBySymbolElement);
     });
-    console.log(myBySymbolElements);
+    //console.log(myBySymbolElements);
     return myBySymbolElements;
   }
 }
