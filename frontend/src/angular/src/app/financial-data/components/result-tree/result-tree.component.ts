@@ -60,7 +60,7 @@ export class ResultTreeComponent {
 
   toggleNode(node: ElementNode): void {
     this.treeControl.toggle(node);
-    node.children.forEach((childNode) => {
+    node?.children?.forEach((childNode) => {
       if (!childNode || !childNode?.children?.length) {
         const myByElements = childNode as ByElements;
         myByElements.isOpen = this.treeControl.isExpanded(node);
