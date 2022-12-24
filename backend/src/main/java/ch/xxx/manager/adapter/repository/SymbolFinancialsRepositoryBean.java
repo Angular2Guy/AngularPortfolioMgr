@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -174,21 +173,21 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
 		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {
 		}
-		final LinkedBlockingQueue<SubTerm> subTermCollection = new LinkedBlockingQueue<>();
+		final LinkedBlockingQueue<SubTerm> subTermQueue = new LinkedBlockingQueue<>();
 		final Collection<Predicate> result = new LinkedList<>();
 		if (financialElementParamDtos != null) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
 				case TermStart -> {
 					try {
-						subTermCollection.put(new SubTerm(myDto.getOperation(), new ArrayList<>()));
+						subTermQueue.put(new SubTerm(myDto.getOperation(), new ArrayList<>()));
 					} catch (InterruptedException e) {
 						new RuntimeException(e);
 					}
 				}
 				case Query -> {
-					Collection<Predicate> localResult = subTermCollection.isEmpty() ? result
-							: subTermCollection.peek().subTerms();
+					Collection<Predicate> localResult = subTermQueue.isEmpty() ? result
+							: subTermQueue.peek().subTerms();
 					Optional<Predicate> conceptClauseOpt = financialElementConceptClause(fePath, myDto);
 					Optional<Predicate> valueClauseOpt = financialElementValueClause(fePath, myDto);
 					List<Predicate> myPredicates = List.of(conceptClauseOpt, valueClauseOpt).stream()
@@ -201,13 +200,13 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					}
 				}
 				case TermEnd -> {
-					if (subTermCollection.isEmpty()) {
-						throw new RuntimeException(String.format("subPredicates: %d", subTermCollection.size()));
+					if (subTermQueue.isEmpty()) {
+						throw new RuntimeException(String.format("subPredicates: %d", subTermQueue.size()));
 					}
-					SubTerm subTermColl = subTermCollection.poll();
+					SubTerm subTermColl = subTermQueue.poll();
 					Collection<Predicate> myPredicates = subTermColl.subTerms();
-					Collection<Predicate> baseTermCollection = subTermCollection.peek() == null ? result
-							: subTermCollection.peek().subTerms();
+					Collection<Predicate> baseTermCollection = subTermQueue.peek() == null ? result
+							: subTermQueue.peek().subTerms();
 					DataHelper.Operation operation = subTermColl.operation();
 					Collection<Predicate> resultPredicates = operation == null ? myPredicates : switch (operation) {
 					case And ->
@@ -225,8 +224,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			});
 		}
 		// validate terms
-		if (!subTermCollection.isEmpty()) {
-			throw new RuntimeException(String.format("subPredicates: %d", subTermCollection.size()));
+		if (!subTermQueue.isEmpty()) {
+			throw new RuntimeException(String.format("subPredicates: %d", subTermQueue.size()));
 		}
 		predicates.addAll(result);
 	}
