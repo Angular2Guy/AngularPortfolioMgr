@@ -100,13 +100,13 @@ export class ResultTreeComponent {
           isOpen: false,
           finanicalElementExts: value,
         } as ByElements;
-        const element = {
+        const myByYearElement = {
           year: key,
           name: key.toString(),
           children: [myByElements],
           byElements: [myByElements],
         } as ByYearElements;
-        byYearElements.push(element);
+        byYearElements.push(myByYearElement);
       });
       const myBySymbolElement = {
         name: key,
