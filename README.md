@@ -28,6 +28,7 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The UI for the search in the SEC Filings data set uses Drag and Drop and displays the results in a Angular Components table or in an Angular Components tree of Angular Components tables.
 * The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query requested by the frontend.
 * The Helm chart for a Kubernetes deployment in the helm directory can deploy the project with Kafka, Zookeeper and Postgresql.
+* Currently Liquibase needs '-Dliquibase.duplicateFileMode=WARN' as VM Parameter at startup.
 
 The current state of the project is that the main features are implemented and it will continue to be improved. 
 
