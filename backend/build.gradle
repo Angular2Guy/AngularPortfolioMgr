@@ -11,9 +11,9 @@
    limitations under the License.
  */
 plugins {
-	id 'org.springframework.boot' version '3.0.0'
+	id 'org.springframework.boot' version '3.0.1'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id 'org.graalvm.buildtools.native' version '0.9.18'
+	id 'org.graalvm.buildtools.native' version '0.9.19'
 	id 'java'    
 }
 
@@ -52,13 +52,13 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.0.0'
 			
-	if(project.hasProperty('withAngular')) {
+//	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
 		testImplementation 'com.h2database:h2'
-	} else {
-		runtimeOnly 'com.h2database:h2'
-		testImplementation 'com.h2database:h2'
-	}
+//	} else {
+//		runtimeOnly 'com.h2database:h2'
+//		testImplementation 'com.h2database:h2'
+//	}
 }
 
 bootJar {
