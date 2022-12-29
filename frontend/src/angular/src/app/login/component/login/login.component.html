@@ -1,7 +1,8 @@
 <div mat-dialog-content>
   <mat-tab-group>
     <mat-tab i18n-label="@@loginLogin" label="Login">
-      <form [formGroup]="loginForm" novalidate>
+      <ng-container [ngTemplateOutlet]="waitingSpinner" *ngIf="waitingForResponse"></ng-container>
+      <form [formGroup]="loginForm" novalidate *ngIf="!waitingForResponse">
         <ul>
           <li>
             <mat-form-field>
@@ -52,6 +53,7 @@
       </form>
     </mat-tab>
     <mat-tab i18n-label="@@signin" label="Signin">
+    <ng-container [ngTemplateOutlet]="waitingSpinner" *ngIf="waitingForResponse"></ng-container>
       <form [formGroup]="signinForm" novalidate>
         <ul>
           <li>
@@ -132,3 +134,12 @@
     </mat-tab>
   </mat-tab-group>
 </div>
+
+<ng-template #waitingSpinner>
+  <div class="spinner-container">
+  	<div>
+  		<h1 i18n="@@loginWaiting">Waiting...</h1>
+  		<mat-spinner></mat-spinner>  		
+  	</div>
+  </div>
+</ng-template>

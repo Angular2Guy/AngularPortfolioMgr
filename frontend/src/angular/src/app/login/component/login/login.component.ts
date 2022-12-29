@@ -37,6 +37,7 @@ export class LoginComponent implements OnInit {
   signinFailed = false;
   pwMatching = true;
   FormFields = FormFields;
+  protected waitingForResponse = false;
 
   constructor(
     public dialogRef: MatDialogRef<MainComponent>,
@@ -86,7 +87,7 @@ export class LoginComponent implements OnInit {
     return this.pwMatching;
   }
 
-  onSigninClick(): void {
+  onSigninClick(): void {	  
     const login: Login = {
       emailAddress: null,
       token: null,
@@ -96,6 +97,7 @@ export class LoginComponent implements OnInit {
     login.username = this.signinForm.get(FormFields.Username).value;
     login.password = this.signinForm.get(FormFields.Password).value;
     login.emailAddress = this.signinForm.get(FormFields.Email).value;
+    this.waitingForResponse = true;
     this.loginService.postSignin(login).subscribe(
       (res) => this.signin(res),
       (err) => console.log(err)
@@ -111,6 +113,7 @@ export class LoginComponent implements OnInit {
     };
     login.username = this.loginForm.get(FormFields.Username).value;
     login.password = this.loginForm.get(FormFields.Password).value;
+    this.waitingForResponse = true;
     this.loginService.postLogin(login).subscribe(
       (res) => this.login(res),
       (err) => console.log(err)
@@ -119,6 +122,7 @@ export class LoginComponent implements OnInit {
 
   private signin(login: boolean): void {
     this.data.login = null;
+    this.waitingForResponse = false;    
     if (login) {
       this.signinFailed = false;
       this.dialogRef.close();
@@ -128,6 +132,7 @@ export class LoginComponent implements OnInit {
   }
 
   private login(login: Login): void {
+	  this.waitingForResponse = false;
     if (login && login.token && login.id) {
       this.tokenService.token = login.token;
       this.tokenService.userId = login.id;
