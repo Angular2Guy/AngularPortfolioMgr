@@ -54,7 +54,7 @@
     </mat-tab>
     <mat-tab i18n-label="@@signin" label="Signin">
     <ng-container [ngTemplateOutlet]="waitingSpinner" *ngIf="waitingForResponse"></ng-container>
-      <form [formGroup]="signinForm" novalidate>
+      <form [formGroup]="signinForm" novalidate *ngIf="!waitingForResponse">
         <ul>
           <li>
             <mat-form-field>
