@@ -55,7 +55,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 @AnalyzeClasses(packages = "ch.xxx.manager", importOptions = { DoNotIncludeTests.class, EclipseAddOn.class, DoNotIncludeAotGenerated.class })
 public class MyArchitectureTests {
 	private JavaClasses importedClasses = new ClassFileImporter()
-			.withImportOptions(List.of(new DoNotIncludeTests(), new DoNotIncludeAotGenerated()))
+			.withImportOptions(List.of(new DoNotIncludeTests(), new DoNotIncludeAotGenerated(), new DoNotIncludeNamedTests()))
 			.importPackages("ch.xxx.manager");
 
 	@ArchTest
@@ -159,6 +159,17 @@ public class MyArchitectureTests {
 				.should(annotatedWithSpringAutowired.or(annotatedWithGuiceInject).or(annotatedWithJakartaInject)
 						.as("be annotated with an injection annotation"));
 		return beAnnotatedWithAnInjectionAnnotation;
+	}
+	
+	static final class DoNotIncludeNamedTests implements ImportOption {		
+			private static final Pattern CUSTOM_TEST_PATTERN = Pattern
+					.compile(".*(Test|Tests)\\.class$");
+
+			@Override
+			public boolean includes(Location location) {
+				return !location.matches(CUSTOM_TEST_PATTERN);
+			}
+			
 	}
 	
 	static final class DoNotIncludeAotGenerated implements ImportOption {
