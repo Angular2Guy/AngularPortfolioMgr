@@ -58,6 +58,7 @@ public class BaseControllerTest {
 	protected SymbolImportService symbolImportService;
 	@MockBean
 	protected KafkaTemplate kafkaTemplate;
+	
 	@MockBean
 	protected JpaAppUserRepository jpaAppUserRepository;
 	@MockBean
@@ -86,4 +87,5 @@ public class BaseControllerTest {
 	protected JpaSymbolRepository jpaSymbolRepository;
 	@MockBean
 	protected DataSource dataSource;
+	
 }
