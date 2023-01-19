@@ -12,9 +12,7 @@
  */
 package ch.xxx.manager.adapter.cron;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -24,7 +22,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
