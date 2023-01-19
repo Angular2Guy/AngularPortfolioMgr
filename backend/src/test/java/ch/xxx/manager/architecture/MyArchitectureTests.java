@@ -174,7 +174,7 @@ public class MyArchitectureTests {
 	
 	static final class DoNotIncludeAotGenerated implements ImportOption {
 		private static final Pattern AOT_GENERATED_PATTERN = Pattern
-				.compile(".*(__BeanDefinitions|SpringCGLIB\\$\\$0)\\.class$");
+				.compile(".*(__BeanDefinitions|SpringCGLIB\\$\\$\\d)\\.class$");
 		private static final Pattern AOT_TEST_GENERATED_PATTERN = Pattern
 				.compile(".*__TestContext.*\\.class$");
 
