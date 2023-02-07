@@ -11,17 +11,36 @@
    limitations under the License.
  */
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { FormBuilder } from "@angular/forms";
+import { MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { ActivatedRoute, Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
+import { TokenService } from "ngx-simple-charts/base-service";
+import { timeout } from "rxjs";
+import { Login } from "../../model/login";
+import { LoginService } from "../../service/login.service";
 
 import { MainComponent } from "./main.component";
 
-/*
 describe('MainComponent', () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
+  let tokenService: TokenService;
+  let loginService: LoginService;
+  let matDialog: MatDialog;
+  let router: ActivatedRoute;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ MainComponent ]
+  beforeEach(waitForAsync(() => {
+	tokenService = jasmine.createSpyObj('tokenService', ['logout']);
+    TestBed.configureTestingModule({		
+	imports: [MatDialogModule, MatToolbarModule,RouterTestingModule.withRoutes([{ path: "**", redirectTo: "/" }])],
+      declarations: [ MainComponent ],
+      providers: [
+		  FormBuilder,
+        {provide: TokenService, useValue: tokenService},
+        {provide: LoginService, useValue: loginService}
+      ]
     })
     .compileComponents();
   }));
@@ -29,11 +48,29 @@ describe('MainComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MainComponent);
     component = fixture.componentInstance;
+    matDialog = TestBed.inject(MatDialog);   
+    router = TestBed.inject(ActivatedRoute);          
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  
+  it('should logout', () => {
+	  component.logout();
+	  expect(tokenService.logout).toHaveBeenCalled();
+  });
+  
+  it('should open login', waitForAsync(() => {
+	  spyOn(matDialog,'open').and.callThrough();
+	  component.openLoginDialog();
+	  expect(matDialog.open).toHaveBeenCalled();	  	   	  	  	 
+  }));
+  it('should close login', waitForAsync(() => {
+	  const matDialogRef = component.openLoginDialog();	  
+	  const testLogin = {emailAddress: 'e', password: 'p', username: 'u',token:'t'} as Login; 
+	  matDialogRef.close(testLogin);	
+	  matDialog.afterAllClosed.subscribe(() => expect(component.login).toEqual(testLogin));
+	  }));  
 });
-*/

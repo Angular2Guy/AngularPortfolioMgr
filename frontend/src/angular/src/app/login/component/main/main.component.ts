@@ -31,17 +31,18 @@ export class MainComponent {
     private router: Router
   ) {}
 
-  openLoginDialog(): void {
+  openLoginDialog(): MatDialogRef<LoginComponent, any> {
     const dialogRef = this.dialog.open(LoginComponent, {
       width: "600px",
       data: { login: this.login },
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      this.login = typeof result == "undefined" ? null : result;
+    dialogRef.beforeClosed().subscribe((result) => {		
+      this.login = typeof result == "undefined" ? null : result;      
       if (this.login) {
         this.router.navigate(["/portfolios/overview"]);
       }
     });
+    return dialogRef;
   }
 
   logout(): void {
