@@ -109,6 +109,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 		final List<Predicate> predicates = createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root);
 
+		predicates.addAll(this.limitYearQuarterResults(symbolFinancialsQueryParams, root));		
 		root.fetch(FINANCIAL_ELEMENTS);
 		Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
 		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates);
@@ -119,10 +120,24 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			return new LinkedList<>();
 		}
 		LocalTime start1 = LocalTime.now();
-		result = this.entityManager.createQuery(createQuery).getResultStream().map(
-				mySymbolFinancials -> removeDublicates(mySymbolFinancials)).limit(100).collect(Collectors.toList());
+		result = this.entityManager.createQuery(createQuery).getResultStream()
+				.map(mySymbolFinancials -> removeDublicates(mySymbolFinancials)).limit(100)
+				.collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		return result;
+	}
+
+	private List<Predicate> limitYearQuarterResults(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+			final Root<SymbolFinancials> root) {
+		List<Predicate> results = List.of();
+		if((symbolFinancialsQueryParams.getFinancialElementParams() == null ||
+				 symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
+				&& (symbolFinancialsQueryParams.getSymbol() == null
+						|| symbolFinancialsQueryParams.getSymbol().isBlank())) {
+			symbolFinancialsQueryParams.setSymbol("A");
+			results = List.of(this.createSymbolCriteria(symbolFinancialsQueryParams, root, true));
+		}
+		return results;
 	}
 
 	private SymbolFinancials removeDublicates(SymbolFinancials mySymbolFinancials) {
@@ -144,15 +159,13 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			final Root<SymbolFinancials> root) {
 		final List<Predicate> predicates = new ArrayList<>();
 		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().equal(
-					this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL)),
-					symbolFinancialsQueryParams.getSymbol().trim().toLowerCase()));
+			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
 		}
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
 		}
-		if (symbolFinancialsQueryParams.getYearFilter() != null
+		if (symbolFinancialsQueryParams.getYearFilter() != null 
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
 				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
@@ -167,6 +180,14 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			}
 		}
 		return predicates;
+	}
+
+	private Predicate createSymbolCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+			final Root<SymbolFinancials> root, boolean uselike) {
+		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL));
+		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
+		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%",lowerStr))
+				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
 	}
 
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
@@ -242,7 +263,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		} else {
 			return new HashSet<>();
 		}
-		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(5000).getResultList());
+		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(1000).getResultList());
 	}
 
 	private Optional<Predicate> financialElementValueClause(Path<FinancialElement> fePath,
