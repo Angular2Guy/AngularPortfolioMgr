@@ -32,6 +32,9 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 
 The current state of the project is that the main features are implemented and it will continue to be improved. 
 
+## C4 Architecture Diagrams
+The project has a [System Context Diagram](structurizr/diagrams/structurizr-1-SystemContext.svg), a [Container Diagram](structurizr/diagrams/structurizr-1-Containers.svg) and a [Component Diagram](structurizr/diagrams/structurizr-1-Components.svg). The Diagrams have been created with Structurizr. The file runStructurizr.sh contains the commands to use Structurizr and the directory structurizr contains the dsl file.
+
 ## Portfolio Manager setup
 To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
 * the Alphavantage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
