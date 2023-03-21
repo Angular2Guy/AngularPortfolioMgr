@@ -49,7 +49,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 1Gi
+    storage: 10Gi
   hostPath:
     path: /data/postgresapm
     type: DirectoryOrCreate
@@ -67,7 +67,7 @@ spec:
   storageClassName: manual  
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -91,7 +91,7 @@ spec:
         resources:
           limits:
             memory: "2G"
-            cpu: "1.5"
+            cpu: "2.5"
           requests:
             memory: "1G"
             cpu: "0.5"
@@ -235,10 +235,10 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: "1G"
+            memory: "786M"
             cpu: "0.7"
           requests:
-            memory: "768M"
+            memory: "512M"
             cpu: "0.1"
         env:
           {{- include "helpers.list-envApp-variables" . | indent 10 }}
@@ -271,3 +271,21 @@ spec:
     protocol: TCP
   selector:
     app: {{ .Values.webAppName }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.webAppName }}
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: {{ .Values.webAppName }}
+  pollingInterval: 10 # Optional. Default: 30 seconds  
+  minReplicaCount:  1 # Optional. Default: 0
+  maxReplicaCount: 3 # Optional. Default: 100
+  triggers:
+    - type: metrics-api
+      metadata:
+        targetValue: "10"        
+        url: "http://{{ .Values.webAppName }}:8080/actuator/metrics/http.server.requests.active"
+        valueLocation: "measurements.0.value"

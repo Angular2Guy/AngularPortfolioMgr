@@ -55,6 +55,7 @@ envApp:
     JPA_SHOW_SQL: true
     H2_CONSOLE: false
     SHUTDOWN_PHASE: 10s
+#    SPRING_PROFILES_ACTIVE: "prod,prod-kafka,kedatest"
     SPRING_PROFILES_ACTIVE: "prod,prod-kafka"
     KAFKA_SERVICE_NAME: kafkaService
   secret:    
