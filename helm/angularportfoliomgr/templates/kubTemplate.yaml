@@ -91,7 +91,7 @@ spec:
         resources:
           limits:
             memory: "2G"
-            cpu: "2.5"
+            cpu: "2.0"
           requests:
             memory: "1G"
             cpu: "0.5"
@@ -141,10 +141,10 @@ spec:
         image: "{{ .Values.zookeeperImageName }}:{{ .Values.zookeeperImageVersion }}"
         resources:
           limits:
-            memory: "768M"
-            cpu: "0.5"
-          requests:
             memory: "512M"
+            cpu: "0.3"
+          requests:
+            memory: "384M"
             cpu: "0.1"
         env:
           {{- include "helpers.list-envZookeeper-variables" . | indent 10 }}
@@ -236,7 +236,7 @@ spec:
         resources:
           limits:
             memory: "786M"
-            cpu: "0.7"
+            cpu: "1.0"
           requests:
             memory: "512M"
             cpu: "0.1"
@@ -289,3 +289,8 @@ spec:
         targetValue: "10"        
         url: "http://{{ .Values.webAppName }}:8080/actuator/metrics/http.server.requests.active"
         valueLocation: "measurements.0.value"
+    - type: cpu
+      metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
+      metadata:
+        type: Utilization # Deprecated in favor of trigger.metricType; allowed types are 'Utilization' or 'AverageValue'
+        value: "70"        
