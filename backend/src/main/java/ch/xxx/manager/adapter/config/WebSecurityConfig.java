@@ -48,8 +48,9 @@ public class WebSecurityConfig {
 		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
 		HttpSecurity httpSecurity = http
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/rest/config/**").permitAll()
-						.requestMatchers("/rest/auth/**").permitAll().requestMatchers("/rest/**")
-						.hasAuthority(DataHelper.Role.USERS.toString()).requestMatchers(blockedPath).denyAll())
+						.requestMatchers("/rest/kedatest/**").permitAll().requestMatchers("/rest/auth/**").permitAll()
+						.requestMatchers("/rest/**").hasAuthority(DataHelper.Role.USERS.toString())
+						.requestMatchers(blockedPath).denyAll())
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()).sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers().frameOptions()
 				.sameOrigin().and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);

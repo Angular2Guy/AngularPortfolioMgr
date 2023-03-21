@@ -35,23 +35,23 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class RestJwtFilter implements Filter {
 	private static final Logger LOG = LoggerFactory.getLogger(RestJwtFilter.class);
-	
+
 	private final JwtTokenService jwtTokenService;
-	
+
 	public RestJwtFilter(JwtTokenService jwtTokenService) {
 		this.jwtTokenService = jwtTokenService;
 	}
-	
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
-		if (httpReq.getRequestURI().contains("/rest") && this.isNotOpenRestEndpoint(httpReq)) {			
+		if (httpReq.getRequestURI().contains("/rest") && this.isNotOpenRestEndpoint(httpReq)) {
 			TokenSubjectRole tokenTuple = this.jwtTokenService.getTokenUserRoles(createHeaderMap(request));
 			if (tokenTuple.role() == null || !tokenTuple.role().contains(DataHelper.Role.USERS.name())) {
 				HttpServletResponse httpRes = (HttpServletResponse) response;
 				httpRes.setStatus(401);
-				LOG.info("Request denied: ",httpReq.getRequestURL().toString());
+				LOG.info("Request denied: ", httpReq.getRequestURL().toString());
 				return;
 			}
 		}
@@ -59,15 +59,16 @@ public class RestJwtFilter implements Filter {
 	}
 
 	private boolean isNotOpenRestEndpoint(HttpServletRequest httpReq) {
-		return !httpReq.getRequestURI().contains("/rest/auth") && !httpReq.getRequestURI().contains("/rest/config");
+		return !httpReq.getRequestURI().contains("/rest/auth") && !httpReq.getRequestURI().contains("/rest/config")
+				&& !httpReq.getRequestURI().contains("/rest/kedatest");
 	}
-	
-	private Map<String,String> createHeaderMap(ServletRequest req) {
+
+	private Map<String, String> createHeaderMap(ServletRequest req) {
 		Map<String, String> header = new HashMap<>();
 		HttpServletRequest httpReq = (HttpServletRequest) req;
-		for(Iterator<String> iter = httpReq.getHeaderNames().asIterator(); iter.hasNext();) {
+		for (Iterator<String> iter = httpReq.getHeaderNames().asIterator(); iter.hasNext();) {
 			String key = iter.next();
-			header.put(key, httpReq.getHeader(key));			
+			header.put(key, httpReq.getHeader(key));
 		}
 		return header;
 	}

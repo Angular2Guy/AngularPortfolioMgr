@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.FilterNumberDto;
 import ch.xxx.manager.domain.model.dto.FilterStringDto;
 import ch.xxx.manager.domain.utils.DataHelper;
-import ch.xxx.manager.domain.utils.DataHelper.TermType;
 import ch.xxx.manager.usecase.service.AppInfoService;
 
 @RestController
