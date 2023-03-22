@@ -20,6 +20,9 @@ zookeeperImageVersion: latest
 kafkaServiceName: kafkaservice
 zookeeperServiceName: zookeeperservice
 
+kedaCpuLimit: "60"
+kedaRequestLimit: "10"
+
 secret:
   nameApp: app-env-secret
   nameDb: db-env-secret
