@@ -171,8 +171,7 @@ metadata:
   name: {{ .Values.kafkaName }}
   labels:
     app: {{ .Values.kafkaName }}
-spec:
-  replicas: 1
+spec:  
   selector:
     matchLabels:
       app: {{ .Values.kafkaName }}
@@ -181,6 +180,7 @@ spec:
       labels:
         app: {{ .Values.kafkaName }}    
     spec:
+      terminationGracePeriodSeconds: 10
       securityContext:
         runAsUser: 0
         runAsGroup: 0
@@ -219,8 +219,7 @@ metadata:
   name: {{ .Values.webAppName }}
   labels:
     app: {{ .Values.webAppName }}    
-spec:
-  replicas: 1
+spec:  
   selector:
     matchLabels:
       app: {{ .Values.webAppName }}
@@ -229,6 +228,7 @@ spec:
       labels:
         app: {{ .Values.webAppName }}
     spec:
+      terminationGracePeriodSeconds: 15
       containers:
       - name: {{ .Values.webAppName }}
         image: "{{ .Values.webImageName }}:{{ .Values.webImageVersion }}" 
@@ -277,6 +277,8 @@ kind: ScaledObject
 metadata:
   name: keda-scaledobject
   namespace: default
+  labels:
+    deploymentName: {{ .Values.webAppName }}
 spec:
   scaleTargetRef:
     name: {{ .Values.webAppName }}
@@ -294,3 +296,4 @@ spec:
       metadata:
         type: Utilization # Deprecated in favor of trigger.metricType; allowed types are 'Utilization' or 'AverageValue'
         value: {{ .Values.kedaCpuLimit }}
+---
