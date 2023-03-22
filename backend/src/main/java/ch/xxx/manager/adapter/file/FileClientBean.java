@@ -27,6 +27,7 @@ import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,8 @@ public class FileClientBean implements FileClient {
 	private final AppInfoService appInfoService;
 	private final ObjectMapper objectMapper;
 	private final FinancialDataService financialDataImportService;
+	@Value("${ssd.io:false}")
+	private boolean ssdIo;
 	String financialDataImportPath;
 
 	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
@@ -112,7 +115,7 @@ public class FileClientBean implements FileClient {
 						inputStream.close();
 					}
 				}
-				if (symbolFinancialsDtos.size() >= 100 || !entries.hasMoreElements()) {
+				if ((this.ssdIo ? symbolFinancialsDtos.size() >= 100 : symbolFinancialsDtos.size() >= 35) || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
 					LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()), maxChildren[0]);
