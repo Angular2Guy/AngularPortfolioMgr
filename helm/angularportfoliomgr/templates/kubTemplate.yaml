@@ -289,10 +289,10 @@ spec:
     - type: metrics-api
       metadata:
         targetValue: "{{ .Values.kedaRequestLimit }}"        
-        url: "http://{{ .Values.webServiceName }}:8080/actuator/metrics/http.server.requests.active"
+        url: "http://{{ .Values.webServiceName }}.default.svc.cluster.local:8080/actuator/metrics/http.server.requests.active"
         valueLocation: "measurements.0.value"
     - type: cpu
-      metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
+      metricType: AverageValue # Allowed types are 'Utilization' or 'AverageValue'
       metadata:        
         value: "{{ .Values.kedaCpuLimit }}"
 ---
