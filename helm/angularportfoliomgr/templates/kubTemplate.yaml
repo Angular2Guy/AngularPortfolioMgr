@@ -288,12 +288,12 @@ spec:
   triggers:
     - type: metrics-api
       metadata:
-        targetValue: {{ .Values.kedaRequestLimit }}        
+        targetValue: "{{ .Values.kedaRequestLimit }}"        
         url: "http://{{ .Values.webAppName }}:8080/actuator/metrics/http.server.requests.active"
         valueLocation: "measurements.0.value"
     - type: cpu
       metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
       metadata:
         type: Utilization # Deprecated in favor of trigger.metricType; allowed types are 'Utilization' or 'AverageValue'
-        value: {{ .Values.kedaCpuLimit }}
+        value: "{{ .Values.kedaCpuLimit }}"
 ---
