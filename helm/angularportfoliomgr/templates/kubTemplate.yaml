@@ -275,7 +275,7 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: {{ .Values.webAppName }}
+  name: keda-scaledobject
   namespace: default
 spec:
   scaleTargetRef:
@@ -293,4 +293,4 @@ spec:
       metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
       metadata:
         type: Utilization # Deprecated in favor of trigger.metricType; allowed types are 'Utilization' or 'AverageValue'
-        value: "70"        
+        value: "60"        
