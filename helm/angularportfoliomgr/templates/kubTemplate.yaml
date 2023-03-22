@@ -293,7 +293,6 @@ spec:
         valueLocation: "measurements.0.value"
     - type: cpu
       metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
-      metadata:
-        type: Utilization # Deprecated in favor of trigger.metricType; allowed types are 'Utilization' or 'AverageValue'
+      metadata:        
         value: "{{ .Values.kedaCpuLimit }}"
 ---
