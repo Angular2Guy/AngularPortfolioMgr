@@ -275,7 +275,7 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: keda-scaledobject
+  name: keda-scaled-webapp
   namespace: default
   labels:
     deploymentName: {{ .Values.webAppName }}
@@ -289,7 +289,7 @@ spec:
     - type: metrics-api
       metadata:
         targetValue: "{{ .Values.kedaRequestLimit }}"        
-        url: "http://{{ .Values.webAppName }}:8080/actuator/metrics/http.server.requests.active"
+        url: "http://{{ .Values.webServiceName }}:8080/actuator/metrics/http.server.requests.active"
         valueLocation: "measurements.0.value"
     - type: cpu
       metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
