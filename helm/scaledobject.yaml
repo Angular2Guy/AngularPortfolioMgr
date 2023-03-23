@@ -1,0 +1,24 @@
+# kubectl apply -f scaledobject.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: keda-scaled-webapp
+  namespace: default
+  labels:
+    deploymentName: angularportfoliomgrapp
+spec:
+  scaleTargetRef:
+    name: angularportfoliomgrapp
+  pollingInterval: 10 # Optional. Default: 30 seconds  
+  minReplicaCount:  1 # Optional. Default: 0
+  maxReplicaCount: 3 # Optional. Default: 100
+  triggers:
+    - type: metrics-api
+      metadata:
+        targetValue: "10"
+        url: "http://angularportfoliomgrservice.default.svc.cluster.local:8080/actuator/metrics/http.server.requests.active"
+        valueLocation: "measurements.0.value"
+    - type: cpu
+      metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
+      metadata:
+        value: "60"
