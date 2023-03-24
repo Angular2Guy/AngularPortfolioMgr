@@ -30,6 +30,7 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query requested by the frontend.
 * The Helm chart for a Kubernetes deployment in the helm directory can deploy the project with Kafka, Zookeeper and Postgresql.
 * Currently Liquibase needs '-Dliquibase.duplicateFileMode=WARN' as VM Parameter at startup.
+* The Helm chart supports horizontal autoscaling of the app with Keda.
 
 The current state of the project is that the main features are implemented and it will continue to be improved. 
 
@@ -60,9 +61,9 @@ After the data import the form for the company query to select a period, symbol 
 The results are show next to the query in a table or in a tree component. The results are limited if a large amount of entries match the query. Due to the large amount of data the queries can take long (again depends on Db version and IO system). Be patient with the spinner.
 
 ## Kubernetes deployment
-The project has a Docker image that can be deployed on Kubernetes. It has been tested in Minikube. The Helm chart for the deployment can be found in the directory [angularportfoliomgr](https://github.com/Angular2Guy/AngularPortfolioMgr/tree/master/helm/angularportfoliomgr). Commands for the Minikube setup can be found in the [minikubeSetup.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/minikubeSetup.sh) script. The commands for the Helm chart are in the [helmCommand.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/helmCommand.sh) script. 
+The project has a Docker image that can be deployed on Kubernetes. It has been tested in Minikube. The Helm chart for the deployment can be found in the directory [angularportfoliomgr](https://github.com/Angular2Guy/AngularPortfolioMgr/tree/master/helm/angularportfoliomgr). Commands for the Minikube setup can be found in the [minikubeSetup.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/minikubeSetup.sh) script. The commands for the Helm chart are in the [helmCommand.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/helmCommand.sh) script. The Keda install commands are in the [helmCommand.sh](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/helmCommand.sh) script and the configuration is in the 'ScaledObject' section in the [kubTemplate.yaml](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/helm/angularportfoliomgr/templates/kubTemplates.yaml)
 
-The 'angularportfoliomgr' Helm chart will deploy Kafka, Zookeeper, Postgresql and the PortfolioMgr. Kafka is used to provide a horizontaly scalable secure logout. The Kafka usage will grow in the future for nightly quote imports and other distributed data. Zookeeper is deployed for Kafka. The Postgresql Database provides persistence for the AngularPortfolio project. 
+The 'angularportfoliomgr' Helm chart will deploy Kafka, Zookeeper, Postgresql and the PortfolioMgr. Kafka is used to provide a horizontaly scalable secure logout. The Kafka usage will grow in the future for nightly quote imports and other distributed data. Zookeeper is deployed for Kafka. The Postgresql Database provides persistence for the AngularPortfolio project. Keda is used to provide horizontal scaling for the AngularPortfolioMgr.
 
 ## Monitoring
 The Spring Actuator interface with Prometheus interface can be used as it is described in this article: 
