@@ -43,6 +43,7 @@ import ch.xxx.manager.usecase.service.FinancialDataService;
 @Component
 public class FileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
+	private volatile boolean importDone = true; 
 	private final AppInfoService appInfoService;
 	private final ObjectMapper objectMapper;
 	private final FinancialDataService financialDataImportService;
@@ -63,6 +64,17 @@ public class FileClientBean implements FileClient {
 	}
 
 	public Boolean importZipFile(String filename) {
+		this.importDone = false;
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			while(!this.importDone) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					LOGGER.warn("ShutdownHook Thread interrupted.", e);
+				}
+			}
+			LOGGER.info("ShutdownHook Thread is Done.");
+		}));
 		ZipFile initialFile = null;
 		try {
 			initialFile = new ZipFile(this.financialDataImportPath + filename);
@@ -127,6 +139,7 @@ public class FileClientBean implements FileClient {
 			LOGGER.info("Indexes ready.");
 			this.financialDataImportService.updateFeConcepts();
 			LOGGER.info("FeConcepts updated.");
+			this.importDone = true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
