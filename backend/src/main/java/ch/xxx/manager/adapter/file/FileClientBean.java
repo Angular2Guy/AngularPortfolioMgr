@@ -65,16 +65,8 @@ public class FileClientBean implements FileClient {
 
 	public Boolean importZipFile(String filename) {
 		this.importDone = false;
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			while(!this.importDone) {
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					LOGGER.warn("ShutdownHook Thread interrupted.", e);
-				}
-			}
-			LOGGER.info("ShutdownHook Thread is Done.");
-		}));
+		Thread shutDownThread = createShutDownThread();
+		Runtime.getRuntime().addShutdownHook(shutDownThread);
 		ZipFile initialFile = null;
 		try {
 			initialFile = new ZipFile(this.financialDataImportPath + filename);
@@ -139,13 +131,27 @@ public class FileClientBean implements FileClient {
 			LOGGER.info("Indexes ready.");
 			this.financialDataImportService.updateFeConcepts();
 			LOGGER.info("FeConcepts updated.");
-			this.importDone = true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
 			this.closeFile(initialFile);
 		}
+		Runtime.getRuntime().removeShutdownHook(shutDownThread);
+		this.importDone = true;
 		return true;
+	}
+
+	private Thread createShutDownThread() {
+		return new Thread(() -> {
+			while(!this.importDone) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					LOGGER.warn("ShutdownHook Thread interrupted.", e);
+				}
+			}
+			LOGGER.info("ShutdownHook Thread is Done.");
+		});
 	}
 
 	private FinancialElementImportDto fixConcept(FinancialElementImportDto myFinancialElementDto) {
