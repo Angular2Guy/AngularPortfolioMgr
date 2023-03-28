@@ -52,8 +52,10 @@ public class WebSecurityConfig {
 						.requestMatchers("/rest/**").hasAuthority(DataHelper.Role.USERS.toString())
 						.requestMatchers(blockedPath).denyAll())
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()).sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers().frameOptions()
-				.sameOrigin().and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers()
+				.contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';")
+				.and().xssProtection().and().frameOptions().sameOrigin()
+				.and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
 
