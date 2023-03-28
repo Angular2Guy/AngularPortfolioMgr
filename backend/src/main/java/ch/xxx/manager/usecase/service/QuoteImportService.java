@@ -67,7 +67,8 @@ public class QuoteImportService {
 
 	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
 			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
-			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient, SectorRepository sectorRepository) {
+			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
+			SectorRepository sectorRepository) {
 		this.alphavatageClient = alphavatageConnector;
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
@@ -108,9 +109,10 @@ public class QuoteImportService {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-				.map(mySymbolEntity -> this.symbolRepository.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofSeconds(1L))))
-				.flatMap(symbolEntity -> Stream.of(
-						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity,  null))
+				.map(mySymbolEntity -> this.symbolRepository
+						.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofSeconds(1L))))
+				.flatMap(symbolEntity -> Stream
+						.of(this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity, null))
 						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
 				.count();
 	}
@@ -143,8 +145,8 @@ public class QuoteImportService {
 //						mySymbol, delay).stream()).count());
 		return symbols.stream()
 				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-						.flatMap(mySymbol -> Stream.of(this.customImport(symbols.iterator().next().toLowerCase(), this.currencyService.getCurrencyMap(),
-								mySymbol, delay)))
+						.flatMap(mySymbol -> Stream.of(this.customImport(symbols.iterator().next().toLowerCase(),
+								this.currencyService.getCurrencyMap(), mySymbol, delay)))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}
@@ -155,10 +157,11 @@ public class QuoteImportService {
 		final Symbol mySymbolEntity = symbolEntity;
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
 		case ALPHAVANTAGE ->
-			this.alphavatageClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout).stream()
-					.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
-		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
-				.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+			this.alphavatageClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
+					.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+		case YAHOO ->
+			this.rapidApiClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
+					.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
 		};
 		return symbolEntity;
@@ -167,14 +170,13 @@ public class QuoteImportService {
 	private Symbol updateSymbol(RapidOverviewImportDto dto, Symbol symbol) {
 		LOGGER.info("RapidOverviewImportDto {}", dto);
 		symbol.setAddress(String.format("%s %s %s", dto.getAssetProfile().getAddress1(),
-				 dto.getAssetProfile().getAddress2(),
-				 dto.getAssetProfile().getCity()));
+				dto.getAssetProfile().getAddress2(), dto.getAssetProfile().getCity()));
 		symbol.setCountry(dto.getAssetProfile().getCountry());
 		symbol.setDescription(dto.getAssetProfile().getLongBusinessSummary());
 		symbol.setIndustry(dto.getAssetProfile().getIndustry());
 		symbol.setSectorStr(dto.getAssetProfile().getSector());
 		Sector sector = new Sector();
-		sector.setYahooName(dto.getAssetProfile().getSector());		
+		sector.setYahooName(dto.getAssetProfile().getSector());
 		sector.getSymbols().add(symbol);
 		sector = this.sectorRepository.save(sector);
 		symbol.setSector(sector);
@@ -189,7 +191,7 @@ public class QuoteImportService {
 		symbol.setIndustry(dto.getIndustry());
 		symbol.setSectorStr(dto.getSector());
 		Sector sector = new Sector();
-		sector.setAlphavantageName(dto.getSector());		
+		sector.setAlphavantageName(dto.getSector());
 		sector.getSymbols().add(symbol);
 		sector = this.sectorRepository.save(sector);
 		symbol.setSector(sector);
@@ -240,16 +242,19 @@ public class QuoteImportService {
 			Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
-		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
-				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
-						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-						.orElse(List.of())
-				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay).retry(1)
-						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-						.orElse(List.of()).stream()
-						.filter(dto -> symbolEntity.getDailyQuotes().stream()
-								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
-						.collect(Collectors.toList());
+		return this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
+				.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
+				.orElse(List.of());
+//		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
+//				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
+//						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
+//						.orElse(List.of())
+//				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay).retry(1)
+//						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
+//						.orElse(List.of()).stream()
+//						.filter(dto -> symbolEntity.getDailyQuotes().stream()
+//								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
+//						.collect(Collectors.toList());
 	}
 
 	private List<IntraDayQuote> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
@@ -263,7 +268,8 @@ public class QuoteImportService {
 		IntraDayQuote entity = new IntraDayQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
 				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
 				Long.parseLong(dto.getVolume()),
-				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity, symbolEntity.getCurrencyKey());
+				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity,
+				symbolEntity.getCurrencyKey());
 		symbolEntity.getIntraDayQuotes().add(entity);
 		return entity;
 	}
@@ -280,12 +286,12 @@ public class QuoteImportService {
 //				.collect(Collectors.toList());			
 //		return quotes;
 //	}
-	
+
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
-				.collect(Collectors.toList());			
+				.collect(Collectors.toList());
 		return quotes;
 	}
 
@@ -298,7 +304,7 @@ public class QuoteImportService {
 		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}
-	
+
 //	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
 //			Map<LocalDate, Collection<Currency>> currencyMap) {
 //		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
@@ -311,6 +317,9 @@ public class QuoteImportService {
 
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
+		if (entities != null && !entities.isEmpty()) {
+			this.dailyQuoteRepository.deleteAll(this.dailyQuoteRepository.findBySymbol(entities.get(0).getSymbolKey()));
+		}
 		return this.dailyQuoteRepository.saveAll(entities);
 	}
 
