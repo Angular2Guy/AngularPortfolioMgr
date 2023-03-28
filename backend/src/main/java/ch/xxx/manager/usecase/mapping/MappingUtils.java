@@ -24,8 +24,8 @@ public class MappingUtils {
 			String result = myEntity.getYahooName() != null && !myEntity.getYahooName().isBlank()
 					? myEntity.getYahooName()
 					: switch (entity.getQuoteSource()) {
-					case ALPHAVANTAGE -> myEntity.getAlphavantageName();
-					case YAHOO -> myEntity.getYahooName();
+					case ALPHAVANTAGE -> Optional.ofNullable(myEntity.getAlphavantageName()).filter(myName -> !myName.isBlank()).orElse(SECTOR_PORTFOLIO);
+					case YAHOO -> Optional.ofNullable(myEntity.getYahooName()).filter(myName -> !myName.isBlank()).orElse(SECTOR_PORTFOLIO);
 					default -> SECTOR_PORTFOLIO;
 					};
 			return result;

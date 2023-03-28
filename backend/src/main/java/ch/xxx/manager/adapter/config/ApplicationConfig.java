@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.adapter.config;
 
+import java.util.Optional;
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
@@ -42,6 +45,23 @@ public class ApplicationConfig {
 
 	@Value("${spring.profiles.active:}")
 	private String activeProfile;
+
+	@Value("${api.key}")
+	private String alphavantageApiKey;
+	@Value("${api.key.rapidapi}")
+	private String rapidApiKey;
+
+	@PostConstruct
+	public void init() {
+		Optional.ofNullable(this.alphavantageApiKey).filter(myApiKey -> !myApiKey.isBlank()).orElseGet(() -> {
+			LOGGER.warn("Alphavantage Api Key is missing!");
+			return null;
+		});
+		Optional.ofNullable(this.rapidApiKey).filter(myApiKey -> !myApiKey.isBlank()).orElseGet(() -> {
+			LOGGER.warn("RapidApi Api Key is missing!");
+			return null;
+		});
+	}
 
 	@Bean
 	public ObjectMapper createObjectMapper() {
