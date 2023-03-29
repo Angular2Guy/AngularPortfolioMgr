@@ -17,6 +17,8 @@ import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { Subscription } from "rxjs";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../service/portfolio.service";
+import { MatDialog } from "@angular/material/dialog";
+import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
 
 @Component({
   selector: "app-portfolio-table",
@@ -42,7 +44,8 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +65,14 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dataSubscription.unsubscribe();
+  }
+
+  updateStock(event: MouseEvent, element: CommonValues) {
+	event.stopPropagation();
+	this.dialog.open(ChangeSymbolComponent, {
+      width: "500px",
+      data: element,
+    });
   }
 
   selPortfolio(commonValues: CommonValues) {

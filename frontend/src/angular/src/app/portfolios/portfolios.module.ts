@@ -37,6 +37,7 @@ import { ProdAppInfoService } from "./service/prod-app-info.service";
 import { ProdConfigComponent } from "./components/prod-config/prod-config.component";
 import { DevConfigComponent } from "./components/dev-config/dev-config.component";
 import { TokenInterceptor } from "ngx-simple-charts/base-service";
+import { ChangeSymbolComponent } from './components/change-symbol/change-symbol.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { TokenInterceptor } from "ngx-simple-charts/base-service";
     PortfolioTableComponent,
     ProdConfigComponent,
     DevConfigComponent,
+    ChangeSymbolComponent,
   ],
   imports: [
     BaseModule,

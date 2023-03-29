@@ -24,13 +24,16 @@
         [class.portfolio-line]="element.id === localPortfolio.id"
         class="table-cell"
       >
-        {{
+      <div class="my-stocks">
+        <div>{{
           !element.symbols || element.id !== localPortfolio.id
             ? !!element?.weight
               ? element.weight
               : "--"
             : element.symbols.length - 1
-        }}
+        }}</div>      
+      <mat-icon fontIcon="more_vert" (click)="updateStock($event, element)"></mat-icon>
+      </div>      
       </td>
     </ng-container>
 

@@ -37,3 +37,9 @@ table {
   $blue: mat.get-color-from-palette(mat.$blue-palette, 900);
   color: #{$blue};
 }
+
+.my-stocks {
+	display: flex;
+	justify-content: flex-end;
+	align-content: center;
+}

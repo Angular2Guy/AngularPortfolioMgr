@@ -20,7 +20,6 @@ import { NewPortfolioComponent } from "../new-portfolio/new-portfolio.component"
 import { PortfolioData } from "../../../model/portfolio-data";
 import { SymbolImportService } from "../../../service/symbol-import.service";
 import { forkJoin, Subscription } from "rxjs";
-import { switchMap, tap } from "rxjs/operators";
 import { AddSymbolComponent } from "../add-symbol/add-symbol.component";
 import { Symbol } from "../../../model/symbol";
 import { QuoteImportService } from "../../../service/quote-import.service";
