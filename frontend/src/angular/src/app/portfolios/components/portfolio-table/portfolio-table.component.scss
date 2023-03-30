@@ -38,8 +38,24 @@ table {
   color: #{$blue};
 }
 
+.table-cell-hover {
+  :hover {
+	background: rgba(0, 0, 0, 0.04);
+	border-radius: 10px;
+  }
+}
+
 .my-stocks {
 	display: flex;
 	justify-content: flex-end;
-	align-content: center;
+	align-content: center;	
+}
+
+.icon-disabled {
+	opacity: 0.2;
+}
+
+.my-stock-amount {
+	height: fit-content;
+	margin-top: 2px;
 }

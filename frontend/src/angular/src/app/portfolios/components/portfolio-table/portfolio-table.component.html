@@ -22,17 +22,18 @@
         mat-cell
         *matCellDef="let element"
         [class.portfolio-line]="element.id === localPortfolio.id"
-        class="table-cell"
+        class="table-cell table-cell-hover"
+        [class.table-cell-hover]="element.id !== localPortfolio.id" 
       >
-      <div class="my-stocks">
-        <div>{{
+      <div class="my-stocks" (click)="updateStock($event, element)">
+        <div class="my-stock-amount">{{
           !element.symbols || element.id !== localPortfolio.id
             ? !!element?.weight
               ? element.weight
               : "--"
             : element.symbols.length - 1
         }}</div>      
-      <mat-icon fontIcon="more_vert" (click)="updateStock($event, element)"></mat-icon>
+      <mat-icon fontIcon="more_vert" [class.icon-disabled]="!!element.symbols && element.id === localPortfolio.id"></mat-icon>
       </div>      
       </td>
     </ng-container>

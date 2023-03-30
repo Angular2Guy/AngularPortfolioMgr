@@ -68,6 +68,9 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
   }
 
   updateStock(event: MouseEvent, element: CommonValues) {
+	if(!!(element as Portfolio).symbols) {
+		return;
+	}
 	event.stopPropagation();
 	this.dialog.open(ChangeSymbolComponent, {
       width: "500px",
