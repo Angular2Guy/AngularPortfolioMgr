@@ -66,7 +66,7 @@ export class AddSymbolComponent implements OnInit {
     private quoteImportService: QuoteImportService,
     private fb: FormBuilder
   ) {
-    this.symbolForm = fb.group(
+    this.symbolForm = this.fb.group(
       {
         symbolSymbol: "",
         symbolName: "",

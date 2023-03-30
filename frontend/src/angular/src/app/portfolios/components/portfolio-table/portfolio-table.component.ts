@@ -39,6 +39,7 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
     "year10",
   ];
   private dataSubscription: Subscription;
+  private dialogSubscription: Subscription;
   reloadData = false;
 
   constructor(
@@ -63,19 +64,31 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
       .subscribe((myData) => (this.localPortfolio = myData));
   }
 
-  ngOnDestroy(): void {
-    this.dataSubscription.unsubscribe();
+  ngOnDestroy(): void {    
+    this.unsubscribe(this.dataSubscription);
+    this.unsubscribe(this.dialogSubscription);    
   }
+
+private unsubscribe(subscribtion: Subscription) {
+	if(!!subscribtion) {
+		subscribtion.unsubscribe();
+		subscribtion = null;
+	}
+}
 
   updateStock(event: MouseEvent, element: CommonValues) {
 	if(!!(element as Portfolio).symbols) {
 		return;
 	}
-	event.stopPropagation();
-	this.dialog.open(ChangeSymbolComponent, {
+	event.stopPropagation();	
+	const dialogRef = this.dialog.open(ChangeSymbolComponent, {
       width: "500px",
       data: element,
-    });
+    });    
+    this.unsubscribe(this.dialogSubscription);
+    this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
+		
+	});
   }
 
   selPortfolio(commonValues: CommonValues) {

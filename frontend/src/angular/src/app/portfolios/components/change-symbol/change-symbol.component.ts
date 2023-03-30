@@ -11,6 +11,7 @@
    limitations under the License.
  */
 import { Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonValues } from 'src/app/model/portfolio';
 import { PortfolioTableComponent } from '../portfolio-table/portfolio-table.component';
@@ -21,9 +22,16 @@ import { PortfolioTableComponent } from '../portfolio-table/portfolio-table.comp
   styleUrls: ['./change-symbol.component.scss']
 })
 export class ChangeSymbolComponent implements OnInit {
+    protected symbolForm: FormGroup;
+    protected updatingQuotes = true;
     
     constructor(public dialogRef: MatDialogRef<PortfolioTableComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: CommonValues) {}
+      @Inject(MAT_DIALOG_DATA) public data: CommonValues,
+      private fb: FormBuilder) {
+		this.symbolForm = this.fb.group({
+	      symbolWeight: 0
+		});
+	  }
     
     ngOnInit(): void {
         console.log(this.data);

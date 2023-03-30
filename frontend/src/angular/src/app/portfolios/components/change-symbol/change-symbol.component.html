@@ -1,1 +1,23 @@
-<p>change-symbol works!</p>
+<div mat-dialog-content>
+  <form [formGroup]="symbolForm" novalidate *ngIf="!updatingQuotes">
+    <ul class="list-style">
+      <li>
+      
+      </li>
+    </ul>
+  </form>
+  <div *ngIf="updatingQuotes">
+    <div class="container">
+      <div i18n="@@addSymbolImportingQuotes">Updating Quotes...</div>
+    </div>
+    <div class="container">
+      <div class="content">
+        <mat-progress-spinner
+          class="example-margin"
+          mode="indeterminate"
+          color="primary"
+        ></mat-progress-spinner>
+      </div>
+    </div>
+  </div>
+</div>
