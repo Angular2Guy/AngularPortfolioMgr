@@ -1,23 +1,20 @@
 <div mat-dialog-content>
   <form [formGroup]="symbolForm" novalidate *ngIf="!updatingQuotes">
+	<div class="grid-container">
+		<div><span i18n="@@changeSymbolName">Name: </span></div><div><span>{{data.name}}</span></div>
+		<div><span i18n="@@changeSymbolSymbol">Symbol: </span></div><div><span>{{data.symbol}}</span></div>
+    	<div><span i18n="@@changeSymbolCurrency">Currency: </span></div><div><span>{{data.currencyKey}}</span></div>
+    </div>
     <ul class="list-style">
       <li>
-      	<span i18n="@@changeSymbolName">Name: </span><span>{{data.name}}</span>      	
-      </li>
-      <li>
-      	<span i18n="@@changeSymbolSymbol">Symbol: </span><span>{{data.symbol}}</span>      	
-      </li>
-      <li>
-      	<span i18n="@@changeSymbolCurrency">Currency: </span><span>{{data.currencyKey}}</span>      	
-      </li>
-      <li>
       	 <mat-form-field class="form-field">
+      	 <mat-label i18n="@@changeSymbolWeight">Weight</mat-label>
           <input
             matInput
             type="text"
             formControlName="{{ FormFields.SymbolWeight }}"            
             i18n-placeholder="@@changeSymbolWeight"
-            placeholder="weight"
+            placeholder="Weight"
             tabindex="3"
           />
           </mat-form-field>
@@ -42,7 +39,7 @@
         </button>
       </li>
     </ul>
-    {{symbolForm.pristine}} {{symbolForm.valid}}
+    <!-- {symbolForm.pristine}} {{symbolForm.valid}} -->
   </form>
   <div *ngIf="updatingQuotes">
     <div class="container">
