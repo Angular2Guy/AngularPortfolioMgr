@@ -11,10 +11,15 @@
    limitations under the License.
  */
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, AbstractControlOptions, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CommonValues } from 'src/app/model/portfolio';
+import { filter } from 'rxjs';
+import { PortfolioElement } from 'src/app/model/portfolio-element';
 import { PortfolioTableComponent } from '../portfolio-table/portfolio-table.component';
+
+enum FormFields {
+  SymbolWeight = "symbolWeight"
+}
 
 @Component({
   selector: 'app-change-symbol',
@@ -22,19 +27,36 @@ import { PortfolioTableComponent } from '../portfolio-table/portfolio-table.comp
   styleUrls: ['./change-symbol.component.scss']
 })
 export class ChangeSymbolComponent implements OnInit {
+	protected FormFields = FormFields;
     protected symbolForm: FormGroup;
-    protected updatingQuotes = true;
+    protected updatingQuotes = false;
+    private newWeight = -1;
     
     constructor(public dialogRef: MatDialogRef<PortfolioTableComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: CommonValues,
+      @Inject(MAT_DIALOG_DATA) public data: PortfolioElement,
       private fb: FormBuilder) {
 		this.symbolForm = this.fb.group({
-	      symbolWeight: 0
+	      [FormFields.SymbolWeight]: [data.weight , [Validators.required, this.validateWeight]]
 		});
 	  }
     
-    ngOnInit(): void {
-        console.log(this.data);
-    }
-
+    ngOnInit(): void {		
+		this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
+		   .pipe(filter((value: number) => !!(''+value).match(/^[\d]+$/g))).subscribe((value: number) => this.newWeight = value);        
+    }	
+	
+	updateClick() {		
+		this.data.weight = this.newWeight >= 0 ? this.newWeight : this.data.weight; 
+		this.dialogRef.close(this.data);
+	}
+	
+	cancelClick() {
+		this.dialogRef.close();
+	}
+	
+	private validateWeight(control: AbstractControl): ValidationErrors {
+		const myValue = control.value?.toString();
+		const myResult = !myValue || !myValue.match(/^[\d]+$/g) ? { xxx: true } as ValidationErrors : {}  as ValidationErrors;
+		return myResult;
+	}
 }

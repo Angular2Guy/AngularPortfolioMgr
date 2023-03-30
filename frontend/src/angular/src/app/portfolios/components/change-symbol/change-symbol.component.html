@@ -2,13 +2,51 @@
   <form [formGroup]="symbolForm" novalidate *ngIf="!updatingQuotes">
     <ul class="list-style">
       <li>
-      
+      	<span i18n="@@changeSymbolName">Name: </span><span>{{data.name}}</span>      	
+      </li>
+      <li>
+      	<span i18n="@@changeSymbolSymbol">Symbol: </span><span>{{data.symbol}}</span>      	
+      </li>
+      <li>
+      	<span i18n="@@changeSymbolCurrency">Currency: </span><span>{{data.currencyKey}}</span>      	
+      </li>
+      <li>
+      	 <mat-form-field class="form-field">
+          <input
+            matInput
+            type="text"
+            formControlName="{{ FormFields.SymbolWeight }}"            
+            i18n-placeholder="@@changeSymbolWeight"
+            placeholder="weight"
+            tabindex="3"
+          />
+          </mat-form-field>
+      </li>
+      <li>
+       <button
+          mat-button
+          (click)="updateClick()"
+          [disabled]="symbolForm.pristine || symbolForm.invalid"
+          tabindex="-1"
+          i18n="@@ok"
+        >
+          Ok
+        </button>
+        <button
+          mat-button
+          (click)="cancelClick()"
+          tabindex="-1"
+          i18n="@@cancel"
+        >
+          Cancel
+        </button>
       </li>
     </ul>
+    {{symbolForm.pristine}} {{symbolForm.valid}}
   </form>
   <div *ngIf="updatingQuotes">
     <div class="container">
-      <div i18n="@@addSymbolImportingQuotes">Updating Quotes...</div>
+      <div i18n="@@changeSymbolUpdatingQuotes">Updating Quotes...</div>
     </div>
     <div class="container">
       <div class="content">

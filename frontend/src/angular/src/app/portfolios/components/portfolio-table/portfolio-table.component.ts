@@ -86,8 +86,11 @@ private unsubscribe(subscribtion: Subscription) {
       data: element,
     });    
     this.unsubscribe(this.dialogSubscription);
-    this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
-		
+    this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {		
+		console.log(result);
+		if(!!result) {
+			//TODO update weight
+		}
 	});
   }
 

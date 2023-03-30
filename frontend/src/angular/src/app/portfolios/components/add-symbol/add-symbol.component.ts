@@ -68,10 +68,10 @@ export class AddSymbolComponent implements OnInit {
   ) {
     this.symbolForm = this.fb.group(
       {
-        symbolSymbol: "",
-        symbolName: "",
-        symbolWeight: 0,
-        createdAt: [DateTime.now(), Validators.required],
+        [FormFields.SymbolSymbol]: "",
+        [FormFields.SymbolName]: "",
+        [FormFields.SymbolWeight]: 0,
+        [FormFields.CreatedAt]: [DateTime.now(), Validators.required],
       },
       {
         validators: [this.validate],
