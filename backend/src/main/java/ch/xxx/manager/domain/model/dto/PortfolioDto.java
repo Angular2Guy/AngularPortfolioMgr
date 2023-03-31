@@ -18,9 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ch.xxx.manager.domain.utils.DataHelper;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PortfolioDto {
 	private Long id;
 	private Long userId;

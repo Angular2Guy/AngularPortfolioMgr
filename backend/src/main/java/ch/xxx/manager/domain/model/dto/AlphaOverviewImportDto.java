@@ -13,8 +13,11 @@
 package ch.xxx.manager.domain.model.dto;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,6 +28,7 @@ import jakarta.persistence.Enumerated;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AlphaOverviewImportDto {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AlphaOverviewImportDto.class);
 	@JsonProperty("Symbol")
 	private String symbol;
 	@JsonProperty("AssetType")
@@ -50,96 +54,156 @@ public class AlphaOverviewImportDto {
 	@JsonProperty("SharesOutstanding")
 	private Long sharesOutstanding;
 	@JsonProperty("DividendDate")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private String dividendDateStr;
 	private LocalDate dividendDate;
 	@JsonProperty("ExDividendDate")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private String exDividendDateStr;
+//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate exDividendDate;
-	
+
+	public String getDividendDateStr() {
+		return dividendDateStr;
+	}
+
+	public void setDividendDateStr(String dividendDateStr) {
+		this.dividendDateStr = dividendDateStr;
+		try {
+			this.dividendDate = Optional.ofNullable(this.dividendDateStr).stream().map(myStr -> myStr.trim().split(" ")[0])
+					.map(myStr -> myStr.split("T")[0]).map(myStr -> LocalDate.parse(myStr)).findFirst()
+					.orElseThrow(() -> new RuntimeException("Failed to convert to Localdate."));			 
+		} catch (Exception e) {
+			LOGGER.warn("{} cannot be parsed as LocalDate.", this.dividendDateStr);
+		}
+	}
+
+	public String getExDividendDateStr() {
+		return exDividendDateStr;
+	}
+
+	public void setExDividendDateStr(String exDividendDateStr) {
+		this.exDividendDateStr = exDividendDateStr;
+		try {
+			this.exDividendDate = Optional.ofNullable(this.exDividendDateStr).stream().map(myStr -> myStr.trim().split(" ")[0])
+					.map(myStr -> myStr.split("T")[0]).map(myStr -> LocalDate.parse(myStr)).findFirst()
+					.orElseThrow(() -> new RuntimeException("Failed to convert to Localdate."));
+		} catch (Exception e) {
+			LOGGER.warn("{} cannot be parsed as LocalDate.", this.exDividendDateStr);
+		}
+	}
+
 	public String getSymbol() {
 		return symbol;
 	}
+
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
+
 	public String getAssetType() {
 		return assetType;
 	}
+
 	public void setAssetType(String assetType) {
 		this.assetType = assetType;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public String getExchange() {
 		return exchange;
 	}
+
 	public void setExchange(String exchange) {
 		this.exchange = exchange;
 	}
+
 	public CurrencyKey getCurrency() {
 		return currency;
 	}
+
 	public void setCurrency(CurrencyKey currency) {
 		this.currency = currency;
 	}
+
 	public String getCountry() {
 		return country;
 	}
+
 	public void setCountry(String country) {
 		this.country = country;
 	}
+
 	public String getSector() {
 		return sector;
 	}
+
 	public void setSector(String sector) {
 		this.sector = sector;
 	}
+
 	public String getIndustry() {
 		return industry;
 	}
+
 	public void setIndustry(String industry) {
 		this.industry = industry;
 	}
+
 	public String getAddress() {
 		return address;
 	}
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
 	public LocalDate getDividendDate() {
 		return dividendDate;
 	}
+
 	public void setDividendDate(LocalDate dividendDate) {
 		this.dividendDate = dividendDate;
 	}
+
 	public String getCik() {
 		return cik;
 	}
+
 	public void setCik(String cik) {
 		this.cik = cik;
 	}
+
 	public Long getSharesOutstanding() {
 		return sharesOutstanding;
 	}
+
 	public void setSharesOutstanding(Long sharesOutstanding) {
 		this.sharesOutstanding = sharesOutstanding;
 	}
+
 	public LocalDate getExDividendDate() {
 		return exDividendDate;
 	}
+
 	public void setExDividendDate(LocalDate exDividendDate) {
 		this.exDividendDate = exDividendDate;
 	}
+
 	@Override
 	public String toString() {
 		return "AlphaOverviewImportDto [symbol=" + symbol + ", assetType=" + assetType + ", name=" + name

@@ -47,17 +47,17 @@ export class ChangeSymbolComponent implements OnInit {
     ngOnInit(): void {		
 		const startChangedAt = this.changedAt;
 		this.symbolForm.controls[FormFields.ChangedAt].valueChanges
-		   .pipe(filter((myChangedAt: DateTime) => myChangedAt.toMillis() > startChangedAt.toMillis()))
+		   .pipe(filter((myChangedAt: DateTime) => !!myChangedAt && myChangedAt.toMillis() > startChangedAt.toMillis()))
 		   .subscribe((value: DateTime) => this.changedAt = value)
 		this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
 		   .pipe(filter((value: number) => !!(''+value).match(/^[\d]+$/g))).subscribe((value: number) => this.newWeight = value);        
     }	
 	
 	updateClick() {	
-		const startChangedAt =DateTime.now().minus(Duration.fromObject({years: 100}));	
+		const startChangedAt = DateTime.now().minus(Duration.fromObject({years: 100}));	
 		if(this.newWeight >= 0 && this.changedAt.toMillis() > startChangedAt.toMillis()) {
 			this.data.weight = this.newWeight;
-			this.data.changedAt = this.changedAt.toJSON();
+			this.data.changedAt = this.changedAt.toISO().split('+')[0];
  		    this.dialogRef.close(this.data);
 		}		 
 	}
