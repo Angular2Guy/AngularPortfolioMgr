@@ -53,11 +53,11 @@ public class ApplicationConfig {
 
 	@PostConstruct
 	public void init() {
-		Optional.ofNullable(this.alphavantageApiKey).filter(myApiKey -> !myApiKey.isBlank()).orElseGet(() -> {
+		Optional.ofNullable(this.alphavantageApiKey).filter(myApiKey -> !myApiKey.isBlank() || myApiKey.equals("xxx")).orElseGet(() -> {
 			LOGGER.warn("Alphavantage Api Key is missing!");
 			return null;
 		});
-		Optional.ofNullable(this.rapidApiKey).filter(myApiKey -> !myApiKey.isBlank()).orElseGet(() -> {
+		Optional.ofNullable(this.rapidApiKey).filter(myApiKey -> !myApiKey.isBlank() || myApiKey.equals("yyy")).orElseGet(() -> {
 			LOGGER.warn("RapidApi Api Key is missing!");
 			return null;
 		});
