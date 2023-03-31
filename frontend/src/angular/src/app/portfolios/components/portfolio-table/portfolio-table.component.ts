@@ -91,11 +91,11 @@ private unsubscribe(subscribtion: Subscription) {
 		//console.log(result);
 		if(!!result && result.weight > 0) {			
 			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.putSymbolToPortfolio(this.localPortfolio, mySymbol.id, result.weight, new Date().toJSON())
+			this.portfolioService.putSymbolToPortfolio(this.localPortfolio, mySymbol.id, result.weight, result.changedAt)
 			   .subscribe(myResult => this.localPortfolio = myResult);		
 		} else if(!!result && result.weight <= 0) {
 			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.deleteSymbolFromPortfolio(this.localPortfolio, mySymbol.id, new Date().toJSON())
+			this.portfolioService.deleteSymbolFromPortfolio(this.localPortfolio, mySymbol.id, result.changedAt)
 			   .subscribe(myResult => this.localPortfolio = myResult);
 		}
 	});

@@ -17,4 +17,5 @@ export interface PortfolioElement extends CommonValues {
   weight: number;
   sector: string;
   lastClose: number;
+  changedAt?: string;
 }
