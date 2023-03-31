@@ -19,6 +19,7 @@ import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
+import { PortfolioElement } from "src/app/model/portfolio-element";
 
 @Component({
   selector: "app-portfolio-table",
@@ -86,10 +87,16 @@ private unsubscribe(subscribtion: Subscription) {
       data: element,
     });    
     this.unsubscribe(this.dialogSubscription);
-    this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {		
-		console.log(result);
-		if(!!result) {
-			//TODO update weight
+    this.dialogSubscription = dialogRef.afterClosed().subscribe((result: PortfolioElement) => {		
+		//console.log(result);
+		if(!!result && result.weight > 0) {			
+			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
+			this.portfolioService.putSymbolToPortfolio(this.localPortfolio, mySymbol.id, result.weight, new Date().toJSON())
+			   .subscribe(myResult => this.localPortfolio = myResult);		
+		} else if(!!result && result.weight <= 0) {
+			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
+			this.portfolioService.deleteSymbolFromPortfolio(this.localPortfolio, mySymbol.id, new Date().toJSON())
+			   .subscribe(myResult => this.localPortfolio = myResult);
 		}
 	});
   }
