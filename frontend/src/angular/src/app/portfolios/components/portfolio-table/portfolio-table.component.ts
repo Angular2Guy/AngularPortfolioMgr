@@ -89,13 +89,16 @@ private unsubscribe(subscribtion: Subscription) {
     this.unsubscribe(this.dialogSubscription);
     this.dialogSubscription = dialogRef.afterClosed().subscribe((result: PortfolioElement) => {		
 		//console.log(result);
+		const myPortfolio = {createdAt: this.localPortfolio?.createdAt, currencyKey: this.localPortfolio?.currencyKey, 
+		   id: this.localPortfolio?.id, name: this.localPortfolio.name, portfolioElements: [], symbols: [], 
+		   userId: this.localPortfolio.userId} as Portfolio;
 		if(!!result && result.weight > 0) {			
 			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.putSymbolToPortfolio(this.localPortfolio, mySymbol.id, result.weight, result.changedAt)
+			this.portfolioService.putSymbolToPortfolio(myPortfolio, mySymbol.id, result.weight, result.changedAt)
 			   .subscribe(myResult => this.localPortfolio = myResult);		
 		} else if(!!result && result.weight <= 0) {
 			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.deleteSymbolFromPortfolio(this.localPortfolio, mySymbol.id, result.changedAt)
+			this.portfolioService.deleteSymbolFromPortfolio(myPortfolio, mySymbol.id, result.changedAt)
 			   .subscribe(myResult => this.localPortfolio = myResult);
 		}
 	});
