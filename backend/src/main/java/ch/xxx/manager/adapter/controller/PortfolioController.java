@@ -74,7 +74,7 @@ public class PortfolioController {
 						.anyMatch(cIndex -> cIndex.getSymbol().equalsIgnoreCase(cSym)))
 				.map(symStr -> StreamHelpers.toStream(ComparisonIndex.values())
 						.filter(ci -> ci.getSymbol().equalsIgnoreCase(symStr)).findFirst())
-				.flatMap(StreamHelpers::unboxOptionals).toList();
+				.flatMap(StreamHelpers::unboxOptional).toList();
 //		LOGGER.info(compIndexes.stream().map(value -> value.getSymbol()).collect(Collectors.joining(",")));
 		return this.portfolioMapper
 				.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));

@@ -73,7 +73,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.collect(Collectors.toSet());
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbolsNoPort);
-		List<Symbol> comparisionSymbols = StreamHelpers.toStream(ComparisonIndex.values()).toList().stream()
+		List<Symbol> comparisionSymbols = StreamHelpers.toStream(ComparisonIndex.values())
 				.map(ComparisonIndex::getSymbol)
 				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr).stream())
 //				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol()))
