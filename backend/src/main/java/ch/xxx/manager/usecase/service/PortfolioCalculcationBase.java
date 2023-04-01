@@ -44,7 +44,7 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
-		return portfolioToSymbols.stream().map(pts -> pts.getSymbol())
+		return portfolioToSymbols.stream().map(pts -> pts.getSymbol()).filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol))
 				.collect(Collectors.toMap(Symbol::getSymbol,
 						mySymbol -> mySymbol.getDailyQuotes().stream()
 								.filter(myQuote -> mySymbol.getSymbol().equalsIgnoreCase(myQuote.getSymbolKey()))
