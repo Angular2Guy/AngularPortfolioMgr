@@ -151,7 +151,7 @@ public class PortfolioService {
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
 				.flatMap(myEntity -> Stream.of(
-						this.updatePtsEntity(myEntity, Optional.of(weight), changedAt.toLocalDate(), Optional.empty())))
+						this.updateWeightPtsEntity(myEntity, weight, changedAt.toLocalDate())))
 				.map(newEntity -> this.portfolioToSymbolRepository.saveAndFlush(newEntity))
 				.map(newEntity -> this.updatePortfolioElements(this.portfolioCalculationService
 						.calculatePortfolio(newEntity.getPortfolio(), Optional.empty())))
@@ -161,8 +161,8 @@ public class PortfolioService {
 
 	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
-				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.saveAndFlush(this.updatePtsEntity(entity,
-						Optional.empty(), LocalDate.now(), Optional.of(removedAt.toLocalDate())))))
+				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.saveAndFlush(this.markAsRemovedPtsEntity(entity,
+						Optional.empty(), removedAt.toLocalDate()))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService
 						.calculatePortfolio(newEntity.getPortfolio(), Optional.empty()))
@@ -189,11 +189,15 @@ public class PortfolioService {
 		return portfolioToSymbol;
 	}
 
-	private PortfolioToSymbol updatePtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate changedAt,
-			Optional<LocalDate> removedAtOpt) {
+	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate removedAt) {		
 		weightOpt.ifPresent(weight -> entity.setWeight(weight));
-		removedAtOpt.ifPresentOrElse(date -> entity.setRemovedAt(date), () -> entity.setChangedAt(changedAt));
+		entity.setRemovedAt(removedAt);		
 		return entity;
+	}
+	
+	private PortfolioToSymbol updateWeightPtsEntity(PortfolioToSymbol entity, Long weight, LocalDate changedAt) {
+		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), weight, changedAt, null);		
+		return portfolioToSymbol;
 	}
 
 	private PortfolioToSymbol createPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDate changedAt) {
