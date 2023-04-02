@@ -36,6 +36,8 @@ public class DailyQuote extends EntityBase {
 	private BigDecimal low;
 	@NotNull
 	private BigDecimal close;
+	@NotNull
+	private BigDecimal adjClose;
 	private Long volume;
 	@NotNull
 	private LocalDate localDay;
@@ -49,7 +51,7 @@ public class DailyQuote extends EntityBase {
 		super();
 	}
 
-	public DailyQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
+	public DailyQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal adjClose,
 			Long volume, LocalDate localDay, Symbol symbol, DataHelper.CurrencyKey currencyKey) {
 		super();
 		super.setId(id);
@@ -58,6 +60,7 @@ public class DailyQuote extends EntityBase {
 		this.high = high;
 		this.low = low;
 		this.close = close;
+		this.adjClose = adjClose;
 		this.volume = volume;
 		this.localDay = localDay;
 		this.symbol = symbol;
@@ -135,5 +138,13 @@ public class DailyQuote extends EntityBase {
 
 	public void setCurrencyKey(DataHelper.CurrencyKey currencyKey) {
 		this.currencyKey = currencyKey;
+	}
+
+	public BigDecimal getAdjClose() {
+		return adjClose;
+	}
+
+	public void setAdjClose(BigDecimal adjClose) {
+		this.adjClose = adjClose;
 	}
 }

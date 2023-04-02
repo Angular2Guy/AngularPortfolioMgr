@@ -223,15 +223,8 @@ public class QuoteImportService {
 
 	private DailyQuote convert(Symbol symbolEntity, HkDailyQuoteImportDto importDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		Optional<CurrencyKey> currencyOpt = currencyMap.get(importDto.getDate()) == null ? Optional.empty()
-//				: currencyMap.get(importDto.getDate()).stream()
-//						.filter(entity -> Optional.ofNullable(entity)
-//								.filter(myEntity -> myEntity.getFromCurrKey().equals(symbolEntity.getCurrencyKey()))
-//								.isPresent())
-//						.flatMap(entity -> Stream.of(entity.getFromCurrKey())).findFirst();
-//		LOGGER.info(importDto.toString());
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(), importDto.getHigh(),
-				importDto.getLow(), importDto.getAdjClose(),
+				importDto.getLow(), importDto.getClose(), importDto.getAdjClose(),
 				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
 				symbolEntity, symbolEntity.getCurrencyKey());
 		symbolEntity.getDailyQuotes().add(entity);
@@ -245,16 +238,6 @@ public class QuoteImportService {
 		return this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
 				.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
 				.orElse(List.of());
-//		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
-//				? this.alphavatageClient.getTimeseriesDailyHistory(symbol, true).delayElement(myDelay).retry(1)
-//						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-//						.orElse(List.of())
-//				: this.alphavatageClient.getTimeseriesDailyHistory(symbol, false).delayElement(myDelay).retry(1)
-//						.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-//						.orElse(List.of()).stream()
-//						.filter(dto -> symbolEntity.getDailyQuotes().stream()
-//								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
-//						.collect(Collectors.toList());
 	}
 
 	private List<IntraDayQuote> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
@@ -279,14 +262,6 @@ public class QuoteImportService {
 		return this.intraDayQuoteRepository.saveAll(entities);
 	}
 
-//	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
-//			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
-//				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
-//				.collect(Collectors.toList());			
-//		return quotes;
-//	}
-
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
@@ -298,22 +273,12 @@ public class QuoteImportService {
 	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportAdjDto dto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
+				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()), new BigDecimal(dto.getAdjustedClose()),
 				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
 				symbolEntity, symbolEntity.getCurrencyKey());
 		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}
-
-//	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
-//			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-//				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
-//				Long.parseLong(dto.getVolume()), LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE),
-//				symbolEntity, symbolEntity.getCurrencyKey());
-//		symbolEntity.getDailyQuotes().add(entity);
-//		return entity;
-//	}
 
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());

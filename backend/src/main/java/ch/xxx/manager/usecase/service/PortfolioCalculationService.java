@@ -83,7 +83,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 						.toStream(this.dailyQuoteRepository.findBySymbolId(portfolioPts.getSymbol().getId(),
 								cutOffDate.minus(1, ChronoUnit.MONTHS), LocalDate.now()))
 						.map(dailyQuote -> new CalcPortfolioElement(portfolioPts.getSymbol().getId(),
-								dailyQuote.getLocalDay(), dailyQuote.getClose(),
+								dailyQuote.getLocalDay(), dailyQuote.getAdjClose(),
 								Symbol.QuoteSource.PORTFOLIO.equals(portfolioPts.getSymbol().getQuoteSource())
 										? portfolioPts.getSymbol().getName()
 										: portfolioPts.getSymbol().getSymbol(),
@@ -93,7 +93,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		List<CalcPortfolioElement> compQuotesPE = comparisonQuotes.stream()
 				.flatMap(compQuotes -> compQuotes.dailyQuoteEntityDtos.stream())
 				.map(dQuote -> new CalcPortfolioElement(dQuote.entity().getSymbol().getId(),
-						dQuote.entity().getLocalDay(), dQuote.entity().getClose(),
+						dQuote.entity().getLocalDay(), dQuote.entity().getAdjClose(),
 						dQuote.entity().getSymbol().getSymbol(), 1L))
 				.collect(Collectors.toList());
 
@@ -210,6 +210,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
 		myDailyQuote.setClose(BigDecimal.ZERO);
+		myDailyQuote.setAdjClose(BigDecimal.ZERO);
 		myDailyQuote.setHigh(BigDecimal.ZERO);
 		myDailyQuote.setLow(BigDecimal.ZERO);
 		myDailyQuote.setOpen(BigDecimal.ZERO);
@@ -266,7 +267,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 					}
 					DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, pts,
 							portfolioQuotes);
-					BigDecimal peClose = this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose,
+					BigDecimal peClose = this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getAdjClose,
 							dailyQuote, pts.getPortfolio());
 					return new CalcPortfolioElement(pts.getSymbol().getId(), myPortfolioQuote.getLocalDay(), peClose,
 							pts.getSymbol().getName(), pts.getWeight());
@@ -280,6 +281,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.orElse(new DailyQuote());
 		portfolioQuote.setClose(this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
 				portfolioToSymbol, portfolioQuote.getClose()));
+		portfolioQuote.setAdjClose(this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
+				portfolioToSymbol, portfolioQuote.getAdjClose()));
 		portfolioQuote.setCurrencyKey(portfolioQuotes.symbol().getCurrencyKey());
 		portfolioQuote.setHigh(this.calcValue(Currency::getHigh, currencyQuote, DailyQuote::getHigh, dailyQuote,
 				portfolioToSymbol, portfolioQuote.getHigh()));

@@ -20,6 +20,7 @@ public class QuoteDto {
 	private BigDecimal high;
 	private BigDecimal low;
 	private BigDecimal close;
+	private BigDecimal adjClose;
 	private Long volume;
 	private LocalDateTime timestamp;
 	private String symbol;
@@ -27,13 +28,14 @@ public class QuoteDto {
 	public QuoteDto() {		
 	}
 
-	public QuoteDto(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume,
+	public QuoteDto(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal adjClose, Long volume,
 			LocalDateTime timestamp, String symbol) {
 		super();
 		this.open = open;
 		this.high = high;
 		this.low = low;
 		this.close = close;
+		this.adjClose = adjClose;
 		this.volume = volume;
 		this.timestamp = timestamp;
 		this.symbol = symbol;
@@ -93,5 +95,13 @@ public class QuoteDto {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+
+	public BigDecimal getAdjClose() {
+		return adjClose;
+	}
+
+	public void setAdjClose(BigDecimal adjClose) {
+		this.adjClose = adjClose;
 	}
 }

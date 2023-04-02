@@ -87,4 +87,28 @@ public class DailyQuoteImportAdjDto {
 	public void setVolume(String volume) {
 		this.volume = volume;
 	}
+
+	public String getAdjustedClose() {
+		return adjustedClose;
+	}
+
+	public void setAdjustedClose(String adjustedClose) {
+		this.adjustedClose = adjustedClose;
+	}
+
+	public String getDividentAmount() {
+		return dividentAmount;
+	}
+
+	public void setDividentAmount(String dividentAmount) {
+		this.dividentAmount = dividentAmount;
+	}
+
+	public String getSplitCoefficient() {
+		return splitCoefficient;
+	}
+
+	public void setSplitCoefficient(String splitCoefficient) {
+		this.splitCoefficient = splitCoefficient;
+	}
 }

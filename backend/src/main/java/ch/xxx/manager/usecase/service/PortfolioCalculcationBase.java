@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -69,8 +70,8 @@ public abstract class PortfolioCalculcationBase {
 
 	protected BigDecimal calcValue(Function<? super Currency, BigDecimal> currExtractor, Currency currencyQuote,
 			Function<? super DailyQuote, BigDecimal> quoteExtractor, DailyQuote dailyQuote, final Portfolio portfolio) {
-		final BigDecimal currValue = currExtractor.apply(currencyQuote);
-		final BigDecimal quoteValue = quoteExtractor.apply(dailyQuote);
+		final BigDecimal currValue = Optional.ofNullable(currExtractor.apply(currencyQuote)).orElse(BigDecimal.ZERO);
+		final BigDecimal quoteValue = Optional.ofNullable(quoteExtractor.apply(dailyQuote)).orElse(BigDecimal.ZERO);
 		BigDecimal calcValue = quoteValue;
 		if (dailyQuote.getCurrencyKey().equals(currencyQuote.getFromCurrKey())
 				&& portfolio.getCurrencyKey().equals(currencyQuote.getToCurrKey())) {

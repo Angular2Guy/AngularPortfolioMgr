@@ -127,8 +127,8 @@ public class PortfolioToIndexService {
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Indexquote not found."));
 		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioPts, indexQuote)
 				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
-		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(firstDailyQuotePortfolio.getClose()
-				.divide(indexQuote.getClose().multiply(currencyChange.getClose()), 10, RoundingMode.HALF_UP));
+		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(firstDailyQuotePortfolio.getAdjClose()
+				.divide(indexQuote.getAdjClose().multiply(currencyChange.getClose()), 10, RoundingMode.HALF_UP));
 		return currentWeight;
 	}
 
@@ -149,12 +149,17 @@ public class PortfolioToIndexService {
 		}
 		return Optional.ofNullable(portfolioChangesMap.get(day)).isEmpty() ? new QuoteDto(
 				dailyQuote.getOpen().multiply(currentWeight.get()), dailyQuote.getHigh().multiply(currentWeight.get()),
-				dailyQuote.getLow().multiply(currentWeight.get()), dailyQuote.getClose().multiply(currentWeight.get()),
+				dailyQuote.getLow().multiply(currentWeight.get()), dailyQuote.getClose().multiply(currentWeight.get()), 
+				dailyQuote.getAdjClose().multiply(currentWeight.get()),
 				0L, dailyQuote.getLocalDay().atStartOfDay(), dailyQuote.getSymbolKey())
 				: portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote))
-						.reduce(new QuoteDto(null, null, null, BigDecimal.ZERO, -1L, day.atStartOfDay(),
+						.reduce(new QuoteDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, -1L, day.atStartOfDay(),
 								dailyQuote.getSymbol().getSymbol()), (acc, value) -> {
+									acc.setOpen(acc.getOpen().add(value.getOpen()));
+									acc.setHigh(acc.getHigh().add(value.getHigh()));
+									acc.setLow(acc.getLow().add(value.getLow()));									
 									acc.setClose(acc.getClose().add(value.getClose()));
+									acc.setAdjClose(acc.getAdjClose().add(value.getAdjClose()));
 									acc.setVolume(0L);
 									return acc;
 								});
@@ -171,7 +176,13 @@ public class PortfolioToIndexService {
 				.multiply(dailyQuote.getClose());
 		BigDecimal change = currencyChange.getClose()
 				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange.getWeight())).multiply(dailyQuote.getClose());
-		return new QuoteDto(null, null, null, change.subtract(changeOld), 0L, day.atStartOfDay(),
+		BigDecimal changeAdjOld = currencyChangeOld.getClose()
+				.multiply(
+						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld.map(PortfolioToSymbol::getWeight).orElse(0L)))
+				.multiply(dailyQuote.getAdjClose());
+		BigDecimal changeAdj = currencyChange.getClose()
+				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange.getWeight())).multiply(dailyQuote.getAdjClose());
+		return new QuoteDto(null, null, null, change.subtract(changeOld), changeAdj.subtract(changeAdjOld), 0L, day.atStartOfDay(),
 				portfolioToSymbol.ptsChange.getSymbol().getSymbol());
 	}
 

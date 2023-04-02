@@ -285,6 +285,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.filter(myDate -> checkCurrencyQuotes(portfolio, dailyQuotesMap, comparisonDailyQuotesMap, myDate))
 				.map(myDate -> this.createCalcValuesDay(myDate, dailyQuotesMap.get(myDate),
 						comparisonDailyQuotesMap.get(myDate), portfolio))
+				.filter(myValue -> !myValue.quote().equals(BigDecimal.ZERO))
 				.toList();
 		return calcValuesDays;
 	}
@@ -334,9 +335,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.getCurrencyQuote(day, portfolio.getCurrencyKey(), comparisonQuote.getCurrencyKey()).get();
 		Currency dailyQuoteCurrency = this.currencyService
 				.getCurrencyQuote(day, portfolio.getCurrencyKey(), dailyQuote.getCurrencyKey()).get();
-		BigDecimal comparisonValue = this.calcValue(Currency::getClose, comparisonCurrency, DailyQuote::getClose,
+		BigDecimal comparisonValue = this.calcValue(Currency::getClose, comparisonCurrency, DailyQuote::getAdjClose,
 				comparisonQuote, portfolio);
-		BigDecimal dailyQuoteValue = this.calcValue(Currency::getClose, dailyQuoteCurrency, DailyQuote::getClose,
+		BigDecimal dailyQuoteValue = this.calcValue(Currency::getClose, dailyQuoteCurrency, DailyQuote::getAdjClose,
 				dailyQuote, portfolio);
 		return new CalcValuesDay(day, dailyQuoteValue, comparisonValue);
 	}
@@ -346,7 +347,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return dailyQuotes.stream().filter(myDailyQuote -> myDailyQuote.getLocalDay().isBefore(cutOffDate))
 				.max(Comparator.comparing(DailyQuote::getLocalDay))
 				.map(myDailyQuote -> this.calcValue(Currency::getClose,
-						this.getCurrencyValue(portfolio, myDailyQuote, symbolCurrencyKeyOpt), DailyQuote::getClose,
+						this.getCurrencyValue(portfolio, myDailyQuote, symbolCurrencyKeyOpt), DailyQuote::getAdjClose,
 						myDailyQuote, portfolio))
 				.orElseGet(() -> {
 					LOGGER.info("symbolValueAtDate {}: {}", cutOffDate.toString(), 0);
