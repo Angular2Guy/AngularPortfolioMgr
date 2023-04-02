@@ -27,11 +27,11 @@
       >
       <div class="my-stocks" (click)="updateStock($event, element)">
         <div class="my-stock-amount">{{
-          !element.symbols || element.id !== localPortfolio.id
+          !element.portfolioElements || element.id !== localPortfolio.id
             ? !!element?.weight
               ? element.weight
               : "--"
-            : element.symbols.length - 1
+            : element.portfolioElements?.length
         }}</div>      
       <mat-icon fontIcon="more_vert" [class.icon-disabled]="!!element.symbols && element.id === localPortfolio.id"></mat-icon>
       </div>      
