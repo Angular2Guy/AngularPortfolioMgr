@@ -162,7 +162,7 @@ public class PortfolioService {
 	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.saveAndFlush(this.markAsRemovedPtsEntity(entity,
-						Optional.empty(), removedAt.toLocalDate()))))
+						removedAt.toLocalDate()))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
 				.map(newEntity -> this.portfolioCalculationService
 						.calculatePortfolio(newEntity.getPortfolio(), Optional.empty()))
@@ -189,10 +189,9 @@ public class PortfolioService {
 		return portfolioToSymbol;
 	}
 
-	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, Optional<Long> weightOpt, LocalDate removedAt) {		
-		weightOpt.ifPresent(weight -> entity.setWeight(weight));
-		entity.setRemovedAt(removedAt);		
-		return entity;
+	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, LocalDate removedAt) {	
+		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), 0L, removedAt, removedAt);			
+		return portfolioToSymbol;
 	}
 	
 	private PortfolioToSymbol updateWeightPtsEntity(PortfolioToSymbol entity, Long weight, LocalDate changedAt) {

@@ -60,6 +60,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<DailyQuote> dailyQuotesToRemove) {
 	};
 
+	private record PtsWithList(PortfolioToSymbol pts, Collection<PortfolioToSymbol> ptsList) {
+	};
+
 	public record ComparisonIndexQuotes(ComparisonIndex comparisonIndex,
 			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
 	};
@@ -148,7 +151,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		return result;
 	}
 
-	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols, Optional<PortfolioToSymbol> ptsOpt) {
+	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols,
+			Optional<PortfolioToSymbol> ptsOpt) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
 //		commonQuoteDates.stream().filter(myDate -> LocalDate.of(2022, 9, 1).isBefore(myDate))
@@ -179,12 +183,29 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.map(pts -> this.calcPortfolioQuotesForSymbol(pts,
+				.filter(StreamHelpers.distinctByKey(pts -> pts.getSymbol().getSymbol()))
+				.map(pts -> this.calcPortfolioQuotesForSymbol(new PtsWithList(pts, portfolioToSymbols),
 						dailyQuotesMap.getOrDefault(pts.getSymbol().getSymbol(), new LinkedList<>()), portfolioQuotes,
 						commonQuoteDates))
 				.flatMap(Collection::stream).sorted(Comparator.comparing(CalcPortfolioElement::localDate))
 				.collect(Collectors.toList());
 		return new PortfolioData(dailyQuotesMap, portfolioQuotes, portfolioElements, toDelete);
+	}
+
+	private Optional<PortfolioToSymbol> findAtDayPts(String symbolStr, LocalDate atDay,
+			Collection<PortfolioToSymbol> portfolioToSymbols) {
+//		Map<String, List<PortfolioToSymbol>> ptsMap = portfolioToSymbols.stream().filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+//				.collect(Collectors.groupingBy(pts -> pts.getSymbol().getSymbol()));
+		LocalDate[] first = new LocalDate[1];
+		Optional<PortfolioToSymbol> ptsWeight = portfolioToSymbols.stream()
+				.filter(pts -> pts.getSymbol().getSymbol().equalsIgnoreCase(symbolStr))
+				.sorted((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()))
+				.peek(pts -> first[0] = first[0] == null ? pts.getChangedAt() : first[0])
+				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0).filter(pts -> atDay.compareTo(first[0]) >= 0)
+				.filter(pts -> Optional.ofNullable(pts.getRemovedAt()).stream()
+						.noneMatch(myRemovedAt -> myRemovedAt.compareTo(LocalDate.now()) <= 0))
+				.max((pts1,pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()));
+		return ptsWeight;
 	}
 
 	private DailyQuote resetPortfolioQuote(DailyQuote myDailyQuote) {
@@ -203,7 +224,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
 				.flatMap(StreamHelpers::unboxOptional)
 //				.peek(pe -> LOG.info("value: {}, weight: {}", pe.value(), pe.weight()))
-				.map(pe -> pe.value().multiply(BigDecimal.valueOf(pe.weight()), MathContext.DECIMAL128))				
+				.map(pe -> pe.value().multiply(BigDecimal.valueOf(pe.weight()), MathContext.DECIMAL128))
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
 		return result;
 	}
@@ -215,31 +236,41 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.max(Comparator.comparing(CalcPortfolioElement::localDate));
 	}
 
-	private Collection<CalcPortfolioElement> calcPortfolioQuotesForSymbol(PortfolioToSymbol portfolioToSymbol,
+	private Collection<CalcPortfolioElement> calcPortfolioQuotesForSymbol(PtsWithList ptsWithList,
 			List<DailyQuote> dailyQuotes, PortfolioSymbolWithDailyQuotes portfolioQuotes,
 			List<LocalDate> commonQuoteDates) {
-		return dailyQuotes.stream()
-				.filter(myDailyQuote -> portfolioToSymbol.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
-						&& Optional.ofNullable(portfolioToSymbol.getRemovedAt()).stream()
+		return dailyQuotes.stream().filter(myDailyQuote -> this
+				.findAtDayPts(
+						ptsWithList.pts().getSymbol().getSymbol(), myDailyQuote.getLocalDay(), ptsWithList.ptsList())
+				.stream()
+				.anyMatch(myPts -> myPts.getChangedAt().compareTo(myDailyQuote.getLocalDay()) <= 0
+						&& Optional.ofNullable(myPts.getRemovedAt()).stream()
 								.filter(myRemovedAt -> myDailyQuote.getLocalDay().compareTo(myRemovedAt) >= 0).findAny()
-								.isEmpty())
+								.isEmpty()))
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.anyMatch(myCommonDate -> myCommonDate.isEqual(myDailyQuote.getLocalDay())))
-				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, portfolioToSymbol, portfolioQuotes))
+				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, ptsWithList, portfolioQuotes))
 				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
 
-	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote,
-			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
-		return this.currencyService.getCurrencyQuote(portfolioToSymbol, dailyQuote).map(currencyQuote -> {
-			DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, portfolioToSymbol,
-					portfolioQuotes);
-			BigDecimal peClose = this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
-					portfolioToSymbol.getPortfolio());
-			return new CalcPortfolioElement(portfolioToSymbol.getSymbol().getId(), myPortfolioQuote.getLocalDay(),
-					peClose, portfolioToSymbol.getSymbol().getName(),
-					portfolioToSymbol.getWeight());
-		});
+	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote, PtsWithList ptsWithList,
+			PortfolioSymbolWithDailyQuotes portfolioQuotes) {
+		return this
+				.findAtDayPts(ptsWithList.pts().getSymbol().getSymbol(), dailyQuote.getLocalDay(),
+						ptsWithList.ptsList())
+				.stream().map(pts -> this.currencyService.getCurrencyQuote(pts, dailyQuote).map(currencyQuote -> {
+					if ((pts.getRemovedAt() != null && pts.getRemovedAt().compareTo(LocalDate.now()) <= 0)
+							|| pts.getWeight().equals(0L)) {
+						LOG.error("Symbol: {}, Date: {}, Weight: {}", pts.getSymbol().getSymbol(),
+								dailyQuote.getLocalDay().toString(), pts.getWeight());
+					}
+					DailyQuote myPortfolioQuote = this.upsertPortfolioQuote(currencyQuote, dailyQuote, pts,
+							portfolioQuotes);
+					BigDecimal peClose = this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose,
+							dailyQuote, pts.getPortfolio());
+					return new CalcPortfolioElement(pts.getSymbol().getId(), myPortfolioQuote.getLocalDay(), peClose,
+							pts.getSymbol().getName(), pts.getWeight());
+				})).findFirst().filter(Optional::isPresent).map(Optional::get);
 	}
 
 	private DailyQuote upsertPortfolioQuote(Currency currencyQuote, DailyQuote dailyQuote,

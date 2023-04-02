@@ -81,11 +81,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null)
-				.sorted((pts1,pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()))
+				.sorted((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()))
 //				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
 //						.distinct().toList().forEach(mySymbolKey -> LOGGER.info("SymbolKey: {}", mySymbolKey)))
-				.map(pts -> this.createPortfolioElement(portfolio,
-						dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts, comparisionSymbols))
+				.map(pts -> this.createPortfolioElement(portfolio, dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts,
+						comparisionSymbols))
 				.collect(Collectors.toList());
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
@@ -168,7 +168,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
 				.filter(myPortfolioElement -> !myPortfolioElement.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
-						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))				
+						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
 				.findFirst().orElse(new PortfolioElement());
 		portfolioElement.setSymbol(portfolioToSymbol.getSymbol().getSymbol());
 		String ptsName = Optional.ofNullable(portfolioToSymbol.getSymbol().getName()).stream().findFirst()
@@ -211,11 +211,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<CalcValuesDay> divValuesDays = new ArrayList<>();
 		CalcValuesDay prevValues = null;
 		for (int i = 0; i < calcValuesDays.size(); i++) {
-			if (prevValues != null) {
+			if (prevValues != null) {				
 				BigDecimal quoteReturn = calcValuesDays.get(i).quote()
 						.divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
 						.multiply(BigDecimal.valueOf(100L));
-				BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote
+				BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote()
 						.divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
 						.multiply(BigDecimal.valueOf(100L));
 				CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
