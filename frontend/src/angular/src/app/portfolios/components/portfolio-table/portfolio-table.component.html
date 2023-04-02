@@ -31,7 +31,7 @@
             ? !!element?.weight
               ? element.weight
               : "--"
-            : element.portfolioElements?.length
+            : element?.portfolioElements?.length
         }}</div>      
       <mat-icon fontIcon="more_vert" [class.icon-disabled]="!!element.symbols && element.id === localPortfolio.id"></mat-icon>
       </div>      
