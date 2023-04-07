@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,7 +41,6 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import jakarta.transaction.Transactional;
@@ -81,8 +81,8 @@ public class PortfolioToIndexService {
 				.filter(pts -> Optional.ofNullable(pts.getChangedAt()).isPresent()
 						|| Optional.ofNullable(pts.getRemovedAt()).isPresent())
 				.collect(Collectors.toList());
-		Map<Symbol, List<PortfolioToSymbol>> symbolToPtsMap = myPortfolioChanges.stream()
-				.collect(Collectors.groupingBy(PortfolioToSymbol::getSymbol,
+		Map<String, List<PortfolioToSymbol>> symbolToPtsMap = myPortfolioChanges.stream()
+				.collect(Collectors.groupingBy(pts -> pts.getSymbol().getSymbol(),
 						Collectors.flatMapping((PortfolioToSymbol pts) -> Stream.of(pts), Collectors.toList())));
 		symbolToPtsMap.entrySet().stream().map(entry -> {
 			entry.setValue(entry.getValue().stream()
@@ -132,9 +132,9 @@ public class PortfolioToIndexService {
 		return currentWeight;
 	}
 
-	private Optional<PortfolioToSymbol> findPreviousPts(Map<Symbol, List<PortfolioToSymbol>> symbolToPtsMap,
+	private Optional<PortfolioToSymbol> findPreviousPts(Map<String, List<PortfolioToSymbol>> symbolToPtsMap,
 			PortfolioToSymbol pts) {
-		List<PortfolioToSymbol> listCopy = List.copyOf(symbolToPtsMap.get(pts.getSymbol()));
+		List<PortfolioToSymbol> listCopy = new ArrayList<>(symbolToPtsMap.getOrDefault(pts.getSymbol().getSymbol(), List.of()));
 		Collections.reverse(listCopy); // needs check
 		return listCopy.stream().filter(myPts -> Optional.ofNullable(myPts.getChangedAt()).orElse(myPts.getRemovedAt())
 				.isBefore(Optional.ofNullable(pts.getChangedAt()).orElse(pts.getRemovedAt()))).findFirst();
