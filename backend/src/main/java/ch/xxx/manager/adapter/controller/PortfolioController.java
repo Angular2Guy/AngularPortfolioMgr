@@ -61,7 +61,7 @@ public class PortfolioController {
 
 	@GetMapping("/id/{portfolioId}")
 	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
-		return this.portfolioMapper.toDto(this.portfolioService.getPortfolioById(portfolioId));
+		return this.portfolioMapper.toDtoFiltered(this.portfolioService.getPortfolioById(portfolioId));
 	}
 
 	@GetMapping("/id/{portfolioId}/start/{start}")

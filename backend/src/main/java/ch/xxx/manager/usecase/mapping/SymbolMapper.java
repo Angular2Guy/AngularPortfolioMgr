@@ -27,7 +27,7 @@ public class SymbolMapper {
 	}
 
 	public SymbolDto convert(Symbol symbol, PortfolioToSymbol portfolioToSymbol) {
-		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), null, null,
+		return new SymbolDto(symbol.getId(), symbol.getSymbol(), symbol.getName(), portfolioToSymbol.getChangedAt(), portfolioToSymbol.getRemovedAt(),
 				symbol.getQuoteSource().toString(), portfolioToSymbol.getWeight(), symbol.getCurrencyKey(),
 				MappingUtils.findSectorName(symbol), symbol.getIndustry(), symbol.getDescription(), symbol.getAddress(),
 				symbol.getCountry());

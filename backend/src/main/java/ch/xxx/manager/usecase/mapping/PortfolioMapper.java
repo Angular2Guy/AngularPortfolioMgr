@@ -14,7 +14,9 @@ package ch.xxx.manager.usecase.mapping;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ import ch.xxx.manager.domain.model.dto.PortfolioBarDto;
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.dto.PortfolioElementDto;
+import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
@@ -38,6 +41,29 @@ public class PortfolioMapper {
 
 	public PortfolioMapper(SymbolMapper symbolMapper) {
 		this.symbolMapper = symbolMapper;
+	}
+
+	public PortfolioDto toDtoFiltered(Portfolio portfolio) {
+		PortfolioDto result = this.toDto(portfolio);
+		@SuppressWarnings("unchecked")
+		Map<String, SymbolDto>[] mapArr = new Map[1];
+		mapArr[0] = new HashMap<String, SymbolDto>();		
+		result.getSymbols().stream().forEach(mySymbolDto -> {
+			if (mapArr[0].get(mySymbolDto.getSymbol()) == null) {
+				mapArr[0].put(mySymbolDto.getSymbol(), mySymbolDto);
+			} else {
+				SymbolDto mapSymbolDto = mapArr[0].get(mySymbolDto.getSymbol());
+				if (mapSymbolDto.getChangedAt().isBefore(mySymbolDto.getChangedAt())) {
+					mapArr[0].put(mySymbolDto.getSymbol(), mySymbolDto);
+				}
+			}
+		});
+		List<SymbolDto> symbolDtos = mapArr[0].entrySet().stream()
+				.filter(myEntry -> myEntry.getValue().getRemovedAt() == null).map(myEntry -> myEntry.getValue())
+				.toList();
+		result.getSymbols().clear();
+		result.getSymbols().addAll(symbolDtos);
+		return result;
 	}
 
 	public PortfolioDto toDto(Portfolio portfolio) {
