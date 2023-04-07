@@ -14,8 +14,8 @@ package ch.xxx.manager.adapter.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,7 +40,6 @@ import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.domain.utils.DataHelper.Role;
 import ch.xxx.manager.domain.utils.JwtUtils;
-import ch.xxx.manager.usecase.mapping.PortfolioMapper;
 import ch.xxx.manager.usecase.service.JwtTokenService;
 import ch.xxx.manager.usecase.service.PortfolioService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,8 +57,6 @@ public class PortfolioControllerTest extends BaseControllerTest {
 	@MockBean
 	private PortfolioService portfolioService;
 	@MockBean
-	private PortfolioMapper portfolioMapper;
-	@MockBean
 	private JwtTokenService jwtTokenService;
 	@Autowired
 	private MockMvc mockMvc;
@@ -67,7 +64,6 @@ public class PortfolioControllerTest extends BaseControllerTest {
 	@SuppressWarnings("unchecked")
 	@BeforeEach
 	public void init() {
-		Mockito.when(this.portfolioMapper.toDto(any(Portfolio.class))).thenCallRealMethod();
 		Mockito.when(this.jwtTokenService.createToken(any(String.class), any(List.class), any(Optional.class)))
 				.thenCallRealMethod();
 		Mockito.when(this.jwtTokenService.resolveToken(any(HttpServletRequest.class))).thenReturn("");

@@ -47,7 +47,7 @@ public class PortfolioMapper {
 		PortfolioDto result = this.toDto(portfolio);
 		@SuppressWarnings("unchecked")
 		Map<String, SymbolDto>[] mapArr = new Map[1];
-		mapArr[0] = new HashMap<String, SymbolDto>();		
+		mapArr[0] = new HashMap<String, SymbolDto>();
 		result.getSymbols().stream().forEach(mySymbolDto -> {
 			if (mapArr[0].get(mySymbolDto.getSymbol()) == null) {
 				mapArr[0].put(mySymbolDto.getSymbol(), mySymbolDto);
