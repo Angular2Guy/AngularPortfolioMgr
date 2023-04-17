@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 
@@ -95,7 +96,7 @@ public class FileClientBean implements FileClient {
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text,
 								SymbolFinancialsDto.class);
-						Optional.ofNullable(symbolFinancialsDto.getData()).stream().forEach(myFinancialsDataDto -> {
+						StreamHelpers.toStream(symbolFinancialsDto.getData()).forEach(myFinancialsDataDto -> {
 							myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
 									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
 									.collect(Collectors.toSet()));
