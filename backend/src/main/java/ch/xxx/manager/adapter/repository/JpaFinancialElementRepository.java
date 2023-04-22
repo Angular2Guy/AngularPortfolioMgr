@@ -24,13 +24,13 @@ import ch.xxx.manager.domain.model.entity.FinancialElement;
 
 public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long> {
 	@Modifying
-	@Query(nativeQuery = true, value = "drop index ix_financial_element_symbol_financials_id")
+	@Query(nativeQuery = true, value = "drop index if exists ix_financial_element_symbol_financials_id")
 	void dropSymbolFinancialsIdIndex();
 	@Modifying
-	@Query(nativeQuery = true, value = "drop index ix_financial_element_concept")
+	@Query(nativeQuery = true, value = "drop index if exists ix_financial_element_concept")
 	void dropConceptIndex();
 	@Modifying
-	@Query(nativeQuery = true, value = "alter table financial_element drop constraint fk_financial_element_symbol_financials_id")
+	@Query(nativeQuery = true, value = "alter table financial_element drop constraint if exists fk_financial_element_symbol_financials_id")
 	void dropFkConstraintSymbolFinancials();
 	@Modifying
 	@Query(nativeQuery = true, value = "alter table financial_element add constraint fk_financial_element_symbol_financials_id foreign key (symbol_financials_id) references symbol_financials(id)")
@@ -45,7 +45,7 @@ public interface JpaFinancialElementRepository extends JpaRepository<FinancialEl
 	@Query(nativeQuery = true, value = "create index ix_financial_element_financial_element_type on financial_element (financial_element_type)")
 	void createFinancialElementTypeIndex();
 	@Modifying
-	@Query(nativeQuery = true, value = "drop index ix_financial_element_financial_element_type")
+	@Query(nativeQuery = true, value = "drop index if exists ix_financial_element_financial_element_type")
 	void dropFinancialElementTypeIndex();
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.FeConceptDto(fe.concept, count(fe.id) as concept_count) from FinancialElement fe group by fe.concept order by concept_count desc")	
 	List<FeConceptDto> findCommonFeConcepts(Pageable pageable);

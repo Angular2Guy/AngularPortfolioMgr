@@ -40,7 +40,6 @@ public class FinancialDataService {
 	private final FinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 	private final List<SfQuarterDto> sfQuarters = new CopyOnWriteArrayList<>();
-	
 
 	public FinancialDataService(SymbolFinancialsImportMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
@@ -76,12 +75,13 @@ public class FinancialDataService {
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		return this.symbolFinancialsRepository.findSymbolFinancials(symbolFinancialsQueryParams);
 	}
-	
+
 	@Transactional
-	public List<SymbolFinancials> findSymbolFinancialsByIds(List<Long> symbolsFinancialsIds) {		
-		return symbolsFinancialsIds.size() > 250 ? List.of() : this.symbolFinancialsRepository.findAllByIdFetchEager(symbolsFinancialsIds);
+	public List<SymbolFinancials> findSymbolFinancialsByIds(List<Long> symbolsFinancialsIds) {
+		return symbolsFinancialsIds.size() > 250 ? List.of()
+				: this.symbolFinancialsRepository.findAllByIdFetchEager(symbolsFinancialsIds);
 	}
-	
+
 	@Transactional
 	public List<FeConceptDto> findFeConcepts() {
 		if (this.feConcepts.isEmpty()) {
@@ -95,7 +95,7 @@ public class FinancialDataService {
 		this.sfQuarters.clear();
 		this.sfQuarters.addAll(this.symbolFinancialsRepository.findCommonSfQuarters());
 	}
-	
+
 	@Transactional
 	public List<SfQuarterDto> findSfQuarters() {
 		if (this.sfQuarters.isEmpty()) {
@@ -108,7 +108,7 @@ public class FinancialDataService {
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
 		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
-	}	
+	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
