@@ -14,6 +14,8 @@ package ch.xxx.manager.domain.model.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+//@JsonInclude(value = Include.NON_NULL)
+//@JsonIgnoreProperties(ignoreUnknown = true) 
 public class FinancialElementImportDto {
 	private Long id;
 	private String label;
@@ -21,6 +23,7 @@ public class FinancialElementImportDto {
 	@JsonProperty(value = "unit")
 	private String currency;
 	private String value;
+	private String info;
 	private SymbolFinancialsDto symbolFinancialsDto;
 	
 	public String getLabel() {
@@ -52,6 +55,12 @@ public class FinancialElementImportDto {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
 	}
 	public SymbolFinancialsDto getSymbolFinancialsDto() {
 		return symbolFinancialsDto;

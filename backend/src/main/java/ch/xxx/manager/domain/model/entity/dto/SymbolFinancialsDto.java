@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ch.xxx.manager.domain.utils.DataHelper;
 
+//@JsonInclude(value = Include.NON_NULL)
+//@JsonIgnoreProperties(ignoreUnknown = true) 
 public class SymbolFinancialsDto {
 	private Long id;
 	@JsonFormat(pattern="yyyy-MM-dd")
@@ -27,8 +29,10 @@ public class SymbolFinancialsDto {
 	private int year;	
 	private DataHelper.Quarter quarter;
 	private String symbol;	
-	private FinancialsDataDto data;
-	
+	private String name;
+	private String country;
+	private String city;
+	private FinancialsDataDto data;	
 	
 	public Long getId() {
 		return id;
@@ -72,10 +76,29 @@ public class SymbolFinancialsDto {
 	public void setData(FinancialsDataDto data) {
 		this.data = data;
 	}
-
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	
 	@Override
 	public String toString() {
 		return "SymbolFinancialsDto [id=" + id + ", startDate=" + startDate + ", endDate=" + endDate + ", year=" + year
-				+ ", quarter=" + quarter + ", symbol=" + symbol + ", data=" + data + "]";
+				+ ", quarter=" + quarter + ", symbol=" + symbol + ", name=" + name + ", country=" + country + ", city="
+				+ city + ", data=" + data + "]";
 	}
 }
