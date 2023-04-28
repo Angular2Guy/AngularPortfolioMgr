@@ -36,4 +36,40 @@
 		</addColumn>
 		<dropColumn tableName="symbol_financials" columnName="info"/>
 	</changeSet>
+	<changeSet id="37" author="angular2guy">	
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_fiscal_name" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_fiscal_name"
+			tableName="symbol_financials">
+			<column name="name" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="38" author="angular2guy">	
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_fiscal_city" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_fiscal_city"
+			tableName="symbol_financials">
+			<column name="city" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="39" author="angular2guy">	
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="symbol_financials"
+					indexName="ix_symbol_financials_fiscal_country" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_symbol_financials_fiscal_country"
+			tableName="symbol_financials">
+			<column name="country" />
+		</createIndex>
+	</changeSet>	
 </databaseChangeLog>
