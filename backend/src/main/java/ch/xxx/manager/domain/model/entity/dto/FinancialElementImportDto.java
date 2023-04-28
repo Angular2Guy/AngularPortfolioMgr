@@ -14,6 +14,8 @@ package ch.xxx.manager.domain.model.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.Size;
+
 //@JsonInclude(value = Include.NON_NULL)
 //@JsonIgnoreProperties(ignoreUnknown = true) 
 public class FinancialElementImportDto {
@@ -23,6 +25,7 @@ public class FinancialElementImportDto {
 	@JsonProperty(value = "unit")
 	private String currency;
 	private String value;
+	@Size(max=512)
 	private String info;
 	private SymbolFinancialsDto symbolFinancialsDto;
 	

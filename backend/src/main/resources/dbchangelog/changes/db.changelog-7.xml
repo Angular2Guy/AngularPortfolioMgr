@@ -16,4 +16,24 @@
 			<column name="adj_close" type="numeric(12,4)"/>
 		</addColumn>
 	</changeSet>	
+	<changeSet author="angular2guy" id="35">
+		<addColumn tableName="symbol_financials">
+			<column name="name" type="varchar(150)"/>
+		</addColumn>
+		<addColumn tableName="symbol_financials">
+			<column name="city" type="varchar(30)"/>
+		</addColumn>
+		<addColumn tableName="symbol_financials">
+			<column name="country" type="varchar(10)"/>
+		</addColumn>
+		<addColumn tableName="symbol_financials">
+			<column name="info" type="varchar(512)"/>
+		</addColumn>						
+	</changeSet>
+	<changeSet id="36" author="angular2guy">	
+		<addColumn tableName="financial_element">
+			<column name="info" type="varchar(512)"/>
+		</addColumn>
+		<dropColumn tableName="symbol_financials" columnName="info"/>
+	</changeSet>
 </databaseChangeLog>

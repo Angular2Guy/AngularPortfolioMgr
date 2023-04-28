@@ -76,7 +76,10 @@ public class SymbolFinancialsImportMapper {
 		entity.setQuarter(symbolFinancialsDto.getQuarter());
 		entity.setStartDate(symbolFinancialsDto.getStartDate());
 		entity.setSymbol(symbolFinancialsDto.getSymbol());
-		entity.setFiscalYear(symbolFinancialsDto.getYear());
+		entity.setCity(symbolFinancialsDto.getCity());
+		entity.setCountry(symbolFinancialsDto.getCountry());
+		entity.setName(symbolFinancialsDto.getName());
+		entity.setFiscalYear(symbolFinancialsDto.getYear());		
 		if (symbolFinancialsDto.getData() != null) {
 			Set<FinancialElement> financialElements = Optional.ofNullable(symbolFinancialsDto.getData().getBalanceSheet()).stream().flatMap(Set::stream)
 					.map(myElement -> this.financialElementMapper.toEntity(myElement, DataHelper.FinancialElementType.BalanceSheet))

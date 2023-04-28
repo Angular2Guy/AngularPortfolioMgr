@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ch.xxx.manager.domain.utils.DataHelper;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +35,13 @@ public class SymbolFinancials extends EntityBase {
 	@NotBlank
 	@Size(max=20)
 	private String symbol;
+	@Size(max=150)
+	@Column(name="`name`")
+	private String name;
+	@Size(max=10)
+	private String country;
+	@Size(max=30)
+	private String city;
 	@OneToMany(mappedBy = "symbolFinancials")
 	private Set<FinancialElement> financialElements = new HashSet<FinancialElement>();
 	
@@ -72,5 +80,23 @@ public class SymbolFinancials extends EntityBase {
 	}
 	public void setFiscalYear(int fiscalYear) {
 		this.fiscalYear = fiscalYear;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
 	}
 }

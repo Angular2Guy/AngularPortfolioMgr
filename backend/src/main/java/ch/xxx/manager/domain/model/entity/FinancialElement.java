@@ -36,7 +36,8 @@ public class FinancialElement extends EntityBase {
 	@Enumerated(EnumType.STRING)
 	private DataHelper.CurrencyKey currency;
 	@Column(name="`value`")
-	private BigDecimal value;
+	private BigDecimal value;	
+	private String info;
 	@ManyToOne
 	private SymbolFinancials symbolFinancials;
 	
@@ -76,5 +77,10 @@ public class FinancialElement extends EntityBase {
 	public void setFinancialElementType(DataHelper.FinancialElementType financialElementType) {
 		this.financialElementType = financialElementType;
 	}
-	
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
+	}
 }
