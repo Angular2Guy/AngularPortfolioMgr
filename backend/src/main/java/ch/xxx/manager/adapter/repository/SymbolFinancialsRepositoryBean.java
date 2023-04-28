@@ -165,15 +165,23 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
-		final List<Predicate> predicates = new ArrayList<>();		
+		final List<Predicate> predicates = new ArrayList<>();
 //		if (symbolFinancialsQueryParams.getSymbol() != null
 //				&& !symbolFinancialsQueryParams.getSymbol().trim().isBlank()) {
 //			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
 //		}
-		this.addStringPredicate(symbolFinancialsQueryParams.getSymbol(), SYMBOL, false, predicates, symbolFinancialsQueryParams, root);		
-		this.addStringPredicate(symbolFinancialsQueryParams.getName(), NAME, true, predicates, symbolFinancialsQueryParams, root);		
-		this.addStringPredicate(symbolFinancialsQueryParams.getCity(), CITY, true, predicates, symbolFinancialsQueryParams, root);
-		this.addStringPredicate(symbolFinancialsQueryParams.getCountry(), COUNTRY, false, predicates, symbolFinancialsQueryParams, root);		
+		Optional.ofNullable(symbolFinancialsQueryParams.getSymbol()).stream()
+				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
+						.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, SYMBOL)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().filter(myValue -> !myValue.trim().isBlank())
+				.forEach(
+						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, NAME)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().filter(myValue -> !myValue.trim().isBlank())
+				.forEach(
+						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, CITY)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()
+				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
+						.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, COUNTRY)));
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
@@ -193,13 +201,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			}
 		}
 		return predicates;
-	}
-
-	private void addStringPredicate(final String param, final String columnName, boolean uselike, final List<Predicate> predicates,
-			final SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams, final Root<SymbolFinancials> root) {
-		if (param != null && !param.trim().isBlank()) {
-			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, uselike, columnName));
-		}
 	}
 
 //	private Predicate createSymbolCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
