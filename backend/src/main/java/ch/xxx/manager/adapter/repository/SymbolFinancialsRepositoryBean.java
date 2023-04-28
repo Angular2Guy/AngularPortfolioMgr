@@ -57,6 +57,9 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private static final String FISCAL_YEAR = "fiscalYear";
 	private static final String VALUE = "value";
 	private static final String CONCEPT = "concept";
+	private static final String NAME = "name";
+	private static final String CITY = "city";
+	private static final String COUNTRY = "country";
 	private final EntityManager entityManager;
 
 	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
@@ -76,6 +79,10 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 						|| symbolFinancialsQueryParams.getSymbol().isBlank())
 				&& (symbolFinancialsQueryParams.getQuarters() == null
 						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
+				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
+				&& (symbolFinancialsQueryParams.getCountry() == null
+						|| symbolFinancialsQueryParams.getCountry().isEmpty())
+				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isEmpty())
 				&& (symbolFinancialsQueryParams.getYearFilter() == null
 						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
 						|| 0 < BigDecimal.valueOf(1800)
@@ -109,7 +116,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 		final List<Predicate> predicates = createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root);
 
-		predicates.addAll(this.limitYearQuarterResults(symbolFinancialsQueryParams, root));		
+		predicates.addAll(this.limitYearQuarterResults(symbolFinancialsQueryParams, root));
 		root.fetch(FINANCIAL_ELEMENTS);
 		Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
 		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates);
@@ -130,8 +137,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private List<Predicate> limitYearQuarterResults(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
 		List<Predicate> results = List.of();
-		if((symbolFinancialsQueryParams.getFinancialElementParams() == null ||
-				 symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
+		if ((symbolFinancialsQueryParams.getFinancialElementParams() == null
+				|| symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
 				&& (symbolFinancialsQueryParams.getSymbol() == null
 						|| symbolFinancialsQueryParams.getSymbol().isBlank())) {
 			symbolFinancialsQueryParams.setSymbol("A");
@@ -158,14 +165,23 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
 		final List<Predicate> predicates = new ArrayList<>();
-		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().isBlank()) {
+		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().trim().isBlank()) {
 			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
+		}
+		if (symbolFinancialsQueryParams.getName() != null && !symbolFinancialsQueryParams.getName().trim().isBlank()) {
+			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, NAME));
+		}
+		if (symbolFinancialsQueryParams.getCity() != null && !symbolFinancialsQueryParams.getCity().trim().isBlank()) {
+			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, CITY));
+		}
+		if (symbolFinancialsQueryParams.getCountry() != null && !symbolFinancialsQueryParams.getCountry().trim().isBlank()) {
+			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, COUNTRY));
 		}
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
 		}
-		if (symbolFinancialsQueryParams.getYearFilter() != null 
+		if (symbolFinancialsQueryParams.getYearFilter() != null
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
 				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
@@ -186,10 +202,18 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 			final Root<SymbolFinancials> root, boolean uselike) {
 		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL));
 		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
-		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%",lowerStr))
+		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
 				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
 	}
 
+	private Predicate createColumnCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+			final Root<SymbolFinancials> root, boolean uselike, String columnName) {
+		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(columnName));
+		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
+		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
+				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
+	}
+	
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
 			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
 		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {

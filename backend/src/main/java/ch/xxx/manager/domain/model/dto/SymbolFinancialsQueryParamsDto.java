@@ -28,6 +28,9 @@ public class SymbolFinancialsQueryParamsDto {
 	@JsonProperty
 	private List<Quarter> quarters = new LinkedList<>();
 	private String symbol;
+	private String name;
+	private String city;
+	private String country;
 	private List<FinancialElementParamDto> financialElementParams = new ArrayList<>();
 	
 	public FilterNumberDto getYearFilter() {
@@ -53,5 +56,23 @@ public class SymbolFinancialsQueryParamsDto {
 	}
 	public void setFinancialElementParams(List<FinancialElementParamDto> financialElementParams) {
 		this.financialElementParams = financialElementParams;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
 	}
 }

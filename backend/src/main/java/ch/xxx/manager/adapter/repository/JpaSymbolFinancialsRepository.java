@@ -20,12 +20,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 
 public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.SfQuarterDto(sf.quarter, count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.quarter order by quarter_count desc")	
 	List<SfQuarterDto> findCommonSfQuarters(Pageable pageable);
+	@Query(value = "select new ch.xxx.manager.domain.model.dto.SfCountryDto(upper(sf.country), count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.country order by quarter_count desc")	
+	List<SfCountryDto> findCommonSfCountries(Pageable pageable);
 	@Query(value = "select sf from SymbolFinancials sf join fetch sf.financialElements fe where sf.id in (:ids)")
 	List<SymbolFinancials> findAllByIdFetchEager(@Param(value = "ids") Collection<Long> ids);
 	List<SymbolFinancials> findBySymbol(String symbol);

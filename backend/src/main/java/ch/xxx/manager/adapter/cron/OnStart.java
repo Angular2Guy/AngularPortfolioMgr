@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
@@ -53,5 +54,7 @@ public class OnStart {
 		LOGGER.info("Concept count {}", feConcepts.size());
 		List<SfQuarterDto> sfQuarters = this.financialDataService.findSfQuarters();
 		LOGGER.info("Quarter count {}", sfQuarters.size());
+		List<SfCountryDto> sfCountries = this.financialDataService.findSfCountries();
+		LOGGER.info("Country count {}", sfCountries.size());
 	}
 }

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
+import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
@@ -57,11 +58,17 @@ public abstract class SymbolFinancialsRepositoryBaseBean implements SymbolFinanc
 		this.jpaSymbolFinancialsRepository.deleteAllInBatch();
 	}
 
+	@Override
 	public List<SfQuarterDto> findCommonSfQuarters() {
 		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20)).stream()
 				.filter(myDto -> myDto.getTimesFound() >= 10).collect(Collectors.toList());
 	}
-
+	
+	@Override
+	public List<SfCountryDto> findCommonSfCountries() {
+		return this.jpaSymbolFinancialsRepository.findCommonSfCountries(Pageable.unpaged());
+	}
+	
 	@Override
 	public abstract List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
 

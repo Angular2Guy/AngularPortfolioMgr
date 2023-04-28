@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
@@ -40,6 +41,7 @@ public class FinancialDataService {
 	private final FinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 	private final List<SfQuarterDto> sfQuarters = new CopyOnWriteArrayList<>();
+	private final List<SfCountryDto> sfCountries = new CopyOnWriteArrayList<>();
 
 	public FinancialDataService(SymbolFinancialsImportMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
@@ -104,6 +106,20 @@ public class FinancialDataService {
 		return this.sfQuarters;
 	}
 
+	@Transactional
+	public void updateSfCountries() {
+		this.sfCountries.clear();
+		this.sfCountries.addAll(this.symbolFinancialsRepository.findCommonSfCountries());
+	}
+	
+	@Transactional
+	public List<SfCountryDto> findSfCountries() {
+		if(this.sfCountries.isEmpty()) {
+			this.updateSfCountries();
+		}
+		return this.sfCountries;
+	}
+	
 	@Transactional
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
