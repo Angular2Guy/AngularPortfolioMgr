@@ -181,7 +181,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, CITY)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
-						.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, COUNTRY)));
+						.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, COUNTRY)));
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
