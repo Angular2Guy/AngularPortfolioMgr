@@ -142,7 +142,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				&& (symbolFinancialsQueryParams.getSymbol() == null
 						|| symbolFinancialsQueryParams.getSymbol().isBlank())) {
 			symbolFinancialsQueryParams.setSymbol("A");
-			results = List.of(this.createSymbolCriteria(symbolFinancialsQueryParams, root, true));
+//			results = List.of(this.createSymbolCriteria(symbolFinancialsQueryParams, root, true));
+			results = List.of(this.createColumnCriteria(symbolFinancialsQueryParams, root, true, SYMBOL));
 		}
 		return results;
 	}
@@ -164,19 +165,15 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 
 	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
-		final List<Predicate> predicates = new ArrayList<>();
-		if (symbolFinancialsQueryParams.getSymbol() != null && !symbolFinancialsQueryParams.getSymbol().trim().isBlank()) {
-			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
-		}
-		if (symbolFinancialsQueryParams.getName() != null && !symbolFinancialsQueryParams.getName().trim().isBlank()) {
-			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, NAME));
-		}
-		if (symbolFinancialsQueryParams.getCity() != null && !symbolFinancialsQueryParams.getCity().trim().isBlank()) {
-			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, CITY));
-		}
-		if (symbolFinancialsQueryParams.getCountry() != null && !symbolFinancialsQueryParams.getCountry().trim().isBlank()) {
-			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, COUNTRY));
-		}
+		final List<Predicate> predicates = new ArrayList<>();		
+//		if (symbolFinancialsQueryParams.getSymbol() != null
+//				&& !symbolFinancialsQueryParams.getSymbol().trim().isBlank()) {
+//			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
+//		}
+		this.addStringPredicate(symbolFinancialsQueryParams.getSymbol(), SYMBOL, false, predicates, symbolFinancialsQueryParams, root);		
+		this.addStringPredicate(symbolFinancialsQueryParams.getName(), NAME, true, predicates, symbolFinancialsQueryParams, root);		
+		this.addStringPredicate(symbolFinancialsQueryParams.getCity(), CITY, true, predicates, symbolFinancialsQueryParams, root);
+		this.addStringPredicate(symbolFinancialsQueryParams.getCountry(), COUNTRY, false, predicates, symbolFinancialsQueryParams, root);		
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
 					.value(symbolFinancialsQueryParams.getQuarters()));
@@ -198,13 +195,20 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		return predicates;
 	}
 
-	private Predicate createSymbolCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
-			final Root<SymbolFinancials> root, boolean uselike) {
-		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL));
-		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
-		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
-				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
+	private void addStringPredicate(final String param, final String columnName, boolean uselike, final List<Predicate> predicates,
+			final SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams, final Root<SymbolFinancials> root) {
+		if (param != null && !param.trim().isBlank()) {
+			predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, uselike, columnName));
+		}
 	}
+
+//	private Predicate createSymbolCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+//			final Root<SymbolFinancials> root, boolean uselike) {
+//		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL));
+//		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
+//		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
+//				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
+//	}
 
 	private Predicate createColumnCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root, boolean uselike, String columnName) {
@@ -213,7 +217,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
 				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
 	}
-	
+
 	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
 			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
 		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {
