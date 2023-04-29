@@ -142,7 +142,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 				&& (symbolFinancialsQueryParams.getSymbol() == null
 						|| symbolFinancialsQueryParams.getSymbol().isBlank())) {
 			symbolFinancialsQueryParams.setSymbol("A");
-//			results = List.of(this.createSymbolCriteria(symbolFinancialsQueryParams, root, true));
 			results = List.of(this.createColumnCriteria(symbolFinancialsQueryParams, root, true, SYMBOL));
 		}
 		return results;
@@ -166,10 +165,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root) {
 		final List<Predicate> predicates = new ArrayList<>();
-//		if (symbolFinancialsQueryParams.getSymbol() != null
-//				&& !symbolFinancialsQueryParams.getSymbol().trim().isBlank()) {
-//			predicates.add(createSymbolCriteria(symbolFinancialsQueryParams, root, false));
-//		}
 		Optional.ofNullable(symbolFinancialsQueryParams.getSymbol()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, SYMBOL)));
@@ -202,14 +197,6 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		}
 		return predicates;
 	}
-
-//	private Predicate createSymbolCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
-//			final Root<SymbolFinancials> root, boolean uselike) {
-//		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(SYMBOL));
-//		String lowerStr = symbolFinancialsQueryParams.getSymbol().trim().toLowerCase();
-//		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
-//				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
-//	}
 
 	private Predicate createColumnCriteria(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root, boolean uselike, String columnName) {
