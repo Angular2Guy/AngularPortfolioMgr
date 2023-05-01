@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsIdParamDto;
@@ -59,6 +60,11 @@ public class FinancialDataController {
 	@GetMapping("/symbolfinancials/quarters/all")
 	public List<SfQuarterDto> getSfQuarters() {
 		return this.financialDataService.findSfQuarters();
+	}
+	
+	@GetMapping("/symbolfinancials/countries/all")
+	public List<SfCountryDto> getSfCountries() {
+		return this.financialDataService.findSfCountries();
 	}
 
 	@GetMapping("/financialelement/concept/{concept}")

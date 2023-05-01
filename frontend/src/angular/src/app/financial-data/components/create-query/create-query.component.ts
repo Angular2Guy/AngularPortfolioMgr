@@ -70,6 +70,8 @@ enum FormFields {
   Year = "year",
   SymbolOperator = "symbolOperator",
   Symbol = "symbol",
+  Name = "name",
+  Country = "country",
   QuarterOperator = "quarterOperator",
   Quarter = "quarter",
   QueryItems = "queryItems",
@@ -126,6 +128,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         [FormFields.Year]: [0, Validators.pattern("^\\d*$")],
         [FormFields.Symbol]: "",
         [FormFields.Quarter]: [""],
+        [FormFields.Name]: "",
+        [FormFields.Country]: "",
         [FormFields.QueryItems]: fb.array([]),
       },
       {
