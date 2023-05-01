@@ -82,10 +82,8 @@
           <mat-label i18n="@@country">Country</mat-label>
           <mat-select
             [formControlName]="FormFields.Country"
-            name="Quarter"
-            multiple
-          >
-            <mat-option *ngFor="let item of quarterQueryItems" [value]="item">{{
+            name="Country">
+            <mat-option *ngFor="let item of countryQueryItems" [value]="item">{{
               item
             }}</mat-option>
           </mat-select>

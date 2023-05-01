@@ -106,6 +106,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   protected queryForm: FormGroup;
   protected yearOperators: string[] = [];
   protected quarterQueryItems: string[] = [];
+  protected countryQueryItems: string[] = [];
   protected symbols: Symbol[] = [];
   protected FormFields = FormFields;
   protected formStatus = "";
@@ -171,6 +172,14 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         .subscribe(
           (values) =>
             (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
+        )
+    );
+    this.subscriptions.push(
+      this.financialDataService
+        .getCountries()
+        .subscribe(
+          (values) =>
+            (this.countryQueryItems = values.map((myValue) => myValue.country))
         )
     );
   }
