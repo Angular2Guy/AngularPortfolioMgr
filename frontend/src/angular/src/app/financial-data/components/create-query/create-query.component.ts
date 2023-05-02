@@ -28,7 +28,6 @@ import {
   FormBuilder,
   Validators,
   ValidationErrors,
-  FormControl,
   ValidatorFn,
 } from "@angular/forms";
 import {
@@ -37,16 +36,14 @@ import {
 } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import {
-  FinancialElement,
   FinancialElementExt,
 } from "../../model/financial-element";
 import {
   SymbolFinancialsQueryParams,
   FinancialElementParams,
-  FilterNumber,
-  FilterString,
+  FilterNumber  
 } from "../../model/symbol-financials-query-params";
-import { Observable, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 import { switchMap, debounceTime, delay } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
@@ -237,6 +234,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
         ? []
         : this.queryForm.controls[FormFields.Quarter].value,
       symbol: this.queryForm.controls[FormFields.Symbol].value,
+      country: this.queryForm.controls[FormFields.Country].value,
+      name: this.queryForm.controls[FormFields.Name].value,
       financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]
         ?.value?.length
         ? this.queryForm.controls[FormFields.QueryItems].value.map(
@@ -262,7 +261,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     const symbolFinancialsFilter =
       !!symbolFinancialsParams?.yearFilter?.value ||
       !!symbolFinancialsParams?.quarters?.length ||
-      !!symbolFinancialsParams?.symbol;
+      !!symbolFinancialsParams?.symbol || !!symbolFinancialsParams?.country || !!symbolFinancialsParams?.name;
     if (result.length > 0 && symbolFinancialsFilter) {
       if (!!logResults) {
         console.log(result.length);

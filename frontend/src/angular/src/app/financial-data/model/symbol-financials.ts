@@ -18,5 +18,8 @@ export interface SymbolFinancials {
   year: number;
   quarter: string;
   symbol: string;
+  name: string;
+  country: string;
+  city: string;	
   financialElements: FinancialElement[];
 }

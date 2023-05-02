@@ -32,5 +32,7 @@ export interface SymbolFinancialsQueryParams {
   yearFilter: FilterNumber;
   quarters: string[];
   symbol: string;
+  country: string;
+  name: string;
   financialElementParams: FinancialElementParams[];
 }
