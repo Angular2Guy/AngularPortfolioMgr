@@ -30,6 +30,7 @@ import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 import ch.xxx.manager.domain.model.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsImportMapper;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
@@ -112,15 +113,15 @@ public class FinancialDataService {
 		this.sfCountries.clear();
 		this.sfCountries.addAll(this.symbolFinancialsRepository.findCommonSfCountries());
 	}
-	
+
 	@Transactional
 	public List<SfCountryDto> findSfCountries() {
-		if(this.sfCountries.isEmpty()) {
+		if (this.sfCountries.isEmpty()) {
 			this.updateSfCountries();
 		}
 		return this.sfCountries;
 	}
-	
+
 	@Transactional
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
@@ -129,14 +130,18 @@ public class FinancialDataService {
 
 	@Transactional
 	public Collection<SymbolFinancials> findSymbolFinancialsByName(String companyName) {
-		return companyName == null || companyName.trim().isBlank() ? List.of() : this.symbolFinancialsRepository.findByName(companyName);
+		return companyName == null || companyName.trim().isBlank() ? List.of()
+				: this.symbolFinancialsRepository.findByName(companyName).stream()
+						.filter(StreamHelpers.distinctByKey(value -> value.getName())).toList();
 	}
-	
+
 	@Transactional
 	public Collection<SymbolFinancials> findSymbolFinancialsBySymbol(String symbol) {
-		return symbol == null || symbol.trim().isBlank() ? List.of() : this.symbolFinancialsRepository.findBySymbol(symbol);
+		return symbol == null || symbol.trim().isBlank() ? List.of()
+				: this.symbolFinancialsRepository.findBySymbol(symbol).stream()
+				.filter(StreamHelpers.distinctByKey(value -> value.getSymbol())).toList();
 	}
-	
+
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
 		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream()
