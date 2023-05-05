@@ -28,5 +28,7 @@ public interface SymbolFinancialsRepository {
     List<SfQuarterDto> findCommonSfQuarters();
     List<SfCountryDto> findCommonSfCountries();
     List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
+    List<SymbolFinancials> findByName(String companyName);
+    List<SymbolFinancials> findBySymbol(String symbol);
     List<SymbolFinancials> findAllByIdFetchEager(Collection<Long> ids);
 }

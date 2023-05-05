@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -126,6 +127,16 @@ public class FinancialDataService {
 		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
 	}
 
+	@Transactional
+	public Collection<SymbolFinancials> findSymbolFinancialsByName(String companyName) {
+		return companyName == null || companyName.trim().isBlank() ? List.of() : this.symbolFinancialsRepository.findByName(companyName);
+	}
+	
+	@Transactional
+	public Collection<SymbolFinancials> findSymbolFinancialsBySymbol(String symbol) {
+		return symbol == null || symbol.trim().isBlank() ? List.of() : this.symbolFinancialsRepository.findBySymbol(symbol);
+	}
+	
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
 		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream()

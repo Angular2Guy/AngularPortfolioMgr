@@ -73,6 +73,16 @@ public abstract class SymbolFinancialsRepositoryBaseBean implements SymbolFinanc
 	public abstract List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
 
 	@Override
+	public List<SymbolFinancials> findByName(String companyName) {	
+		return this.jpaSymbolFinancialsRepository.findByName(companyName.trim().toLowerCase(), Pageable.ofSize(20));
+	}
+
+	@Override
+	public List<SymbolFinancials> findBySymbol(String symbol) {	
+		return this.jpaSymbolFinancialsRepository.findBySymbol(symbol.trim().toLowerCase(), Pageable.ofSize(20));
+	}
+	
+	@Override
 	public List<SymbolFinancials> findAllByIdFetchEager(Collection<Long> ids) {
 		LocalTime start = LocalTime.now();
 		List<SymbolFinancials> results = this.jpaSymbolFinancialsRepository.findAllByIdFetchEager(ids);

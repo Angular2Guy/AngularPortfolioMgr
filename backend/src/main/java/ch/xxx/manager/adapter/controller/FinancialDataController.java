@@ -33,6 +33,7 @@ import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsIdParamDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.domain.model.dto.SymbolNameRc;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -61,7 +62,7 @@ public class FinancialDataController {
 	public List<SfQuarterDto> getSfQuarters() {
 		return this.financialDataService.findSfQuarters();
 	}
-	
+
 	@GetMapping("/symbolfinancials/countries/all")
 	public List<SfCountryDto> getSfCountries() {
 		return this.financialDataService.findSfCountries();
@@ -73,6 +74,18 @@ public class FinancialDataController {
 				.ofNullable(myDto.getConcept()).stream().anyMatch(myConcept -> myConcept.contains(concept))).toList();
 	}
 
+	@GetMapping("/symbolfinancials/companyname/{companyname}")
+	public List<SymbolNameRc> findSymbolNameByName(@PathVariable("companyname") String companyName) {
+		return this.financialDataService.findSymbolFinancialsByName(companyName).stream()
+				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
+	}
+
+	@GetMapping("/symbolfinancials/symbol/{symbol}")
+	public List<SymbolNameRc> findSymbolNameBySymbol(@PathVariable("symbol") String symbol) {
+		return this.financialDataService.findSymbolFinancialsBySymbol(symbol).stream()
+				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
+	}
+	
 	@PostMapping("/search/params")
 	public List<SymbolFinancialsDto> findSymbolFinancials(
 			@RequestBody SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
