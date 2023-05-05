@@ -170,10 +170,10 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 						.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, SYMBOL)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().filter(myValue -> !myValue.trim().isBlank())
 				.forEach(
-						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, NAME)));
+						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, NAME)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().filter(myValue -> !myValue.trim().isBlank())
 				.forEach(
-						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, true, CITY)));
+						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, CITY)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams, root, false, COUNTRY)));
