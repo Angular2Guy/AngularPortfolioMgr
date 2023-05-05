@@ -50,6 +50,7 @@ import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { QueryFormFields } from "../query/query.component";
 import { Symbol } from "src/app/model/symbol";
+import { SfSymbolName } from "../../model/sf-symbol-name";
 
 export interface MyItem {
   queryItemType: ItemType;
@@ -105,6 +106,7 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   protected quarterQueryItems: string[] = [];
   protected countryQueryItems: string[] = [];
   protected symbols: Symbol[] = [];
+  protected sfSymbolNames: SfSymbolName[] = [];
   protected FormFields = FormFields;
   protected formStatus = "";
   @Output()
@@ -154,6 +156,14 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
           switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue))
         )
         .subscribe((myValue) => (this.symbols = myValue))
+    );
+    this.subscriptions.push(
+      this.queryForm.controls[FormFields.Name].valueChanges
+        .pipe(
+          debounceTime(200),
+          switchMap((myValue) => this.financialDataService.getSymbolNamesByCompanyName(myValue))
+        )
+        .subscribe((myValue) => this.sfSymbolNames = myValue)
     );
     this.subscriptions.push(
       this.configService.getNumberOperators().subscribe((values) => {

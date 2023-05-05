@@ -20,12 +20,14 @@ import { FeConcept } from "../model/fe-concept";
 import { SymbolFinancialsQueryParams } from "../model/symbol-financials-query-params";
 import { SymbolFinancials } from "../model/symbol-financials";
 import { FeCountry } from "../model/fe-country";
+import { SfSymbolName } from "../model/sf-symbol-name";
 
 @Injectable()
 export class FinancialDataService {
   private quarters: QuarterData[] = [];
   private feConcepts: FeConcept[] = [];
   private feCountries: FeCountry[] = [];
+  private sfSymbolNames: SfSymbolName[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -57,6 +59,14 @@ export class FinancialDataService {
         .get<FeConcept[]>(`/rest/financialdata/financialelement/concept/all`)
         .pipe(tap((values) => (this.feConcepts = values)));
     }
+  }
+  
+  getSymbolNamesBySymbol(symbol: string): Observable<SfSymbolName[]> {
+	  return this.http.get<SfSymbolName[]>(`/rest/financialdata/symbolfinancials/symbol/${symbol}`);
+  }
+
+  getSymbolNamesByCompanyName(symbol: string): Observable<SfSymbolName[]> {
+	  return this.http.get<SfSymbolName[]>(`/rest/financialdata/symbolfinancials/companyname/${symbol}`);
   }
   
   getCountries(): Observable<FeCountry[]> {

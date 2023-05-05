@@ -32,7 +32,7 @@ public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinan
 	@Query(value = "select sf from SymbolFinancials sf join fetch sf.financialElements fe where sf.id in (:ids)")
 	List<SymbolFinancials> findAllByIdFetchEager(@Param(value = "ids") Collection<Long> ids);
 	@Query(value="select sf from SymbolFinancials sf where lower(sf.symbol) like %:symbol%")
-	List<SymbolFinancials> findBySymbol(String symbol, Pageable pageable);
+	List<SymbolFinancials> findBySymbol(@Param("symbol") String symbol, Pageable pageable);
 	@Query(value="select sf from SymbolFinancials sf where lower(sf.name) like %:companyName%")
-	List<SymbolFinancials> findByName(String companyName, Pageable pageable);
+	List<SymbolFinancials> findByName(@Param("companyName") String companyName, Pageable pageable);
 }
