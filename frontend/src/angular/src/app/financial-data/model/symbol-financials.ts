@@ -13,6 +13,7 @@
 import { FinancialElement } from "./financial-element";
 
 export interface SymbolFinancials {
+  id: number;
   startDate: Date;
   endDate: Date;
   year: number;

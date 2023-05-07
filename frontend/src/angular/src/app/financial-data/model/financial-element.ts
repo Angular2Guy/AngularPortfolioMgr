@@ -11,6 +11,7 @@
    limitations under the License.
  */
 export interface FinancialElement {
+  id: number;
   label: string;
   concept: string;
   financialElementType: string;
@@ -20,6 +21,7 @@ export interface FinancialElement {
 
 export class FinancialElementExt implements FinancialElement {
   constructor(financialElement: FinancialElement) {
+	this.id = financialElement.id;
     this.label = financialElement.label;
     this.concept = financialElement.concept;
     this.financialElementType = financialElement.financialElementType;
@@ -27,6 +29,7 @@ export class FinancialElementExt implements FinancialElement {
     this.value = financialElement.value;
   }
 
+  id: number = -1;
   label: string = "";
   concept: string = "";
   financialElementType: string = "";
