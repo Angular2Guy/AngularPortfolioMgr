@@ -2,6 +2,14 @@
   display: none;
 }
 
+.single-line {
+	white-space: nowrap;
+}
+
+.align-icon {
+	vertical-align: middle;
+}
+
 .example-tree ul,
 .example-tree li {
   margin-top: 0;
