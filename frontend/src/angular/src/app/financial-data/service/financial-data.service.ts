@@ -21,6 +21,7 @@ import { SymbolFinancialsQueryParams } from "../model/symbol-financials-query-pa
 import { SymbolFinancials } from "../model/symbol-financials";
 import { FeCountry } from "../model/fe-country";
 import { SfSymbolName } from "../model/sf-symbol-name";
+import { FeIdInfo } from "../model/fe-id-info";
 
 @Injectable()
 export class FinancialDataService {
@@ -59,6 +60,10 @@ export class FinancialDataService {
         .get<FeConcept[]>(`/rest/financialdata/financialelement/concept/all`)
         .pipe(tap((values) => (this.feConcepts = values)));
     }
+  }
+  
+  getFeInfo(id: number): Observable<FeIdInfo> {
+	  return this.http.get<FeIdInfo>(`/rest/financialdata/financialelement/id/${id}`);
   }
   
   getSymbolNamesBySymbol(symbol: string): Observable<SfSymbolName[]> {

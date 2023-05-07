@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
@@ -51,5 +52,5 @@ public interface JpaFinancialElementRepository extends JpaRepository<FinancialEl
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.FeConceptDto(fe.concept, count(fe.id) as concept_count) from FinancialElement fe group by fe.concept order by concept_count desc")	
 	List<FeConceptDto> findCommonFeConcepts(Pageable pageable);
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.FeIdInfoDto(fe.id, fe.info) from FinancialElement fe where fe.id = :id")
-	FeIdInfoDto findFeIdInfoById(Long id);
+	FeIdInfoDto findFeIdInfoById(@Param("id") Long id);
 }
