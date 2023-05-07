@@ -26,7 +26,8 @@ public class FinancialElementMapper {
 		dto.setCurrency(entity.getCurrency());
 		dto.setFinancialElementType(entity.getFinancialElementType());
 		dto.setLabel(entity.getLabel());
-		dto.setValue(entity.getValue());		
+		dto.setValue(entity.getValue());	
+		dto.setId(entity.getId());
 		return dto;
 	}
 }

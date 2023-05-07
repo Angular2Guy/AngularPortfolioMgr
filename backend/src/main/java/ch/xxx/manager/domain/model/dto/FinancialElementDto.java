@@ -18,6 +18,7 @@ import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.domain.utils.DataHelper.FinancialElementType;
 
 public class FinancialElementDto {
+	private Long id;
 	private String label;
 	private String concept;
 	private FinancialElementType financialElementType;
@@ -53,5 +54,11 @@ public class FinancialElementDto {
 	}
 	public void setValue(BigDecimal value) {
 		this.value = value;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

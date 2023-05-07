@@ -37,6 +37,10 @@ public class SymbolFinancialsMapper {
 		dto.setStartDate(symbolFinancials.getStartDate());
 		dto.setSymbol(symbolFinancials.getSymbol());
 		dto.setYear(symbolFinancials.getFiscalYear());
+		dto.setId(symbolFinancials.getId());
+		dto.setCity(symbolFinancials.getCity());
+		dto.setName(symbolFinancials.getName());
+		dto.setCountry(symbolFinancials.getCountry());
 		dto.setFinancialElements(Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.map(myFe -> this.financialElementMapper.toDto(myFe)).collect(Collectors.toList()));
 		return dto;
