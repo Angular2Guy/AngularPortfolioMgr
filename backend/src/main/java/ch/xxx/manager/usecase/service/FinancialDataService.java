@@ -137,7 +137,7 @@ public class FinancialDataService {
 	}
 
 	@Transactional
-	public Collection<FeIdInfoDto> findFeInfo(Long id) {
+	public FeIdInfoDto findFeInfo(Long id) {
 		return this.financialElementRepository.findFeIdInfoById(id);
 	}
 	

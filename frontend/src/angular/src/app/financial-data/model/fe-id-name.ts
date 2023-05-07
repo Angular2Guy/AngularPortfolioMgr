@@ -10,8 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.domain.model.dto;
-
-public record SymbolNameRc(String symbol, String name) {
-
+export interface FeIdName {
+  name: string;
+  id: number;
 }

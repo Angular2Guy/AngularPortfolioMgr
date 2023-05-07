@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
-import ch.xxx.manager.domain.model.dto.SymbolNameRc;
+import ch.xxx.manager.domain.model.dto.SymbolNameDto;
 import ch.xxx.manager.domain.model.entity.SymbolFinancials;
 
 @Component
@@ -46,7 +46,7 @@ public class SymbolFinancialsMapper {
 		return dto;
 	}
 	
-	public SymbolNameRc toRc(SymbolFinancials symbolFinancials) {
-		return new SymbolNameRc(symbolFinancials.getSymbol(), symbolFinancials.getName());
+	public SymbolNameDto toRc(SymbolFinancials symbolFinancials) {
+		return new SymbolNameDto(symbolFinancials.getSymbol(), symbolFinancials.getName());
 	}
 }

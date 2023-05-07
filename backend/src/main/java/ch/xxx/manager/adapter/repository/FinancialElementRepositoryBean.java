@@ -78,7 +78,7 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	}
 	
 	@Override
-	public List<FeIdInfoDto> findFeIdInfoById(Long id) {
+	public FeIdInfoDto findFeIdInfoById(Long id) {
 		return this.jpaFinancialElementRepository.findFeIdInfoById(id);
 	}
 

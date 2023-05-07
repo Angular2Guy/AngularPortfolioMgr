@@ -32,5 +32,5 @@ public interface FinancialElementRepository {
 	void createFinancialElementTypeIndex();
 	void dropFinancialElementTypeIndex();
 	List<FeConceptDto> findCommonFeConcepts();
-	List<FeIdInfoDto> findFeIdInfoById(Long id);
+	FeIdInfoDto findFeIdInfoById(Long id);
 }

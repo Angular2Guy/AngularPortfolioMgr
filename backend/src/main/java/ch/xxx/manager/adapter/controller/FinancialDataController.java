@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.adapter.controller;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,8 +34,7 @@ import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsIdParamDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
-import ch.xxx.manager.domain.model.dto.SymbolNameRc;
-import ch.xxx.manager.usecase.mapping.FinancialElementMapper;
+import ch.xxx.manager.domain.model.dto.SymbolNameDto;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -48,14 +46,12 @@ public class FinancialDataController {
 	private final SymbolService symbolService;
 	private final FinancialDataService financialDataService;
 	private final SymbolFinancialsMapper symbolFinancialsMapper;
-	private final FinancialElementMapper financialElementMapper;
 
 	public FinancialDataController(SymbolService symbolService, FinancialDataService financialDataService,
-			SymbolFinancialsMapper symbolFinancialsMapper, FinancialElementMapper financialElementMapper) {
+			SymbolFinancialsMapper symbolFinancialsMapper) {
 		this.symbolService = symbolService;
 		this.financialDataService = financialDataService;
 		this.symbolFinancialsMapper = symbolFinancialsMapper;
-		this.financialElementMapper = financialElementMapper;
 	}
 
 	@GetMapping("/financialelement/concept/all")
@@ -80,18 +76,18 @@ public class FinancialDataController {
 	}
 
 	@GetMapping("/financialelement/id/{id}")
-	public Collection<FeIdInfoDto> getFeInfo(@PathVariable("id") Long id) {
+	public FeIdInfoDto getFeInfo(@PathVariable("id") Long id) {
 		return this.financialDataService.findFeInfo(id);
 	}
 	
 	@GetMapping("/symbolfinancials/companyname/{companyname}")
-	public List<SymbolNameRc> findSymbolNameByName(@PathVariable("companyname") String companyName) {
+	public List<SymbolNameDto> findSymbolNameByName(@PathVariable("companyname") String companyName) {
 		return this.financialDataService.findSymbolFinancialsByName(companyName).stream()
 				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
 	}
 
 	@GetMapping("/symbolfinancials/symbol/{symbol}")
-	public List<SymbolNameRc> findSymbolNameBySymbol(@PathVariable("symbol") String symbol) {
+	public List<SymbolNameDto> findSymbolNameBySymbol(@PathVariable("symbol") String symbol) {
 		return this.financialDataService.findSymbolFinancialsBySymbol(symbol).stream()
 				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
 	}		
