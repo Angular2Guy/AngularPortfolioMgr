@@ -11,8 +11,11 @@
    limitations under the License.
  */
 import { NestedTreeControl } from "@angular/cdk/tree";
-import { Component, Input } from "@angular/core";
+import { Component, DestroyRef, inject, Input, TemplateRef, ViewChild } from "@angular/core";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatTreeNestedDataSource } from "@angular/material/tree";
+import { MonoTypeOperatorFunction, Subject, takeUntil } from "rxjs";
+import { FeIdInfo } from "../../model/fe-id-info";
 import { FinancialElement, FinancialElementExt } from "../../model/financial-element";
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
@@ -55,8 +58,14 @@ export class ResultTreeComponent {
     "currency",
     "quarter",
   ];
+  protected financialElement: FinancialElement = null;
+  protected destroyRef: DestroyRef;
+  
+  @ViewChild('bottomSheet') bsTemplate:TemplateRef<HTMLElement>;
 
-  constructor(private financialDataService: FinancialDataService) {}
+  constructor(private financialDataService: FinancialDataService, private bottomSheet: MatBottomSheet) {
+	  this.destroyRef = inject(DestroyRef);
+  }
   
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
@@ -73,7 +82,14 @@ export class ResultTreeComponent {
 
   conceptClick(element: FinancialElement): void {
 	  //console.log(element);
-	  this.financialDataService.getFeInfo(element.id).subscribe(value => console.log(value));
+	  this.financialDataService.getFeInfo(element.id)
+	  .pipe(this.takeUntilDestroyed())
+	  .subscribe(value => {
+		  console.log(value);
+		  this.financialElement = element;
+		  this.financialElement.info = (value as FeIdInfo).info;
+		  this.bottomSheet.open(this.bsTemplate);
+	  });
   }
 
   get symbolFinancials(): SymbolFinancials[] {
@@ -126,5 +142,16 @@ export class ResultTreeComponent {
     });
     //console.log(myBySymbolElements);
     return myBySymbolElements;
+  }
+  
+  private takeUntilDestroyed<T>(): MonoTypeOperatorFunction<T> {
+    const subject = new Subject();
+
+  this.destroyRef.onDestroy(() => {
+    subject.next(true);
+    subject.complete();
+  });
+
+  return takeUntil<T>(subject.asObservable());
   }
 }

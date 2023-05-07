@@ -26,6 +26,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatTreeModule } from "@angular/material/tree";
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import { FinancialDataRoutingModule } from "./financial-data-routing.module";
 import { OverviewComponent } from "./components/overview/overview.component";
 import { ImportFinancialsComponent } from "./components/import-financials/import-financials.component";
@@ -61,6 +62,7 @@ import { ResultTreeComponent } from "./components/result-tree/result-tree.compon
     MatTreeModule,
     MatAutocompleteModule,
     DragDropModule,
+    MatBottomSheetModule,
     BaseModule,
     FinancialDataRoutingModule,
   ],

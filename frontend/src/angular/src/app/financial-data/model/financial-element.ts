@@ -17,6 +17,7 @@ export interface FinancialElement {
   financialElementType: string;
   currency: string;
   value: number;
+  info?: string;
 }
 
 export class FinancialElementExt implements FinancialElement {
@@ -27,15 +28,17 @@ export class FinancialElementExt implements FinancialElement {
     this.financialElementType = financialElement.financialElementType;
     this.currency = financialElement.currency;
     this.value = financialElement.value;
+    this.info = !financialElement?.info ? this.info : financialElement.info;
   }
 
   id: number = -1;
-  label: string = "";
-  concept: string = "";
-  financialElementType: string = "";
-  currency: string = "";
+  label: string = '';
+  concept: string = '';
+  financialElementType: string = '';
+  currency: string = '';
   value: number = 0;
   year: number = 0;
-  quarter: string = "";
-  symbol: string = "";
+  quarter: string = '';
+  symbol: string = '';
+  info: string = '';
 }
