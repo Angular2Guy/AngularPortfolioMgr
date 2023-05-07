@@ -16,6 +16,7 @@ import { MatTreeNestedDataSource } from "@angular/material/tree";
 import { FinancialElement, FinancialElementExt } from "../../model/financial-element";
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
+import { FinancialDataService } from "../../service/financial-data.service";
 
 interface ElementNode {
   name: string;
@@ -55,6 +56,8 @@ export class ResultTreeComponent {
     "quarter",
   ];
 
+  constructor(private financialDataService: FinancialDataService) {}
+  
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
 
@@ -69,7 +72,8 @@ export class ResultTreeComponent {
   }
 
   conceptClick(element: FinancialElement): void {
-	  console.log(element);
+	  //console.log(element);
+	  this.financialDataService.getFeInfo(element.id).subscribe(value => console.log(value));
   }
 
   get symbolFinancials(): SymbolFinancials[] {
