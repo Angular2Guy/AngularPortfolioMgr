@@ -17,8 +17,10 @@
         <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept"
           >Concept</mat-header-cell
         >
-        <mat-cell *matCellDef="let element" matTooltip="{{ element.label }}">
-          {{ element.concept }}
+        <mat-cell *matCellDef="let element" matTooltip="{{ element.label }}" (click)="conceptClick(element)">          
+          	<span style="white-space: nowrap;">
+          	<mat-icon inline="true" aria-hidden="false" aria-label="info" fontIcon="info_outline" style="vertical-align: middle;" class="material-symbols-outlined"></mat-icon> 
+          {{ element.concept }}</span>
         </mat-cell>
       </ng-container>
 

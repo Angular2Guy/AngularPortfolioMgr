@@ -13,7 +13,7 @@
 import { NestedTreeControl } from "@angular/cdk/tree";
 import { Component, Input } from "@angular/core";
 import { MatTreeNestedDataSource } from "@angular/material/tree";
-import { FinancialElementExt } from "../../model/financial-element";
+import { FinancialElement, FinancialElementExt } from "../../model/financial-element";
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 
@@ -66,6 +66,10 @@ export class ResultTreeComponent {
         myByElements.isOpen = this.treeControl.isExpanded(node);
       }
     });
+  }
+
+  conceptClick(element: FinancialElement): void {
+	  console.log(element);
   }
 
   get symbolFinancials(): SymbolFinancials[] {
