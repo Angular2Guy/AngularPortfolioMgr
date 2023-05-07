@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
 
 public interface FinancialElementRepository {
 	FinancialElement save(FinancialElement financialElement);
@@ -31,4 +32,5 @@ public interface FinancialElementRepository {
 	void createFinancialElementTypeIndex();
 	void dropFinancialElementTypeIndex();
 	List<FeConceptDto> findCommonFeConcepts();
+	List<FeIdInfoDto> findFeIdInfoById(Long id);
 }

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
 import ch.xxx.manager.domain.model.entity.FinancialElement;
 import ch.xxx.manager.domain.model.entity.FinancialElementRepository;
 
@@ -74,6 +75,11 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	@Override
 	public List<FeConceptDto> findCommonFeConcepts() {
 		return this.jpaFinancialElementRepository.findCommonFeConcepts(Pageable.ofSize(200));
+	}
+	
+	@Override
+	public List<FeIdInfoDto> findFeIdInfoById(Long id) {
+		return this.jpaFinancialElementRepository.findFeIdInfoById(id);
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
 import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
@@ -135,6 +136,11 @@ public class FinancialDataService {
 						.filter(StreamHelpers.distinctByKey(value -> value.getName())).toList();
 	}
 
+	@Transactional
+	public Collection<FeIdInfoDto> findFeInfo(Long id) {
+		return this.financialElementRepository.findFeIdInfoById(id);
+	}
+	
 	@Transactional
 	public Collection<SymbolFinancials> findSymbolFinancialsBySymbol(String symbol) {
 		return symbol == null || symbol.trim().isBlank() ? List.of()

@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
+import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
 import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
@@ -34,6 +36,7 @@ import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsIdParamDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.domain.model.dto.SymbolNameRc;
+import ch.xxx.manager.usecase.mapping.FinancialElementMapper;
 import ch.xxx.manager.usecase.mapping.SymbolFinancialsMapper;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 import ch.xxx.manager.usecase.service.SymbolService;
@@ -45,12 +48,14 @@ public class FinancialDataController {
 	private final SymbolService symbolService;
 	private final FinancialDataService financialDataService;
 	private final SymbolFinancialsMapper symbolFinancialsMapper;
+	private final FinancialElementMapper financialElementMapper;
 
 	public FinancialDataController(SymbolService symbolService, FinancialDataService financialDataService,
-			SymbolFinancialsMapper symbolFinancialsMapper) {
+			SymbolFinancialsMapper symbolFinancialsMapper, FinancialElementMapper financialElementMapper) {
 		this.symbolService = symbolService;
 		this.financialDataService = financialDataService;
 		this.symbolFinancialsMapper = symbolFinancialsMapper;
+		this.financialElementMapper = financialElementMapper;
 	}
 
 	@GetMapping("/financialelement/concept/all")
@@ -74,6 +79,11 @@ public class FinancialDataController {
 				.ofNullable(myDto.getConcept()).stream().anyMatch(myConcept -> myConcept.contains(concept))).toList();
 	}
 
+	@GetMapping("/financialelement/id/{id}")
+	public Collection<FeIdInfoDto> getFeInfo(@PathVariable("id") Long id) {
+		return this.financialDataService.findFeInfo(id);
+	}
+	
 	@GetMapping("/symbolfinancials/companyname/{companyname}")
 	public List<SymbolNameRc> findSymbolNameByName(@PathVariable("companyname") String companyName) {
 		return this.financialDataService.findSymbolFinancialsByName(companyName).stream()
@@ -84,7 +94,7 @@ public class FinancialDataController {
 	public List<SymbolNameRc> findSymbolNameBySymbol(@PathVariable("symbol") String symbol) {
 		return this.financialDataService.findSymbolFinancialsBySymbol(symbol).stream()
 				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
-	}
+	}		
 	
 	@PostMapping("/search/params")
 	public List<SymbolFinancialsDto> findSymbolFinancials(
