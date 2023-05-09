@@ -75,13 +75,15 @@
 </mat-tree>
 
 <ng-template #bottomSheet>
-	<div>
-		{{financialElement.concept}}
+	<div class="bs-line">
+		<span i18n="@@queryResultsConcept">Concept</span>: {{financialElement.concept}}
 	</div>
-	<div>
-		{{financialElement.label}}
+	<mat-divider></mat-divider>	
+	<div class="bs-line">
+		<span i18n="@@queryResultsLabel">Label</span>: {{financialElement.label}}
 	</div>
-	<div>
-		{{financialElement.info}}
+	<mat-divider></mat-divider>	
+	<div class="bs-line">
+		<span i18n="@@queryResultsInfo">Info</span>: {{financialElement.info}}
 	</div>
 </ng-template>
