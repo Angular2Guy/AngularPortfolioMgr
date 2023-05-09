@@ -61,19 +61,25 @@ export class FinancialDataService {
         .pipe(tap((values) => (this.feConcepts = values)));
     }
   }
-  
+
   getFeInfo(id: number): Observable<FeIdInfo> {
-	  return this.http.get<FeIdInfo>(`/rest/financialdata/financialelement/id/${id}`);
+    return this.http.get<FeIdInfo>(
+      `/rest/financialdata/financialelement/id/${id}`
+    );
   }
-  
+
   getSymbolNamesBySymbol(symbol: string): Observable<SfSymbolName[]> {
-	  return this.http.get<SfSymbolName[]>(`/rest/financialdata/symbolfinancials/symbol/${symbol}`);
+    return this.http.get<SfSymbolName[]>(
+      `/rest/financialdata/symbolfinancials/symbol/${symbol}`
+    );
   }
 
   getSymbolNamesByCompanyName(symbol: string): Observable<SfSymbolName[]> {
-	  return this.http.get<SfSymbolName[]>(`/rest/financialdata/symbolfinancials/companyname/${symbol}`);
+    return this.http.get<SfSymbolName[]>(
+      `/rest/financialdata/symbolfinancials/companyname/${symbol}`
+    );
   }
-  
+
   getCountries(): Observable<FeCountry[]> {
     if (this.feCountries.length > 0) {
       return of(this.feCountries);

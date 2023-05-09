@@ -17,10 +17,21 @@
         <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept"
           >Concept</mat-header-cell
         >
-        <mat-cell *matCellDef="let element" matTooltip="{{ element.label }}" (click)="conceptClick(element)">          
-          	<span class="single-line">
-          	<mat-icon inline="true" aria-hidden="false" aria-label="info" fontIcon="info_outline" class="align-icon"></mat-icon> 
-          {{ element.concept }}</span>
+        <mat-cell
+          *matCellDef="let element"
+          matTooltip="{{ element.label }}"
+          (click)="conceptClick(element)"
+        >
+          <span class="single-line">
+            <mat-icon
+              inline="true"
+              aria-hidden="false"
+              aria-label="info"
+              fontIcon="info_outline"
+              class="align-icon"
+            ></mat-icon>
+            {{ element.concept }}</span
+          >
         </mat-cell>
       </ng-container>
 
@@ -75,15 +86,16 @@
 </mat-tree>
 
 <ng-template #bottomSheet>
-	<div class="bs-line">
-		<span i18n="@@queryResultsConcept">Concept</span>: {{financialElement.concept}}
-	</div>
-	<mat-divider></mat-divider>	
-	<div class="bs-line">
-		<span i18n="@@queryResultsLabel">Label</span>: {{financialElement.label}}
-	</div>
-	<mat-divider></mat-divider>	
-	<div class="bs-line">
-		<span i18n="@@queryResultsInfo">Info</span>: {{financialElement.info}}
-	</div>
+  <div class="bs-line">
+    <span i18n="@@queryResultsConcept">Concept</span>:
+    {{ financialElement.concept }}
+  </div>
+  <mat-divider></mat-divider>
+  <div class="bs-line">
+    <span i18n="@@queryResultsLabel">Label</span>: {{ financialElement.label }}
+  </div>
+  <mat-divider></mat-divider>
+  <div class="bs-line">
+    <span i18n="@@queryResultsInfo">Info</span>: {{ financialElement.info }}
+  </div>
 </ng-template>

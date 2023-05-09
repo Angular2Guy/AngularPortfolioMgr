@@ -13,22 +13,22 @@
     </div>
     <div class="text-container">
       <span class="symbol-data" i18n="@@symbolStartDate"
-        >Start Date: {{ symbolData?.start | date: "mediumDate" }}</span
+        >Start Date: {{ symbolData?.start | date : "mediumDate" }}</span
       >
       <span class="symbol-data" i18n="@@symbolEndDate"
-        >End Date: {{ symbolData?.end | date: "mediumDate" }}</span
+        >End Date: {{ symbolData?.end | date : "mediumDate" }}</span
       >
       <span class="symbol-data" i18n="@@symbolOpen"
-        >Open: {{ symbolData?.open | number: "1.2-2" }}</span
+        >Open: {{ symbolData?.open | number : "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolHigh"
-        >High: {{ symbolData?.high | number: "1.2-2" }}</span
+        >High: {{ symbolData?.high | number : "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolLow"
-        >Low: {{ symbolData?.low | number: "1.2-2" }}</span
+        >Low: {{ symbolData?.low | number : "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolClose"
-        >Close: {{ symbolData?.close | number: "1.2-2" }}</span
+        >Close: {{ symbolData?.close | number : "1.2-2" }}</span
       >
     </div>
     <div class="text-container">
@@ -36,20 +36,20 @@
         >Currency: {{ symbol?.currencyKey }}</span
       >
       <span class="symbol-data" i18n="@@symbolAvgVolume"
-        >Average Volume: {{ symbolData?.avgVolume | number: "1.0-0" }}</span
+        >Average Volume: {{ symbolData?.avgVolume | number : "1.0-0" }}</span
       >
       <span class="symbol-data" i18n="@@symbolAvgClose"
-        >Average Close: {{ symbolData?.avgClose | number: "1.2-2" }}</span
+        >Average Close: {{ symbolData?.avgClose | number : "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolMedClose"
-        >Median Close: {{ symbolData?.medianClose | number: "1.2-2" }}</span
+        >Median Close: {{ symbolData?.medianClose | number : "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolVolClose"
         >Volatility Close:
         {{
           !symbolData.volatilityClose
             ? ""
-            : (symbolData.volatilityClose * 100 | number: "1.2-2")
+            : (symbolData.volatilityClose * 100 | number : "1.2-2")
         }}%</span
       >
     </div>

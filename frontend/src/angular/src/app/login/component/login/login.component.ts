@@ -87,7 +87,7 @@ export class LoginComponent implements OnInit {
     return this.pwMatching;
   }
 
-  onSigninClick(): void {	  
+  onSigninClick(): void {
     const login: Login = {
       emailAddress: null,
       token: null,
@@ -122,7 +122,7 @@ export class LoginComponent implements OnInit {
 
   private signin(login: boolean): void {
     this.data.login = null;
-    this.waitingForResponse = false;    
+    this.waitingForResponse = false;
     if (login) {
       this.signinFailed = false;
       this.dialogRef.close();
@@ -132,7 +132,7 @@ export class LoginComponent implements OnInit {
   }
 
   private login(login: Login): void {
-	  this.waitingForResponse = false;
+    this.waitingForResponse = false;
     if (login && login.token && login.id) {
       this.tokenService.token = login.token;
       this.tokenService.userId = login.id;

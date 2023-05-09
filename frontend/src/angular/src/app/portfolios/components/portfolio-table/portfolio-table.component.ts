@@ -65,43 +65,66 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
       .subscribe((myData) => (this.localPortfolio = myData));
   }
 
-  ngOnDestroy(): void {    
+  ngOnDestroy(): void {
     this.unsubscribe(this.dataSubscription);
-    this.unsubscribe(this.dialogSubscription);    
+    this.unsubscribe(this.dialogSubscription);
   }
 
-private unsubscribe(subscribtion: Subscription) {
-	if(!!subscribtion) {
-		subscribtion.unsubscribe();
-		subscribtion = null;
-	}
-}
+  private unsubscribe(subscribtion: Subscription) {
+    if (!!subscribtion) {
+      subscribtion.unsubscribe();
+      subscribtion = null;
+    }
+  }
 
   updateStock(event: MouseEvent, element: CommonValues) {
-	if(!!(element as Portfolio).symbols) {
-		return;
-	}
-	event.stopPropagation();	
-	const dialogRef = this.dialog.open(ChangeSymbolComponent, {
+    if (!!(element as Portfolio).symbols) {
+      return;
+    }
+    event.stopPropagation();
+    const dialogRef = this.dialog.open(ChangeSymbolComponent, {
       width: "500px",
       data: element,
-    });    
+    });
     this.unsubscribe(this.dialogSubscription);
-    this.dialogSubscription = dialogRef.afterClosed().subscribe((result: PortfolioElement) => {		
-		//console.log(result);
-		const myPortfolio = {createdAt: this.localPortfolio?.createdAt, currencyKey: this.localPortfolio?.currencyKey, 
-		   id: this.localPortfolio?.id, name: this.localPortfolio.name, portfolioElements: [], symbols: [], 
-		   userId: this.localPortfolio.userId} as Portfolio;
-		if(!!result && result.weight > 0) {			
-			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.putSymbolToPortfolio(myPortfolio, mySymbol.id, result.weight, result.changedAt)
-			   .subscribe(myResult => this.localPortfolio = myResult);		
-		} else if(!!result && result.weight <= 0) {
-			const mySymbol = this.localPortfolio.symbols.filter(mySymbol => mySymbol.symbol === result.symbol)[0];
-			this.portfolioService.deleteSymbolFromPortfolio(myPortfolio, mySymbol.id, result.changedAt)
-			   .subscribe(myResult => this.localPortfolio = myResult);
-		}
-	});
+    this.dialogSubscription = dialogRef
+      .afterClosed()
+      .subscribe((result: PortfolioElement) => {
+        //console.log(result);
+        const myPortfolio = {
+          createdAt: this.localPortfolio?.createdAt,
+          currencyKey: this.localPortfolio?.currencyKey,
+          id: this.localPortfolio?.id,
+          name: this.localPortfolio.name,
+          portfolioElements: [],
+          symbols: [],
+          userId: this.localPortfolio.userId,
+        } as Portfolio;
+        if (!!result && result.weight > 0) {
+          const mySymbol = this.localPortfolio.symbols.filter(
+            (mySymbol) => mySymbol.symbol === result.symbol
+          )[0];
+          this.portfolioService
+            .putSymbolToPortfolio(
+              myPortfolio,
+              mySymbol.id,
+              result.weight,
+              result.changedAt
+            )
+            .subscribe((myResult) => (this.localPortfolio = myResult));
+        } else if (!!result && result.weight <= 0) {
+          const mySymbol = this.localPortfolio.symbols.filter(
+            (mySymbol) => mySymbol.symbol === result.symbol
+          )[0];
+          this.portfolioService
+            .deleteSymbolFromPortfolio(
+              myPortfolio,
+              mySymbol.id,
+              result.changedAt
+            )
+            .subscribe((myResult) => (this.localPortfolio = myResult));
+        }
+      });
   }
 
   selPortfolio(commonValues: CommonValues) {

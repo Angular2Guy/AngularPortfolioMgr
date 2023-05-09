@@ -21,6 +21,6 @@ export interface SymbolFinancials {
   symbol: string;
   name: string;
   country: string;
-  city: string;	
+  city: string;
   financialElements: FinancialElement[];
 }

@@ -35,13 +35,11 @@ import {
   ItemType,
 } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
-import {
-  FinancialElementExt,
-} from "../../model/financial-element";
+import { FinancialElementExt } from "../../model/financial-element";
 import {
   SymbolFinancialsQueryParams,
   FinancialElementParams,
-  FilterNumber  
+  FilterNumber,
 } from "../../model/symbol-financials-query-params";
 import { Subscription } from "rxjs";
 import { switchMap, debounceTime, delay } from "rxjs/operators";
@@ -161,9 +159,11 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
       this.queryForm.controls[FormFields.Name].valueChanges
         .pipe(
           debounceTime(200),
-          switchMap((myValue) => this.financialDataService.getSymbolNamesByCompanyName(myValue))
+          switchMap((myValue) =>
+            this.financialDataService.getSymbolNamesByCompanyName(myValue)
+          )
         )
-        .subscribe((myValue) => this.sfSymbolNames = myValue)
+        .subscribe((myValue) => (this.sfSymbolNames = myValue))
     );
     this.subscriptions.push(
       this.configService.getNumberOperators().subscribe((values) => {
@@ -271,7 +271,9 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     const symbolFinancialsFilter =
       !!symbolFinancialsParams?.yearFilter?.value ||
       !!symbolFinancialsParams?.quarters?.length ||
-      !!symbolFinancialsParams?.symbol || !!symbolFinancialsParams?.country || !!symbolFinancialsParams?.name;
+      !!symbolFinancialsParams?.symbol ||
+      !!symbolFinancialsParams?.country ||
+      !!symbolFinancialsParams?.name;
     if (result.length > 0 && symbolFinancialsFilter) {
       if (!!logResults) {
         console.log(result.length);

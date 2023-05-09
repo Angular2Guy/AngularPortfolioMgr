@@ -22,7 +22,7 @@ export interface FinancialElement {
 
 export class FinancialElementExt implements FinancialElement {
   constructor(financialElement: FinancialElement) {
-	this.id = financialElement.id;
+    this.id = financialElement.id;
     this.label = financialElement.label;
     this.concept = financialElement.concept;
     this.financialElementType = financialElement.financialElementType;
@@ -32,13 +32,13 @@ export class FinancialElementExt implements FinancialElement {
   }
 
   id: number = -1;
-  label: string = '';
-  concept: string = '';
-  financialElementType: string = '';
-  currency: string = '';
+  label: string = "";
+  concept: string = "";
+  financialElementType: string = "";
+  currency: string = "";
   value: number = 0;
   year: number = 0;
-  quarter: string = '';
-  symbol: string = '';
-  info: string = '';
+  quarter: string = "";
+  symbol: string = "";
+  info: string = "";
 }

@@ -68,22 +68,17 @@ export class QueryComponent implements OnInit, OnDestroy {
     private configService: ConfigService,
     private financialDataService: FinancialDataService
   ) {
-    this.itemFormGroup = fb.group(
-      {
-        [QueryFormFields.QueryOperator]: "",
-        [QueryFormFields.ConceptOperator]: "",
-        [QueryFormFields.Concept]: ["", [Validators.required]],
-        [QueryFormFields.NumberOperator]: "",
-        [QueryFormFields.NumberValue]: [
-          0,
-          [
-            Validators.required,
-            Validators.pattern("^[+-]?(\\d+[\\,\\.])*\\d+$"),
-          ],
-        ],
-        [QueryFormFields.ItemType]: ItemType.Query,
-      }
-    );
+    this.itemFormGroup = fb.group({
+      [QueryFormFields.QueryOperator]: "",
+      [QueryFormFields.ConceptOperator]: "",
+      [QueryFormFields.Concept]: ["", [Validators.required]],
+      [QueryFormFields.NumberOperator]: "",
+      [QueryFormFields.NumberValue]: [
+        0,
+        [Validators.required, Validators.pattern("^[+-]?(\\d+[\\,\\.])*\\d+$")],
+      ],
+      [QueryFormFields.ItemType]: ItemType.Query,
+    });
   }
 
   ngOnInit(): void {
@@ -129,7 +124,6 @@ export class QueryComponent implements OnInit, OnDestroy {
       this.getOperators(400);
     }
   }
-
 
   private getOperators(delayMillis: number): void {
     setTimeout(() => {
@@ -187,7 +181,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   itemRemove(): void {
     this.removeItem.emit(this.formArrayIndex);
   }
-  
+
   get showType(): boolean {
     return this._showType;
   }
@@ -195,13 +189,13 @@ export class QueryComponent implements OnInit, OnDestroy {
   @Input()
   set showType(showType: boolean) {
     this._showType = showType;
-    if (!this.showType) {		
+    if (!this.showType) {
       const formIndex =
         this?.baseFormArray?.controls?.findIndex(
           (myControl) => myControl === this.itemFormGroup
         ) || -1;
       if (formIndex < 0) {
-		  console.log('showType showType(...)');
+        console.log("showType showType(...)");
         this.baseFormArray.insert(this.formArrayIndex, this.itemFormGroup);
       }
     } else {
@@ -210,7 +204,7 @@ export class QueryComponent implements OnInit, OnDestroy {
           (myControl) => myControl === this.itemFormGroup
         ) || -1;
       if (formIndex >= 0) {
-		  console.log('showType remove showType(...)');
+        console.log("showType remove showType(...)");
         this.baseFormArray.removeAt(formIndex);
       }
     }

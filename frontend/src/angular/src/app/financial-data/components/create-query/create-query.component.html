@@ -62,33 +62,34 @@
       </div>
     </div>
     <div class="symbol-financials-container">
-        <mat-form-field class="form-field">
-          <mat-label i18n="@@createQueryName">Name</mat-label>
-          <input
-            matInput
-            type="text"
-            [matAutocomplete]="autoName"
-            formControlName="{{ FormFields.Name }}"
-            i18n-placeholder="@@phName"
-            placeholder="name"
-          />
-          <mat-autocomplete #autoName="matAutocomplete" autoActiveFirstOption>
-            <mat-option *ngFor="let sfSymbolName of sfSymbolNames" [value]="sfSymbolName.name">
-              {{ sfSymbolName.name }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field class="form-field">
-          <mat-label i18n="@@country">Country</mat-label>
-          <mat-select
-            [formControlName]="FormFields.Country"
-            name="Country">
-            <mat-option *ngFor="let item of countryQueryItems" [value]="item">{{
-              item
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>    
+      <mat-form-field class="form-field">
+        <mat-label i18n="@@createQueryName">Name</mat-label>
+        <input
+          matInput
+          type="text"
+          [matAutocomplete]="autoName"
+          formControlName="{{ FormFields.Name }}"
+          i18n-placeholder="@@phName"
+          placeholder="name"
+        />
+        <mat-autocomplete #autoName="matAutocomplete" autoActiveFirstOption>
+          <mat-option
+            *ngFor="let sfSymbolName of sfSymbolNames"
+            [value]="sfSymbolName.name"
+          >
+            {{ sfSymbolName.name }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field class="form-field">
+        <mat-label i18n="@@country">Country</mat-label>
+        <mat-select [formControlName]="FormFields.Country" name="Country">
+          <mat-option *ngFor="let item of countryQueryItems" [value]="item">{{
+            item
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
     <div cdkDropListGroup>
       <div class="query-container">
         <h2 i18n="@@createQueryAvailableSecQueryItems">

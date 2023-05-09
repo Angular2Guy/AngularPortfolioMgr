@@ -36,8 +36,8 @@ export class MainComponent {
       width: "600px",
       data: { login: this.login },
     });
-    dialogRef.beforeClosed().subscribe((result) => {		
-      this.login = typeof result == "undefined" ? null : result;      
+    dialogRef.beforeClosed().subscribe((result) => {
+      this.login = typeof result == "undefined" ? null : result;
       if (this.login) {
         this.router.navigate(["/portfolios/overview"]);
       }
