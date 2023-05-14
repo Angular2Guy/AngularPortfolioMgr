@@ -24,13 +24,14 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
 import { PortfolioTimechartComponent } from './components/portfolio-timechart/portfolio-timechart.component';
+import { TimeChartComponent } from './components/time-chart/time-chart.component';
 
 @NgModule({
   declarations: [
     PortfolioChartsComponent,
     PortfolioComparisonComponent,
     PortfolioSectorsComponent,  
-    PortfolioTimechartComponent,  
+    PortfolioTimechartComponent, TimeChartComponent,  
   ],
   imports: [
     BaseModule,
