@@ -38,7 +38,7 @@ import { ProdConfigComponent } from "./components/prod-config/prod-config.compon
 import { DevConfigComponent } from "./components/dev-config/dev-config.component";
 import { TokenInterceptor } from "ngx-simple-charts/base-service";
 import { ChangeSymbolComponent } from "./components/change-symbol/change-symbol.component";
-import { PortfolioTimechartComponent } from './components/portfolio-timechart/portfolio-timechart.component';
+
 
 @NgModule({
   declarations: [
@@ -48,8 +48,7 @@ import { PortfolioTimechartComponent } from './components/portfolio-timechart/po
     PortfolioTableComponent,
     ProdConfigComponent,
     DevConfigComponent,
-    ChangeSymbolComponent,
-    PortfolioTimechartComponent,
+    ChangeSymbolComponent,    
   ],
   imports: [
     BaseModule,

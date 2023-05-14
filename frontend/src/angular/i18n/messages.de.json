@@ -119,6 +119,7 @@
     "month3": "3 Months",
     "year3": "3 Years",
     "portfolioChartsSectors": "Portfolio Sectors",
+    "portfolioChartsTimechart": "Portfolio Timechart",
     "portfolioChartsName": "Portfolio: {$INTERPOLATION}",
     "portfolioChartsStartDate": "Start Date: {$INTERPOLATION}",
     "portfolioSectorsLegendTitle": "Portfolio sector distribution",

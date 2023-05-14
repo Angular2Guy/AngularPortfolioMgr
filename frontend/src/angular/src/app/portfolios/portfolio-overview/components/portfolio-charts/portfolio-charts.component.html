@@ -17,5 +17,12 @@
         ></app-portfolio-sectors>
       </ng-template>
     </mat-tab>
+    <mat-tab i18n-label="@@portfolioChartsTimechart" label="Portfolio Timechart">
+      <ng-template matTabContent>
+        <app-portfolio-timechart
+          [selPortfolio]="selPortfolio"
+        ></app-portfolio-timechart>
+      </ng-template>
+    </mat-tab>
   </mat-tab-group>
 </div>

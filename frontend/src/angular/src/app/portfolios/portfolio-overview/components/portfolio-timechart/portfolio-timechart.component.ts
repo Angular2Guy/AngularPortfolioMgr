@@ -10,7 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Portfolio } from 'src/app/model/portfolio';
 
 @Component({
   selector: 'app-portfolio-timechart',
@@ -18,5 +19,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./portfolio-timechart.component.scss']
 })
 export class PortfolioTimechartComponent {
+  private localSelPortfolio: Portfolio;
+	
+  get selPortfolio(): Portfolio {
+    return this.localSelPortfolio;
+  }
 
+  @Input()
+  set selPortfolio(myPortfolio: Portfolio) {
+    this.localSelPortfolio = myPortfolio;
+  }
 }

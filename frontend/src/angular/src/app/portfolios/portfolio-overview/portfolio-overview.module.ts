@@ -23,12 +23,14 @@ import { MatRadioModule } from "@angular/material/radio";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
+import { PortfolioTimechartComponent } from './components/portfolio-timechart/portfolio-timechart.component';
 
 @NgModule({
   declarations: [
     PortfolioChartsComponent,
     PortfolioComparisonComponent,
-    PortfolioSectorsComponent,    
+    PortfolioSectorsComponent,  
+    PortfolioTimechartComponent,  
   ],
   imports: [
     BaseModule,
