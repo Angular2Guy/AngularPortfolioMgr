@@ -21,7 +21,7 @@ import {
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatTreeNestedDataSource } from "@angular/material/tree";
-import { MonoTypeOperatorFunction, Subject, takeUntil } from "rxjs";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 import { FeIdInfo } from "../../model/fe-id-info";
 import {
   FinancialElement,
@@ -69,15 +69,13 @@ export class ResultTreeComponent {
     "quarter",
   ];
   protected financialElement: FinancialElement = null;
-  protected destroyRef: DestroyRef;
 
   @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;
 
   constructor(
     private financialDataService: FinancialDataService,
-    private bottomSheet: MatBottomSheet
-  ) {
-    this.destroyRef = inject(DestroyRef);
+    private bottomSheet: MatBottomSheet    
+  ) {    
   }
 
   protected hasChild = (_: number, node: ElementNode) =>
@@ -96,8 +94,7 @@ export class ResultTreeComponent {
   conceptClick(element: FinancialElement): void {
     //console.log(element);
     this.financialDataService
-      .getFeInfo(element.id)
-      .pipe(this.takeUntilDestroyed())
+      .getFeInfo(element.id)      
       .subscribe((value) => {
         //console.log(value);
         this.financialElement = element;
@@ -156,16 +153,5 @@ export class ResultTreeComponent {
     });
     //console.log(myBySymbolElements);
     return myBySymbolElements;
-  }
-
-  private takeUntilDestroyed<T>(): MonoTypeOperatorFunction<T> {
-    const subject = new Subject();
-
-    this.destroyRef.onDestroy(() => {
-      subject.next(true);
-      subject.complete();
-    });
-
-    return takeUntil<T>(subject.asObservable());
   }
 }

@@ -10,31 +10,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit, OnDestroy } from "@angular/core";
+import { Component, Input, OnInit, DestroyRef, inject } from "@angular/core";
 import { Portfolio } from "src/app/model/portfolio";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { Subscription } from "rxjs";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../../service/portfolio.service";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-portfolio-charts",
   templateUrl: "./portfolio-charts.component.html",
   styleUrls: ["./portfolio-charts.component.scss"],
 })
-export class PortfolioChartsComponent implements OnInit, OnDestroy {
-  selPortfolio: Portfolio;
-  private dataSubscription: Subscription;
+export class PortfolioChartsComponent implements OnInit {
+  selPortfolio: Portfolio;    
   reloadData = false;
 
   constructor(
     private route: ActivatedRoute,
-    private portfolioService: PortfolioService
-  ) {}
+    private portfolioService: PortfolioService,
+    private destroyRef: DestroyRef
+  ) {
+  }
 
   ngOnInit(): void {
-    this.dataSubscription = this.route.paramMap
+    this.route.paramMap
       .pipe(
+		  takeUntilDestroyed(this.destroyRef),
         filter((params: ParamMap) => parseInt(params.get("portfolioId")) >= 0),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
@@ -45,9 +47,5 @@ export class PortfolioChartsComponent implements OnInit, OnDestroy {
         tap(() => (this.reloadData = false))
       )
       .subscribe((myData) => (this.selPortfolio = myData));
-  }
-
-  ngOnDestroy(): void {
-    this.dataSubscription.unsubscribe();
   }
 }

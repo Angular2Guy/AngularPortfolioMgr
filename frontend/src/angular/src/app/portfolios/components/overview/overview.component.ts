@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, OnDestroy } from "@angular/core";
+import { Component, OnInit, HostListener, OnDestroy, DestroyRef, inject } from "@angular/core";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
 import { PortfolioService } from "../../../service/portfolio.service";
@@ -30,13 +30,14 @@ import {
   SpinnerData,
   DialogSpinnerComponent,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-overview",
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
 })
-export class OverviewComponent implements OnInit, OnDestroy {
+export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;
   portfolios: Portfolio[] = [];
   myPortfolio!: Portfolio;
@@ -55,6 +56,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private dialogSubscription: Subscription;
   private profiles: string = null;
   private showPortfolioTable = true;
+  //private destroyRef: DestroyRef;
 
   constructor(
     private tokenService: TokenService,
@@ -63,8 +65,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
     private portfolioService: PortfolioService,
     private symbolImportService: SymbolImportService,
     private quoteImportService: QuoteImportService,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private destroyRef: DestroyRef
+  ) {
+	  this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
+  }
 
   ngOnInit() {
     this.windowHeight = window.innerHeight - 84;
@@ -72,11 +77,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.configService
       .getProfiles()
       .subscribe((value) => (this.profiles = !value ? "dev" : value));
-  }
-
-  ngOnDestroy(): void {
-    this.cleanupDialogSubcription();
-  }
+  }  
 
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
@@ -142,6 +143,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private refreshPortfolios() {
     this.portfolioService
       .getPortfolioByUserId(this.tokenService.userId as number)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((myPortfolios) => {
         myPortfolios.forEach(
           (port) => (port.symbols = !port.symbols ? [] : port.symbols)
@@ -212,7 +214,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       this.symbolImportService.getSymbolImportDe(),
       this.quoteImportService.importFxDailyQuotes("USD"),
       this.quoteImportService.importFxDailyQuotes("HKD")
-    ).subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
       console.log(
         `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
       );

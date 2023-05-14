@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, OnDestroy } from "@angular/core";
+import { Component, OnInit, HostListener, DestroyRef } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
@@ -32,7 +32,7 @@ import {
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
 })
-export class OverviewComponent implements OnInit, OnDestroy {
+export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;
   private dialogSubscription: Subscription;
   protected symbolFinancials: SymbolFinancials[] = [];
@@ -44,15 +44,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
     private tokenService: TokenService,
     private dialog: MatDialog,
     private configService: ConfigService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private destroyRef: DestroyRef
+  ) {
+	  this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
+  }
 
   ngOnInit(): void {
     this.windowHeight = window.innerHeight - 84;
-  }
-
-  ngOnDestroy(): void {
-    this.cleanupDialogSubcription();
   }
 
   private cleanupDialogSubcription(): void {

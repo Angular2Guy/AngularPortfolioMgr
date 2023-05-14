@@ -16,6 +16,8 @@ import {
   OnDestroy,
   Output,
   EventEmitter,
+  DestroyRef,
+  inject
 } from "@angular/core";
 import {
   CdkDragDrop,
@@ -41,7 +43,6 @@ import {
   FinancialElementParams,
   FilterNumber,
 } from "../../model/symbol-financials-query-params";
-import { Subscription } from "rxjs";
 import { switchMap, debounceTime, delay } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
@@ -49,6 +50,7 @@ import { FinancialDataService } from "../../service/financial-data.service";
 import { QueryFormFields } from "../query/query.component";
 import { Symbol } from "src/app/model/symbol";
 import { SfSymbolName } from "../../model/sf-symbol-name";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 export interface MyItem {
   queryItemType: ItemType;
@@ -78,13 +80,12 @@ enum FormFields {
   templateUrl: "./create-query.component.html",
   styleUrls: ["./create-query.component.scss"],
 })
-export class CreateQueryComponent implements OnInit, OnDestroy {
+export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [
     { queryItemType: ItemType.Query, title: "Query" },
     { queryItemType: ItemType.TermStart, title: "Term Start" },
     { queryItemType: ItemType.TermEnd, title: "Term End" },
-  ];
-  private subscriptions: Subscription[] = [];
+  ];  
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [
     { queryItemType: ItemType.Query, title: "Query" },
@@ -118,7 +119,8 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private symbolService: SymbolService,
     private configService: ConfigService,
-    private financialDataService: FinancialDataService
+    private financialDataService: FinancialDataService,
+    private destroyRef: DestroyRef
   ) {
     this.queryForm = fb.group(
       {
@@ -146,54 +148,42 @@ export class CreateQueryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.symbolFinancials.emit([]);
     this.financialElements.emit([]);
-    this.availableInit.forEach((myItem) => this.availableItems.push(myItem));
-    this.subscriptions.push(
+    this.availableInit.forEach((myItem) => this.availableItems.push(myItem));    
       this.queryForm.controls[FormFields.Symbol].valueChanges
         .pipe(
+			takeUntilDestroyed(this.destroyRef),
           debounceTime(200),
           switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue))
         )
-        .subscribe((myValue) => (this.symbols = myValue))
-    );
-    this.subscriptions.push(
+        .subscribe((myValue) => (this.symbols = myValue))        
       this.queryForm.controls[FormFields.Name].valueChanges
         .pipe(
+			takeUntilDestroyed(this.destroyRef),
           debounceTime(200),
           switchMap((myValue) =>
             this.financialDataService.getSymbolNamesByCompanyName(myValue)
           )
         )
         .subscribe((myValue) => (this.sfSymbolNames = myValue))
-    );
-    this.subscriptions.push(
+    
       this.configService.getNumberOperators().subscribe((values) => {
         this.yearOperators = values;
         this.queryForm.controls[FormFields.YearOperator].patchValue(
           values.filter((myValue) => myValue === "=")[0]
         );
       })
-    );
-    this.subscriptions.push(
       this.financialDataService
-        .getQuarters()
+        .getQuarters()        
         .subscribe(
           (values) =>
             (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
-        )
-    );
-    this.subscriptions.push(
+        )    
       this.financialDataService
-        .getCountries()
+        .getCountries()        
         .subscribe(
           (values) =>
             (this.countryQueryItems = values.map((myValue) => myValue.country))
         )
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((value) => value.unsubscribe());
-    this.subscriptions = null;
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {
