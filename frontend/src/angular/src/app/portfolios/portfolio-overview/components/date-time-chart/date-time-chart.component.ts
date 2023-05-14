@@ -13,10 +13,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-time-chart',
-  templateUrl: './time-chart.component.html',
-  styleUrls: ['./time-chart.component.scss']
+  selector: 'app-date-time-chart',
+  templateUrl: './date-time-chart.component.html',
+  styleUrls: ['./date-time-chart.component.scss']
 })
-export class TimeChartComponent {
+export class DateTimeChartComponent {
 
 }

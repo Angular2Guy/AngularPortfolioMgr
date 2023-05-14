@@ -12,7 +12,7 @@
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimeChartComponent } from './time-chart.component';
+import { DateTimeChartComponent } from './date-time-chart.component';
 
 /*
 describe('TimeChartComponent', () => {
