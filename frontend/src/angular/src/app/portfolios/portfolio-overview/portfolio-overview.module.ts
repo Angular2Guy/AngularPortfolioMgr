@@ -25,6 +25,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
 import { PortfolioTimechartComponent } from './components/portfolio-timechart/portfolio-timechart.component';
 import { DateTimeChartComponent } from './components/date-time-chart/date-time-chart.component';
+import { CalendarService } from "./service/calendar.service";
 
 @NgModule({
   declarations: [
@@ -45,5 +46,6 @@ import { DateTimeChartComponent } from './components/date-time-chart/date-time-c
     MatCheckboxModule,
     PortfoliosOverviewRoutingModule,
   ],
+  providers: [CalendarService]
 })
 export class PortfolioOverviewModule {}

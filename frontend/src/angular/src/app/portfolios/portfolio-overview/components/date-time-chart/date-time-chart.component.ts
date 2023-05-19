@@ -10,17 +10,53 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
-import { Item } from './model/item';
+import { Component, Input, OnInit } from '@angular/core';
+import { DateTime, Duration } from 'luxon';
+import { Item } from '../../model/item';
+import { CalendarService } from '../../service/calendar.service';
 
 @Component({
   selector: 'app-date-time-chart',
   templateUrl: './date-time-chart.component.html',
   styleUrls: ['./date-time-chart.component.scss']
 })
-export class DateTimeChartComponent {
+export class DateTimeChartComponent implements OnInit {
 	@Input({required: true})	
 	protected items: Item<Event>[];
 	@Input({required: true})
 	protected start: Date;
+	protected end: Date;
+	@Input({required: true})
+	protected showDays: boolean;
+	protected periodDays: DateTime[] = [];
+	protected periodMonths: DateTime[] = [];
+	protected periodYears: DateTime[] = [];
+	
+	constructor(protected calendarService: CalendarService) {}
+	
+    ngOnInit(): void {
+		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
+		let myItem = new Item<Event>();
+		myItem.end = new Date(0, 11,31);
+        const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
+        const openEndItems =  this.items.filter(newItem => !newItem?.end);
+        this.end = openEndItems.length > 0 ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;               
+        for(let myDay = DateTime.fromJSDate(this.start);
+        	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
+        	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
+			this.periodDays.push(myDay);			
+		}		
+		for(let myMonth = DateTime.fromJSDate(this.start); 
+			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
+			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
+			this.periodMonths.push(myMonth);
+		}
+		for(let myYear = DateTime.fromJSDate(this.start); 
+			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
+			myYear = myYear.plus(Duration.fromObject({years: 1}))) {
+			this.periodMonths.push(myYear);
+		}
+    }
+    
+    
 }

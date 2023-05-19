@@ -12,7 +12,7 @@
  */
 import { Component, Input } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
-import { Item } from '../date-time-chart/model/item';
+import { Item } from '../../model/item';
 
 @Component({
   selector: 'app-portfolio-timechart',
