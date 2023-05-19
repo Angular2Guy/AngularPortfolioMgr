@@ -10,17 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
-import { Item } from './model/item';
+import { EventEmitter } from "@angular/core";
 
-@Component({
-  selector: 'app-date-time-chart',
-  templateUrl: './date-time-chart.component.html',
-  styleUrls: ['./date-time-chart.component.scss']
-})
-export class DateTimeChartComponent {
-	@Input({required: true})	
-	protected items: Item<Event>[];
-	@Input({required: true})
-	protected start: Date;
+export class Item<T extends Event> {	
+	id: number;
+	name: string;
+	details: string;
+	start: Date;
+	end: Date;
+	eventEmitter = new EventEmitter<T>();
+	cssClass: string;
 }

@@ -12,6 +12,7 @@
  */
 import { Component, Input } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
+import { Item } from '../date-time-chart/model/item';
 
 @Component({
   selector: 'app-portfolio-timechart',
@@ -20,6 +21,8 @@ import { Portfolio } from 'src/app/model/portfolio';
 })
 export class PortfolioTimechartComponent {
   private localSelPortfolio: Portfolio;
+  protected start = new Date();
+  protected items: Item<Event>[] = [];
 	
   get selPortfolio(): Portfolio {
     return this.localSelPortfolio;
