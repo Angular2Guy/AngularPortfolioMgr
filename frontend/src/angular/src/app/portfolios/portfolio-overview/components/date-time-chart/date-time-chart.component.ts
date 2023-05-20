@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, Input, OnInit } from '@angular/core';
-import { DateTime, Duration } from 'luxon';
+import { DateTime, Duration, Interval } from 'luxon';
 import { Item } from '../../model/item';
 import { CalendarService } from '../../service/calendar.service';
 
@@ -59,4 +59,31 @@ export class DateTimeChartComponent implements OnInit {
 			this.periodYears.push(myYear);
 		}
     }
+    
+    protected calcStartPx(item: Item<Event>): number {
+		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
+		const itemInterval = Interval.fromDateTimes(chartStart, DateTime.fromJSDate(item.start));
+		const itemDays = itemInterval.length('days');
+		return itemDays * (this.DAY_WIDTH + 2);
+	}
+	
+	protected calcEndPx(item: Item<Event>): number {
+		if(!item?.end) {
+			return 0;
+		}
+		const chartEnd = DateTime.fromJSDate(this.end);
+		const itemInterval = Interval.fromDateTimes(DateTime.fromJSDate(item.end), chartEnd);
+		const itemDays = itemInterval.length('days');
+		return itemDays * (this.DAY_WIDTH + 2);
+	}	
+	
+	protected calcWidthPx(item: Item<Event>): number {
+		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});		
+		const chartEnd = DateTime.fromJSDate(this.end);		
+		const itemInterval = Interval.fromDateTimes(chartStart, chartEnd);
+		const itemDays = Math.ceil(itemInterval.length('days')); //Math.ceil() for full days 
+		//console.log(itemDays * (this.DAY_WIDTH + 2));
+		//console.log(itemDays);				
+		return (itemDays * (this.DAY_WIDTH + 2) -2) - (this.calcStartPx(item) + this.calcEndPx(item));
+	}
 }

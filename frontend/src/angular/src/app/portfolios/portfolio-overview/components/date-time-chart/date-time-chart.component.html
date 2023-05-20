@@ -9,6 +9,10 @@
 			<div *ngFor="let periodDay of periodDays" class="header-box" [class.header-sunday]="periodDay.weekday == 7"
 				[style.width.px]="DAY_WIDTH">{{periodDay.toJSDate() | date: 'dd'}}</div>	
 		</div>
+		<div class="header-line">
+			<div *ngFor="let item of items" class="header-box stock-line" [style.width.px]="calcWidthPx(item)"
+				[style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)">{{item.name}}</div>	
+		</div>
 	</ng-container>
 	<ng-container *ngIf="!showDays">
 		<div class="header-line">					
@@ -20,4 +24,5 @@
 				[style.width.px]="MONTH_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM'}}</div>
 		</div>	
 	</ng-container>
+</div>
 </div>
