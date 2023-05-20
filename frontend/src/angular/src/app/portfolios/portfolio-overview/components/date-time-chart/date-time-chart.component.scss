@@ -12,4 +12,16 @@
  */
  .header-box {	 
 	 border: 1px solid #000000;
+	 flex: 0 0 auto;
+	 text-align: center;
+ }
+ 
+ .header-line {
+	 display: flex;
+	 flex-wrap: nowrap;	 
+ }
+ 
+ .time-chart-header {
+	 padding-bottom: 15px;
+	 overflow: auto;	 	 
  }
