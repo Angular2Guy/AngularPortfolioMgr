@@ -57,6 +57,4 @@ export class DateTimeChartComponent implements OnInit {
 			this.periodMonths.push(myYear);
 		}
     }
-    
-    
 }
