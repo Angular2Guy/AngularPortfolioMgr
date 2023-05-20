@@ -1,7 +1,7 @@
 <div class="time-chart">
 	<div class="time-chart-header">
 		<div *ngIf="showDays">
-			showDays
+			<div *ngFor="let periodMonth of periodMonths" [class]="header-box" [style.width.px]="1 * calendarService.DAY_WIDTH">>{{periodMonth.toJSDate() | date[format:'MMMM YYYY']}}</div>
 		</div>
 		<div *ngIf="!showDays">
 			!showDays

@@ -45,15 +45,15 @@ export class DateTimeChartComponent implements OnInit {
         	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
         	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
 			this.periodDays.push(myDay);			
-		}		
-		for(let myMonth = DateTime.fromJSDate(this.start); 
+		}				
+		for(let myMonth = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1}); 
 			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
 			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
 			this.periodMonths.push(myMonth);
-		}
-		for(let myYear = DateTime.fromJSDate(this.start); 
-			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
-			myYear = myYear.plus(Duration.fromObject({years: 1}))) {
+		}		
+		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
+			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
+			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
 			this.periodMonths.push(myYear);
 		}
     }

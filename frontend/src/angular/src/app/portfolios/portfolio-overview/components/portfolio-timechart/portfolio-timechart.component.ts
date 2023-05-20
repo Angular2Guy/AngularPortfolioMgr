@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
 import { Item } from '../../model/item';
 
@@ -19,10 +19,21 @@ import { Item } from '../../model/item';
   templateUrl: './portfolio-timechart.component.html',
   styleUrls: ['./portfolio-timechart.component.scss']
 })
-export class PortfolioTimechartComponent {
+export class PortfolioTimechartComponent implements OnInit {
   private localSelPortfolio: Portfolio;
   protected start = new Date();
   protected items: Item<Event>[] = [];
+
+  ngOnInit(): void {
+	this.start = new Date(new Date().getFullYear() -2, new Date().getMonth(), new Date().getDate());
+	const myItem = new Item<Event>();
+	myItem.id = 1;
+	myItem.name = 'MyName';
+	myItem.details = 'MyDetails';
+	myItem.start = this.start;
+	myItem.end = new Date();
+	this.items.push(myItem);
+  }
 	
   get selPortfolio(): Portfolio {
     return this.localSelPortfolio;
