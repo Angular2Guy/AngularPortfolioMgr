@@ -31,6 +31,8 @@ export class DateTimeChartComponent implements OnInit {
 	protected periodDays: DateTime[] = [];
 	protected periodMonths: DateTime[] = [];
 	protected periodYears: DateTime[] = [];
+	protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
+	protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
 	
 	constructor(protected calendarService: CalendarService) {}
 	

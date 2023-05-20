@@ -1,12 +1,12 @@
 <div class="time-chart">
 	<div class="time-chart-header">
 		<div *ngIf="showDays">
-			<div *ngFor="let periodMonth of periodMonths" [class]="header-box" 
-				[style.width.px]="periodMonth.daysInMonth * calendarService.DAY_WIDTH">{{periodMonth.toJSDate() | date[format:'MMMM YYYY']}}</div>			
+			<div *ngFor="let periodMonth of periodMonths" class="header-box" 
+				[style.width.px]="periodMonth.daysInMonth * DAY_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM YYYY'}}</div>			
 		</div>
 		<div *ngIf="!showDays">
-			<div *ngFor="let periodYear of periodYears" [class]="header-box" 
-				[style.width.px]="periodYear.daysInYear * calendarService.DAY_WIDTH">{{periodMonth.toJSDate() | date[format:'YYYY']}}</div>
+			<div *ngFor="let periodYear of periodYears" class="header-box" 
+				[style.width.px]="12 * MONTH_WIDTH">{{periodYear.toJSDate() | date: 'YYYY'}}</div>
 		</div>
 	</div>
 </div>
