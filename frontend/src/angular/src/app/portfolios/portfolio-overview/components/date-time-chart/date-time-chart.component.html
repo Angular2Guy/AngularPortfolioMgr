@@ -6,7 +6,7 @@
 				[style.width.px]="(periodMonth.daysInMonth * (DAY_WIDTH + 2)) -2">{{periodMonth.toJSDate() | date: 'MMMM YYYY'}}</div>
 		</div>
 		<div class="header-line">
-			<div *ngFor="let periodDay of periodDays" class="header-box" 
+			<div *ngFor="let periodDay of periodDays" class="header-box" [class.header-sunday]="periodDay.weekday == 7"
 				[style.width.px]="DAY_WIDTH">{{periodDay.toJSDate() | date: 'dd'}}</div>	
 		</div>
 	</ng-container>
