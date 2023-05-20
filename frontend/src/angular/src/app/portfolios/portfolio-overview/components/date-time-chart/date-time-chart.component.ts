@@ -43,7 +43,7 @@ export class DateTimeChartComponent implements OnInit {
         const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
         const openEndItems =  this.items.filter(newItem => !newItem?.end);
         this.end = openEndItems.length > 0 ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;               
-        for(let myDay = DateTime.fromJSDate(this.start);
+        for(let myDay = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
         	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
         	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
 			this.periodDays.push(myDay);			
