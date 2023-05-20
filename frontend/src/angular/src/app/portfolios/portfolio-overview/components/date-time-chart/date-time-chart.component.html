@@ -11,9 +11,13 @@
 		</div>
 	</ng-container>
 	<ng-container *ngIf="!showDays">
-		<div *ngIf="!showDays" class="header-line">
+		<div class="header-line">					
 			<div *ngFor="let periodYear of periodYears" class="header-box" 
 				[style.width.px]="(12 * (MONTH_WIDTH + 2)) -2">{{periodYear.toJSDate() | date: 'YYYY'}}</div>
+		</div>
+		<div class="header-line">
+			<div *ngFor="let periodMonth of periodMonths" class="header-box" 
+				[style.width.px]="MONTH_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM'}}</div>
 		</div>	
 	</ng-container>
 </div>
