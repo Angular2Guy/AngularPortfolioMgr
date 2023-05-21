@@ -21,8 +21,8 @@ import { CalendarService } from '../../service/calendar.service';
   styleUrls: ['./date-time-chart.component.scss']
 })
 export class DateTimeChartComponent implements OnInit {	
-	private localItems: Item<Event>[];	
-	private localStart: Date;
+	private localItems: Item<Event>[] = [];	
+	private localStart: Date = new Date();
 	private localShowDays: boolean;
 	protected end: Date;	
 	protected periodDays: DateTime[] = [];
@@ -67,7 +67,7 @@ export class DateTimeChartComponent implements OnInit {
 		return result;
 	}
 	
-	private calcChartTime(): void {
+	private calcChartTime(): void {		
 		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
 		let myItem = new Item<Event>();
 		myItem.end = new Date(0, 11,31);
