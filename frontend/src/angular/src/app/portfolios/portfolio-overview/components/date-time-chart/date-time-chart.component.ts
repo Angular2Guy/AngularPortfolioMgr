@@ -20,14 +20,11 @@ import { CalendarService } from '../../service/calendar.service';
   templateUrl: './date-time-chart.component.html',
   styleUrls: ['./date-time-chart.component.scss']
 })
-export class DateTimeChartComponent implements OnInit {
-	@Input({required: true})	
-	protected items: Item<Event>[];
-	@Input({required: true})
-	protected start: Date;
-	protected end: Date;
-	@Input({required: true})
-	protected showDays: boolean;
+export class DateTimeChartComponent implements OnInit {	
+	private localItems: Item<Event>[];	
+	private localStart: Date;
+	private localShowDays: boolean;
+	protected end: Date;	
 	protected periodDays: DateTime[] = [];
 	protected periodMonths: DateTime[] = [];
 	protected periodYears: DateTime[] = [];
@@ -37,27 +34,7 @@ export class DateTimeChartComponent implements OnInit {
 	constructor(protected calendarService: CalendarService) {}
 	
     ngOnInit(): void {
-		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
-		let myItem = new Item<Event>();
-		myItem.end = new Date(0, 11,31);
-        const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
-        const openEndItems =  this.items.filter(newItem => !newItem?.end);
-        this.end = openEndItems.length > 0 || !this.showDays ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;               
-        for(let myDay = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
-        	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
-        	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
-			this.periodDays.push(myDay);			
-		}				
-		for(let myMonth = DateTime.fromObject({year: this.start.getFullYear(), month: !!this.showDays ? this.start.getMonth()+1 : 1, day: 1}); 
-			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
-			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
-			this.periodMonths.push(myMonth);			
-		}		
-		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
-			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
-			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
-			this.periodYears.push(myYear);
-		}
+		this.calcChartTime();
     }
     
     protected calcStartPx(item: Item<Event>): number {
@@ -88,5 +65,59 @@ export class DateTimeChartComponent implements OnInit {
 		//console.log(itemDays);		
 		const result = (itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2) -2) - (this.calcStartPx(item) + this.calcEndPx(item));
 		return result;
+	}
+	
+	private calcChartTime(): void {
+		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
+		let myItem = new Item<Event>();
+		myItem.end = new Date(0, 11,31);
+        const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
+        const openEndItems =  this.items.filter(newItem => !newItem?.end);
+        this.end = openEndItems.length > 0 || !this.showDays ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;               
+        for(let myDay = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
+        	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
+        	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
+			this.periodDays.push(myDay);			
+		}				
+		for(let myMonth = DateTime.fromObject({year: this.start.getFullYear(), month: !!this.showDays ? this.start.getMonth()+1 : 1, day: 1}); 
+			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
+			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
+			this.periodMonths.push(myMonth);			
+		}		
+		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
+			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
+			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
+			this.periodYears.push(myYear);
+		}		
+	}
+	
+	get items(): Item<Event>[] {
+		return this.localItems;
+	}
+	
+	@Input({required: true})	
+	set items(items: Item<Event>[]) {
+		this.localItems = items;
+		this.calcChartTime();
+	}
+	
+	get start(): Date {
+		return this.localStart;
+	}
+	
+	@Input({required: true})
+	set start(start: Date) {
+		this.localStart = start;
+		this.calcChartTime();
+	}
+	
+	get showDays(): boolean {
+		return this.localShowDays;
+	}
+	
+	@Input({required: true})
+	set showDays(showDays: boolean) {
+		this.localShowDays = showDays;
+		this.calcChartTime();
 	}
 }
