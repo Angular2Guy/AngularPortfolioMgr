@@ -62,7 +62,7 @@ export class DateTimeChartComponent implements OnInit {
     
     protected calcStartPx(item: Item<Event>): number {
 		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
-		const itemInterval = Interval.fromDateTimes(chartStart, DateTime.fromJSDate(item.start));
+		const itemInterval = Interval.fromDateTimes(chartStart, !!item.start ? DateTime.fromJSDate(item.start) : chartStart);
 		const itemDays = itemInterval.length('days');
 		return itemDays * (this.DAY_WIDTH + 2);
 	}
@@ -72,7 +72,7 @@ export class DateTimeChartComponent implements OnInit {
 			return 0;
 		}
 		const chartEnd = DateTime.fromJSDate(this.end);
-		const itemInterval = Interval.fromDateTimes(DateTime.fromJSDate(item.end), chartEnd);
+		const itemInterval = Interval.fromDateTimes(!!item.end ? DateTime.fromJSDate(item.end) : chartEnd, chartEnd);
 		const itemDays = itemInterval.length('days');
 		return itemDays * (this.DAY_WIDTH + 2);
 	}	

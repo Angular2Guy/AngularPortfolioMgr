@@ -10,8 +10,10 @@
 				[style.width.px]="DAY_WIDTH">{{periodDay.toJSDate() | date: 'dd'}}</div>	
 		</div>
 		<div class="header-line">
-			<div *ngFor="let item of items" class="header-box stock-line" [style.width.px]="calcWidthPx(item)"
-				[style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)">{{item.name}}</div>	
+			<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPx(item)" [class.stock-line-start]="!!item.start" 
+				[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)"
+				#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
+          		matTooltipHideDelay="3000">{{item.name}}</div>	
 		</div>
 	</ng-container>
 	<ng-container *ngIf="!showDays">

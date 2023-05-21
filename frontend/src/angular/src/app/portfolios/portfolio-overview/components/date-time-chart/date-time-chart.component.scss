@@ -33,4 +33,19 @@
  .stock-line {
 	 width: 100%;
 	 background-color: #f7f792;
+	 border-top: 1px solid #000000;
+	 border-bottom: 1px solid #000000;
+	 flex: 0 0 auto;
+	 text-align: center;	
  }
+ 
+ .stock-line-start {
+	 border-left: 1px solid #000000;
+	 border-radius: 4px;
+ }
+ 
+.stock-line-end {
+	 border-right: 1px solid #000000;
+	 border-radius: 4px;
+ }
+ 
