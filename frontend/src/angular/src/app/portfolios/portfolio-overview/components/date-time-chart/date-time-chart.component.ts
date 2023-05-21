@@ -61,29 +61,32 @@ export class DateTimeChartComponent implements OnInit {
     }
     
     protected calcStartPx(item: Item<Event>): number {
-		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
+		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: (!this.showDays ? 1 : this.start.getMonth()+1), day: 1});
 		const itemInterval = Interval.fromDateTimes(chartStart, !!item.start ? DateTime.fromJSDate(item.start) : chartStart);
-		const itemDays = itemInterval.length('days');
-		return itemDays * (this.DAY_WIDTH + 2);
+		const itemPeriods = !this.showDays ? itemInterval.length('months') : itemInterval.length('days');
+		const result = itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2);
+		return result;
 	}
 	
 	protected calcEndPx(item: Item<Event>): number {
 		if(!item?.end) {
 			return 0;
 		}
-		const chartEnd = DateTime.fromJSDate(this.end);
-		const itemInterval = Interval.fromDateTimes(!!item.end ? DateTime.fromJSDate(item.end) : chartEnd, chartEnd);
-		const itemDays = itemInterval.length('days');
-		return itemDays * (this.DAY_WIDTH + 2);
+		const chartEnd = DateTime.fromJSDate(this.end);		
+		const itemInterval = Interval.fromDateTimes(DateTime.fromJSDate(item.end), chartEnd);
+		const itemPeriods = !this.showDays ? itemInterval.length('months') : itemInterval.length('days');
+		const result = itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2);		
+		return result;
 	}	
 	
 	protected calcWidthPx(item: Item<Event>): number {
-		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});		
-		const chartEnd = DateTime.fromJSDate(this.end);		
-		const itemInterval = Interval.fromDateTimes(chartStart, chartEnd);
-		const itemDays = Math.ceil(itemInterval.length('days')); //Math.ceil() for full days 
+		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: !this.showDays ? 1 : this.start.getMonth()+1, day: 1});		
+		const chartEnd = DateTime.fromJSDate(this.end);				
+		const itemInterval = Interval.fromDateTimes(chartStart, chartEnd);		
+		const itemPeriods = !this.showDays ? itemInterval.length('months') : Math.ceil(itemInterval.length('days')); //Math.ceil() for full days 
 		//console.log(itemDays * (this.DAY_WIDTH + 2));
-		//console.log(itemDays);				
-		return (itemDays * (this.DAY_WIDTH + 2) -2) - (this.calcStartPx(item) + this.calcEndPx(item));
+		//console.log(itemDays);		
+		const result = (itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2) -2) - (this.calcStartPx(item) + this.calcEndPx(item));
+		return result;
 	}
 }

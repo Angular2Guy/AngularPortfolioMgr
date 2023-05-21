@@ -8,13 +8,7 @@
 		<div class="header-line">
 			<div *ngFor="let periodDay of periodDays" class="header-box" [class.header-sunday]="periodDay.weekday == 7"
 				[style.width.px]="DAY_WIDTH">{{periodDay.toJSDate() | date: 'dd'}}</div>	
-		</div>
-		<div class="header-line">
-			<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPx(item)" [class.stock-line-start]="!!item.start" 
-				[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)"
-				#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
-          		matTooltipHideDelay="3000"><div class="stock-name">{{item.name}}</div></div>	
-		</div>
+		</div>		
 	</ng-container>
 	<ng-container *ngIf="!showDays">
 		<div class="header-line">					
@@ -26,5 +20,13 @@
 				[style.width.px]="MONTH_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM'}}</div>
 		</div>	
 	</ng-container>
+	<div class="header-line">
+		<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPx(item)" [class.stock-line-start]="!!item.start" 
+			[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)"
+			#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
+       		matTooltipHideDelay="3000">
+       		<div class="stock-name">{{item.name}}</div>
+       	</div>	
+	</div>
 </div>
 </div>
