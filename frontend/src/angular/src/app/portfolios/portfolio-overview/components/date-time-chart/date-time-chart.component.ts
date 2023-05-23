@@ -28,6 +28,8 @@ export class DateTimeChartComponent implements OnInit {
 	protected periodDays: DateTime[] = [];
 	protected periodMonths: DateTime[] = [];
 	protected periodYears: DateTime[] = [];
+	protected monthHeaderAnchorIds: string[] = [];
+	protected yearHeaderAnchorIds: string[] = [];
 	protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
 	protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
 	
@@ -67,6 +69,20 @@ export class DateTimeChartComponent implements OnInit {
 		return result;
 	}
 	
+	protected generateHeaderAnchorId(dateTime: DateTime): string {
+		const headerAnchorId = '' + dateTime.year + '_' + dateTime.month + '_' + new Date().getMilliseconds().toString(16);		
+		return headerAnchorId;
+	}
+	
+	protected scrollToAnchorId(anchorId: string): void {
+		 const element = document.getElementById(anchorId);
+         element.scrollIntoView({
+          block: 'start',
+          behavior: 'smooth',
+          inline: 'center'
+        });
+	}
+	
 	private calcChartTime(): void {		
 		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
 		let myItem = new Item<Event>();
@@ -83,11 +99,13 @@ export class DateTimeChartComponent implements OnInit {
 			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
 			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
 			this.periodMonths.push(myMonth);			
+			this.monthHeaderAnchorIds.push('M_'+this.generateHeaderAnchorId(myMonth))
 		}		
 		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
 			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
 			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
 			this.periodYears.push(myYear);
+			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));
 		}		
 	}
 	
@@ -98,7 +116,7 @@ export class DateTimeChartComponent implements OnInit {
 	@Input({required: true})	
 	set items(items: Item<Event>[]) {
 		this.localItems = items;
-		this.calcChartTime();
+		this.calcChartTime();		
 	}
 	
 	get start(): Date {

@@ -19,5 +19,6 @@ export class Item<T extends Event> {
 	start: Date;
 	end: Date;
 	eventEmitter = new EventEmitter<T>();
-	cssClass: string;
+	cssClass = '';
+	headerAnchorId = '';
 }

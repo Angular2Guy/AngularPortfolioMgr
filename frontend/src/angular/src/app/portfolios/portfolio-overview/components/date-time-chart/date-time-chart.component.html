@@ -2,7 +2,7 @@
 	<div class="time-chart-header">
 	<ng-container *ngIf="showDays">
 		<div class="header-line">
-			<div *ngFor="let periodMonth of periodMonths" class="header-box" 
+			<div *ngFor="let periodMonth of periodMonths;let indexOfelement=index;" class="header-box" [id]="monthHeaderAnchorIds[indexOfelement]" 
 				[style.width.px]="(periodMonth.daysInMonth * (DAY_WIDTH + 2)) -2">{{periodMonth.toJSDate() | date: 'MMMM YYYY'}}</div>
 		</div>
 		<div class="header-line">
@@ -12,7 +12,7 @@
 	</ng-container>
 	<ng-container *ngIf="!showDays">
 		<div class="header-line">					
-			<div *ngFor="let periodYear of periodYears" class="header-box" 
+			<div *ngFor="let periodYear of periodYears;let indexOfelement=index;" class="header-box"  [id]="monthHeaderAnchorIds[indexOfelement]"
 				[style.width.px]="(12 * (MONTH_WIDTH + 2)) -2">{{periodYear.toJSDate() | date: 'YYYY'}}</div>
 		</div>
 		<div class="header-line">
