@@ -1,5 +1,7 @@
 <div class="time-chart">
 	<div class="time-chart-header">
+	<mat-icon class="prev-year" fontIcon="arrow_back" (click)="scrollToTime(-1)"></mat-icon>
+	<mat-icon class="next-year" fontIcon="arrow_forward" (click)="scrollToTime(1)"></mat-icon>
 	<ng-container *ngIf="showDays">
 		<div class="header-line">
 			<div *ngFor="let periodMonth of periodMonths;let indexOfelement=index;" class="header-box" [id]="monthHeaderAnchorIds[indexOfelement]" 
@@ -12,7 +14,7 @@
 	</ng-container>
 	<ng-container *ngIf="!showDays">
 		<div class="header-line">					
-			<div *ngFor="let periodYear of periodYears;let indexOfelement=index;" class="header-box"  [id]="monthHeaderAnchorIds[indexOfelement]"
+			<div *ngFor="let periodYear of periodYears;let indexOfelement=index;" class="header-box"  [id]="yearHeaderAnchorIds[indexOfelement]"
 				[style.width.px]="(12 * (MONTH_WIDTH + 2)) -2">{{periodYear.toJSDate() | date: 'YYYY'}}</div>
 		</div>
 		<div class="header-line">

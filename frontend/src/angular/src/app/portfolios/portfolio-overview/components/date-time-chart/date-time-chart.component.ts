@@ -30,6 +30,8 @@ export class DateTimeChartComponent implements OnInit {
 	protected periodYears: DateTime[] = [];
 	protected monthHeaderAnchorIds: string[] = [];
 	protected yearHeaderAnchorIds: string[] = [];
+	protected anchoreIdIndex = 0;
+	protected nextAnchorId = '';
 	protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
 	protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
 	
@@ -74,6 +76,13 @@ export class DateTimeChartComponent implements OnInit {
 		return headerAnchorId;
 	}
 	
+	protected scrollToTime(timeDiff: number): void {
+		const anchorIds = !this.showDays ? this.yearHeaderAnchorIds : this.monthHeaderAnchorIds; 
+		this.anchoreIdIndex = this.anchoreIdIndex + timeDiff < 0 ? 0 : this.anchoreIdIndex + timeDiff >= anchorIds.length ?  
+			anchorIds.length -1 : this.anchoreIdIndex + timeDiff;
+		this.scrollToAnchorId(anchorIds[this.anchoreIdIndex]);  
+	}
+	
 	protected scrollToAnchorId(anchorId: string): void {
 		 const element = document.getElementById(anchorId);
          element.scrollIntoView({
@@ -106,7 +115,8 @@ export class DateTimeChartComponent implements OnInit {
 			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
 			this.periodYears.push(myYear);
 			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));
-		}		
+		}	
+		console.log(this.yearHeaderAnchorIds);			
 	}
 	
 	get items(): Item<Event>[] {
