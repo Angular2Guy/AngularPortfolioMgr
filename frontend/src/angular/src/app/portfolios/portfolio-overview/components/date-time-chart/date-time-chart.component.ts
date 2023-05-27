@@ -105,7 +105,8 @@ export class DateTimeChartComponent implements OnInit {
         	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
 			this.periodDays.push(myDay);			
 		}
-		this.periodMonths = [];        
+		this.periodMonths = [];     
+		this.monthHeaderAnchorIds = [];   
 		for(let myMonth = DateTime.fromObject({year: this.start.getFullYear(), month: !!this.showDays ? this.start.getMonth()+1 : 1, day: 1}); 
 			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
 			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
@@ -113,6 +114,7 @@ export class DateTimeChartComponent implements OnInit {
 			this.monthHeaderAnchorIds.push('M_'+this.generateHeaderAnchorId(myMonth))
 		}
        	this.periodYears = [];
+       	this.yearHeaderAnchorIds = [];
 		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
 			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
 			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
