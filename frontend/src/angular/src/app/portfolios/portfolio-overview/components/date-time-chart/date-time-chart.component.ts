@@ -25,7 +25,7 @@ export class DateTimeChartComponent implements OnInit {
 	private localStart: Date = new Date();
 	private localShowDays: boolean;
 	protected end: Date;
-	protected dayPx = 0;	
+	protected dayPx = -10;	
 	protected periodDays: DateTime[] = [];
 	protected periodMonths: DateTime[] = [];
 	protected periodYears: DateTime[] = [];
@@ -42,33 +42,61 @@ export class DateTimeChartComponent implements OnInit {
 		this.calcChartTime();
     }        
     
-    protected calcStartPx(item: Item<Event>): number {
+    protected scrollContainer(event: Event): void {		
+		//console.log((event.target as Element).scrollLeft);
+		//console.log((event.target as Element).scrollWidth);
+		//console.log((event.target as Element).clientWidth);
+		const myScrollWidth = (event.target as Element).scrollWidth;
+		const myClientWidth = (event.target as Element).clientWidth;
+		const myScrollRight = myScrollWidth - myClientWidth - (event.target as Element).scrollLeft;
+		let myScrollDayPosition = 0;		
+		const today = DateTime.now().setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();
+		myScrollDayPosition = myScrollWidth - this.calcStartPx(today) ;
+		const leftDayContainerBoundary = myScrollDayPosition + myClientWidth < myScrollWidth ? myScrollWidth : myScrollDayPosition + myScrollWidth;
+		//const rightDayContainerBoundary = myScrollDayPosition - myClientWidth  < 0 ? 0 : myScrollDayPosition - myClientWidth;		
+		this.dayPx = myScrollWidth - leftDayContainerBoundary - myScrollRight + myScrollDayPosition;		
+		//console.log(leftDayContainerBoundary);
+		//console.log(rightDayContainerBoundary);		
+		//console.log(this.dayPx);
+		//console.log(myScrollRight);
+		//console.log(myScrollDayPosition);
+	}
+    
+    protected calcStartPx(start: Date): number {
 		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: (!this.showDays ? 1 : this.start.getMonth()+1), day: 1});
-		const itemInterval = Interval.fromDateTimes(chartStart, !!item.start ? DateTime.fromJSDate(item.start) : chartStart);
+		const itemInterval = Interval.fromDateTimes(chartStart, !!start ? DateTime.fromJSDate(start) : chartStart);
 		const itemPeriods = !this.showDays ? itemInterval.length('months') : itemInterval.length('days');
 		const result = itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2);
 		return result;
 	}
-	
-	protected calcEndPx(item: Item<Event>): number {
-		if(!item?.end) {
-			return 0;
-		}
+    
+    protected calcEndPx(end: Date): number {
 		const chartEnd = DateTime.fromJSDate(this.end);		
-		const itemInterval = Interval.fromDateTimes(DateTime.fromJSDate(item.end), chartEnd);
+		const itemInterval = Interval.fromDateTimes(DateTime.fromJSDate(end), chartEnd);
 		const itemPeriods = !this.showDays ? itemInterval.length('months') : itemInterval.length('days');
 		const result = itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2);		
 		return result;
+	}
+    
+    protected calcStartPxItem(item: Item<Event>): number {
+		return this.calcStartPx(item.start);		
+	}
+	
+	protected calcEndPxItem(item: Item<Event>): number {
+		if(!item?.end) {
+			return 0;
+		}
+		return this.calcEndPx(item.end);		
 	}	
 	
-	protected calcWidthPx(item: Item<Event>): number {
+	protected calcWidthPxItem(item: Item<Event>): number {
 		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: !this.showDays ? 1 : this.start.getMonth()+1, day: 1});		
 		const chartEnd = DateTime.fromJSDate(this.end);				
 		const itemInterval = Interval.fromDateTimes(chartStart, chartEnd);		
 		const itemPeriods = !this.showDays ? itemInterval.length('months') : Math.ceil(itemInterval.length('days')); //Math.ceil() for full days 
 		//console.log(itemDays * (this.DAY_WIDTH + 2));
 		//console.log(itemDays);		
-		const result = (itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2) -2) - (this.calcStartPx(item) + this.calcEndPx(item));
+		const result = (itemPeriods * ((!this.showDays ? this.MONTH_WIDTH : this.DAY_WIDTH) + 2) -2) - (this.calcStartPxItem(item) + this.calcEndPxItem(item));
 		return result;
 	}
 	

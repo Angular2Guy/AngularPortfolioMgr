@@ -1,8 +1,8 @@
 <div class="time-chart">
-	<div class="time-chart-header">
+	<div class="time-chart-header" (scroll)="scrollContainer($event)">
 	<mat-icon class="prev-year" fontIcon="arrow_back" (click)="scrollToTime(-1)"></mat-icon>
 	<mat-icon class="next-year" fontIcon="arrow_forward" (click)="scrollToTime(1)"></mat-icon>
-	<div class="current-time" [style.left.px]="dayPx"></div>
+	<div class="current-time" [style.right.px]="dayPx"></div>
 	<ng-container *ngIf="showDays">
 		<div class="header-line">
 			<div *ngFor="let periodMonth of periodMonths;let indexOfelement=index;" class="header-box" [id]="monthHeaderAnchorIds[indexOfelement]" 
@@ -24,8 +24,8 @@
 		</div>	
 	</ng-container>
 	<div class="header-line">
-		<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPx(item)" [class.stock-line-start]="!!item.start" 
-			[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPx(item)" [style.margin-right.px]="calcEndPx(item)"
+		<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPxItem(item)" [class.stock-line-start]="!!item.start" 
+			[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPxItem(item)" [style.margin-right.px]="calcEndPxItem(item)"
 			#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
        		matTooltipHideDelay="300">
        		<div class="stock-name">{{item.name}}</div>
