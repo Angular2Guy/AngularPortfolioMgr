@@ -11,6 +11,7 @@
    limitations under the License.
  */
 import { Component, Input, OnInit } from '@angular/core';
+import { DateTime } from 'luxon';
 import { Portfolio } from 'src/app/model/portfolio';
 import { Item } from '../../model/item';
 
@@ -24,8 +25,8 @@ export class PortfolioTimechartComponent implements OnInit {
   protected start = new Date();
   protected items: Item<Event>[] = [];
 
-  ngOnInit(): void {
-	this.start = new Date(new Date().getFullYear() -2, new Date().getMonth(), new Date().getDate());
+  ngOnInit(): void {		  
+	this.start = DateTime.now().minus({year: 2}).toJSDate();
 	const myItem = new Item<Event>();
 	myItem.id = 1;
 	myItem.name = 'MyName';

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, LOCALE_ID, OnInit } from '@angular/core';
 import { DateTime, Duration, Interval } from 'luxon';
 import { Item } from '../../model/item';
 import { CalendarService } from '../../service/calendar.service';
@@ -35,7 +35,7 @@ export class DateTimeChartComponent implements OnInit {
 	protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
 	protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
 	
-	constructor(protected calendarService: CalendarService) {}
+	constructor(protected calendarService: CalendarService, @Inject(LOCALE_ID) private locale: string) {}
 	
     ngOnInit(): void {
 		this.calcChartTime();
@@ -93,23 +93,24 @@ export class DateTimeChartComponent implements OnInit {
 	}
 	
 	private calcChartTime(): void {		
-		const endOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
+		const myEndOfYear = new Date(new Date().getFullYear(),11,31,23,59,59);
+		const endOfYear = DateTime.fromJSDate(myEndOfYear).setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();		
 		let myItem = new Item<Event>();
-		myItem.end = new Date(0, 11,31);
+		myItem.end = DateTime.fromJSDate( new Date(0, 11,31)).setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();
         const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
         const openEndItems =  this.items.filter(newItem => !newItem?.end);
         this.end = openEndItems.length > 0 || !this.showDays ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;       
         this.periodDays = [];       
         for(let myDay = DateTime.fromObject({year: this.start.getFullYear(), month: this.start.getMonth()+1, day: 1});
         	myDay.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
-        	myDay = myDay.plus(Duration.fromObject({days: 1}))) {
+        	myDay = myDay.plus({days: 1})) {
 			this.periodDays.push(myDay);			
 		}
 		this.periodMonths = [];     
 		this.monthHeaderAnchorIds = [];   
 		for(let myMonth = DateTime.fromObject({year: this.start.getFullYear(), month: !!this.showDays ? this.start.getMonth()+1 : 1, day: 1}); 
 			myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis(); 
-			myMonth = myMonth.plus(Duration.fromObject({months: 1}))) {
+			myMonth = myMonth.plus({months: 1})) {
 			this.periodMonths.push(myMonth);			
 			this.monthHeaderAnchorIds.push('M_'+this.generateHeaderAnchorId(myMonth))
 		}
@@ -117,10 +118,10 @@ export class DateTimeChartComponent implements OnInit {
        	this.yearHeaderAnchorIds = [];
 		for(let myYear = DateTime.fromObject({year: this.start.getFullYear(), month: 1, day: 1}); 
 			myYear.toMillis() <= DateTime.fromJSDate(this.end).toMillis();			 
-			myYear = myYear.plus(Duration.fromObject({years: 1}))) {				
+			myYear = myYear.plus({years: 1})) {						
 			this.periodYears.push(myYear);
-			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));
-		}					
+			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));						
+		}		
 	}
 	
 	get items(): Item<Event>[] {
@@ -139,7 +140,7 @@ export class DateTimeChartComponent implements OnInit {
 	
 	@Input({required: true})
 	set start(start: Date) {
-		this.localStart = start;
+		this.localStart = DateTime.fromJSDate(start).setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();
 		this.calcChartTime();
 	}
 	
