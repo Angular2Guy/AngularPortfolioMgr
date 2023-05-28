@@ -24,7 +24,8 @@ export class DateTimeChartComponent implements OnInit {
 	private localItems: Item<Event>[] = [];	
 	private localStart: Date = new Date();
 	private localShowDays: boolean;
-	protected end: Date;	
+	protected end: Date;
+	protected dayPx = 0;	
 	protected periodDays: DateTime[] = [];
 	protected periodMonths: DateTime[] = [];
 	protected periodYears: DateTime[] = [];
@@ -39,7 +40,7 @@ export class DateTimeChartComponent implements OnInit {
 	
     ngOnInit(): void {
 		this.calcChartTime();
-    }
+    }        
     
     protected calcStartPx(item: Item<Event>): number {
 		const chartStart = DateTime.fromObject({year: this.start.getFullYear(), month: (!this.showDays ? 1 : this.start.getMonth()+1), day: 1});
@@ -121,7 +122,15 @@ export class DateTimeChartComponent implements OnInit {
 			myYear = myYear.plus({years: 1})) {						
 			this.periodYears.push(myYear);
 			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));						
-		}		
+		}	
+		/*
+		if(!this.showDays) {
+			this.dayPx =  (12 * (this.MONTH_WIDTH + 2)) -2 * this.periodYears.length;
+		} else {
+			this.dayPx = this.periodMonths.reduce<number>((px, myPeriodMonth) => px + (myPeriodMonth.daysInMonth * (this.DAY_WIDTH + 2)) -2, 0);			
+		}
+		console.log(this.dayPx);
+		*/
 	}
 	
 	get items(): Item<Event>[] {
