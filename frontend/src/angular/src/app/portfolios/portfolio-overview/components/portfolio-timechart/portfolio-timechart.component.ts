@@ -24,6 +24,7 @@ export class PortfolioTimechartComponent implements OnInit {
   private localSelPortfolio: Portfolio;
   protected start = new Date();
   protected items: Item<Event>[] = [];
+  protected showDays = false;
 
   ngOnInit(): void {		  
 	this.start = DateTime.now().minus({year: 2}).toJSDate();
