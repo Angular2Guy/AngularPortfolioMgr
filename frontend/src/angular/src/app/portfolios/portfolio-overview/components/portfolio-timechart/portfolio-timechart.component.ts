@@ -36,11 +36,11 @@ export class PortfolioTimechartComponent implements OnInit {
 	myItem.end = new Date();
 	this.items.push(myItem);
 	myItem = new Item<Event>();
-	myItem.id = 1;
+	myItem.id = 2;
 	myItem.name = 'MyName2';
 	myItem.details = 'MyDetails2';
 	myItem.start = DateTime.now().minus({year: 1}).toJSDate();
-	myItem.end = DateTime.now().minus({month: 1}).toJSDate();
+	myItem.end = null;	
 	this.items.push(myItem);
   }
 	

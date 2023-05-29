@@ -36,7 +36,10 @@
 	 border-top: 1px solid #000000;
 	 border-bottom: 1px solid #000000;
 	 flex: 0 0 auto;
-	 text-align: center;	
+	 text-align: center;
+	 :nth-child(even) {
+		 background-color: #b6f7fa;
+	 }	
  }
  
  .stock-line-start {

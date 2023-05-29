@@ -43,7 +43,9 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
 	constructor(protected calendarService: CalendarService, @Inject(LOCALE_ID) private locale: string) {}
 	
     ngAfterViewInit(): void {
-        this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;
+        setTimeout(() => {
+        	this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;			
+		});
         //console.log(this.timeChartHeight);
     }
 	
@@ -135,7 +137,7 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
 		const endOfYear = DateTime.fromJSDate(myEndOfYear).setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();		
 		let myItem = new Item<Event>();
 		myItem.end = DateTime.fromJSDate( new Date(0, 11,31)).setLocale(this.locale).setZone(Intl.DateTimeFormat().resolvedOptions().timeZone).toJSDate();
-        const lastEndItem = this.items.reduce((acc, newItem) => acc.end.getMilliseconds() < newItem?.end.getMilliseconds() ? newItem: acc, myItem);
+        const lastEndItem = this.items.reduce((acc, newItem) => acc?.end?.getMilliseconds() < newItem?.end?.getMilliseconds() ? newItem: acc, myItem);
         const openEndItems =  this.items.filter(newItem => !newItem?.end);
         this.end = openEndItems.length > 0 || !this.showDays ? endOfYear : lastEndItem.end.getFullYear() < 1 ? endOfYear : lastEndItem.end;       
         this.periodDays = [];       
