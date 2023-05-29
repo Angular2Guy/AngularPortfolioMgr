@@ -47,7 +47,7 @@ export class OverviewComponent implements OnInit {
     private router: Router,
     private destroyRef: DestroyRef
   ) {
-	  this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
+    this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
   }
 
   ngOnInit(): void {

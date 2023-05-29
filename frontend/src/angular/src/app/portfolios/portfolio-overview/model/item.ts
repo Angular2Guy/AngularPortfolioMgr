@@ -12,13 +12,13 @@
  */
 import { EventEmitter } from "@angular/core";
 
-export class Item<T extends Event> {	
-	id: number;
-	name: string;
-	details: string;
-	start: Date;
-	end: Date;
-	eventEmitter = new EventEmitter<T>();
-	cssClass = '';
-	headerAnchorId = '';
+export class Item<T extends Event> {
+  id: number;
+  name: string;
+  details: string;
+  start: Date;
+  end: Date;
+  eventEmitter = new EventEmitter<T>();
+  cssClass = "";
+  headerAnchorId = "";
 }

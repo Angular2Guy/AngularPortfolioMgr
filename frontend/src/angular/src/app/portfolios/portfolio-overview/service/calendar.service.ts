@@ -10,14 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable()
 export class CalendarService {
   public static readonly DAY_WIDTH = 20;
   public static readonly MONTH_WIDTH = 100;
-  
-  constructor() { }
-  
-  
+
+  constructor() {}
 }

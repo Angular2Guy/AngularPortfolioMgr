@@ -74,9 +74,8 @@ export class ResultTreeComponent {
 
   constructor(
     private financialDataService: FinancialDataService,
-    private bottomSheet: MatBottomSheet    
-  ) {    
-  }
+    private bottomSheet: MatBottomSheet
+  ) {}
 
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
@@ -93,14 +92,12 @@ export class ResultTreeComponent {
 
   conceptClick(element: FinancialElement): void {
     //console.log(element);
-    this.financialDataService
-      .getFeInfo(element.id)      
-      .subscribe((value) => {
-        //console.log(value);
-        this.financialElement = element;
-        this.financialElement.info = (value as FeIdInfo).info;
-        this.bottomSheet.open(this.bsTemplate);
-      });
+    this.financialDataService.getFeInfo(element.id).subscribe((value) => {
+      //console.log(value);
+      this.financialElement = element;
+      this.financialElement.info = (value as FeIdInfo).info;
+      this.bottomSheet.open(this.bsTemplate);
+    });
   }
 
   get symbolFinancials(): SymbolFinancials[] {

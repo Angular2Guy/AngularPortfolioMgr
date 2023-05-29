@@ -10,15 +10,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { DateTime } from 'luxon';
-import { Portfolio } from 'src/app/model/portfolio';
-import { Item } from '../../model/item';
+import { Component, Input, OnInit } from "@angular/core";
+import { DateTime } from "luxon";
+import { Portfolio } from "src/app/model/portfolio";
+import { Item } from "../../model/item";
 
 @Component({
-  selector: 'app-portfolio-timechart',
-  templateUrl: './portfolio-timechart.component.html',
-  styleUrls: ['./portfolio-timechart.component.scss']
+  selector: "app-portfolio-timechart",
+  templateUrl: "./portfolio-timechart.component.html",
+  styleUrls: ["./portfolio-timechart.component.scss"],
 })
 export class PortfolioTimechartComponent implements OnInit {
   private localSelPortfolio: Portfolio;
@@ -26,24 +26,24 @@ export class PortfolioTimechartComponent implements OnInit {
   protected items: Item<Event>[] = [];
   protected showDays = false;
 
-  ngOnInit(): void {		  
-	this.start = DateTime.now().minus({year: 2}).toJSDate();
-	let myItem = new Item<Event>();
-	myItem.id = 1;
-	myItem.name = 'MyName1';
-	myItem.details = 'MyDetails1';
-	myItem.start = this.start;
-	myItem.end = new Date();
-	this.items.push(myItem);
-	myItem = new Item<Event>();
-	myItem.id = 2;
-	myItem.name = 'MyName2';
-	myItem.details = 'MyDetails2';
-	myItem.start = DateTime.now().minus({year: 1}).toJSDate();
-	myItem.end = null;	
-	this.items.push(myItem);
+  ngOnInit(): void {
+    this.start = DateTime.now().minus({ year: 2 }).toJSDate();
+    let myItem = new Item<Event>();
+    myItem.id = 1;
+    myItem.name = "MyName1";
+    myItem.details = "MyDetails1";
+    myItem.start = this.start;
+    myItem.end = new Date();
+    this.items.push(myItem);
+    myItem = new Item<Event>();
+    myItem.id = 2;
+    myItem.name = "MyName2";
+    myItem.details = "MyDetails2";
+    myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();
+    myItem.end = null;
+    this.items.push(myItem);
   }
-	
+
   get selPortfolio(): Portfolio {
     return this.localSelPortfolio;
   }

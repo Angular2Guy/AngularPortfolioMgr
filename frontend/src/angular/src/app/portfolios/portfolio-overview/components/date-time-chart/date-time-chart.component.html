@@ -1,35 +1,82 @@
 <div class="time-chart" #timeChart>
-	<div class="time-chart-header" (scroll)="scrollContainer($event)">
-	<mat-icon class="prev-year" fontIcon="arrow_back" (click)="scrollToTime(-1)"></mat-icon>
-	<mat-icon class="next-year" fontIcon="arrow_forward" (click)="scrollToTime(1)"></mat-icon>
-	<div class="current-time" [style.right.px]="dayPx" [style.height.px]="timeChartHeight"></div>
-	<ng-container *ngIf="showDays">
-		<div class="header-line">
-			<div *ngFor="let periodMonth of periodMonths;let indexOfelement=index;" class="header-box" [id]="monthHeaderAnchorIds[indexOfelement]" 
-				[style.width.px]="(periodMonth.daysInMonth * (DAY_WIDTH + 2)) -2">{{periodMonth.toJSDate() | date: 'MMMM YYYY'}}</div>
-		</div>
-		<div class="header-line">
-			<div *ngFor="let periodDay of periodDays" class="header-box" [class.header-sunday]="periodDay.weekday == 7"
-				[style.width.px]="DAY_WIDTH">{{periodDay.toJSDate() | date: 'dd'}}</div>	
-		</div>		
-	</ng-container>
-	<ng-container *ngIf="!showDays">
-		<div class="header-line">					
-			<div *ngFor="let periodYear of periodYears;let indexOfelement=index;" class="header-box"  [id]="yearHeaderAnchorIds[indexOfelement]"
-				[style.width.px]="(12 * (MONTH_WIDTH + 2)) -2">{{periodYear.toJSDate().getFullYear() }}</div>
-		</div>
-		<div class="header-line">
-			<div *ngFor="let periodMonth of periodMonths" class="header-box" 
-				[style.width.px]="MONTH_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM'}}</div>
-		</div>	
-	</ng-container>
-	<div class="header-line" *ngFor="let item of items">
-		<div class="stock-line" [style.width.px]="calcWidthPxItem(item)" [class.stock-line-start]="!!item.start" 
-			[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPxItem(item)" [style.margin-right.px]="calcEndPxItem(item)"
-			#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
-       		matTooltipHideDelay="300">
-       		<div class="stock-name">{{item.name}}</div>
-       	</div>	
-	</div>
-</div>
+  <div class="time-chart-header" (scroll)="scrollContainer($event)">
+    <mat-icon
+      class="prev-year"
+      fontIcon="arrow_back"
+      (click)="scrollToTime(-1)"
+    ></mat-icon>
+    <mat-icon
+      class="next-year"
+      fontIcon="arrow_forward"
+      (click)="scrollToTime(1)"
+    ></mat-icon>
+    <div
+      class="current-time"
+      [style.right.px]="dayPx"
+      [style.height.px]="timeChartHeight"
+    ></div>
+    <ng-container *ngIf="showDays">
+      <div class="header-line">
+        <div
+          *ngFor="let periodMonth of periodMonths; let indexOfelement = index"
+          class="header-box"
+          [id]="monthHeaderAnchorIds[indexOfelement]"
+          [style.width.px]="periodMonth.daysInMonth * (DAY_WIDTH + 2) - 2"
+        >
+          {{ periodMonth.toJSDate() | date : "MMMM YYYY" }}
+        </div>
+      </div>
+      <div class="header-line">
+        <div
+          *ngFor="let periodDay of periodDays"
+          class="header-box"
+          [class.header-sunday]="periodDay.weekday == 7"
+          [style.width.px]="DAY_WIDTH"
+        >
+          {{ periodDay.toJSDate() | date : "dd" }}
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!showDays">
+      <div class="header-line">
+        <div
+          *ngFor="let periodYear of periodYears; let indexOfelement = index"
+          class="header-box"
+          [id]="yearHeaderAnchorIds[indexOfelement]"
+          [style.width.px]="12 * (MONTH_WIDTH + 2) - 2"
+        >
+          {{ periodYear.toJSDate().getFullYear() }}
+        </div>
+      </div>
+      <div class="header-line">
+        <div
+          *ngFor="let periodMonth of periodMonths"
+          class="header-box"
+          [style.width.px]="MONTH_WIDTH"
+        >
+          {{ periodMonth.toJSDate() | date : "MMMM" }}
+        </div>
+      </div>
+    </ng-container>
+    <div class="header-line" *ngFor="let item of items">
+      <div
+        class="stock-line"
+        [style.width.px]="calcWidthPxItem(item)"
+        [class.stock-line-start]="!!item.start"
+        [class.stock-line-end]="!!item.end"
+        [style.margin-left.px]="calcStartPxItem(item)"
+        [style.margin-right.px]="calcEndPxItem(item)"
+        #tooltip="matTooltip"
+        [matTooltip]="
+          !item?.name && !item?.details
+            ? 'None'
+            : item?.name + ', ' + item?.details
+        "
+        matTooltipPosition="above"
+        matTooltipHideDelay="300"
+      >
+        <div class="stock-name">{{ item.name }}</div>
+      </div>
+    </div>
+  </div>
 </div>

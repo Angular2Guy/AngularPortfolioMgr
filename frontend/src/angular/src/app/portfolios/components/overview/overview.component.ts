@@ -10,7 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, OnDestroy, DestroyRef, inject } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  HostListener,
+  OnDestroy,
+  DestroyRef,
+  inject,
+} from "@angular/core";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
 import { PortfolioService } from "../../../service/portfolio.service";
@@ -68,7 +75,7 @@ export class OverviewComponent implements OnInit {
     private dialog: MatDialog,
     private destroyRef: DestroyRef
   ) {
-	  this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
+    this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
   }
 
   ngOnInit() {
@@ -77,7 +84,7 @@ export class OverviewComponent implements OnInit {
     this.configService
       .getProfiles()
       .subscribe((value) => (this.profiles = !value ? "dev" : value));
-  }  
+  }
 
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
@@ -214,21 +221,23 @@ export class OverviewComponent implements OnInit {
       this.symbolImportService.getSymbolImportDe(),
       this.quoteImportService.importFxDailyQuotes("USD"),
       this.quoteImportService.importFxDailyQuotes("HKD")
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
-      console.log(
-        `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
-      );
-      setTimeout(
-        () =>
-          this.symbolImportService
-            .getIndexSymbols()
-            .subscribe((resultIndex) => {
-              console.log(`Index Symbols: ${resultIndex}`);
-              this.importingSymbols = false;
-            }),
-        60000
-      );
-    });
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
+        console.log(
+          `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
+        );
+        setTimeout(
+          () =>
+            this.symbolImportService
+              .getIndexSymbols()
+              .subscribe((resultIndex) => {
+                console.log(`Index Symbols: ${resultIndex}`);
+                this.importingSymbols = false;
+              }),
+          60000
+        );
+      });
   }
 
   logout(): void {

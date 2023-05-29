@@ -17,7 +17,7 @@ import {
   Output,
   EventEmitter,
   DestroyRef,
-  inject
+  inject,
 } from "@angular/core";
 import {
   CdkDragDrop,
@@ -85,7 +85,7 @@ export class CreateQueryComponent implements OnInit {
     { queryItemType: ItemType.Query, title: "Query" },
     { queryItemType: ItemType.TermStart, title: "Term Start" },
     { queryItemType: ItemType.TermEnd, title: "Term End" },
-  ];  
+  ];
   protected availableItems: MyItem[] = [];
   protected queryItems: MyItem[] = [
     { queryItemType: ItemType.Query, title: "Query" },
@@ -148,42 +148,42 @@ export class CreateQueryComponent implements OnInit {
   ngOnInit(): void {
     this.symbolFinancials.emit([]);
     this.financialElements.emit([]);
-    this.availableInit.forEach((myItem) => this.availableItems.push(myItem));    
-      this.queryForm.controls[FormFields.Symbol].valueChanges
-        .pipe(
-			takeUntilDestroyed(this.destroyRef),
-          debounceTime(200),
-          switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue))
+    this.availableInit.forEach((myItem) => this.availableItems.push(myItem));
+    this.queryForm.controls[FormFields.Symbol].valueChanges
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        debounceTime(200),
+        switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue))
+      )
+      .subscribe((myValue) => (this.symbols = myValue));
+    this.queryForm.controls[FormFields.Name].valueChanges
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        debounceTime(200),
+        switchMap((myValue) =>
+          this.financialDataService.getSymbolNamesByCompanyName(myValue)
         )
-        .subscribe((myValue) => (this.symbols = myValue))        
-      this.queryForm.controls[FormFields.Name].valueChanges
-        .pipe(
-			takeUntilDestroyed(this.destroyRef),
-          debounceTime(200),
-          switchMap((myValue) =>
-            this.financialDataService.getSymbolNamesByCompanyName(myValue)
-          )
-        )
-        .subscribe((myValue) => (this.sfSymbolNames = myValue))
-    
-      this.configService.getNumberOperators().subscribe((values) => {
-        this.yearOperators = values;
-        this.queryForm.controls[FormFields.YearOperator].patchValue(
-          values.filter((myValue) => myValue === "=")[0]
-        );
-      })
-      this.financialDataService
-        .getQuarters()        
-        .subscribe(
-          (values) =>
-            (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
-        )    
-      this.financialDataService
-        .getCountries()        
-        .subscribe(
-          (values) =>
-            (this.countryQueryItems = values.map((myValue) => myValue.country))
-        )
+      )
+      .subscribe((myValue) => (this.sfSymbolNames = myValue));
+
+    this.configService.getNumberOperators().subscribe((values) => {
+      this.yearOperators = values;
+      this.queryForm.controls[FormFields.YearOperator].patchValue(
+        values.filter((myValue) => myValue === "=")[0]
+      );
+    });
+    this.financialDataService
+      .getQuarters()
+      .subscribe(
+        (values) =>
+          (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
+      );
+    this.financialDataService
+      .getCountries()
+      .subscribe(
+        (values) =>
+          (this.countryQueryItems = values.map((myValue) => myValue.country))
+      );
   }
 
   drop(event: CdkDragDrop<MyItem[]>) {

@@ -13,13 +13,15 @@
 import { DestroyRef } from "@angular/core";
 import { MonoTypeOperatorFunction, Subject, takeUntil } from "rxjs";
 
-export function takeUntilDestroyed<T>(destroyRef: DestroyRef): MonoTypeOperatorFunction<T> {
-    const subject = new Subject();
+export function takeUntilDestroyed<T>(
+  destroyRef: DestroyRef
+): MonoTypeOperatorFunction<T> {
+  const subject = new Subject();
 
-    destroyRef.onDestroy(() => {
-      subject.next(true);
-      subject.complete();
-    });
+  destroyRef.onDestroy(() => {
+    subject.next(true);
+    subject.complete();
+  });
 
-    return takeUntil<T>(subject.asObservable());
+  return takeUntil<T>(subject.asObservable());
 }

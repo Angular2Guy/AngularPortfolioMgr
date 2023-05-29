@@ -22,19 +22,19 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
-import { PortfolioTimechartComponent } from './components/portfolio-timechart/portfolio-timechart.component';
-import { DateTimeChartComponent } from './components/date-time-chart/date-time-chart.component';
+import { PortfolioTimechartComponent } from "./components/portfolio-timechart/portfolio-timechart.component";
+import { DateTimeChartComponent } from "./components/date-time-chart/date-time-chart.component";
 import { CalendarService } from "./service/calendar.service";
 
 @NgModule({
   declarations: [
     PortfolioChartsComponent,
     PortfolioComparisonComponent,
-    PortfolioSectorsComponent,  
-    PortfolioTimechartComponent, 
-    DateTimeChartComponent,  
+    PortfolioSectorsComponent,
+    PortfolioTimechartComponent,
+    DateTimeChartComponent,
   ],
   imports: [
     BaseModule,
@@ -48,6 +48,6 @@ import { CalendarService } from "./service/calendar.service";
     MatTooltipModule,
     PortfoliosOverviewRoutingModule,
   ],
-  providers: [CalendarService]
+  providers: [CalendarService],
 })
 export class PortfolioOverviewModule {}

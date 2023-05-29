@@ -70,10 +70,12 @@ export class QueryComponent implements OnInit {
     private configService: ConfigService,
     private financialDataService: FinancialDataService,
     private destroyRef: DestroyRef
-  ) {	 
-	  this.destroyRef.onDestroy(() => {if (!this.showType) {
-      this.baseFormArray.removeAt(this.formArrayIndex);
-    }})
+  ) {
+    this.destroyRef.onDestroy(() => {
+      if (!this.showType) {
+        this.baseFormArray.removeAt(this.formArrayIndex);
+      }
+    });
     this.itemFormGroup = fb.group({
       [QueryFormFields.QueryOperator]: "",
       [QueryFormFields.ConceptOperator]: "",
@@ -87,25 +89,24 @@ export class QueryComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {    
-      this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges
-        .pipe(takeUntilDestroyed(this.destroyRef), 
-           debounceTime(200))
-        .subscribe((myValue) =>
-          this.financialDataService
-            .getConcepts()
-            .subscribe(
-              (myConceptList) =>
-                (this.concepts = myConceptList.filter((myConcept) =>
-                  FinancialsDataUtils.compareStrings(
-                    myConcept.concept,
-                    myValue,
-                    this.itemFormGroup.controls[QueryFormFields.ConceptOperator]
-                      .value
-                  )
-                ))
-            )
-        )
+  ngOnInit(): void {
+    this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200))
+      .subscribe((myValue) =>
+        this.financialDataService
+          .getConcepts()
+          .subscribe(
+            (myConceptList) =>
+              (this.concepts = myConceptList.filter((myConcept) =>
+                FinancialsDataUtils.compareStrings(
+                  myConcept.concept,
+                  myValue,
+                  this.itemFormGroup.controls[QueryFormFields.ConceptOperator]
+                    .value
+                )
+              ))
+          )
+      );
     this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(
       this.queryItemType
     );
@@ -131,39 +132,37 @@ export class QueryComponent implements OnInit {
   }
 
   private getOperators(delayMillis: number): void {
-    setTimeout(() => {      
-        this.financialDataService
-          .getConcepts()
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe
-          //myValues => console.log(myValues)
-          ()
-        this.configService.getNumberOperators().subscribe((values) => {
-          this.numberQueryItems = values;
-          this.itemFormGroup.controls[
-            QueryFormFields.NumberOperator
-          ].patchValue(values.filter((myValue) => "=" === myValue)[0]);
-        })      
-        this.configService.getStringOperators().subscribe((values) => {
-          this.stringQueryItems = values;
-          this.itemFormGroup.controls[
-            QueryFormFields.ConceptOperator
-          ].patchValue(
-            values.filter((myValue) => this.containsOperator === myValue)[0]
-          );
-        })      
+    setTimeout(() => {
+      this.financialDataService
+        .getConcepts()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe
+        //myValues => console.log(myValues)
+        ();
+      this.configService.getNumberOperators().subscribe((values) => {
+        this.numberQueryItems = values;
+        this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(
+          values.filter((myValue) => "=" === myValue)[0]
+        );
+      });
+      this.configService.getStringOperators().subscribe((values) => {
+        this.stringQueryItems = values;
+        this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(
+          values.filter((myValue) => this.containsOperator === myValue)[0]
+        );
+      });
       if (ItemType.TermEnd === this.queryItemType) {
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
           "End"
         );
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].disable();
-      } else {        
-          this.configService.getQueryOperators().subscribe((values) => {
-            this.termQueryItems = values;
-            this.itemFormGroup.controls[
-              QueryFormFields.QueryOperator
-            ].patchValue(values.filter((myValue) => "And" === myValue)[0]);
-          })
+      } else {
+        this.configService.getQueryOperators().subscribe((values) => {
+          this.termQueryItems = values;
+          this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
+            values.filter((myValue) => "And" === myValue)[0]
+          );
+        });
       }
     }, delayMillis);
   }

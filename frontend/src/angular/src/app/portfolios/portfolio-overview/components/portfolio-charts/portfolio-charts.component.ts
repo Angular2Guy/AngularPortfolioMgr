@@ -23,20 +23,19 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
   styleUrls: ["./portfolio-charts.component.scss"],
 })
 export class PortfolioChartsComponent implements OnInit {
-  selPortfolio: Portfolio;    
+  selPortfolio: Portfolio;
   reloadData = false;
 
   constructor(
     private route: ActivatedRoute,
     private portfolioService: PortfolioService,
     private destroyRef: DestroyRef
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
-		  takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(this.destroyRef),
         filter((params: ParamMap) => parseInt(params.get("portfolioId")) >= 0),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
