@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { AfterViewInit, Component, ElementRef, Inject, Input, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
-import { DateTime, Duration, Interval } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { Item } from '../../model/item';
 import { CalendarService } from '../../service/calendar.service';
 
@@ -162,14 +162,6 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
 			this.periodYears.push(myYear);
 			this.yearHeaderAnchorIds.push('Y_'+this.generateHeaderAnchorId(myYear));						
 		}	
-		/*
-		if(!this.showDays) {
-			this.dayPx =  (12 * (this.MONTH_WIDTH + 2)) -2 * this.periodYears.length;
-		} else {
-			this.dayPx = this.periodMonths.reduce<number>((px, myPeriodMonth) => px + (myPeriodMonth.daysInMonth * (this.DAY_WIDTH + 2)) -2, 0);			
-		}
-		console.log(this.dayPx);
-		*/
 	}
 	
 	get items(): Item<Event>[] {
