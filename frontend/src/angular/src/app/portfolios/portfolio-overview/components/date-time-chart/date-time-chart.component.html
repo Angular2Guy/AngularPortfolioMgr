@@ -23,8 +23,8 @@
 				[style.width.px]="MONTH_WIDTH">{{periodMonth.toJSDate() | date: 'MMMM'}}</div>
 		</div>	
 	</ng-container>
-	<div class="header-line">
-		<div *ngFor="let item of items" class="stock-line" [style.width.px]="calcWidthPxItem(item)" [class.stock-line-start]="!!item.start" 
+	<div class="header-line" *ngFor="let item of items">
+		<div class="stock-line" [style.width.px]="calcWidthPxItem(item)" [class.stock-line-start]="!!item.start" 
 			[class.stock-line-end]="!!item.end" [style.margin-left.px]="calcStartPxItem(item)" [style.margin-right.px]="calcEndPxItem(item)"
 			#tooltip="matTooltip" [matTooltip]="!item?.name && !item?.details ? 'None' : item?.name + ', '+ item?.details" matTooltipPosition="above"
        		matTooltipHideDelay="300">

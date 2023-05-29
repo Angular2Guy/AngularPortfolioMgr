@@ -28,12 +28,19 @@ export class PortfolioTimechartComponent implements OnInit {
 
   ngOnInit(): void {		  
 	this.start = DateTime.now().minus({year: 2}).toJSDate();
-	const myItem = new Item<Event>();
+	let myItem = new Item<Event>();
 	myItem.id = 1;
-	myItem.name = 'MyName';
-	myItem.details = 'MyDetails';
+	myItem.name = 'MyName1';
+	myItem.details = 'MyDetails1';
 	myItem.start = this.start;
 	myItem.end = new Date();
+	this.items.push(myItem);
+	myItem = new Item<Event>();
+	myItem.id = 1;
+	myItem.name = 'MyName2';
+	myItem.details = 'MyDetails2';
+	myItem.start = DateTime.now().minus({year: 1}).toJSDate();
+	myItem.end = DateTime.now().minus({month: 1}).toJSDate();
 	this.items.push(myItem);
   }
 	
