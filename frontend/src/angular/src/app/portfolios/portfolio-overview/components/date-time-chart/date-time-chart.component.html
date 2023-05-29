@@ -1,8 +1,8 @@
-<div class="time-chart">
+<div class="time-chart" #timeChart>
 	<div class="time-chart-header" (scroll)="scrollContainer($event)">
 	<mat-icon class="prev-year" fontIcon="arrow_back" (click)="scrollToTime(-1)"></mat-icon>
 	<mat-icon class="next-year" fontIcon="arrow_forward" (click)="scrollToTime(1)"></mat-icon>
-	<div class="current-time" [style.right.px]="dayPx"></div>
+	<div class="current-time" [style.right.px]="dayPx" [style.height.px]="timeChartHeight"></div>
 	<ng-container *ngIf="showDays">
 		<div class="header-line">
 			<div *ngFor="let periodMonth of periodMonths;let indexOfelement=index;" class="header-box" [id]="monthHeaderAnchorIds[indexOfelement]" 

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Inject, Input, LOCALE_ID, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, Input, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
 import { DateTime, Duration, Interval } from 'luxon';
 import { Item } from '../../model/item';
 import { CalendarService } from '../../service/calendar.service';
@@ -20,7 +20,7 @@ import { CalendarService } from '../../service/calendar.service';
   templateUrl: './date-time-chart.component.html',
   styleUrls: ['./date-time-chart.component.scss']
 })
-export class DateTimeChartComponent implements OnInit {	
+export class DateTimeChartComponent implements OnInit, AfterViewInit {	
 	private localItems: Item<Event>[] = [];	
 	private localStart: Date = new Date();
 	private localShowDays: boolean;
@@ -33,10 +33,19 @@ export class DateTimeChartComponent implements OnInit {
 	protected yearHeaderAnchorIds: string[] = [];
 	protected anchoreIdIndex = 0;
 	protected nextAnchorId = '';
+	protected timeChartHeight = 0;
 	protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
 	protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
 	
+	@ViewChild('timeChart')
+	private timeChartRef: ElementRef;
+	
 	constructor(protected calendarService: CalendarService, @Inject(LOCALE_ID) private locale: string) {}
+	
+    ngAfterViewInit(): void {
+        this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;
+        //console.log(this.timeChartHeight);
+    }
 	
     ngOnInit(): void {
 		this.calcChartTime();
