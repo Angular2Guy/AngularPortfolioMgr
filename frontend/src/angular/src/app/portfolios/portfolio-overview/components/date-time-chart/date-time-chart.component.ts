@@ -45,6 +45,7 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
   protected timeChartHeight = 0;
   protected readonly DAY_WIDTH = CalendarService.DAY_WIDTH;
   protected readonly MONTH_WIDTH = CalendarService.MONTH_WIDTH;
+  protected readonly CURRENT_TIME = "currentTime";
 
   @ViewChild("timeChart")
   private timeChartRef: ElementRef;
@@ -56,8 +57,17 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;
+      this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;      
     });
+    setTimeout(() => {
+		console.log('afterViewInit');
+		let myPeriods = !this.showDays ? this.periodYears : this.periodMonths;
+		myPeriods = myPeriods.filter(myPeriod => myPeriod.diffNow().seconds <= 0);
+		const myPeriodIndex = myPeriods.length === 0 ? -1 : myPeriods.length-1;
+		if(myPeriodIndex >= 0) { 
+			this.scrollToAnchorId(!this.showDays ? this.yearHeaderAnchorIds[myPeriodIndex] : this.monthHeaderAnchorIds[myPeriodIndex]);
+		}		
+	}, 1000);
     //console.log(this.timeChartHeight);
   }
 
@@ -188,7 +198,7 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
     element.scrollIntoView({
       block: "start",
       behavior: "smooth",
-      inline: "center",
+      inline: "nearest",
     });
   }
 
@@ -259,6 +269,7 @@ export class DateTimeChartComponent implements OnInit, AfterViewInit {
       this.periodYears.push(myYear);
       this.yearHeaderAnchorIds.push("Y_" + this.generateHeaderAnchorId(myYear));
     }
+    console.log('onInit');
   }
 
   get items(): Item<Event>[] {

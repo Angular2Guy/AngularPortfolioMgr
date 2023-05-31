@@ -11,7 +11,8 @@
       (click)="scrollToTime(1)"
     ></mat-icon>
     <div
-      class="current-time"
+      class="current-time"       
+      [id]="CURRENT_TIME"
       [style.right.px]="dayPx"
       [style.height.px]="timeChartHeight"
     ></div>
