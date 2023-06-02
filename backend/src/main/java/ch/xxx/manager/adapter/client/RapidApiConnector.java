@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 import ch.xxx.manager.usecase.service.RapidApiClient;
+import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -33,7 +34,7 @@ public class RapidApiConnector implements RapidApiClient {
 	@Value("${show.api.key}")
 	private String showApiKey;
 
-	@jakarta.annotation.PostConstruct
+	@PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
 			LOGGER.info("RapidApiKey: " + apiKey);

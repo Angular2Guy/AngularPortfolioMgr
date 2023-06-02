@@ -49,6 +49,10 @@ public class AppUser {
 	private boolean locked;
 	private boolean enabled;
 	private String uuid;
+	//500 calls a day and 5 a min
+	//private String alphavantageKey;
+	//500 calls a month (only for company info)
+	//private String rapidApiKey;
 	@OneToMany(mappedBy = "appUser")
 	private Set<Portfolio> portfolios = new HashSet<>();
 	

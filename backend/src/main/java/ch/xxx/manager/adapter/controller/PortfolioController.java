@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -60,8 +61,11 @@ public class PortfolioController {
 	}
 
 	@GetMapping("/id/{portfolioId}")
-	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId) {
-		return this.portfolioMapper.toDtoFiltered(this.portfolioService.getPortfolioById(portfolioId));
+	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId,
+			@RequestParam(required = false) Optional<String> withHistory) {
+		return withHistory.stream().filter(myString -> "true".equalsIgnoreCase(myString))
+				.map(xxx -> this.portfolioMapper.toDto(this.portfolioService.getPortfolioById(portfolioId))).findFirst()
+				.orElse(this.portfolioMapper.toDtoFiltered(this.portfolioService.getPortfolioById(portfolioId)));
 	}
 
 	@GetMapping("/id/{portfolioId}/start/{start}")
