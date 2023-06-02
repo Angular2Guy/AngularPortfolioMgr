@@ -20,7 +20,7 @@
   background-color: #adffb0;
 }
 
-.header-line {
+.chart-line {
   display: flex;
   flex-wrap: nowrap;
 }
@@ -39,7 +39,7 @@
   text-align: center;
 }
 
-.header-line:nth-child(odd) .stock-line {
+.chart-line:nth-child(odd) .stock-line {
   background-color: #b6f7fa;
 }
 

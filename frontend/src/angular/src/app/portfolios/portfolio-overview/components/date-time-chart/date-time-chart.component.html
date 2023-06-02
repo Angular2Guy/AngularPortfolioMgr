@@ -17,7 +17,7 @@
       [style.height.px]="timeChartHeight"
     ></div>
     <ng-container *ngIf="showDays">
-      <div class="header-line">
+      <div class="chart-line">
         <div
           *ngFor="let periodMonth of periodMonths; let indexOfelement = index"
           class="header-box"
@@ -27,7 +27,7 @@
           {{ periodMonth.toJSDate() | date : "MMMM YYYY" }}
         </div>
       </div>
-      <div class="header-line">
+      <div class="chart-line">
         <div
           *ngFor="let periodDay of periodDays"
           class="header-box"
@@ -39,7 +39,7 @@
       </div>
     </ng-container>
     <ng-container *ngIf="!showDays">
-      <div class="header-line">
+      <div class="chart-line">
         <div
           *ngFor="let periodYear of periodYears; let indexOfelement = index"
           class="header-box"
@@ -49,7 +49,7 @@
           {{ periodYear.toJSDate().getFullYear() }}
         </div>
       </div>
-      <div class="header-line">
+      <div class="chart-line">
         <div
           *ngFor="let periodMonth of periodMonths"
           class="header-box"
@@ -59,7 +59,7 @@
         </div>
       </div>
     </ng-container>
-    <div class="header-line" *ngFor="let item of items">
+    <div class="chart-line" *ngFor="let item of items">
       <div
         class="stock-line"
         [style.width.px]="calcWidthPxItem(item)"
