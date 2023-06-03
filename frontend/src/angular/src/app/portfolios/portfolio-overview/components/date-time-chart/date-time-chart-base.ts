@@ -15,7 +15,7 @@ import { Item } from "../../model/item";
 import { CalendarService } from "../../service/calendar.service";
 
 export class DateTimeChartBase {
-  protected localStart: Date = new Date();
+  protected localStart = new Date();
   protected localShowDays: boolean;
   protected end: Date;
   protected localItems: Item<Event>[] = [];
@@ -30,6 +30,17 @@ export class DateTimeChartBase {
   constructor(protected locale: string) {}	 
   
   protected calcChartTime(): void {
+	this.localStart = !this.localStart ? new Date() : this.localStart;
+	if(this.localItems.length < 1) {
+		return;
+	}
+	this.localStart = this.localItems.map(myItem => myItem.start)
+	  .reduce((acc, myItem) => myItem.valueOf() < acc.valueOf() ? myItem : acc, new Date());
+	//console.log(this.localStart);
+	const startOfChart = DateTime.fromJSDate(this.localStart)
+      .setLocale(this.locale)
+      .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+      .toJSDate();
     const myEndOfYear = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
     const endOfYear = DateTime.fromJSDate(myEndOfYear)
       .setLocale(this.locale)
@@ -42,7 +53,7 @@ export class DateTimeChartBase {
       .toJSDate();
     const lastEndItem = this.localItems.reduce(
       (acc, newItem) =>
-        acc?.end?.getMilliseconds() < newItem?.end?.getMilliseconds()
+        acc?.end?.valueOf() < newItem?.end?.valueOf()
           ? newItem
           : acc,
       myItem
@@ -65,9 +76,9 @@ export class DateTimeChartBase {
       myDay = myDay.plus({ days: 1 })
     ) {
       this.periodDays.push(myDay);
-    }
-    this.periodMonths = [];
-    this.monthHeaderAnchorIds = [];
+    }    
+    this.periodMonths = [];    
+    this.monthHeaderAnchorIds = [];        
     for (
       let myMonth = DateTime.fromObject({
         year: this.localStart.getFullYear(),
@@ -77,7 +88,7 @@ export class DateTimeChartBase {
       myMonth.toMillis() <= DateTime.fromJSDate(this.end).toMillis();
       myMonth = myMonth.plus({ months: 1 })
     ) {
-      this.periodMonths.push(myMonth);
+	  this.periodMonths.push(myMonth);
       this.monthHeaderAnchorIds.push(
         "M_" + this.generateHeaderAnchorId(myMonth)
       );
@@ -96,7 +107,7 @@ export class DateTimeChartBase {
       this.periodYears.push(myYear);
       this.yearHeaderAnchorIds.push("Y_" + this.generateHeaderAnchorId(myYear));
     }
-    //console.log('onInit');
+    //console.log(`start: ${this.localStart} end: ${this.end}`);
   }
   
   protected generateHeaderAnchorId(dateTime: DateTime): string {

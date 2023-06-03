@@ -45,10 +45,8 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
 	  super(locale);
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;      
-    });
+  ngAfterViewInit(): void {    
+	this.calcTimeChartHeight();
     setTimeout(() => {
 		//console.log('afterViewInit');
 		let myPeriods = !this.showDays ? this.periodYears : this.periodMonths;
@@ -63,6 +61,12 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
 
   ngOnInit(): void {
     this.calcChartTime();
+  }
+
+  protected calcTimeChartHeight(): void {
+	setTimeout(() => {
+      this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;      
+    });
   }
 
   protected scrollContainer(event: Event): void {
@@ -186,22 +190,24 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   }
 
   @Input({ required: true })
-  set items(items: Item<Event>[]) {
+  set items(items: Item<Event>[]) {		
     this.localItems = items;
     this.calcChartTime();
+    this.calcTimeChartHeight();
   }
 
   get start(): Date {
     return this.localStart;
   }
 
-  @Input({ required: true })
+  @Input()
   set start(start: Date) {
     this.localStart = DateTime.fromJSDate(start)
       .setLocale(this.locale)
       .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
       .toJSDate();
     this.calcChartTime();
+    this.calcTimeChartHeight();
   }
 
   get showDays(): boolean {
@@ -212,5 +218,6 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   set showDays(showDays: boolean) {
     this.localShowDays = showDays;
     this.calcChartTime();
+    this.calcTimeChartHeight();
   }
 }
