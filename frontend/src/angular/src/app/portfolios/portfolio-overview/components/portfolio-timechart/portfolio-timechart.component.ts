@@ -45,7 +45,7 @@ export class PortfolioTimechartComponent implements OnInit {
 		const myItems: Item<Event>[] = [];
 		let myIndex = 0;
 		myMap.forEach((myValue,myKey) => {
-		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() > value.valueOf() ? value : acc);
+		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() < value.valueOf() ? value : acc);
 		    const myEndItem = myValue.reduce((acc,value) => acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc);
 		    const myEnd = !myEndItem?.removedAt ? null : new Date(myEndItem.removedAt);
 			let myItem = new Item<Event>();
@@ -58,7 +58,8 @@ export class PortfolioTimechartComponent implements OnInit {
 			myItem.id = myIndex;
 			myIndex = myIndex++;
 			myItems.push(myItem);
-		});			
+		});		
+		//console.log(myItems);	
 		this.items = myItems;		    
 	});	
     /*

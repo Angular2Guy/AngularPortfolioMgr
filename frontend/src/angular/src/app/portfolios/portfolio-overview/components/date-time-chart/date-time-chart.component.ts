@@ -24,6 +24,11 @@ import { DateTime, Interval } from "luxon";
 import { Item } from "../../model/item";
 import { DateTimeChartBase } from "./date-time-chart-base";
 
+interface LineKeyToItems {
+	lineKey: string;
+	items: Item<Event>[];
+}
+
 @Component({
   selector: "app-date-time-chart",
   templateUrl: "./date-time-chart.component.html",
@@ -34,6 +39,7 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   protected anchoreIdIndex = 0;
   protected nextAnchorId = "";
   protected timeChartHeight = 0;
+  protected lineKeyToItems: LineKeyToItems[] = [];   
   protected readonly CURRENT_TIME = "currentTime";
 
   @ViewChild("timeChart")
@@ -185,6 +191,20 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
     });
   }
 
+  private updateLineKeyToItems(): void {
+	const lineKeyToItems = new Map<string,Item<Event>[]>();			 
+    this.localItems.forEach(myItem => {
+	  const myItems = !lineKeyToItems[myItem.lineId] ? [] : lineKeyToItems[myItem.lineId];
+	  myItems.push(myItem);
+	  lineKeyToItems.set(myItem.lineId, myItems);
+	}); 
+	for(;this.lineKeyToItems.length > 0; this.lineKeyToItems.pop()) {}
+	for(let key of lineKeyToItems.keys()) {
+		const myLineKeyToItem = {lineKey: key, items: lineKeyToItems.get(key)} as LineKeyToItems;
+		this.lineKeyToItems.push(myLineKeyToItem);
+	}	
+  }
+
   get items(): Item<Event>[] {
     return this.localItems;
   }
@@ -192,6 +212,7 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   @Input({ required: true })
   set items(items: Item<Event>[]) {		
     this.localItems = items;
+	this.updateLineKeyToItems();
     this.calcChartTime();
     this.calcTimeChartHeight();
   }

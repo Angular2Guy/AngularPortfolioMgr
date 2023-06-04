@@ -59,8 +59,8 @@
         </div>
       </div>
     </ng-container>
-    <div class="chart-line" *ngFor="let item of items">
-      <div
+    <div class="chart-line" *ngFor="let myItems of lineKeyToItems">
+      <div *ngFor="let item of myItems.items"
         class="stock-line"
         [style.width.px]="calcWidthPxItem(item)"
         [class.stock-line-start]="!!item.start"
