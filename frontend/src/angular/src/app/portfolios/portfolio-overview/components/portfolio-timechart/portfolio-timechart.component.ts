@@ -13,9 +13,11 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { DateTime } from "luxon";
 import { Portfolio } from "src/app/model/portfolio";
+import { Symbol } from "src/app/model/symbol";
 import { ServiceUtils } from "src/app/model/service-utils";
 import { PortfolioService } from "src/app/service/portfolio.service";
 import { Item } from "../../model/item";
+
 
 @Component({
   selector: "app-portfolio-timechart",
@@ -33,16 +35,28 @@ export class PortfolioTimechartComponent implements OnInit {
   ngOnInit(): void {
 	this.portfolioService.getPortfolioByIdWithHistory(this.localSelPortfolio.id).subscribe(result => {
 		//console.log(result);
-		const myItems = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER)).map((mySymbol, index) => {
+		const myMap = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER))
+		.reduce((acc, mySymbol) => {
+		   const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
+		   myValue.push(mySymbol);
+		   acc[mySymbol.symbol] = myValue;
+		   return acc;
+		},new Map<string,Symbol[]>());
+		const myItems: Item<Event>[] = [];
+		let myIndex = 0;
+		myMap.forEach((myValue,myKey) => {
+		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() > value.valueOf() ? value : acc);
+		    const myEnd = myValue.map(mySym => !mySym?.removedAt ? null : new Date(mySym.removedAt)).reduce((acc,value) => acc?.valueOf() < value?.valueOf() ? value : acc);	
 			let myItem = new Item<Event>();
-			myItem.id = index;
-			myItem.details = mySymbol.description;
-			myItem.name = mySymbol.name;
-			myItem.start = new Date(mySymbol.changedAt);
-			myItem.end = !mySymbol?.removedAt ? null : new Date(mySymbol.removedAt);
-			//console.log(myItem);
-			return myItem;
-		});		
+			myItem.id = myIndex;
+			myItem.details = myValue[0].description;
+			myItem.name = myValue[0].name;
+			myItem.start = myStart;
+			myItem.end = myEnd;
+			myItem.id = myIndex;
+			myIndex = myIndex++;
+			myItems.push(myItem);
+		});			
 		this.items = myItems;		    
 	});	
     /*
