@@ -39,16 +39,18 @@ export class PortfolioTimechartComponent implements OnInit {
 		.reduce((acc, mySymbol) => {
 		   const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
 		   myValue.push(mySymbol);
-		   acc[mySymbol.symbol] = myValue;
+		   acc.set(mySymbol.symbol,myValue);		   
 		   return acc;
-		},new Map<string,Symbol[]>());
+		},new Map<string,Symbol[]>());		
 		const myItems: Item<Event>[] = [];
 		let myIndex = 0;
 		myMap.forEach((myValue,myKey) => {
 		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() > value.valueOf() ? value : acc);
-		    const myEnd = myValue.map(mySym => !mySym?.removedAt ? null : new Date(mySym.removedAt)).reduce((acc,value) => acc?.valueOf() < value?.valueOf() ? value : acc);	
+		    const myEndItem = myValue.reduce((acc,value) => acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc);
+		    const myEnd = !myEndItem?.removedAt ? null : new Date(myEndItem.removedAt);
 			let myItem = new Item<Event>();
 			myItem.id = myIndex;
+			myItem.lineId = myKey;
 			myItem.details = myValue[0].description;
 			myItem.name = myValue[0].name;
 			myItem.start = myStart;
@@ -63,6 +65,7 @@ export class PortfolioTimechartComponent implements OnInit {
     this.start = DateTime.now().minus({ year: 2 }).toJSDate();
     let myItem = new Item<Event>();
     myItem.id = 1;
+    myItem.lineId = 1;
     myItem.name = "MyName1";
     myItem.details = "MyDetails1";
     myItem.start = this.start;
@@ -70,6 +73,7 @@ export class PortfolioTimechartComponent implements OnInit {
     this.items.push(myItem);
     myItem = new Item<Event>();
     myItem.id = 2;
+    myItem.lineId = 2;
     myItem.name = "MyName2";
     myItem.details = "MyDetails2";
     myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();

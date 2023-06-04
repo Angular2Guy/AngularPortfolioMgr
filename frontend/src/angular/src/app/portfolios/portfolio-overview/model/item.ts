@@ -14,6 +14,7 @@ import { EventEmitter } from "@angular/core";
 
 export class Item<T extends Event> {
   id: number;
+  lineId: string;
   name: string;
   details: string;
   start: Date;
