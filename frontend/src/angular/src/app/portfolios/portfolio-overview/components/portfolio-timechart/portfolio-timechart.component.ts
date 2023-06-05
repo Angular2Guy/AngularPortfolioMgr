@@ -33,6 +33,7 @@ export class PortfolioTimechartComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
+	/*
 	this.portfolioService.getPortfolioByIdWithHistory(this.localSelPortfolio.id).subscribe(result => {
 		//console.log(result);
 		const myMap = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER))
@@ -61,26 +62,33 @@ export class PortfolioTimechartComponent implements OnInit {
 		});		
 		//console.log(myItems);	
 		this.items = myItems;		    
-	});	
-    /*
-    this.start = DateTime.now().minus({ year: 2 }).toJSDate();
+	});
+	*/	    
+    this.start = DateTime.now().minus({ year: 4 }).toJSDate();
     let myItem = new Item<Event>();
     myItem.id = 1;
-    myItem.lineId = 1;
+    myItem.lineId = '1';
     myItem.name = "MyName1";
     myItem.details = "MyDetails1";
     myItem.start = this.start;
-    myItem.end = new Date();
+    myItem.end = DateTime.now().minus({ year: 3 }).toJSDate();
     this.items.push(myItem);
     myItem = new Item<Event>();
     myItem.id = 2;
-    myItem.lineId = 2;
+    myItem.lineId = '1';
+    myItem.name = "MyName1";
+    myItem.details = "MyDetails1";
+    myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();
+    myItem.end = new Date();
+    this.items.push(myItem);
+    myItem = new Item<Event>();
+    myItem.id = 3;
+    myItem.lineId = '2';
     myItem.name = "MyName2";
     myItem.details = "MyDetails2";
-    myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();
+    myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();
     myItem.end = null;
-    this.items.push(myItem);
-    */
+    this.items.push(myItem);    
   }
 
   get selPortfolio(): Portfolio {

@@ -39,11 +39,14 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   protected anchoreIdIndex = 0;
   protected nextAnchorId = "";
   protected timeChartHeight = 0;
+  protected chartLineHeight = 0;
   protected lineKeyToItems: LineKeyToItems[] = [];   
   protected readonly CURRENT_TIME = "currentTime";
 
   @ViewChild("timeChart")
   private timeChartRef: ElementRef;
+  @ViewChild("headerLine")
+  private headerLineRef: ElementRef;
 
   constructor(    
     @Inject(LOCALE_ID) locale: string
@@ -52,7 +55,7 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   }
 
   ngAfterViewInit(): void {    
-	this.calcTimeChartHeight();
+	this.calcTimeChartValues();
     setTimeout(() => {
 		//console.log('afterViewInit');
 		let myPeriods = !this.showDays ? this.periodYears : this.periodMonths;
@@ -63,15 +66,17 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
 		}		
 	}, 1000);
     //console.log(this.timeChartHeight);
+    console.log(this.headerLineRef?.nativeElement?.clientHeight);
   }
 
   ngOnInit(): void {
     this.calcChartTime();
   }
 
-  protected calcTimeChartHeight(): void {
+  protected calcTimeChartValues(): void {
 	setTimeout(() => {
-      this.timeChartHeight = this.timeChartRef.nativeElement.offsetHeight;      
+      this.timeChartHeight = this.timeChartRef?.nativeElement?.offsetHeight;
+      this.chartLineHeight = this.headerLineRef?.nativeElement?.clientHeight;
     });
   }
 
@@ -191,18 +196,18 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
     });
   }
 
-  private updateLineKeyToItems(): void {
+  private updateLineKeyToItems(): void {	
 	const lineKeyToItems = new Map<string,Item<Event>[]>();			 
     this.localItems.forEach(myItem => {
-	  const myItems = !lineKeyToItems[myItem.lineId] ? [] : lineKeyToItems[myItem.lineId];
+	  const myItems = !lineKeyToItems.get(myItem.lineId) ? [] : lineKeyToItems.get(myItem.lineId);
 	  myItems.push(myItem);
 	  lineKeyToItems.set(myItem.lineId, myItems);
-	}); 
+	}); 	
 	for(;this.lineKeyToItems.length > 0; this.lineKeyToItems.pop()) {}
 	for(let key of lineKeyToItems.keys()) {
 		const myLineKeyToItem = {lineKey: key, items: lineKeyToItems.get(key)} as LineKeyToItems;
-		this.lineKeyToItems.push(myLineKeyToItem);
-	}	
+		this.lineKeyToItems.push(myLineKeyToItem);		
+	}		
   }
 
   get items(): Item<Event>[] {
@@ -214,7 +219,7 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
     this.localItems = items;
 	this.updateLineKeyToItems();
     this.calcChartTime();
-    this.calcTimeChartHeight();
+    this.calcTimeChartValues();
   }
 
   get start(): Date {
@@ -228,7 +233,7 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
       .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
       .toJSDate();
     this.calcChartTime();
-    this.calcTimeChartHeight();
+    this.calcTimeChartValues();
   }
 
   get showDays(): boolean {
@@ -239,6 +244,6 @@ export class DateTimeChartComponent extends DateTimeChartBase implements OnInit,
   set showDays(showDays: boolean) {
     this.localShowDays = showDays;
     this.calcChartTime();
-    this.calcTimeChartHeight();
+    this.calcTimeChartValues();
   }
 }

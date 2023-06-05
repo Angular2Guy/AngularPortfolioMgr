@@ -17,17 +17,17 @@
       [style.height.px]="timeChartHeight"
     ></div>
     <ng-container *ngIf="showDays">
-      <div class="chart-line">
+      <div class="header-line" #headerLine>
         <div
-          *ngFor="let periodMonth of periodMonths; let indexOfelement = index"
+          *ngFor="let periodMonth of periodMonths; let indexOfElement = index"
           class="header-box"
-          [id]="monthHeaderAnchorIds[indexOfelement]"
+          [id]="monthHeaderAnchorIds[indexOfElement]"
           [style.width.px]="periodMonth.daysInMonth * (DAY_WIDTH + 2) - 2"
         >
           {{ periodMonth.toJSDate() | date : "MMMM YYYY" }}
         </div>
       </div>
-      <div class="chart-line">
+      <div class="header-line">
         <div
           *ngFor="let periodDay of periodDays"
           class="header-box"
@@ -39,17 +39,17 @@
       </div>
     </ng-container>
     <ng-container *ngIf="!showDays">
-      <div class="chart-line">
+      <div class="header-line" #headerLine> 
         <div
-          *ngFor="let periodYear of periodYears; let indexOfelement = index"
+          *ngFor="let periodYear of periodYears; let indexOfElement = index"
           class="header-box"
-          [id]="yearHeaderAnchorIds[indexOfelement]"
+          [id]="yearHeaderAnchorIds[indexOfElement]"
           [style.width.px]="12 * (MONTH_WIDTH + 2) - 2"
         >
           {{ periodYear.toJSDate().getFullYear() }}
         </div>
       </div>
-      <div class="chart-line">
+      <div class="header-line">
         <div
           *ngFor="let periodMonth of periodMonths"
           class="header-box"
@@ -59,14 +59,14 @@
         </div>
       </div>
     </ng-container>
-    <div class="chart-line" *ngFor="let myItems of lineKeyToItems">
-      <div *ngFor="let item of myItems.items"
+    <div class="chart-line" *ngFor="let myItems of lineKeyToItems" [style.height.px]="chartLineHeight">
+      <div *ngFor="let item of myItems.items; let indexOfElement = index"
         class="stock-line"
         [style.width.px]="calcWidthPxItem(item)"
         [class.stock-line-start]="!!item.start"
         [class.stock-line-end]="!!item.end"
-        [style.margin-left.px]="calcStartPxItem(item)"
-        [style.margin-right.px]="calcEndPxItem(item)"
+        [style.left.px]="calcStartPxItem(item)"
+        [style.top.px]="-chartLineHeight * indexOfElement"
         #tooltip="matTooltip"
         [matTooltip]="
           !item?.name && !item?.details
