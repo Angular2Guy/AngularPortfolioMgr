@@ -33,7 +33,6 @@ export class PortfolioTimechartComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-	/*
 	this.portfolioService.getPortfolioByIdWithHistory(this.localSelPortfolio.id).subscribe(result => {
 		//console.log(result);
 		const myMap = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER))
@@ -63,7 +62,7 @@ export class PortfolioTimechartComponent implements OnInit {
 		//console.log(myItems);	
 		this.items = myItems;		    
 	});
-	*/	    
+	/*	    
     this.start = DateTime.now().minus({ year: 4 }).toJSDate();
     let myItem = new Item<Event>();
     myItem.id = 1;
@@ -88,7 +87,8 @@ export class PortfolioTimechartComponent implements OnInit {
     myItem.details = "MyDetails2";
     myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();
     myItem.end = null;
-    this.items.push(myItem);    
+    this.items.push(myItem);
+    */    
   }
 
   get selPortfolio(): Portfolio {
