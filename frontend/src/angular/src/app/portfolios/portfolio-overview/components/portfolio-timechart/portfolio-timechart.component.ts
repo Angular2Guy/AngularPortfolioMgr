@@ -16,7 +16,7 @@ import { Portfolio } from "src/app/model/portfolio";
 import { Symbol } from "src/app/model/symbol";
 import { ServiceUtils } from "src/app/model/service-utils";
 import { PortfolioService } from "src/app/service/portfolio.service";
-import { Item } from "../../model/item";
+import { ChartItem } from "ngx-simple-charts/date-time";
 
 
 @Component({
@@ -27,7 +27,7 @@ import { Item } from "../../model/item";
 export class PortfolioTimechartComponent implements OnInit {
   private localSelPortfolio: Portfolio;
   protected start = new Date();
-  protected items: Item<Event>[] = [];
+  protected items: ChartItem<Event>[] = [];
   protected showDays = false;
   
   constructor(private portfolioService: PortfolioService) {}
@@ -42,13 +42,13 @@ export class PortfolioTimechartComponent implements OnInit {
 		   acc.set(mySymbol.symbol,myValue);		   
 		   return acc;
 		},new Map<string,Symbol[]>());		
-		const myItems: Item<Event>[] = [];
+		const myItems: ChartItem<Event>[] = [];
 		let myIndex = 0;
 		myMap.forEach((myValue,myKey) => {
 		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() < value.valueOf() ? value : acc);
 		    const myEndItem = myValue.reduce((acc,value) => acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc);
 		    const myEnd = !myEndItem?.removedAt ? null : new Date(myEndItem.removedAt);
-			let myItem = new Item<Event>();
+			let myItem = new ChartItem<Event>();
 			myItem.id = myIndex;
 			myItem.lineId = myKey;
 			myItem.details = myValue[0].description;
