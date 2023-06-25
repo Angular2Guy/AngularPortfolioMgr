@@ -12,7 +12,7 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 	<changeSet id="init-data" author="angular2guy" runOnChange="true">
-		<loadUpdateData file="dbchangelog/data/app_user.csv" tableName="app_user" primaryKey="id"
+		<loadUpdateData file="data/app_user.csv" tableName="app_user" primaryKey="id"
 			relativeToChangelogFile="true" />
 	</changeSet>
 </databaseChangeLog>
