@@ -25,7 +25,8 @@ import { ChartItem } from "ngx-simple-charts/date-time";
   styleUrls: ["./portfolio-timechart.component.scss"],
 })
 export class PortfolioTimechartComponent implements OnInit {
-  private localSelPortfolio: Portfolio;
+  @Input({required: true})
+  public selPortfolio: Portfolio;
   protected start = new Date();
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
@@ -33,7 +34,7 @@ export class PortfolioTimechartComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-	this.portfolioService.getPortfolioByIdWithHistory(this.localSelPortfolio.id).subscribe(result => {
+	this.portfolioService.getPortfolioByIdWithHistory(this.selPortfolio.id).subscribe(result => {
 		//console.log(result);
 		const myMap = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER))
 		.reduce((acc, mySymbol) => {
@@ -89,14 +90,5 @@ export class PortfolioTimechartComponent implements OnInit {
     myItem.end = null;
     this.items.push(myItem);
     */    
-  }
-
-  get selPortfolio(): Portfolio {
-    return this.localSelPortfolio;
-  }
-
-  @Input({required: true})
-  set selPortfolio(myPortfolio: Portfolio) {
-    this.localSelPortfolio = myPortfolio;
   }
 }
