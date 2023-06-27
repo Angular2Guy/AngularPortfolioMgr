@@ -17,6 +17,7 @@ import { Symbol } from "src/app/model/symbol";
 import { ServiceUtils } from "src/app/model/service-utils";
 import { PortfolioService } from "src/app/service/portfolio.service";
 import { ChartItem } from "ngx-simple-charts/date-time";
+import { Item } from "../../model/item";
 
 
 @Component({
@@ -63,8 +64,11 @@ export class PortfolioTimechartComponent implements OnInit {
 		//console.log(myItems);	
 		this.items = myItems;		    
 	});
-	/*	    
-    this.start = DateTime.now().minus({ year: 4 }).toJSDate();
+	//this.testData();    
+  }
+  
+  private testData(): void {
+	  this.start = DateTime.now().minus({ year: 4 }).toJSDate();
     let myItem = new Item<Event>();
     myItem.id = 1;
     myItem.lineId = '1';
@@ -89,6 +93,5 @@ export class PortfolioTimechartComponent implements OnInit {
     myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();
     myItem.end = null;
     this.items.push(myItem);
-    */    
   }
 }
