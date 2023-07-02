@@ -39,10 +39,14 @@ public class AppUserDto implements UserDetails {
 	private boolean enabled;
 	private String uuid;
 	private String token;
+	//500 calls a day and 5 a min
+	private String alphavantageKey;
+	//500 calls a month (only for company info)
+	private String rapidApiKey;
 	private Long secUntilNexLogin;
 
 	public AppUserDto(Long id, String userName, LocalDate birthdate, String password, String token, String emailAddress,
-			String userRole, boolean locked, boolean enabled, String uuid, Long secUntilNexLogin) {
+			String userRole, boolean locked, boolean enabled, String uuid, String alphavantageKey, String rapidApiKey,Long secUntilNexLogin) {
 		super();
 		this.id = id;
 		this.username = userName;
@@ -55,9 +59,27 @@ public class AppUserDto implements UserDetails {
 		this.uuid = uuid;
 		this.secUntilNexLogin = secUntilNexLogin;
 		this.token = token;
+		this.alphavantageKey = alphavantageKey;
+		this.rapidApiKey = rapidApiKey;
 	}
 
 	public AppUserDto() {
+	}
+
+	public String getRapidApiKey() {
+		return rapidApiKey;
+	}
+
+	public void setRapidApiKey(String rapidApiKey) {
+		this.rapidApiKey = rapidApiKey;
+	}
+
+	public String getAlphavantageKey() {
+		return alphavantageKey;
+	}
+
+	public void setAlphavantageKey(String alphavantageKey) {
+		this.alphavantageKey = alphavantageKey;
 	}
 
 	public Long getSecUntilNexLogin() {

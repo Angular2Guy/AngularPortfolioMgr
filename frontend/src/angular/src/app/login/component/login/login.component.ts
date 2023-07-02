@@ -23,6 +23,8 @@ enum FormFields {
   Password = "password",
   Password2 = "password2",
   Email = "email",
+  RapidApiKey = "rapidApiKey",
+  Alphavantage = "alphavantageKey"
 }
 
 @Component({
@@ -52,6 +54,8 @@ export class LoginComponent implements OnInit {
         [FormFields.Password]: ["", Validators.required],
         [FormFields.Password2]: ["", Validators.required],
         [FormFields.Email]: ["", Validators.required],
+        //[FormFields.RapidApiKey]: ["", Validators.required],
+        //[FormFields.Alphavantage]: ["", Validators.required],
       },
       {
         validator: this.validate.bind(this),
@@ -98,10 +102,10 @@ export class LoginComponent implements OnInit {
     login.password = this.signinForm.get(FormFields.Password).value;
     login.emailAddress = this.signinForm.get(FormFields.Email).value;
     this.waitingForResponse = true;
-    this.loginService.postSignin(login).subscribe(
-      (res) => this.signin(res),
-      (err) => console.log(err)
-    );
+    this.loginService.postSignin(login).subscribe({
+      next: (res) => this.signin(res),
+      error: (err) => console.log(err)
+    });
   }
 
   onLoginClick(): void {
@@ -114,10 +118,10 @@ export class LoginComponent implements OnInit {
     login.username = this.loginForm.get(FormFields.Username).value;
     login.password = this.loginForm.get(FormFields.Password).value;
     this.waitingForResponse = true;
-    this.loginService.postLogin(login).subscribe(
-      (res) => this.login(res),
-      (err) => console.log(err)
-    );
+    this.loginService.postLogin(login).subscribe({
+      next: (res) => this.login(res),
+      error: (err) => console.log(err)
+    });
   }
 
   private signin(login: boolean): void {

@@ -15,6 +15,7 @@ package ch.xxx.manager.domain.model.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
@@ -28,20 +29,19 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-
 @Entity
 public class AppUser {
-	@Id	
+	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name="seq", sequenceName="hibernate_sequence", allocationSize = 50)
+	@SequenceGenerator(name = "seq", sequenceName = "hibernate_sequence", allocationSize = 50)
 	private Long id;
 	@NotBlank
-	@Size(max=255)
+	@Size(max = 255)
 	private String userName;
 	private LocalDate birthDate;
 	private LocalDateTime updatedAt;
 	@NotBlank
-	@Size(max=255)
+	@Size(max = 255)
 	private String password;
 	private String emailAddress;
 	@NotBlank
@@ -49,16 +49,16 @@ public class AppUser {
 	private boolean locked;
 	private boolean enabled;
 	private String uuid;
-	//500 calls a day and 5 a min
-	//private String alphavantageKey;
-	//500 calls a month (only for company info)
-	//private String rapidApiKey;
+	// 500 calls a day and 5 a min
+	private String alphavantageKey;
+	// 500 calls a month (only for company info)
+	private String rapidApiKey;
 	@OneToMany(mappedBy = "appUser")
 	private Set<Portfolio> portfolios = new HashSet<>();
-	
-	
+
 	public AppUser(Long id, String userName, LocalDate birthdate, String password, String emailAddress, String userRole,
-			boolean locked, boolean enabled, String uuid, Set<Portfolio> portfolios) {
+			boolean locked, boolean enabled, String uuid, String alphavantageKey, String rapidApiKey,
+			Set<Portfolio> portfolios) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -69,17 +69,40 @@ public class AppUser {
 		this.locked = locked;
 		this.enabled = enabled;
 		this.uuid = uuid;
+		if (Optional.ofNullable(alphavantageKey).stream().anyMatch(myStr -> !myStr.isBlank())) {
+			this.alphavantageKey = alphavantageKey;
+		}
+		if (Optional.ofNullable(rapidApiKey).stream().anyMatch(myStr -> !myStr.isBlank())) {
+			this.rapidApiKey = rapidApiKey;
+		}
 		this.portfolios = portfolios;
 	}
 
-	public AppUser() {}
+	public AppUser() {
+	}
 
 	@PrePersist
 	@PreUpdate
 	void init() {
 		this.updatedAt = LocalDateTime.now();
 	}
-	
+
+	public String getAlphavantageKey() {
+		return alphavantageKey;
+	}
+
+	public void setAlphavantageKey(String alphavantageKey) {
+		this.alphavantageKey = alphavantageKey;
+	}
+
+	public String getRapidApiKey() {
+		return rapidApiKey;
+	}
+
+	public void setRapidApiKey(String rapidApiKey) {
+		this.rapidApiKey = rapidApiKey;
+	}
+
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -91,6 +114,7 @@ public class AppUser {
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}

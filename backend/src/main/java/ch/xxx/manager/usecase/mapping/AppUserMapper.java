@@ -26,7 +26,8 @@ public class AppUserMapper {
 		AppUserDto dto = entityOpt.isEmpty() ? null
 				: new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
 						"XXX", token, "YYY", entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
-						entityOpt.get().isEnabled(), "ZZZ", untilNextLogin);
+						entityOpt.get().isEnabled(), "ZZZ", //entityOpt.get().getAlphavantageKey(),entityOpt.get().getRapidApiKey(),
+						null, null, untilNextLogin);
 		return dto;
 	}
 
@@ -44,11 +45,12 @@ public class AppUserMapper {
 	public AppUserDto convert(AppUser entity) {
 		return new AppUserDto(entity.getId(), entity.getUserName(), entity.getBirthDate(), entity.getPassword(), null,
 				entity.getEmailAddress(), entity.getUserRole(), entity.isLocked(), entity.isEnabled(), entity.getUuid(),
-				1000L);
+				entity.getAlphavantageKey(), entity.getRapidApiKey(), 1000L);
 	}
 
 	public AppUser convert(AppUserDto dto) {
 		return new AppUser(dto.getId(), dto.getUsername(), dto.getBirthdate(), dto.getPassword(), dto.getEmailAddress(),
-				dto.getUserRole() == null || dto.getUserRole().isBlank() ? "XXX" : dto.getUserRole(), dto.isLocked(), dto.isEnabled(), dto.getUserRole(), Set.of());
+				dto.getUserRole() == null || dto.getUserRole().isBlank() ? "XXX" : dto.getUserRole(), dto.isLocked(),
+				dto.isEnabled(), dto.getUserRole(), dto.getAlphavantageKey(), dto.getRapidApiKey(), Set.of());
 	}
 }
