@@ -13,30 +13,30 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 	<changeSet author="angular2guy" id="34">
 		<addColumn tableName="daily_quote">
-			<column name="adj_close" type="numeric(12,4)"/>
+			<column name="adj_close" type="numeric(12,4)" />
 		</addColumn>
-	</changeSet>	
+	</changeSet>
 	<changeSet author="angular2guy" id="35">
 		<addColumn tableName="symbol_financials">
-			<column name="name" type="varchar(150)"/>
+			<column name="name" type="varchar(150)" />
 		</addColumn>
 		<addColumn tableName="symbol_financials">
-			<column name="city" type="varchar(30)"/>
+			<column name="city" type="varchar(30)" />
 		</addColumn>
 		<addColumn tableName="symbol_financials">
-			<column name="country" type="varchar(10)"/>
+			<column name="country" type="varchar(10)" />
 		</addColumn>
 		<addColumn tableName="symbol_financials">
-			<column name="info" type="varchar(512)"/>
-		</addColumn>						
+			<column name="info" type="varchar(512)" />
+		</addColumn>
 	</changeSet>
-	<changeSet id="36" author="angular2guy">	
+	<changeSet id="36" author="angular2guy">
 		<addColumn tableName="financial_element">
-			<column name="info" type="varchar(512)"/>
+			<column name="info" type="varchar(512)" />
 		</addColumn>
-		<dropColumn tableName="symbol_financials" columnName="info"/>
+		<dropColumn tableName="symbol_financials" columnName="info" />
 	</changeSet>
-	<changeSet id="37" author="angular2guy">	
+	<changeSet id="37" author="angular2guy">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<indexExists tableName="symbol_financials"
@@ -48,7 +48,7 @@
 			<column name="name" />
 		</createIndex>
 	</changeSet>
-	<changeSet id="38" author="angular2guy">	
+	<changeSet id="38" author="angular2guy">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<indexExists tableName="symbol_financials"
@@ -60,16 +60,23 @@
 			<column name="city" />
 		</createIndex>
 	</changeSet>
-	<changeSet id="39" author="angular2guy">	
+	<changeSet id="39" author="angular2guy">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<indexExists tableName="symbol_financials"
 					indexName="ix_symbol_financials_fiscal_country" />
 			</not>
 		</preConditions>
-		<createIndex indexName="ix_symbol_financials_fiscal_country"
+		<createIndex
+			indexName="ix_symbol_financials_fiscal_country"
 			tableName="symbol_financials">
 			<column name="country" />
 		</createIndex>
-	</changeSet>	
+	</changeSet>
+	<changeSet id="40" author="angular2guy">
+		<addColumn tableName="app_user">
+			<column name="alphavantage_key" type="varchar(255)" />
+			<column name="rapid_api_key" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

@@ -176,7 +176,7 @@ public class MyArchitectureTests {
 		private static final Pattern AOT_GENERATED_PATTERN = Pattern
 				.compile(".*(__BeanDefinitions|SpringCGLIB\\$\\$\\d)\\.class$");
 		private static final Pattern AOT_TEST_GENERATED_PATTERN = Pattern
-				.compile(".*__TestContext.*\\.class$");
+				.compile(".*(__TestContext|__Autowiring).*\\.class$");
 
 		@Override
 		public boolean includes(Location location) {

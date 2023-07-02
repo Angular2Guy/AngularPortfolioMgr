@@ -26,7 +26,7 @@ public class AppUserMapper {
 		AppUserDto dto = entityOpt.isEmpty() ? null
 				: new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
 						"XXX", token, "YYY", entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
-						entityOpt.get().isEnabled(), "ZZZ", //entityOpt.get().getAlphavantageKey(),entityOpt.get().getRapidApiKey(),
+						entityOpt.get().isEnabled(), "ZZZ", // entityOpt.get().getAlphavantageKey(),entityOpt.get().getRapidApiKey(),
 						null, null, untilNextLogin);
 		return dto;
 	}
@@ -39,6 +39,10 @@ public class AppUserMapper {
 		myEntity.setUserName(dto.getUsername());
 		myEntity.setUserRole(dto.getUserRole());
 		myEntity.setUuid(dto.getUuid());
+		myEntity.setAlphavantageKey(Optional.ofNullable(dto.getAlphavantageKey()).stream()
+				.filter(myString -> !myString.isBlank()).findFirst().orElse(myEntity.getAlphavantageKey()));
+		myEntity.setRapidApiKey(Optional.ofNullable(dto.getRapidApiKey()).stream()
+				.filter(myString -> !myString.isBlank()).findFirst().orElse(myEntity.getRapidApiKey()));
 		return myEntity;
 	}
 
