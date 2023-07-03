@@ -17,7 +17,7 @@
                 formControlName="{{ FormFields.Username }}"
               />
             </mat-form-field>
-          </li>
+          </li>       
           <li>
             <mat-form-field>
               <input
@@ -102,13 +102,35 @@
           >
             Passwords do not match
           </li>
+             <li>
+            <mat-form-field>
+              <input
+                matInput
+                i18n-placeholder="@@loginAlphavantageKey"
+                placeholder="AlphavantageKey"
+                tabindex="4"
+                formControlName="{{ FormFields.AlphavantageKey }}"
+              />
+            </mat-form-field>
+          </li>
+          <li>
+            <mat-form-field>
+              <input
+                matInput
+                i18n-placeholder="@@loginRapidApiKey"
+                placeholder="RapidApiKey"
+                tabindex="5"
+                formControlName="{{ FormFields.AlphavantageKey }}"
+              />
+            </mat-form-field>
+          </li>
           <li>
             <mat-form-field>
               <input
                 matInput
                 i18n-placeholder="@@email"
                 placeholder="Email"
-                tabindex="4"
+                tabindex="6"
                 formControlName="{{ FormFields.Email }}"
               />
             </mat-form-field>

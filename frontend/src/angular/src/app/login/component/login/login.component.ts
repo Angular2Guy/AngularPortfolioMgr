@@ -24,7 +24,7 @@ enum FormFields {
   Password2 = "password2",
   Email = "email",
   RapidApiKey = "rapidApiKey",
-  Alphavantage = "alphavantageKey"
+  AlphavantageKey = "alphavantageKey"
 }
 
 @Component({
@@ -54,8 +54,8 @@ export class LoginComponent implements OnInit {
         [FormFields.Password]: ["", Validators.required],
         [FormFields.Password2]: ["", Validators.required],
         [FormFields.Email]: ["", Validators.required],
-        //[FormFields.RapidApiKey]: ["", Validators.required],
-        //[FormFields.Alphavantage]: ["", Validators.required],
+        [FormFields.RapidApiKey]: ["", Validators.required],
+        [FormFields.AlphavantageKey]: ["", Validators.required],
       },
       {
         validator: this.validate.bind(this),
