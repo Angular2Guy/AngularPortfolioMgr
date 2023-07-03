@@ -33,7 +33,7 @@ import { CalendarService } from "./service/calendar.service";
     PortfolioChartsComponent,
     PortfolioComparisonComponent,
     PortfolioSectorsComponent,
-    PortfolioTimechartComponent
+    PortfolioTimechartComponent,
   ],
   imports: [
     BaseModule,

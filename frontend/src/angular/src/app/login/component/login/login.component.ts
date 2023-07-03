@@ -24,7 +24,7 @@ enum FormFields {
   Password2 = "password2",
   Email = "email",
   RapidApiKey = "rapidApiKey",
-  AlphavantageKey = "alphavantageKey"
+  AlphavantageKey = "alphavantageKey",
 }
 
 @Component({
@@ -104,7 +104,7 @@ export class LoginComponent implements OnInit {
     this.waitingForResponse = true;
     this.loginService.postSignin(login).subscribe({
       next: (res) => this.signin(res),
-      error: (err) => console.log(err)
+      error: (err) => console.log(err),
     });
   }
 
@@ -120,7 +120,7 @@ export class LoginComponent implements OnInit {
     this.waitingForResponse = true;
     this.loginService.postLogin(login).subscribe({
       next: (res) => this.login(res),
-      error: (err) => console.log(err)
+      error: (err) => console.log(err),
     });
   }
 

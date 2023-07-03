@@ -19,59 +19,72 @@ import { PortfolioService } from "src/app/service/portfolio.service";
 import { ChartItem } from "ngx-simple-charts/date-time";
 import { Item } from "../../model/item";
 
-
 @Component({
   selector: "app-portfolio-timechart",
   templateUrl: "./portfolio-timechart.component.html",
   styleUrls: ["./portfolio-timechart.component.scss"],
 })
 export class PortfolioTimechartComponent implements OnInit {
-  @Input({required: true})
+  @Input({ required: true })
   public selPortfolio: Portfolio;
   protected start = new Date();
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
-  
+
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-	this.portfolioService.getPortfolioByIdWithHistory(this.selPortfolio.id).subscribe(result => {
-		//console.log(result);
-		const myMap = result.symbols.filter(mySymbol => !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER))
-		.reduce((acc, mySymbol) => {
-		   const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
-		   myValue.push(mySymbol);
-		   acc.set(mySymbol.symbol,myValue);		   
-		   return acc;
-		},new Map<string,Symbol[]>());		
-		const myItems: ChartItem<Event>[] = [];
-		let myIndex = 0;
-		myMap.forEach((myValue,myKey) => {
-		    const myStart = myValue.map(mySym => new Date(mySym.changedAt)).reduce((acc, value) => acc.valueOf() < value.valueOf() ? value : acc);
-		    const myEndItem = myValue.reduce((acc,value) => acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc);
-		    const myEnd = !myEndItem?.removedAt ? null : new Date(myEndItem.removedAt);
-			let myItem = new ChartItem<Event>();
-			myItem.id = myIndex;
-			myItem.lineId = myKey;
-			myItem.details = myValue[0].description;
-			myItem.name = myValue[0].name;
-			myItem.start = myStart;
-			myItem.end = myEnd;
-			myItem.id = myIndex;
-			myIndex = myIndex++;
-			myItems.push(myItem);
-		});		
-		//console.log(myItems);	
-		this.items = myItems;		    
-	});
-	//this.testData();    
+    this.portfolioService
+      .getPortfolioByIdWithHistory(this.selPortfolio.id)
+      .subscribe((result) => {
+        //console.log(result);
+        const myMap = result.symbols
+          .filter(
+            (mySymbol) =>
+              !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER)
+          )
+          .reduce((acc, mySymbol) => {
+            const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
+            myValue.push(mySymbol);
+            acc.set(mySymbol.symbol, myValue);
+            return acc;
+          }, new Map<string, Symbol[]>());
+        const myItems: ChartItem<Event>[] = [];
+        let myIndex = 0;
+        myMap.forEach((myValue, myKey) => {
+          const myStart = myValue
+            .map((mySym) => new Date(mySym.changedAt))
+            .reduce((acc, value) =>
+              acc.valueOf() < value.valueOf() ? value : acc
+            );
+          const myEndItem = myValue.reduce((acc, value) =>
+            acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc
+          );
+          const myEnd = !myEndItem?.removedAt
+            ? null
+            : new Date(myEndItem.removedAt);
+          let myItem = new ChartItem<Event>();
+          myItem.id = myIndex;
+          myItem.lineId = myKey;
+          myItem.details = myValue[0].description;
+          myItem.name = myValue[0].name;
+          myItem.start = myStart;
+          myItem.end = myEnd;
+          myItem.id = myIndex;
+          myIndex = myIndex++;
+          myItems.push(myItem);
+        });
+        //console.log(myItems);
+        this.items = myItems;
+      });
+    //this.testData();
   }
-  
+
   private testData(): void {
-	  this.start = DateTime.now().minus({ year: 4 }).toJSDate();
+    this.start = DateTime.now().minus({ year: 4 }).toJSDate();
     let myItem = new Item<Event>();
     myItem.id = 1;
-    myItem.lineId = '1';
+    myItem.lineId = "1";
     myItem.name = "MyName1";
     myItem.details = "MyDetails1";
     myItem.start = this.start;
@@ -79,7 +92,7 @@ export class PortfolioTimechartComponent implements OnInit {
     this.items.push(myItem);
     myItem = new Item<Event>();
     myItem.id = 2;
-    myItem.lineId = '1';
+    myItem.lineId = "1";
     myItem.name = "MyName1";
     myItem.details = "MyDetails1";
     myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();
@@ -87,7 +100,7 @@ export class PortfolioTimechartComponent implements OnInit {
     this.items.push(myItem);
     myItem = new Item<Event>();
     myItem.id = 3;
-    myItem.lineId = '2';
+    myItem.lineId = "2";
     myItem.name = "MyName2";
     myItem.details = "MyDetails2";
     myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();

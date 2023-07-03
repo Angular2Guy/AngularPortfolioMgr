@@ -32,9 +32,9 @@ export class PortfolioService {
       .get<Portfolio>(`/rest/portfolio/id/${portfolioId}`)
       .pipe(shareReplay(1));
   }
-  
+
   getPortfolioByIdWithHistory(portfolioId: number): Observable<Portfolio> {
-	  return this.http
+    return this.http
       .get<Portfolio>(`/rest/portfolio/id/${portfolioId}?withHistory=true`)
       .pipe(shareReplay(1));
   }
