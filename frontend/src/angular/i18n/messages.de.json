@@ -47,6 +47,8 @@
     "loginLoginFailed": " Login Failed ",
     "signin": "Signin",
     "loginPasswordsNoMatch": " Passwords do not match ",
+    "loginAlphavantageKey": "AlphavantageKey",
+    "loginRapidApiKey": "RapidApiKey",
     "email": "Email",
     "loginSigninFailed": " Signin Failed ",
     "loginWaiting": "Waiting...",
