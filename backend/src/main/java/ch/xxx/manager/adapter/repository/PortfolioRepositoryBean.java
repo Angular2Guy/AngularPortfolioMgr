@@ -48,4 +48,9 @@ public class PortfolioRepositoryBean implements PortfolioRepository{
 	public Portfolio save(Portfolio portfolio) {
 		return this.jpaPortfolioRepository.save(portfolio);
 	}
+
+	@Override
+	public Long countPortfolioSymbolsByUserId(Long userId) {
+		return this.jpaPortfolioRepository.countPortfolioSymbolsByUserId(userId);
+	}
 }

@@ -81,6 +81,10 @@ public class PortfolioService {
 				.orElseThrow(() -> new ResourceNotFoundException("Portfolio not found: " + portfolioId));
 	}
 
+	public Long countPortfolioSymbolsByUserId(Long userId) {
+		return this.portfolioRepository.countPortfolioSymbolsByUserId(userId);
+	}
+	
 	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start,
 			List<ComparisonIndex> compIndexes) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)

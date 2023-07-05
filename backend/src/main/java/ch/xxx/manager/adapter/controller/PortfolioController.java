@@ -83,6 +83,11 @@ public class PortfolioController {
 		return this.portfolioMapper
 				.toBarsDto(this.portfolioService.getPortfolioBarsByIdAndStart(portfolioId, start, compIndexes));
 	}
+	
+	@GetMapping("/countsymbols/userid/{userId}")
+	public Long countPortfolioSymbolsByUserId(@PathVariable("userId") Long userId) {
+		return this.portfolioService.countPortfolioSymbolsByUserId(userId);
+	}
 
 	@PostMapping
 	public PortfolioDto createPortfolio(@RequestBody PortfolioDto dto) {

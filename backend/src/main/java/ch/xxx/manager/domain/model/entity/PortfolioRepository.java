@@ -15,6 +15,8 @@ package ch.xxx.manager.domain.model.entity;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.repository.query.Param;
+
 import ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto;
 
 public interface PortfolioRepository {
@@ -22,4 +24,5 @@ public interface PortfolioRepository {
 	List<Portfolio> findByUserId(Long userId);
 	List<PortfolioAndSymbolDto> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId);
 	Portfolio save(Portfolio portfolio);
+	Long countPortfolioSymbolsByUserId(@Param(value = "userId") Long userId);
 }

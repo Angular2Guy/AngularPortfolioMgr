@@ -29,4 +29,6 @@ public interface JpaPortfolioRepository extends JpaRepository<Portfolio, Long> {
 			+ "from Portfolio p inner join p.appUser au inner join p.portfolioToSymbols pts inner join pts.symbol s "
 			+ "where p.id = :portfolioId and (pts.removedAt is null or pts.removedAt > CURRENT_TIMESTAMP)")
 	List<PortfolioAndSymbolDto> findPortfolioCalcEntitiesByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
+	@Query("select count(distinct(pts.symbol.id)) from Portfolio p inner join p.portfolioToSymbols pts where p.appUser.id = :userId and pts.removedAt is null")
+	Long countPortfolioSymbolsByUserId(@Param(value = "userId") Long userId);
 }
