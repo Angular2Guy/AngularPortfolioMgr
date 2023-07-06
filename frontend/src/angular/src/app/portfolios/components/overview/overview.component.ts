@@ -59,6 +59,8 @@ export class OverviewComponent implements OnInit {
     "year10",
   ];
   importingSymbols = false;
+  //limit 250
+  countPortfolioSymbolsByUserId = 1000000;
   private timeoutId = -1;
   private dialogSubscription: Subscription;
   private profiles: string = null;
@@ -162,6 +164,8 @@ export class OverviewComponent implements OnInit {
           this.selPortfolio(this.myPortfolio, true);
         }
       });
+      this.portfolioService.countPortfolioSymbolsByUserId(this.tokenService.userId as number).pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe(result => this.countPortfolioSymbolsByUserId = result);
   }
 
   addSymbol(portfolio: Portfolio) {

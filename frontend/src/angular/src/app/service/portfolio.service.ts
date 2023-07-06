@@ -39,6 +39,10 @@ export class PortfolioService {
       .pipe(shareReplay(1));
   }
 
+  countPortfolioSymbolsByUserId(userId: number): Observable<number> {
+	  return this.http.get<number>(`/rest/portfolio/countsymbols/userid/${userId}`).pipe(shareReplay(1));
+  }
+
   getPortfolioBarsByIdAndStart(
     portfolioId: number,
     start: Date,

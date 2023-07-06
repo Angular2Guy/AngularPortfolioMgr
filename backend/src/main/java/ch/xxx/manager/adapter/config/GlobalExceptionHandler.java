@@ -20,6 +20,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
+import ch.xxx.manager.domain.exception.ResourceForbiddenException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<?> authenticationHandler(Exception ex, WebRequest request) {
 		super.logger.warn("Authentication failed.", ex);
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+	}
+	
+	@ExceptionHandler(ResourceForbiddenException.class)
+	public ResponseEntity<?> resourceForbiddenHandler(Exception ex, WebRequest request) {
+		super.logger.warn("Resource forbidden.", ex);
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}
 }

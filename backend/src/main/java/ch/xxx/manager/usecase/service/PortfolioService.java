@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.exception.ResourceForbiddenException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
@@ -84,7 +85,7 @@ public class PortfolioService {
 	public Long countPortfolioSymbolsByUserId(Long userId) {
 		return this.portfolioRepository.countPortfolioSymbolsByUserId(userId);
 	}
-	
+
 	public PortfolioBarsWrapper getPortfolioBarsByIdAndStart(Long portfolioId, LocalDate start,
 			List<ComparisonIndex> compIndexes) {
 		Portfolio portfolio = this.portfolioRepository.findById(portfolioId)
@@ -111,8 +112,7 @@ public class PortfolioService {
 		Portfolio updatedPortfolio = this.portfolioToSymbolRepository
 				.saveAndFlush(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio();
 		Optional<PortfolioToSymbol> ptsOpt = updatedPortfolio.getPortfolioToSymbols().stream()
-				.filter(pts -> pts.getSymbol().getId().equals(symbolId))
-				.findFirst();
+				.filter(myPts -> myPts.getSymbol().getId().equals(symbolId)).findFirst();
 		PortfolioWithElements portfolioWithElements = this.portfolioCalculationService
 				.calculatePortfolio(updatedPortfolio, ptsOpt);
 		return updatePortfolioElements(portfolioWithElements);
@@ -154,8 +154,7 @@ public class PortfolioService {
 	public PortfolioWithElements updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
-				.flatMap(myEntity -> Stream.of(
-						this.updateWeightPtsEntity(myEntity, weight, changedAt.toLocalDate())))
+				.flatMap(myEntity -> Stream.of(this.updateWeightPtsEntity(myEntity, weight, changedAt.toLocalDate())))
 				.map(newEntity -> this.portfolioToSymbolRepository.saveAndFlush(newEntity))
 				.map(newEntity -> this.updatePortfolioElements(this.portfolioCalculationService
 						.calculatePortfolio(newEntity.getPortfolio(), Optional.empty())))
@@ -165,11 +164,11 @@ public class PortfolioService {
 
 	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
-				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository.saveAndFlush(this.markAsRemovedPtsEntity(entity,
-						removedAt.toLocalDate()))))
+				.flatMap(entity -> Stream.of(this.portfolioToSymbolRepository
+						.saveAndFlush(this.markAsRemovedPtsEntity(entity, removedAt.toLocalDate()))))
 				.map(newEntity -> this.removePortfolioElement(newEntity))
-				.map(newEntity -> this.portfolioCalculationService
-						.calculatePortfolio(newEntity.getPortfolio(), Optional.empty()))
+				.map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio(),
+						Optional.empty()))
 				.peek(portfolioWithElements -> this.dailyQuoteRepository
 						.saveAll(portfolioWithElements.portfolioDailyQuotes()))
 				.peek(portfolioWithElements -> this.removeDailyQuotes(portfolioWithElements.portfolio(),
@@ -193,29 +192,35 @@ public class PortfolioService {
 		return portfolioToSymbol;
 	}
 
-	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, LocalDate removedAt) {	
-		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), 0L, removedAt, removedAt);			
+	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, LocalDate removedAt) {
+		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), 0L,
+				removedAt, removedAt);
 		return portfolioToSymbol;
 	}
-	
+
 	private PortfolioToSymbol updateWeightPtsEntity(PortfolioToSymbol entity, Long weight, LocalDate changedAt) {
-		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), weight, changedAt, null);		
+		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(),
+				weight, changedAt, null);
 		return portfolioToSymbol;
 	}
 
 	private PortfolioToSymbol createPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDate changedAt) {
-		PortfolioToSymbol entity = new PortfolioToSymbol();
-		entity.setPortfolio(this.portfolioRepository.findById(dto.getId()).map(myPts -> {
-			myPts.getPortfolioToSymbols().add(entity);
-			return myPts;
-		}).orElseThrow(() -> new RuntimeException(String.format("Portfolio with id %d not found.", dto.getId()))));
-		entity.setSymbol(this.symbolRepository.findById(symbolId).map(myPts -> {
-			myPts.getPortfolioToSymbols().add(entity);
-			return myPts;
-		}).orElseThrow(() -> new RuntimeException(String.format("Symbol with id %d not found", symbolId))));
-		entity.setWeight(weight);
-		entity.setChangedAt(changedAt);
-		return entity;
+		Portfolio myPortfolio = this.portfolioRepository.findById(dto.getId())
+				.orElseThrow(() -> new RuntimeException(String.format("Portfolio with id %d not found.", dto.getId())));
+		if (250 >= this.countPortfolioSymbolsByUserId(myPortfolio.getAppUser().getId())) {
+			final PortfolioToSymbol entity = new PortfolioToSymbol();
+			myPortfolio.getPortfolioToSymbols().add(entity);
+			entity.setPortfolio(myPortfolio);
+			entity.setSymbol(this.symbolRepository.findById(symbolId).map(myPts -> {
+				myPts.getPortfolioToSymbols().add(entity);
+				return myPts;
+			}).orElseThrow(() -> new RuntimeException(String.format("Symbol with id %d not found", symbolId))));
+			entity.setWeight(weight);
+			entity.setChangedAt(changedAt);
+			return entity;
+		} else {
+			throw new ResourceForbiddenException("Too many Symbols in user Portfolios.");
+		}
 	}
 
 	private PortfolioToSymbol createPortfolioPtSAndSymbol(Portfolio portfolioEntity) {
