@@ -65,7 +65,7 @@
           <button mat-list-item (click)="selPortfolio(portfolio)">
             {{ portfolio.name }}
           </button>
-          <button [disabled]="countPortfolioSymbolsByUserId > 250"
+          <button [disabled]="countPortfolioSymbolsByUserId > 200"
             mat-list-item
             (click)="addSymbol(portfolio)"
             class="add-button"
