@@ -12,21 +12,28 @@
  */
 package ch.xxx.manager.adapter.cron;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
+import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.transaction.Transactional;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -34,14 +41,20 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 @Service
 public class CronJobService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronJobService.class);
+	private static final Long PORTFOLIO_SYMBOL_LIMIT = 200L;
+	private final AppUserRepository appUserRepository;
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
 	private Environment environment;
+	@Value("${api.key}")
+	private String apiKey;
 
-	public CronJobService(SymbolImportService symbolImportService, QuoteImportService quoteImportService,
-			CurrencyService currencyService, AppUserService appUserService, Environment environment) {
+	public CronJobService(AppUserRepository appUserRepository, SymbolImportService symbolImportService,
+			QuoteImportService quoteImportService, CurrencyService currencyService, AppUserService appUserService,
+			Environment environment) {
+		this.appUserRepository = appUserRepository;
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
@@ -84,7 +97,8 @@ public class CronJobService {
 		List<String> symbols = this.symbolImportService
 				.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
 						ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
-		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
+		Long symbolCount = symbols.stream().map(
+				mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol, new UserKeys(this.apiKey, null)))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 	}
@@ -92,17 +106,22 @@ public class CronJobService {
 	@Transactional
 	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
-	public void scheduledImporterQuotes() {		
-//		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
-//				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
-//		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
-//				.filter(mySymbol -> symbolsToFilter.stream()
-//						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
-//				.collect(Collectors.toList());
-//		Long quoteCount = symbolsToUpdate.stream()
-//				.flatMap(mySymbol -> Stream.of(
-//						this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(), Duration.ofSeconds(15))))
-//				.reduce(0L, (acc, value) -> acc + value);
-//		LOGGER.info("Quote import done for: {}", quoteCount);
+	public void scheduledImporterQuotes() {
+		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
+				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
+		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
+				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
+		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
+				.filter(mySymbol -> symbolsToFilter.stream()
+						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
+				.collect(Collectors.toList());
+		AtomicLong index = new AtomicLong(-1L);
+		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = index.addAndGet(1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(15), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Quote import done for: {}", quoteCount);
 	}
 }

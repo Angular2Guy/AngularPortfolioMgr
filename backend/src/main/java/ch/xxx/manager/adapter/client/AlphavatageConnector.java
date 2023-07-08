@@ -27,6 +27,7 @@ import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
+import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
@@ -91,7 +92,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 //	}
 
 	@Override
-	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
+	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys) {
 		try {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
