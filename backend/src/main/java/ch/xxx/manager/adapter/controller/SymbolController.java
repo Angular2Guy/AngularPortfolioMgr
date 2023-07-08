@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.QuoteImportService;
+import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import ch.xxx.manager.usecase.service.SymbolService;
 
@@ -35,6 +37,10 @@ public class SymbolController {
 	private final SymbolImportService importService;
 	private final SymbolService symbolService;
 	private final QuoteImportService quoteImportService;
+	@Value("${api.key}")
+	private String apiKey;
+	@Value("${api.key.rapidapi}")
+	private String rapidApiKey;
 
 	public SymbolController(SymbolImportService importService, SymbolService service,
 			QuoteImportService quoteImportService) {
@@ -65,8 +71,8 @@ public class SymbolController {
 	public String importIndexSymbols() {
 		List<String> symbols = this.importService.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
 				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
-		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol))
-				.reduce(0L, (acc, value) -> acc + value);
+		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol,
+				new UserKeys(this.apiKey, this.rapidApiKey))).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 		return String.format("Indexquotes import done for: %d", symbolCount);
 	}

@@ -54,7 +54,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class JwtTokenService {
 	private static final Logger LOG = LoggerFactory.getLogger(JwtTokenService.class);
-	private final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();
+	private final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();	
+	public static final String USER_UUID = "UserUuid"; 
 
 	public record UserNameUuid(String userName, String uuid) {
 	}

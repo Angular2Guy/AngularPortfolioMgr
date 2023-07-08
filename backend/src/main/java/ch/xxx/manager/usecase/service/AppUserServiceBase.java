@@ -246,10 +246,14 @@ public class AppUserServiceBase {
 		return jwtTokenService.getTokenUserRoles(headers);
 	}
 
-	public AppUserDto load(Long id) {
+	public AppUserDto loadById(Long id) {
 		return this.appUserMapper.convert(this.repository.findById(id), null, 10L);
 	}
 
+	public AppUserDto loadByUuid(String uuid) {
+		return this.appUserMapper.convert(this.repository.findByUuid(uuid), null, 10L);
+	}
+	
 	public List<AppUserDto> loadAll() {
 		return this.repository.findAll().stream()
 				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), null, 10L)))

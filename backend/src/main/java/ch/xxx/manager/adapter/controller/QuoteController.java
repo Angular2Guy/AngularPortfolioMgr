@@ -18,15 +18,20 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
+import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
+import ch.xxx.manager.usecase.service.JwtTokenService;
 import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
+import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import ch.xxx.manager.usecase.service.QuoteService;
 
 @RestController
@@ -36,13 +41,15 @@ public class QuoteController {
 	private final QuoteImportService quoteImportService;
 	private final PortfolioToIndexService portfolioToIndexService;
 	private final CurrencyService currencyService;
+	private final AppUserService appUserService;
 
 	public QuoteController(QuoteService quoteService, QuoteImportService quoteImportService,
-			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService) {
+			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService, AppUserService appUserService) {
 		this.quoteService = quoteService;
 		this.quoteImportService = quoteImportService;
 		this.portfolioToIndexService = portfolioToIndexService;
 		this.currencyService = currencyService;
+		this.appUserService = appUserService;
 	}
 
 	@GetMapping("/daily/all/symbol/{symbol}")
@@ -85,8 +92,9 @@ public class QuoteController {
 	}
 
 	@GetMapping("/import/daily/symbol/{symbol}")
-	public Long importDailyQuotes(@PathVariable("symbol") String symbol) {
-		return this.quoteImportService.importDailyQuoteHistory(symbol);
+	public Long importDailyQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
+		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid);		
+		return this.quoteImportService.importDailyQuoteHistory(symbol, new UserKeys(appUserDto.getAlphavantageKey(), appUserDto.getRapidApiKey()));
 	}
 
 	@GetMapping("/import/intraday/symbol/{symbol}")

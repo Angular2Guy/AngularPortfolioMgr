@@ -29,7 +29,8 @@ public interface AppUserService {
 	AppUserDto login(AppUserDto appUserDto);
 	Boolean logout(String bearerStr);
 	TokenSubjectRole getTokenRoles(Map<String, String> headers);
-	AppUserDto load(Long id);
+	AppUserDto loadById(Long id);
 	List<AppUserDto> loadAll();
+	AppUserDto loadByUuid(String uuid);
 	void sendKafkaEvent(KafkaEventDto kafkaEventDto);
 }

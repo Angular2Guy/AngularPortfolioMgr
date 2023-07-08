@@ -94,7 +94,10 @@ public class AuthenticationController {
 	
 	@GetMapping("/id/{id}")
 	public AppUserDto getUser(@PathVariable Long id) {
-		return this.appUserService.load(id);
+		AppUserDto appUserDto = this.appUserService.loadById(id);
+		appUserDto.setAlphavantageKey("XXX");
+		appUserDto.setRapidApiKey("XXX");
+		return appUserDto;
 	}
 	/*
 	@GetMapping("/all")

@@ -41,7 +41,6 @@ import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
-import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
