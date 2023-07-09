@@ -83,11 +83,11 @@ public class QuoteImportService {
 		this.sectorRepository = sectorRepository;		
 	}
 
-	public Long importIntraDayQuotes(String symbol) {
-		return this.importIntraDayQuotes(symbol, null);
+	public Long importIntraDayQuotes(String symbol, UserKeys userKeys) {
+		return this.importIntraDayQuotes(symbol, null, userKeys);
 	}
 
-	public Long importIntraDayQuotes(String symbol, Duration delay) {
+	public Long importIntraDayQuotes(String symbol, Duration delay, UserKeys userKeys) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
@@ -101,7 +101,7 @@ public class QuoteImportService {
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 				.filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
 				.map(mySymbol -> new SymbolAndWrapper(mySymbol,
-						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol()).delayElement(myDelay)
+						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol(), userKeys).delayElement(myDelay)
 								.blockOptional(myTimeout).orElse(intraDayWrapperImportDto)))
 				.peek(myRecord -> this
 						.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))

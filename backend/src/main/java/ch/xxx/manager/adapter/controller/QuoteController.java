@@ -98,8 +98,9 @@ public class QuoteController {
 	}
 
 	@GetMapping("/import/intraday/symbol/{symbol}")
-	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol) {
-		return this.quoteImportService.importIntraDayQuotes(symbol);
+	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
+		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid);		
+		return this.quoteImportService.importIntraDayQuotes(symbol, new UserKeys(appUserDto.getAlphavantageKey(), appUserDto.getRapidApiKey()));
 	}
 
 	@GetMapping("/import/daily/currency/{to_curr}")

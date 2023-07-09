@@ -115,13 +115,21 @@ public class CronJobService {
 				.filter(mySymbol -> symbolsToFilter.stream()
 						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
 				.collect(Collectors.toList());
-		AtomicLong index = new AtomicLong(-1L);
+		final AtomicLong indexDaily = new AtomicLong(-1L);
 		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
-			var myIndex = index.addAndGet(1L);
+			var myIndex = indexDaily.addAndGet(1L);
 			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
 			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
-					Duration.ofSeconds(15), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
-		LOGGER.info("Quote import done for: {}", quoteCount);
+		LOGGER.info("Daily Quote import done for: {}", quoteCount);
+		final AtomicLong indexIntraDay = new AtomicLong(allUserKeys.size());
+		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = indexIntraDay.addAndGet(-1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
 	}
 }

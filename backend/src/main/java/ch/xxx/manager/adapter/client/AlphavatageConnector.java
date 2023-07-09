@@ -61,11 +61,11 @@ public class AlphavatageConnector implements AlphavatageClient {
 	}
 
 	@Override
-	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol) {
+	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys) {
 		try {
 			final String myUrl = String.format(
 					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
-					symbol, this.apiKey);
+					symbol, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
 					.get().uri(new URI(myUrl)).retrieve().bodyToMono(IntraDayWrapperImportDto.class);
@@ -97,7 +97,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
 					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s", symbol,
-					fullSeriesStr, this.apiKey);
+					fullSeriesStr, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
 					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);

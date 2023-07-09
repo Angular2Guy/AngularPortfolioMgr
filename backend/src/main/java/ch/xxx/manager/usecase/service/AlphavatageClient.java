@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 
 public interface AlphavatageClient {
 	Mono<AlphaOverviewImportDto> importCompanyProfile(String symbol);
-	Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol);
+	Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys);
 	Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys);
 	Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries);
 }
