@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
+import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
@@ -33,6 +34,7 @@ import ch.xxx.manager.usecase.service.PortfolioToIndexService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import ch.xxx.manager.usecase.service.QuoteService;
+import ch.xxx.manager.usecase.service.SymbolImportService;
 
 @RestController
 @RequestMapping("rest/quote")
@@ -42,14 +44,16 @@ public class QuoteController {
 	private final PortfolioToIndexService portfolioToIndexService;
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
+	private final SymbolImportService symbolImportService;
 
 	public QuoteController(QuoteService quoteService, QuoteImportService quoteImportService,
-			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService, AppUserService appUserService) {
+			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService, AppUserService appUserService,SymbolImportService symbolImportService) {
 		this.quoteService = quoteService;
 		this.quoteImportService = quoteImportService;
 		this.portfolioToIndexService = portfolioToIndexService;
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
+		this.symbolImportService = symbolImportService;
 	}
 
 	@GetMapping("/daily/all/symbol/{symbol}")
@@ -108,5 +112,12 @@ public class QuoteController {
 		Long count = this.currencyService.importFxDailyQuoteHistory(to_curr);
 		this.currencyService.initCurrencyMap();
 		return count;
+	}
+	
+	@GetMapping("/update/portfolio/symbols")
+	public Long updatePortfolioSymbols() {
+		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
+		this.quoteImportService.updateSymbolQuotes(symbolsToUpdate);
+		return 0L;
 	}
 }

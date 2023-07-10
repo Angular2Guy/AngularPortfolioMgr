@@ -12,10 +12,7 @@
  */
 package ch.xxx.manager.adapter.cron;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -26,7 +23,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
@@ -40,9 +36,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Service
 public class CronJobService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CronJobService.class);
-	private static final Long PORTFOLIO_SYMBOL_LIMIT = 200L;
-	private final AppUserRepository appUserRepository;
+	private static final Logger LOGGER = LoggerFactory.getLogger(CronJobService.class);	
 	private final SymbolImportService symbolImportService;
 	private final QuoteImportService quoteImportService;
 	private final CurrencyService currencyService;
@@ -51,10 +45,9 @@ public class CronJobService {
 	@Value("${api.key}")
 	private String apiKey;
 
-	public CronJobService(AppUserRepository appUserRepository, SymbolImportService symbolImportService,
+	public CronJobService(SymbolImportService symbolImportService,
 			QuoteImportService quoteImportService, CurrencyService currencyService, AppUserService appUserService,
 			Environment environment) {
-		this.appUserRepository = appUserRepository;
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
@@ -103,33 +96,10 @@ public class CronJobService {
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 	}
 
-	@Transactional
 	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
-		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
-				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
-		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
-				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
-		List<Symbol> symbolsToUpdate = this.symbolImportService.refreshSymbolEntities().stream()
-				.filter(mySymbol -> symbolsToFilter.stream()
-						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
-				.collect(Collectors.toList());
-		final AtomicLong indexDaily = new AtomicLong(-1L);
-		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
-			var myIndex = indexDaily.addAndGet(1L);
-			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
-			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
-					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
-		}).reduce(0L, (acc, value) -> acc + value);
-		LOGGER.info("Daily Quote import done for: {}", quoteCount);
-		final AtomicLong indexIntraDay = new AtomicLong(allUserKeys.size());
-		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
-			var myIndex = indexIntraDay.addAndGet(-1L);
-			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
-			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(),
-					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
-		}).reduce(0L, (acc, value) -> acc + value);
-		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
+		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
+		this.quoteImportService.updateSymbolQuotes(symbolsToUpdate);
 	}
 }

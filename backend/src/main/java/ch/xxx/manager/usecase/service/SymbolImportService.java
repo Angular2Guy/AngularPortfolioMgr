@@ -118,6 +118,16 @@ public class SymbolImportService {
 		return result.stream().map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
 	}
 
+	public List<Symbol> findSymbolsToUpdate() {
+		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
+				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
+		List<Symbol> symbolsToUpdate = this.refreshSymbolEntities().stream()
+				.filter(mySymbol -> symbolsToFilter.stream()
+						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
+				.collect(Collectors.toList());
+		return symbolsToUpdate;
+	}
+	
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol) {
 		ComparisonIndex compIndex = Stream.of(ComparisonIndex.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()

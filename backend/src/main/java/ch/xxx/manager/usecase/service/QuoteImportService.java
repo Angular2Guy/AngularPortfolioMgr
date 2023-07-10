@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +60,8 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 public class QuoteImportService {
 	public record UserKeys(String alphavantageKey, String RapidApiKey) {
 	}
-
+	
+	private static final Long PORTFOLIO_SYMBOL_LIMIT = 200L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	private final AlphavatageClient alphavatageClient;
 	private final YahooClient yahooClient;
@@ -67,7 +70,8 @@ public class QuoteImportService {
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final SymbolRepository symbolRepository;
 	private final CurrencyService currencyService;
-	private final SectorRepository sectorRepository;	
+	private final SectorRepository sectorRepository;
+	private final AppUserRepository appUserRepository;
 
 	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
 			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
@@ -80,9 +84,33 @@ public class QuoteImportService {
 		this.symbolRepository = symbolRepository;
 		this.currencyService = currencyService;
 		this.rapidApiClient = rapidApiClient;
-		this.sectorRepository = sectorRepository;		
+		this.sectorRepository = sectorRepository;
+		this.appUserRepository = appUserRepository;
 	}
 
+	@Async
+	public Long updateSymbolQuotes(List<Symbol> symbolsToUpdate) {
+		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
+				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
+		final AtomicLong indexDaily = new AtomicLong(-1L);
+		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = indexDaily.addAndGet(1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.importUpdateDailyQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Daily Quote import done for: {}", quoteCount);
+		final AtomicLong indexIntraDay = new AtomicLong(allUserKeys.size());
+		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = indexIntraDay.addAndGet(-1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.importIntraDayQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
+		return quoteCount;
+	}
+	
 	public Long importIntraDayQuotes(String symbol, UserKeys userKeys) {
 		return this.importIntraDayQuotes(symbol, null, userKeys);
 	}
