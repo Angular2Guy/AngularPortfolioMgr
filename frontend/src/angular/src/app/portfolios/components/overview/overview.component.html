@@ -16,16 +16,18 @@
       <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
       </mat-progress-spinner>
     </span>
-    <span class="header-space"
+    <span class="header-space" *ngIf="isProdBuild"
+      ><button
+        mat-flat-button
+        color="primary"
+        (click)="updateQuotes()"
+        i18n="@@overviewUpdateQuotes">Update Quotes</button></span>
+    <span class="header-space" *ngIf="isProdBuild"
       ><button
         mat-flat-button
         color="primary"
         (click)="importSymbols()"
-        i18n="@@overviewImportSymbols"
-      >
-        Import Symbols
-      </button></span
-    >
+        i18n="@@overviewImportSymbols">Import Symbols</button></span>
     <span
       ><button
         mat-flat-button

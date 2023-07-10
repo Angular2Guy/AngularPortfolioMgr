@@ -38,6 +38,7 @@ import {
   DialogSpinnerComponent,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-overview",
@@ -61,11 +62,11 @@ export class OverviewComponent implements OnInit {
   importingSymbols = false;
   //limit 250
   countPortfolioSymbolsByUserId = 1000000;
+  protected isProdBuild = environment.production;
   private timeoutId = -1;
   private dialogSubscription: Subscription;
   private profiles: string = null;
   private showPortfolioTable = true;
-  //private destroyRef: DestroyRef;
 
   constructor(
     private tokenService: TokenService,
@@ -147,6 +148,10 @@ export class OverviewComponent implements OnInit {
 
   showFinancialData() {
     this.router.navigate([`/financialdata`]);
+  }
+
+  updateQuotes() {
+	  console.log('updateQuotes()');
   }
 
   private refreshPortfolios() {
