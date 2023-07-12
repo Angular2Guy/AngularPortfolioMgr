@@ -12,44 +12,55 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
+import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class SymbolImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
+	private static final Long PORTFOLIO_SYMBOL_LIMIT = 200L;
+	
 	private final NasdaqClient nasdaqClient;
 	private final HkexClient hkexClient;
 	private final SymbolRepository repository;
 	private final XetraClient xetraClient;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
+	private final QuoteImportService quoteImportService;
+	private final AppUserRepository appUserRepository;
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
-			XetraClient xetraClient) {
+			XetraClient xetraClient, QuoteImportService quoteImportService, AppUserRepository appUserRepository) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;
 		this.repository = repository;
 		this.xetraClient = xetraClient;
+		this.quoteImportService = quoteImportService;
+		this.appUserRepository = appUserRepository;
 	}
 
 	public List<Symbol> refreshSymbolEntities() {
@@ -59,6 +70,29 @@ public class SymbolImportService {
 		return Collections.unmodifiableList(new ArrayList<Symbol>(this.allSymbolEntities.get()));
 	}
 
+	@Async
+	public Long updateSymbolQuotes(List<Symbol> symbolsToUpdate) {
+		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
+				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
+		final AtomicLong indexDaily = new AtomicLong(-1L);
+		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = indexDaily.addAndGet(1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Daily Quote import done for: {}", quoteCount);
+		final AtomicLong indexIntraDay = new AtomicLong(allUserKeys.size());
+		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
+			var myIndex = indexIntraDay.addAndGet(-1L);
+			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
+			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(),
+					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+		}).reduce(0L, (acc, value) -> acc + value);
+		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
+		return quoteCount;
+	}
+	
 	public String importUsSymbols() {
 		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq)))
 				.block();

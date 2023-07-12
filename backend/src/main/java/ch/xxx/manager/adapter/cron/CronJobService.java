@@ -100,6 +100,6 @@ public class CronJobService {
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
-		this.quoteImportService.updateSymbolQuotes(symbolsToUpdate);
+		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
 	}
 }

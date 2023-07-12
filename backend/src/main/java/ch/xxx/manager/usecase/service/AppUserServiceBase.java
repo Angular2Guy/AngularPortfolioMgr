@@ -115,6 +115,7 @@ public class AppUserServiceBase {
 		return new RefreshTokenDto(newToken);
 	}
 
+	//use tink to encrypt api keys
 	public AppUserDto save(AppUserDto appUser) {
 		return this.appUserMapper.convert(
 				Optional.of(this.repository
@@ -162,6 +163,7 @@ public class AppUserServiceBase {
 		return this.signin(appUserDto, true, true).isPresent();
 	}
 
+	//use tink to encrypt api keys
 	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist, boolean check) {	
 		if(appUserDto.getId() != null) {
 			return Optional.empty();

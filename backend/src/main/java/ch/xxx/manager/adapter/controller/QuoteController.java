@@ -117,7 +117,7 @@ public class QuoteController {
 	@GetMapping("/update/portfolio/symbols")
 	public Long updatePortfolioSymbols() {
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
-		this.quoteImportService.updateSymbolQuotes(symbolsToUpdate);
+		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
 		return 0L;
 	}
 }
