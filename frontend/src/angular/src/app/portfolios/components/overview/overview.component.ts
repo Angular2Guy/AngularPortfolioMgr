@@ -38,7 +38,6 @@ import {
   DialogSpinnerComponent,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-overview",
@@ -61,11 +60,10 @@ export class OverviewComponent implements OnInit {
   ];
   importingSymbols = false;
   //limit 250
-  countPortfolioSymbolsByUserId = 1000000;
-  protected isProdBuild = environment.production;
+  countPortfolioSymbolsByUserId = 1000000;  
   private timeoutId = -1;
   private dialogSubscription: Subscription;
-  private profiles: string = null;
+  protected profiles: string = null;
   private showPortfolioTable = true;
 
   constructor(
@@ -86,7 +84,7 @@ export class OverviewComponent implements OnInit {
     this.refreshPortfolios();
     this.configService
       .getProfiles()
-      .subscribe((value) => (this.profiles = !value ? "dev" : value));
+      .subscribe((value) => (this.profiles = !value ? "dev" : value.trim().toLowerCase()));
   }
 
   @HostListener("window:resize", ["$event"])
@@ -151,7 +149,8 @@ export class OverviewComponent implements OnInit {
   }
 
   updateQuotes() {
-	  console.log('updateQuotes()');
+	  this.quoteImportService.updateAllDailyIntraDayQuotes();
+	  console.log('updateQuotes() called.');
   }
 
   private refreshPortfolios() {

@@ -33,4 +33,8 @@ export class QuoteImportService {
       `/rest/quote/import/daily/currency/${to_curr}`
     );
   }
+  
+  updateAllDailyIntraDayQuotes(): Observable<number> {
+	  return this.http.get<number>('/rest/quote/update/portfolio/symbols');
+  }
 }

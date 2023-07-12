@@ -16,13 +16,13 @@
       <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
       </mat-progress-spinner>
     </span>
-    <span class="header-space" *ngIf="isProdBuild"
+    <span class="header-space" *ngIf="!!profiles && profiles.includes('dev')"
       ><button
         mat-flat-button
         color="primary"
         (click)="updateQuotes()"
         i18n="@@overviewUpdateQuotes">Update Quotes</button></span>
-    <span class="header-space" *ngIf="isProdBuild"
+    <span class="header-space" *ngIf="!!profiles && profiles.includes('dev')"
       ><button
         mat-flat-button
         color="primary"
