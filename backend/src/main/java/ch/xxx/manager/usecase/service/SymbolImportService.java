@@ -38,6 +38,7 @@ import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +47,7 @@ import reactor.core.publisher.Mono;
 public class SymbolImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolImportService.class);
 	private static final Long PORTFOLIO_SYMBOL_LIMIT = 200L;
-	
+
 	private final NasdaqClient nasdaqClient;
 	private final HkexClient hkexClient;
 	private final SymbolRepository repository;
@@ -88,13 +89,13 @@ public class SymbolImportService {
 		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
 			var myIndex = indexIntraDay.addAndGet(-1L);
 			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
-			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(),
-					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(), Duration.ofSeconds(20),
+					allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
 		return CompletableFuture.completedFuture(quoteCount);
 	}
-	
+
 	public String importUsSymbols() {
 		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq)))
 				.block();
@@ -157,13 +158,14 @@ public class SymbolImportService {
 	public List<Symbol> findSymbolsToUpdate() {
 		List<String> symbolsToFilter = List.of(ComparisonIndex.SP500.getSymbol(),
 				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol());
-		List<Symbol> symbolsToUpdate = this.refreshSymbolEntities().stream()
+		List<Symbol> symbolsToUpdate = this.appUserRepository.findAll().stream()
+				.map(appUser -> this.appUserRepository.findAllUserSymbolsByAppUserId(appUser.getId()))
+				.flatMap(Set::stream).filter(StreamHelpers.distinctByKey(Symbol::getSymbol))
 				.filter(mySymbol -> symbolsToFilter.stream()
-						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
-				.collect(Collectors.toList());
+						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol()))).toList();
 		return symbolsToUpdate;
 	}
-	
+
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol) {
 		ComparisonIndex compIndex = Stream.of(ComparisonIndex.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()

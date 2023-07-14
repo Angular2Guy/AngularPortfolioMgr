@@ -14,6 +14,9 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.data.repository.query.Param;
 
 public interface AppUserRepository {
 	Optional<AppUser> findByUsername(String username);
@@ -22,4 +25,5 @@ public interface AppUserRepository {
 	Optional<AppUser> findById(Long id);
 	AppUser save(AppUser appUser);
 	Iterable<AppUser> saveAll(Iterable<AppUser> users);
+	Set<Symbol> findAllUserSymbolsByAppUserId(@Param(value="userId") Long id);
 }

@@ -13,16 +13,20 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.AppUser;
+import ch.xxx.manager.domain.model.entity.Symbol;
 
 public interface JpaAppUserRepository extends JpaRepository<AppUser, Long> {
 		@Query("select au from AppUser au where au.userName = :username")
 		Optional<AppUser> findByUsername(@Param(value = "username") String username);
 		@Query("select au from AppUser au where au.uuid = :uuid")
 		Optional<AppUser> findByUuid(@Param(value = "uuid") String uuid);
+		@Query("select distinct(s) from AppUser au join au.portfolios p join p.portfolioToSymbols pts join pts.symbol s where au.id = :userId")
+		Set<Symbol> findAllUserSymbolsByAppUserId(@Param(value="userId") Long id);
 }

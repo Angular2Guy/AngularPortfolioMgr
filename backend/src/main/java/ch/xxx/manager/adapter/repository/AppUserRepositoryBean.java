@@ -14,11 +14,13 @@ package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.Symbol;
 
 @Repository
 public class AppUserRepositoryBean implements AppUserRepository {
@@ -56,5 +58,10 @@ public class AppUserRepositoryBean implements AppUserRepository {
 	@Override
 	public Iterable<AppUser> saveAll(Iterable<AppUser> users) {
 		return this.jpaAppUserRepository.saveAll(users);
+	}
+
+	@Override
+	public Set<Symbol> findAllUserSymbolsByAppUserId(Long id) {
+		return this.jpaAppUserRepository.findAllUserSymbolsByAppUserId(id);
 	}
 }
