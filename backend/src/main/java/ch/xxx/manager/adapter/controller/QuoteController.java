@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -39,6 +41,7 @@ import ch.xxx.manager.usecase.service.SymbolImportService;
 @RestController
 @RequestMapping("rest/quote")
 public class QuoteController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteController.class);
 	private final QuoteService quoteService;
 	private final QuoteImportService quoteImportService;
 	private final PortfolioToIndexService portfolioToIndexService;
@@ -116,6 +119,7 @@ public class QuoteController {
 	
 	@GetMapping("/update/portfolio/symbols")
 	public Long updatePortfolioSymbols() {
+		LOGGER.info("updateSymbolQuotes started.");
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
 		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
 		return 0L;

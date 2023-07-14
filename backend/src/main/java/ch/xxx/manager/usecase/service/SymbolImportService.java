@@ -94,6 +94,7 @@ public class SymbolImportService {
 					allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
+		LOGGER.info("updateSymbolQuotes done.");
 		return CompletableFuture.completedFuture(quoteCount);
 	}
 
