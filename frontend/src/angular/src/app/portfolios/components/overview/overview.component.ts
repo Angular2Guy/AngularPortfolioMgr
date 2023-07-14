@@ -84,7 +84,11 @@ export class OverviewComponent implements OnInit {
     this.refreshPortfolios();
     this.configService
       .getProfiles()
-      .subscribe((value) => (this.profiles = !value ? "dev" : value.trim().toLowerCase()));
+      .subscribe((value) => {
+		this.profiles = !value ? "dev" : value.trim().toLowerCase();
+		//this.profiles = "dev " + this.profiles;
+      	console.log(this.profiles);
+      });
   }
 
   @HostListener("window:resize", ["$event"])
@@ -149,8 +153,7 @@ export class OverviewComponent implements OnInit {
   }
 
   updateQuotes() {
-	  this.quoteImportService.updateAllDailyIntraDayQuotes();
-	  console.log('updateQuotes() called.');
+	  this.quoteImportService.updateAllDailyIntraDayQuotes().subscribe(xxx => console.log('updateQuotes() called.'));
   }
 
   private refreshPortfolios() {

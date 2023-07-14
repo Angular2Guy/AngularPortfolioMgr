@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -71,7 +73,7 @@ public class SymbolImportService {
 	}
 
 	@Async
-	public Long updateSymbolQuotes(List<Symbol> symbolsToUpdate) {
+	public Future<Long> updateSymbolQuotes(List<Symbol> symbolsToUpdate) {
 		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
 				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
 		final AtomicLong indexDaily = new AtomicLong(-1L);
@@ -90,7 +92,7 @@ public class SymbolImportService {
 					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
-		return quoteCount;
+		return CompletableFuture.completedFuture(quoteCount);
 	}
 	
 	public String importUsSymbols() {
