@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -85,7 +86,7 @@ public class SymbolImportService {
 					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Daily Quote import done for: {}", quoteCount);
-		final AtomicLong indexIntraDay = new AtomicLong(allUserKeys.size());
+		final AtomicLong indexIntraDay = new AtomicLong(symbolsToUpdate.size());
 		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
 			var myIndex = indexIntraDay.addAndGet(-1L);
 			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
@@ -161,8 +162,11 @@ public class SymbolImportService {
 		List<Symbol> symbolsToUpdate = this.appUserRepository.findAll().stream()
 				.map(appUser -> this.appUserRepository.findAllUserSymbolsByAppUserId(appUser.getId()))
 				.flatMap(Set::stream).filter(StreamHelpers.distinctByKey(Symbol::getSymbol))
+				.filter(mySymbol -> Optional.of(mySymbol.getSymbol()).stream()
+						.noneMatch(aSymbol -> aSymbol.contains(ServiceUtils.PORTFOLIO_MARKER)))
 				.filter(mySymbol -> symbolsToFilter.stream()
-						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol()))).toList();
+						.noneMatch(mySymbolStr -> mySymbolStr.equalsIgnoreCase(mySymbol.getSymbol())))
+				.toList();
 		return symbolsToUpdate;
 	}
 
