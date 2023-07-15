@@ -32,18 +32,20 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The Helm chart for a Kubernetes deployment in the helm directory can deploy the project with Kafka, Zookeeper and Postgresql.
 * Currently Liquibase needs '-Dliquibase.duplicateFileMode=WARN' as VM Parameter at startup.
 * The Helm chart supports horizontal autoscaling of the app with Keda.
+* The scrolling Dateline chart is added to show how a portfolio evolves over time.
+* Support for a separate Api Key pair for each user is implemented to support the import/update for the quotes.
 
-The current state of the project is that the main features are implemented and it will continue to be improved. 
+The current state of the project is that a multi user portfolio management is implemented. 
 
 ## C4 Architecture Diagrams
 The project has a [System Context Diagram](structurizr/diagrams/structurizr-1-SystemContext.svg), a [Container Diagram](structurizr/diagrams/structurizr-1-Containers.svg) and a [Component Diagram](structurizr/diagrams/structurizr-1-Components.svg). The Diagrams have been created with Structurizr. The file runStructurizr.sh contains the commands to use Structurizr and the directory structurizr contains the dsl file.
 
 ## Portfolio Manager setup
-To use the Portfolio Manager 2 Apikeys are needed to import the stock quotes and the company information. 
+To use the Portfolio Manager 2 Apikeys are needed for the application and for each user to import the stock quotes and the company information. 
 * the Alphavantage Apikey is available [here](https://www.alphavantage.co/support/#api-key) and needs to be put in the property file with key: api.key=
 * the RapidApi Apikey ist availabe [here](https://rapidapi.com/apidojo/api/yh-finance/) (An account with a valid email address can be created.) and need to be  put in the property file with the key: api.key.rapidapi=
 
-That will enable the Portfolio Manager to import the stock quotes for the portfolio. The apis have request frequency limits that have to be considered! 
+That will enable the Portfolio Manager to import the stock quotes for the portfolio each user has to provide Alphavantage/RapidApi keys. The keys are stored with each user and enable the import/update of the quotes by multiple users of the application. The nightly quote import uses the keys to update the quotes.
 The Portfolio Manager starts with a H2 in memory database that will lose its content with each application termination. To have persistent data in the database the postgresql support needs to be used. It is activated in the 'prod' profile and needs a local [postgresql database](https://www.postgresql.org/) or an available [docker image](https://hub.docker.com/_/postgres) of the database. The properties to setup the database access are in the [application-prod.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod.properties) or the [application-prod-kafka.properties](https://github.com/Angular2Guy/AngularPortfolioMgr/blob/master/backend/src/main/resources/application-prod-kafka.properties). 
 
 ## SEC Filings analysis setup
