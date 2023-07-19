@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,10 +31,17 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
@@ -41,6 +51,7 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
+import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -56,6 +67,9 @@ public class SymbolImportService {
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
 	private final QuoteImportService quoteImportService;
 	private final AppUserRepository appUserRepository;
+	private DeterministicAead daead;
+	@Value("${tink.json.key}")
+	private String tinkJsonKey;
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
 			XetraClient xetraClient, QuoteImportService quoteImportService, AppUserRepository appUserRepository) {
@@ -65,6 +79,14 @@ public class SymbolImportService {
 		this.xetraClient = xetraClient;
 		this.quoteImportService = quoteImportService;
 		this.appUserRepository = appUserRepository;
+	}
+
+	@PostConstruct
+	public void init() throws GeneralSecurityException {
+		//LOGGER.info(this.tinkJsonKey);
+		DeterministicAeadConfig.register();
+		KeysetHandle handle = TinkJsonProtoKeysetFormat.parseKeyset(this.tinkJsonKey, InsecureSecretKeyAccess.get());
+		this.daead = handle.getPrimitive(DeterministicAead.class);
 	}
 
 	public List<Symbol> refreshSymbolEntities() {
@@ -77,7 +99,10 @@ public class SymbolImportService {
 	@Async
 	public Future<Long> updateSymbolQuotes(List<Symbol> symbolsToUpdate) {
 		List<UserKeys> allUserKeys = this.appUserRepository.findAll().stream()
-				.map(myAppUser -> new UserKeys(myAppUser.getAlphavantageKey(), myAppUser.getRapidApiKey())).toList();
+				.map(myAppUser -> new UserKeys(
+						this.decrypt(myAppUser.getAlphavantageKey(), UUID.fromString(myAppUser.getUuid())),
+						this.decrypt(myAppUser.getRapidApiKey(), UUID.fromString(myAppUser.getUuid()))))
+				.toList();
 		final AtomicLong indexDaily = new AtomicLong(-1L);
 		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
 			var myIndex = indexDaily.addAndGet(1L);
@@ -96,6 +121,17 @@ public class SymbolImportService {
 		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
 		LOGGER.info("updateSymbolQuotes done.");
 		return CompletableFuture.completedFuture(quoteCount);
+	}
+
+	public String decrypt(String ciphertext, UUID userUuid) {
+		byte[] decrypted;
+		try {
+			decrypted = daead.decryptDeterministically(ciphertext.getBytes(Charset.defaultCharset()),
+					userUuid.toString().getBytes(Charset.defaultCharset()));
+		} catch (GeneralSecurityException e) {
+			throw new RuntimeException(e);
+		}
+		return new String(decrypted, Charset.defaultCharset());
 	}
 
 	public String importUsSymbols() {

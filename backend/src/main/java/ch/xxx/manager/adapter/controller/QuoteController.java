@@ -15,6 +15,7 @@ package ch.xxx.manager.adapter.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,14 +101,18 @@ public class QuoteController {
 
 	@GetMapping("/import/daily/symbol/{symbol}")
 	public Long importDailyQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
-		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid);		
-		return this.quoteImportService.importDailyQuoteHistory(symbol, new UserKeys(appUserDto.getAlphavantageKey(), appUserDto.getRapidApiKey()));
+		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid, true);		
+		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(), UUID.fromString(appUserDto.getUuid()));
+		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(), UUID.fromString(appUserDto.getUuid()));
+		return this.quoteImportService.importDailyQuoteHistory(symbol, new UserKeys(alphavantageKey, rapidApiKey));
 	}
 
 	@GetMapping("/import/intraday/symbol/{symbol}")
 	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
-		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid);		
-		return this.quoteImportService.importIntraDayQuotes(symbol, new UserKeys(appUserDto.getAlphavantageKey(), appUserDto.getRapidApiKey()));
+		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid, true);	
+		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(), UUID.fromString(appUserDto.getUuid()));
+		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(), UUID.fromString(appUserDto.getUuid()));
+		return this.quoteImportService.importIntraDayQuotes(symbol, new UserKeys(alphavantageKey, rapidApiKey));
 	}
 
 	@GetMapping("/import/daily/currency/{to_curr}")

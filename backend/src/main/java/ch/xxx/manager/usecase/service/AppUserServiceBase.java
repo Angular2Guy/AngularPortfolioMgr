@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,12 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
@@ -63,6 +71,7 @@ public class AppUserServiceBase {
 	private final RevokedTokenRepository revokedTokenRepository;
 	protected final RevokedTokenMapper revokedTokenMapper;
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
+	private DeterministicAead daead;
 
 	@Value("${spring.mail.username}")
 	private String mailuser;
@@ -70,6 +79,8 @@ public class AppUserServiceBase {
 	private String mailpwd;
 	@Value("${messenger.url.uuid.confirm}")
 	protected String confirmUrl;
+	@Value("${tink.json.key}")
+	private String tinkJsonKey;
 
 	public AppUserServiceBase(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
 			RevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
@@ -85,8 +96,11 @@ public class AppUserServiceBase {
 	}
 
 	@PostConstruct
-	public void init() {
+	public void init() throws GeneralSecurityException {
 		LOGGER.info("Profiles: {}, Classname: {}", this.myService.getProfiles(), this.myService.getClassName());
+		DeterministicAeadConfig.register();
+		KeysetHandle handle = TinkJsonProtoKeysetFormat.parseKeyset(this.tinkJsonKey, InsecureSecretKeyAccess.get());
+		this.daead = handle.getPrimitive(DeterministicAead.class);
 	}
 
 	public void updateLoggedOutUsers() {
@@ -104,7 +118,7 @@ public class AppUserServiceBase {
 						&& myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(timeout)))
 				.toList());
 	}
-	
+
 	public RefreshTokenDto refreshToken(String bearerToken) {
 		Optional<String> tokenOpt = this.jwtTokenService.resolveToken(bearerToken);
 		if (tokenOpt.isEmpty()) {
@@ -115,12 +129,35 @@ public class AppUserServiceBase {
 		return new RefreshTokenDto(newToken);
 	}
 
-	//use tink to encrypt api keys
-	public AppUserDto save(AppUserDto appUser) {
+	public AppUserDto save(AppUserDto appUserDto) {
 		return this.appUserMapper.convert(
 				Optional.of(this.repository
-						.save(this.appUserMapper.convert(appUser, this.repository.findById(appUser.getId())))),
+						.save(this.mapEncryptDto(appUserDto, this.repository.findById(appUserDto.getId())))),
 				null, 10L);
+	}
+
+	private AppUser mapEncryptDto(AppUserDto appUserDto, Optional<AppUser> appUserOpt) {
+		AppUser appUser = this.appUserMapper.convert(appUserDto, appUserOpt);
+		UUID userUuid = appUserOpt.map(myAppUser -> UUID.fromString(myAppUser.getUuid())).orElse(UUID.randomUUID());
+		appUser.setUuid(userUuid.toString());
+		if (appUserDto.getAlphavantageKey() != null && !appUserDto.getAlphavantageKey().isBlank()) {
+			appUser.setAlphavantageKey(this.encrypt(appUserDto.getAlphavantageKey(), userUuid));
+		}
+		if (appUserDto.getRapidApiKey() != null && !appUserDto.getRapidApiKey().isBlank()) {
+			appUser.setRapidApiKey(this.encrypt(appUserDto.getRapidApiKey(), userUuid));
+		}
+		return appUser;
+	}
+
+	private String encrypt(String plainText, UUID userUuid) {
+		byte[] ciphertext;
+		try {
+			ciphertext = daead.encryptDeterministically(plainText.getBytes(Charset.defaultCharset()),
+					userUuid.toString().getBytes(Charset.defaultCharset()));
+		} catch (GeneralSecurityException e) {
+			throw new RuntimeException(e);
+		}
+		return new String(new String(ciphertext, Charset.defaultCharset()));
 	}
 
 	public Boolean confirmUuid(String uuid) {
@@ -163,13 +200,13 @@ public class AppUserServiceBase {
 		return this.signin(appUserDto, true, true).isPresent();
 	}
 
-	//use tink to encrypt api keys
-	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist, boolean check) {	
-		if(appUserDto.getId() != null) {
+	public Optional<AppUser> signin(AppUserDto appUserDto, boolean persist, boolean check) {
+		if (appUserDto.getId() != null) {
 			return Optional.empty();
 		}
-		Optional<AppUser> result = check ? this.checkSaveSignin(this.appUserMapper.convert(appUserDto,
-				this.repository.findByUsername(appUserDto.getUsername()))) : Optional.of(this.appUserMapper.convert(appUserDto));
+		Optional<AppUser> result = check
+				? this.checkSaveSignin(this.mapEncryptDto(appUserDto, this.repository.findByUsername(appUserDto.getUsername())))
+				: Optional.of(this.appUserMapper.convert(appUserDto));
 		result = result.stream().map(myAppUser -> persist ? this.repository.save(myAppUser) : myAppUser).findAny();
 		return result;
 	}
@@ -179,8 +216,6 @@ public class AppUserServiceBase {
 		if (entity.getId() == null) {
 			String encryptedPassword = this.passwordEncoder.encode(entity.getPassword());
 			entity.setPassword(encryptedPassword);
-			UUID uuid = UUID.randomUUID();
-			entity.setUuid(uuid.toString());
 			entity.setLocked(false);
 			entity.setUserRole(Role.USERS.name());
 			boolean emailConfirmEnabled = this.confirmUrl != null && !this.confirmUrl.isBlank();
@@ -226,7 +261,7 @@ public class AppUserServiceBase {
 				.count();
 		Optional<RevokedToken> result = Optional.empty();
 		if (revokedTokensForUuid == 0) {
-			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));			
+			result = Optional.of(new RevokedToken(username, uuid, LocalDateTime.now()));
 		} else {
 			LOGGER.warn("Duplicate logout for user {} logout: {}", username, revokedTokensForUuid);
 		}
@@ -252,16 +287,16 @@ public class AppUserServiceBase {
 		return this.appUserMapper.convert(this.repository.findById(id), null, 10L);
 	}
 
-	public AppUserDto loadByUuid(String uuid) {
-		return this.appUserMapper.convert(this.repository.findByUuid(uuid), null, 10L);
+	public AppUserDto loadByUuid(String uuid, boolean showApiKeys) {
+		return this.appUserMapper.convert(this.repository.findByUuid(uuid), null, 10L, showApiKeys);
 	}
-	
+
 	public List<AppUserDto> loadAll() {
 		return this.repository.findAll().stream()
 				.flatMap(entity -> Stream.of(this.appUserMapper.convert(Optional.of(entity), null, 10L)))
 				.collect(Collectors.toList());
 	}
-	
+
 	public void sendKafkaEvent(KafkaEventDto kafkaEventDto) {
 		LOGGER.info("KafkaEvent not send.");
 	}

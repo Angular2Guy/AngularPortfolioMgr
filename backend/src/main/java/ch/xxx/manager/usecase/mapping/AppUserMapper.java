@@ -22,15 +22,19 @@ import ch.xxx.manager.domain.model.entity.AppUser;
 
 @Component
 public class AppUserMapper {
-	public AppUserDto convert(Optional<AppUser> entityOpt, String token, long untilNextLogin) {
+	public AppUserDto convert(Optional<AppUser> entityOpt, String token, long untilNextLogin, boolean addApiKeys) {
 		AppUserDto dto = entityOpt.isEmpty() ? null
 				: new AppUserDto(entityOpt.get().getId(), entityOpt.get().getUserName(), entityOpt.get().getBirthDate(),
 						"XXX", token, "YYY", entityOpt.get().getUserRole(), entityOpt.get().isLocked(),
-						entityOpt.get().isEnabled(), "ZZZ", // entityOpt.get().getAlphavantageKey(),entityOpt.get().getRapidApiKey(),
-						null, null, untilNextLogin);
+						entityOpt.get().isEnabled(), "ZZZ", addApiKeys ? entityOpt.get().getAlphavantageKey() : null,
+						addApiKeys ? entityOpt.get().getRapidApiKey() : null, untilNextLogin);
 		return dto;
 	}
 
+	public AppUserDto convert(Optional<AppUser> entityOpt, String token, long untilNextLogin) {
+		return convert(entityOpt, token, untilNextLogin, false);
+	}
+	
 	public AppUser convert(AppUserDto dto, Optional<AppUser> entityOpt) {
 		final AppUser myEntity = entityOpt.orElse(new AppUser());
 		myEntity.setBirthDate(dto.getBirthdate());
