@@ -97,10 +97,14 @@ export class LoginComponent implements OnInit {
       token: null,
       password: null,
       username: null,
+      alphavantageKey: null,
+      rapidApiKey: null
     };
     login.username = this.signinForm.get(FormFields.Username).value;
     login.password = this.signinForm.get(FormFields.Password).value;
     login.emailAddress = this.signinForm.get(FormFields.Email).value;
+    login.alphavantageKey = this.signinForm.get(FormFields.AlphavantageKey).value;
+    login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey).value;
     this.waitingForResponse = true;
     this.loginService.postSignin(login).subscribe({
       next: (res) => this.signin(res),

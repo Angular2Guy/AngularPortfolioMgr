@@ -14,6 +14,7 @@ package ch.xxx.manager.tink;
 
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,9 +51,12 @@ public class EncryptionTest {
 		String plaintext = "This is a test text for Tink encryption.";
 		KeysetHandle handle = TinkJsonProtoKeysetFormat.parseKeyset(JSON_KEYSET, InsecureSecretKeyAccess.get());
 		DeterministicAead daead = handle.getPrimitive(DeterministicAead.class);
-		byte[] ciphertext = daead.encryptDeterministically(plaintext.getBytes(Charset.defaultCharset()), USER_UUID.toString().getBytes(Charset.defaultCharset()));
-		//System.out.println(new String(ciphertext));
-		String result = new String(daead.decryptDeterministically(ciphertext, USER_UUID.toString().getBytes(Charset.defaultCharset())));
+		byte[] cipherBytes = daead.encryptDeterministically(plaintext.getBytes(Charset.defaultCharset()),
+				USER_UUID.toString().getBytes(Charset.defaultCharset()));
+		String cipherText = new String(Base64.getEncoder().encode(cipherBytes), Charset.defaultCharset());
+		// System.out.println(new String(ciphertext));
+		String result = new String(daead.decryptDeterministically(Base64.getDecoder().decode(cipherText),
+				USER_UUID.toString().getBytes(Charset.defaultCharset())));
 		Assertions.assertEquals(plaintext, result);
 	}
 }

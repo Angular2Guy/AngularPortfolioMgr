@@ -17,4 +17,6 @@ export interface Login {
   emailAddress: string;
   token: string;
   secUntilNexLogin?: number;
+  alphavantageKey?: string;
+  rapidApiKey?: string;
 }

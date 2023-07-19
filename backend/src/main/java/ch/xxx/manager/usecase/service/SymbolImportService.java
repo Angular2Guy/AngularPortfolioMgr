@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -130,8 +131,8 @@ public class SymbolImportService {
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
-		}
-		return new String(decrypted, Charset.defaultCharset());
+		}		
+		return new String(Base64.getDecoder().decode(decrypted), Charset.defaultCharset());
 	}
 
 	public String importUsSymbols() {
