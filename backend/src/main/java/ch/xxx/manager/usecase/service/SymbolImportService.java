@@ -127,12 +127,12 @@ public class SymbolImportService {
 	public String decrypt(String ciphertext, UUID userUuid) {
 		byte[] decrypted;
 		try {
-			decrypted = daead.decryptDeterministically(ciphertext.getBytes(Charset.defaultCharset()),
+			decrypted = daead.decryptDeterministically(Base64.getDecoder().decode(ciphertext.getBytes(Charset.defaultCharset())),
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
 		}		
-		return new String(Base64.getDecoder().decode(decrypted), Charset.defaultCharset());
+		return new String(decrypted, Charset.defaultCharset());
 	}
 
 	public String importUsSymbols() {

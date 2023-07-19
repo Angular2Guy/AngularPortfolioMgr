@@ -185,7 +185,7 @@ public class AppUserServiceBase {
 				.filter(role1 -> role1.name().equalsIgnoreCase(myUser.getUserRole()))).findAny();
 		if (myRole.isPresent() && entityOpt.get().isEnabled()
 				&& this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
-			Callable<String> callableTask = () -> this.jwtTokenService.createToken(entityOpt.get().getUserName(),
+			Callable<String> callableTask = () -> this.jwtTokenService.createToken(entityOpt.get().getUserName(),  
 					Arrays.asList(myRole.get()), Optional.empty());
 			try {
 				String jwtToken = executorService.schedule(callableTask, 3, TimeUnit.SECONDS).get();
@@ -288,8 +288,8 @@ public class AppUserServiceBase {
 		return this.appUserMapper.convert(this.repository.findById(id), null, 10L);
 	}
 
-	public AppUserDto loadByUuid(String uuid, boolean showApiKeys) {
-		return this.appUserMapper.convert(this.repository.findByUuid(uuid), null, 10L, showApiKeys);
+	public AppUserDto loadByName(String name, boolean showApiKeys) {
+		return this.appUserMapper.convert(this.repository.findByUsername(name), null, 10L, showApiKeys);
 	}
 
 	public List<AppUserDto> loadAll() {

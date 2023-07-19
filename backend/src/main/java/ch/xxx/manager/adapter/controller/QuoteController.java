@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
@@ -49,15 +50,18 @@ public class QuoteController {
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
 	private final SymbolImportService symbolImportService;
+	private final JwtTokenService jwtTokenProvider;
 
 	public QuoteController(QuoteService quoteService, QuoteImportService quoteImportService,
-			PortfolioToIndexService portfolioToIndexService, CurrencyService currencyService, AppUserService appUserService,SymbolImportService symbolImportService) {
+			JwtTokenService jwtTokenProvider, PortfolioToIndexService portfolioToIndexService,
+			CurrencyService currencyService, AppUserService appUserService, SymbolImportService symbolImportService) {
 		this.quoteService = quoteService;
 		this.quoteImportService = quoteImportService;
 		this.portfolioToIndexService = portfolioToIndexService;
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
 		this.symbolImportService = symbolImportService;
+		this.jwtTokenProvider = jwtTokenProvider;
 	}
 
 	@GetMapping("/daily/all/symbol/{symbol}")
@@ -100,18 +104,25 @@ public class QuoteController {
 	}
 
 	@GetMapping("/import/daily/symbol/{symbol}")
-	public Long importDailyQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
-		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid, true);		
-		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(), UUID.fromString(appUserDto.getUuid()));
-		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(), UUID.fromString(appUserDto.getUuid()));
+	public Long importDailyQuotes(@PathVariable("symbol") String symbol, @RequestHeader("authorization") String token) {
+		AppUserDto appUserDto = this.appUserService.loadByName(this.jwtTokenProvider.getUsername(this.jwtTokenProvider
+				.resolveToken(token).orElseThrow(() -> new AuthenticationException("Invalid token."))), true);
+		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(),
+				UUID.fromString(appUserDto.getUuid()));
+		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(),
+				UUID.fromString(appUserDto.getUuid()));
 		return this.quoteImportService.importDailyQuoteHistory(symbol, new UserKeys(alphavantageKey, rapidApiKey));
 	}
 
 	@GetMapping("/import/intraday/symbol/{symbol}")
-	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol, @RequestHeader(JwtTokenService.USER_UUID) String userUuid) {
-		AppUserDto appUserDto = this.appUserService.loadByUuid(userUuid, true);	
-		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(), UUID.fromString(appUserDto.getUuid()));
-		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(), UUID.fromString(appUserDto.getUuid()));
+	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol,
+			@RequestHeader("authorization") String token) {
+		AppUserDto appUserDto = this.appUserService.loadByName(this.jwtTokenProvider.getUsername(this.jwtTokenProvider
+				.resolveToken(token).orElseThrow(() -> new AuthenticationException("Invalid token."))), true);		
+		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(),
+				UUID.fromString(appUserDto.getUuid()));
+		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(),
+				UUID.fromString(appUserDto.getUuid()));
 		return this.quoteImportService.importIntraDayQuotes(symbol, new UserKeys(alphavantageKey, rapidApiKey));
 	}
 
@@ -121,7 +132,7 @@ public class QuoteController {
 		this.currencyService.initCurrencyMap();
 		return count;
 	}
-	
+
 	@GetMapping("/update/portfolio/symbols")
 	public Long updatePortfolioSymbols() {
 		LOGGER.info("updateSymbolQuotes started.");

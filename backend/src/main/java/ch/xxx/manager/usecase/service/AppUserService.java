@@ -31,6 +31,6 @@ public interface AppUserService {
 	TokenSubjectRole getTokenRoles(Map<String, String> headers);
 	AppUserDto loadById(Long id);
 	List<AppUserDto> loadAll();
-	AppUserDto loadByUuid(String uuid, boolean showApiKeys);
+	AppUserDto loadByName(String name, boolean showApiKeys);
 	void sendKafkaEvent(KafkaEventDto kafkaEventDto);
 }
