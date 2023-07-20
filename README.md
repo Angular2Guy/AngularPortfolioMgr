@@ -34,6 +34,7 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The Helm chart supports horizontal autoscaling of the app with Keda.
 * The scrolling Dateline chart is added to show how a portfolio evolves over time.
 * Support for a separate Api Key pair for each user is implemented to support the import/update for the quotes.
+* The User Api Keys are encrypted with Tink. 
 
 The current state of the project is that a multi user portfolio management is implemented. 
 
