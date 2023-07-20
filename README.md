@@ -5,6 +5,8 @@ Author: Sven Loesekann
 
 Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka
 
+[![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
+
 ## Articles
 * [A scrolling Date/Timeline Chart with Angular Material Components](https://angular2guy.wordpress.com/2023/07/01/a-scrolling-date-timeline-chart-with-angular-material-components/)
 * [Autoscaling Kubernetes setup for Spring Boot Apps with Database and Kafka](https://angular2guy.wordpress.com/2023/03/23/autoscaling-kubernetes-setup-for-spring-boot-apps-with-a-database-and-kafka/)
