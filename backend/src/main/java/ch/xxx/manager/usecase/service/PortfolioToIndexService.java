@@ -154,12 +154,12 @@ public class PortfolioToIndexService {
 				0L, dailyQuote.getLocalDay().atStartOfDay(), dailyQuote.getSymbolKey())
 				: portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote))
 						.reduce(new QuoteDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, -1L, day.atStartOfDay(),
-								dailyQuote.getSymbol().getSymbol()), (acc, value) -> {
-									acc.setOpen(acc.getOpen().add(value.getOpen()));
-									acc.setHigh(acc.getHigh().add(value.getHigh()));
-									acc.setLow(acc.getLow().add(value.getLow()));									
-									acc.setClose(acc.getClose().add(value.getClose()));
-									acc.setAdjClose(acc.getAdjClose().add(value.getAdjClose()));
+								dailyQuote.getSymbol().getSymbol()), (acc, value) -> {									
+									acc.setOpen(acc.getOpen().add(Optional.ofNullable(value.getOpen()).orElse(BigDecimal.ZERO)));
+									acc.setHigh(acc.getHigh().add(Optional.ofNullable(value.getHigh()).orElse(BigDecimal.ZERO)));
+									acc.setLow(acc.getLow().add(Optional.ofNullable(value.getLow()).orElse(BigDecimal.ZERO)));									
+									acc.setClose(acc.getClose().add(Optional.ofNullable(value.getClose()).orElse(BigDecimal.ZERO)));
+									acc.setAdjClose(acc.getAdjClose().add(Optional.ofNullable(value.getAdjClose()).orElse(BigDecimal.ZERO)));
 									acc.setVolume(0L);
 									return acc;
 								});
