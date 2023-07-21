@@ -3,7 +3,7 @@
 
 Author: Sven Loesekann
 
-Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka
+Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka, Tink
 
 [![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
 
@@ -21,7 +21,7 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 * [Configurable Services in the NgxSimpleCharts library](https://angular2guy.wordpress.com/2022/09/13/configurable-services-in-the-ngx-simple-charts-library/)
 
 ## What is the goal?
-The goal is to provide an Angular based Web App with a Jpa backend server. The build tool is Gradle. Apache Kafka can be used for scalable Jwt token revokation. 
+The goal is to provide a Portfolio Management Application to compare different portfolios for there quality over time. It is an Angular based Web App with a Jpa backend server. The build tool is Gradle. Apache Kafka can be used for scalable Jwt token revokation. 
 
 ## Current state of the project
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
@@ -38,7 +38,7 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * Support for a separate Api Key pair for each user is implemented to support the import/update for the quotes.
 * The User Api Keys are encrypted with Tink. 
 
-The current state of the project is that a multi user portfolio management is implemented. 
+The current state of the project is that a multi user portfolio management is implemented and is ready for use. 
 
 ## C4 Architecture Diagrams
 The project has a [System Context Diagram](structurizr/diagrams/structurizr-1-SystemContext.svg), a [Container Diagram](structurizr/diagrams/structurizr-1-Containers.svg) and a [Component Diagram](structurizr/diagrams/structurizr-1-Components.svg). The Diagrams have been created with Structurizr. The file runStructurizr.sh contains the commands to use Structurizr and the directory structurizr contains the dsl file.
