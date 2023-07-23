@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue;
 
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.JwtTokenService;
@@ -51,11 +52,13 @@ public class WebSecurityConfig {
 						.requestMatchers("/rest/kedatest/**").permitAll().requestMatchers("/rest/auth/**").permitAll()
 						.requestMatchers("/rest/**").hasAuthority(DataHelper.Role.USERS.toString())
 						.requestMatchers(blockedPath).denyAll())
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()).sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().headers()
-				.contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';")
-				.and().xssProtection().and().frameOptions().sameOrigin()
-				.and().addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+				.csrf(myCsrf -> myCsrf.disable())
+				.sessionManagement(mySm -> mySm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.headers(myHeaders -> myHeaders.contentSecurityPolicy(myCsp -> myCsp.policyDirectives(
+						"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';")))
+				.headers(myHeaders -> myHeaders.xssProtection(myXss -> myXss.headerValue(HeaderValue.ENABLED)))
+				.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
 
