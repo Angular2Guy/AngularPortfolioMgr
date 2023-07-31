@@ -74,7 +74,8 @@ public class XetraConnector implements XetraClient {
 	}
 
 	private String createCsvUrl(String href) {
-		String url = "https://www.xetra.com" + href.replaceAll("href=\"", "").replaceAll("\"", "");
+		String url = (href.contains("https://www.xetra.com") ? "" : "https://www.xetra.com")
+				+ href.replaceAll("href=\"", "").replaceAll("\"", "");
 		return url;
 	}
 }
