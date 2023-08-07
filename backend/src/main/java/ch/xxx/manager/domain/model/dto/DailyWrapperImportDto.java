@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DailyWrapperImportDto {
 	@JsonProperty("Meta Data")
 	private DailyMetaDataImportDto metaData;	
+//	@JsonProperty("Time Series (Daily)")
+//	private Map<String,DailyQuoteImportAdjDto> dailyQuotes = new HashMap<>();
 	@JsonProperty("Time Series (Daily)")
-	private Map<String,DailyQuoteImportAdjDto> dailyQuotes = new HashMap<>();
+	private Map<String,DailyQuoteImportDto> dailyQuotes = new HashMap<>();
 	
 	public DailyMetaDataImportDto getMetaData() {
 		return metaData;
@@ -29,10 +31,16 @@ public class DailyWrapperImportDto {
 	public void setMetaData(DailyMetaDataImportDto metaData) {
 		this.metaData = metaData;
 	}
-	public Map<String, DailyQuoteImportAdjDto> getDailyQuotes() {
+//	public Map<String, DailyQuoteImportAdjDto> getDailyQuotes() {
+//		return dailyQuotes;
+//	}
+//	public void setDailyQuotes(Map<String, DailyQuoteImportAdjDto> dailyQuotes) {
+//		this.dailyQuotes = dailyQuotes;
+//	}
+	public Map<String, DailyQuoteImportDto> getDailyQuotes() {
 		return dailyQuotes;
 	}
-	public void setDailyQuotes(Map<String, DailyQuoteImportAdjDto> dailyQuotes) {
+	public void setDailyQuotes(Map<String, DailyQuoteImportDto> dailyQuotes) {
 		this.dailyQuotes = dailyQuotes;
 	}
 }

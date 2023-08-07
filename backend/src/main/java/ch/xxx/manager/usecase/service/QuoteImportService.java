@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyQuoteImportAdjDto;
+import ch.xxx.manager.domain.model.dto.DailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
@@ -284,6 +285,17 @@ public class QuoteImportService {
 		return entity;
 	}
 
+	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
+			Map<LocalDate, Collection<Currency>> currencyMap) {
+		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
+				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
+				new BigDecimal(dto.getClose()), Long.parseLong(dto.getVolume()),
+				LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE), symbolEntity,
+				symbolEntity.getCurrencyKey());
+		symbolEntity.getDailyQuotes().add(entity);
+		return entity;
+	}
+	
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
 		if (entities != null && !entities.isEmpty()) {
