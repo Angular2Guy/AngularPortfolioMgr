@@ -75,29 +75,13 @@ public class AlphavatageConnector implements AlphavatageClient {
 		return Mono.empty();
 	}
 
-//	@Override
-//	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries) {
-//		try {
-//			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
-//			final String myUrl = String.format(
-//					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s", symbol,
-//					fullSeriesStr, this.apiKey);
-//			LOGGER.info(myUrl);
-//			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-//					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
-//		} catch (URISyntaxException e) {
-//			LOGGER.error("getTimeseriesHistory failed.", e);
-//		}
-//		return Mono.empty();
-//	}
-
 	@Override
 	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys) {
 		try {
-			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
-			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s", symbol,
-					fullSeriesStr, userKeys.alphavantageKey());
+			final String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
+			final String urlBase = false ? "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s" 
+					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s"; 
+			final String myUrl = String.format(urlBase, symbol,	fullSeriesStr, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
 			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
 					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
