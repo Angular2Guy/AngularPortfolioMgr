@@ -66,7 +66,7 @@ public class PortfolioControllerTest extends BaseControllerTest {
 	public void init() {
 		Mockito.when(this.jwtTokenService.createToken(any(String.class), any(List.class), any(Optional.class)))
 				.thenCallRealMethod();
-		Mockito.when(this.jwtTokenService.resolveToken(any(HttpServletRequest.class))).thenReturn("");
+		Mockito.when(this.jwtTokenService.resolveToken(any(HttpServletRequest.class))).thenReturn(Optional.of(""));
 		Mockito.when(this.jwtTokenService.validateToken(any(String.class))).thenReturn(true);
 		Mockito.when(this.jwtTokenService.getAuthentication(any(String.class))).thenCallRealMethod();
 		Mockito.when(this.jwtTokenService.getTokenUserRoles(any(Map.class))).thenCallRealMethod();

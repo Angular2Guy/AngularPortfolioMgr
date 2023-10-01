@@ -141,12 +141,10 @@ public class AppUserServiceBase {
 		AppUser appUser = this.appUserMapper.convert(appUserDto, appUserOpt);
 		UUID userUuid = appUserOpt.map(myAppUser -> UUID.fromString(myAppUser.getUuid())).orElse(UUID.randomUUID());
 		appUser.setUuid(userUuid.toString());
-		if (appUserDto.getAlphavantageKey() != null && !appUserDto.getAlphavantageKey().isBlank()) {
-			appUser.setAlphavantageKey(this.encrypt(appUserDto.getAlphavantageKey(), userUuid));
-		}
-		if (appUserDto.getRapidApiKey() != null && !appUserDto.getRapidApiKey().isBlank()) {
-			appUser.setRapidApiKey(this.encrypt(appUserDto.getRapidApiKey(), userUuid));
-		}
+		Optional.ofNullable(appUserDto.getAlphavantageKey()).stream().filter(alphaKey -> !alphaKey.trim().isBlank())
+				.findFirst().ifPresent(alphaKey -> appUser.setAlphavantageKey(this.encrypt(alphaKey, userUuid)));
+		Optional.ofNullable(appUserDto.getRapidApiKey()).stream().filter(rapidKey -> !rapidKey.trim().isBlank()).findFirst()
+				.ifPresent(rapidKey -> appUser.setRapidApiKey(this.encrypt(rapidKey, userUuid)));		
 		return appUser;
 	}
 
@@ -157,8 +155,8 @@ public class AppUserServiceBase {
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
-		}		
-		return  new String(Base64.getEncoder().encode(ciphertext), Charset.defaultCharset());
+		}
+		return new String(Base64.getEncoder().encode(ciphertext), Charset.defaultCharset());
 	}
 
 	public Boolean confirmUuid(String uuid) {
@@ -185,7 +183,7 @@ public class AppUserServiceBase {
 				.filter(role1 -> role1.name().equalsIgnoreCase(myUser.getUserRole()))).findAny();
 		if (myRole.isPresent() && entityOpt.get().isEnabled()
 				&& this.passwordEncoder.matches(passwd, entityOpt.get().getPassword())) {
-			Callable<String> callableTask = () -> this.jwtTokenService.createToken(entityOpt.get().getUserName(),  
+			Callable<String> callableTask = () -> this.jwtTokenService.createToken(entityOpt.get().getUserName(),
 					Arrays.asList(myRole.get()), Optional.empty());
 			try {
 				String jwtToken = executorService.schedule(callableTask, 3, TimeUnit.SECONDS).get();
@@ -206,7 +204,8 @@ public class AppUserServiceBase {
 			return Optional.empty();
 		}
 		Optional<AppUser> result = check
-				? this.checkSaveSignin(this.mapEncryptDto(appUserDto, this.repository.findByUsername(appUserDto.getUsername())))
+				? this.checkSaveSignin(
+						this.mapEncryptDto(appUserDto, this.repository.findByUsername(appUserDto.getUsername())))
 				: Optional.of(this.appUserMapper.convert(appUserDto));
 		result = result.stream().map(myAppUser -> persist ? this.repository.save(myAppUser) : myAppUser).findAny();
 		return result;

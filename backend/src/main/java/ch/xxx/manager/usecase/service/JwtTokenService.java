@@ -54,8 +54,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class JwtTokenService {
 	private static final Logger LOG = LoggerFactory.getLogger(JwtTokenService.class);
-	private final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();	
-	public static final String USER_UUID = "UserUuid"; 
+	private final List<UserNameUuid> loggedOutUsers = new CopyOnWriteArrayList<>();
+	public static final String USER_UUID = "UserUuid";
 
 	public record UserNameUuid(String userName, String uuid) {
 	}
@@ -70,7 +70,9 @@ public class JwtTokenService {
 
 	@PostConstruct
 	public void init() {
-		this.jwtTokenKey = Keys.hmacShaKeyFor(Base64.getUrlDecoder().decode(secretKey.getBytes(StandardCharsets.ISO_8859_1)));;
+		this.jwtTokenKey = Keys
+				.hmacShaKeyFor(Base64.getUrlDecoder().decode(secretKey.getBytes(StandardCharsets.ISO_8859_1)));
+		;
 	}
 
 	public void updateLoggedOutUsers(List<RevokedToken> users) {
@@ -100,11 +102,8 @@ public class JwtTokenService {
 
 	public String refreshToken(String token) {
 		validateToken(token);
-		Optional<Jws<Claims>> claimsOpt = JwtUtils.getClaims(Optional.of(token), this.jwtTokenKey);
-		if (claimsOpt.isEmpty()) {
-			throw new AuthorizationServiceException("Invalid token claims");
-		}
-		Claims claims = claimsOpt.get().getBody();
+		Claims claims = JwtUtils.getClaims(Optional.of(token), this.jwtTokenKey)
+				.orElseThrow(() -> new AuthorizationServiceException("Invalid token claims")).getBody();
 		claims.setIssuedAt(new Date());
 		claims.setExpiration(new Date(Instant.now().toEpochMilli() + validityInMilliseconds));
 		String newToken = Jwts.builder().setClaims(claims).signWith(this.jwtTokenKey, SignatureAlgorithm.HS256)
@@ -126,9 +125,10 @@ public class JwtTokenService {
 
 	public String getUuid(String token) {
 		this.validateToken(token);
-		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.UUID, String.class);
+		return Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody()
+				.get(JwtUtils.UUID, String.class);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection<DataHelper.Role> getAuthorities(String token) {
 		Collection<DataHelper.Role> roles = new LinkedList<>();
@@ -137,15 +137,16 @@ public class JwtTokenService {
 		}
 		Collection<Map<String, String>> rolestrs = (Collection<Map<String, String>>) Jwts.parserBuilder()
 				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.TOKENAUTHKEY);
-		return rolestrs.stream().map(str -> roles.stream()
-				.filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, ""))).findFirst().orElse(DataHelper.Role.GUEST))
+		return rolestrs.stream()
+				.map(str -> roles.stream().filter(r -> r.name().equals(str.getOrDefault(JwtUtils.AUTHORITY, "")))
+						.findFirst().orElse(DataHelper.Role.GUEST))
 				.collect(Collectors.toList());
 	}
 
-	public String resolveToken(HttpServletRequest req) {
+	public Optional<String> resolveToken(HttpServletRequest req) {
 		String bearerToken = req.getHeader(JwtUtils.AUTHORIZATION);
 		Optional<String> tokenOpt = resolveToken(bearerToken);
-		return tokenOpt.isEmpty() ? null : tokenOpt.get();
+		return tokenOpt;
 	}
 
 	public Optional<String> resolveToken(String bearerToken) {
@@ -160,11 +161,12 @@ public class JwtTokenService {
 			Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token);
 			String subject = Optional.ofNullable(claimsJws.getBody().getSubject())
 					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
-			String uuid = Optional.ofNullable(claimsJws.getBody().get(JwtUtils.UUID, String.class)).orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
-			// LOG.info("Subject: {}, Uuid: {}, LoggedOutUsers: {}", subject, uuid, JwtTokenService.loggedOutUsers.size());
-			return this.loggedOutUsers.stream()
-					.noneMatch(myUserName -> 
-					subject.equalsIgnoreCase(myUserName.userName()) && uuid.equals(myUserName.uuid()));
+			String uuid = Optional.ofNullable(claimsJws.getBody().get(JwtUtils.UUID, String.class))
+					.orElseThrow(() -> new AuthenticationException("Invalid JWT token"));
+			// LOG.info("Subject: {}, Uuid: {}, LoggedOutUsers: {}", subject, uuid,
+			// JwtTokenService.loggedOutUsers.size());
+			return this.loggedOutUsers.stream().noneMatch(
+					myUserName -> subject.equalsIgnoreCase(myUserName.userName()) && uuid.equals(myUserName.uuid()));
 		} catch (JwtException | IllegalArgumentException e) {
 			throw new AuthenticationException("Expired or invalid JWT token", e);
 		}

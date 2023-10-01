@@ -151,7 +151,7 @@ public class FinancialDataService {
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void storeFinancialsData(List<SymbolFinancialsDto> symbolFinancialsDtos) {
 		Set<SymbolFinancials> symbolFinancials = symbolFinancialsDtos.stream()
-				.map(myDto -> this.symbolFinancialsMapper.toEntity(myDto)).collect(Collectors.toSet());
+				.map(this.symbolFinancialsMapper::toEntity).collect(Collectors.toSet());
 		this.symbolFinancialsRepository.saveAll(symbolFinancials);
 		this.financialElementRepository.saveAll(symbolFinancials.stream()
 				.flatMap(mySymbolFinancials -> mySymbolFinancials.getFinancialElements().stream())

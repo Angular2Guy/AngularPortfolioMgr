@@ -39,10 +39,7 @@ public class JwtUtils {
 	}
 
 	private static Optional<String> extractToken(Optional<String> authStr) {
-		if (authStr.isPresent()) {
-			authStr = Optional.ofNullable(authStr.get().startsWith(BEARER) ? authStr.get().substring(7) : null);
-		}
-		return authStr;
+		return authStr.stream().filter(myAuthStr -> myAuthStr.startsWith(BEARER)).map(myAuthStr -> myAuthStr.substring(7)).findFirst();		
 	}
 
 	public static Optional<Jws<Claims>> getClaims(Optional<String> token, Key jwtTokenKey) {

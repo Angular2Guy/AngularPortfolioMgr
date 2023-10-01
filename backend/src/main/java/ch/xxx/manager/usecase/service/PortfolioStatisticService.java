@@ -81,7 +81,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(pts -> pts.getRemovedAt() == null)
-				.sorted((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()))
+				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 //				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
 //						.distinct().toList().forEach(mySymbolKey -> LOGGER.info("SymbolKey: {}", mySymbolKey)))
 				.map(pts -> this.createPortfolioElement(portfolio, dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts,

@@ -199,7 +199,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		LocalDate[] first = new LocalDate[1];
 		Optional<PortfolioToSymbol> ptsWeight = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().equalsIgnoreCase(symbolStr))
-				.sorted((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()))
+				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 				.peek(pts -> first[0] = first[0] == null ? pts.getChangedAt() : first[0])
 				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0).filter(pts -> atDay.compareTo(first[0]) >= 0)
 				.filter(pts -> Optional.ofNullable(pts.getRemovedAt()).stream()

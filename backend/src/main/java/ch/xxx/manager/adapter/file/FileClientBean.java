@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -97,13 +98,13 @@ public class FileClientBean implements FileClient {
 								SymbolFinancialsDto.class);
 						StreamHelpers.toStream(symbolFinancialsDto.getData()).forEach(myFinancialsDataDto -> {
 							myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
-									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.map(this::fixConcept)
 									.collect(Collectors.toSet()));
 							myFinancialsDataDto.setCashFlow(myFinancialsDataDto.getCashFlow().stream()
-									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.map(this::fixConcept)
 									.collect(Collectors.toSet()));
 							myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
-									.map(myFinancialElementDto -> fixConcept(myFinancialElementDto))
+									.map(this::fixConcept)
 									.collect(Collectors.toSet()));
 							int bsChildern = myFinancialsDataDto.getBalanceSheet() == null ? 0 : myFinancialsDataDto.getBalanceSheet().size();
 							int cfChildern = myFinancialsDataDto.getCashFlow() == null ? 0 : myFinancialsDataDto.getCashFlow().size();

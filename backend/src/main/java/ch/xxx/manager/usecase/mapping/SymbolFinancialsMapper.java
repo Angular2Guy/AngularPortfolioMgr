@@ -42,7 +42,7 @@ public class SymbolFinancialsMapper {
 		dto.setName(symbolFinancials.getName());
 		dto.setCountry(symbolFinancials.getCountry());
 		dto.setFinancialElements(Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
-				.map(myFe -> this.financialElementMapper.toDto(myFe)).collect(Collectors.toList()));
+				.map(this.financialElementMapper::toDto).collect(Collectors.toList()));
 		return dto;
 	}
 	
