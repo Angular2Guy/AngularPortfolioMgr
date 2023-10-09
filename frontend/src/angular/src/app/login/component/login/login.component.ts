@@ -10,13 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MainComponent } from "../main/main.component";
 import { LoginService } from "../../service/login.service";
 import { Login } from "../../model/login";
 import { TokenService } from "ngx-simple-charts/base-service";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 enum FormFields {
   Username = "username",
@@ -46,6 +47,7 @@ export class LoginComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private loginService: LoginService,
     private tokenService: TokenService,
+    private destroyRef: DestroyRef,
     fb: FormBuilder
   ) {
     this.signinForm = fb.group(
@@ -106,7 +108,7 @@ export class LoginComponent implements OnInit {
     login.alphavantageKey = this.signinForm.get(FormFields.AlphavantageKey).value;
     login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey).value;
     this.waitingForResponse = true;
-    this.loginService.postSignin(login).subscribe({
+    this.loginService.postSignin(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => this.signin(res),
       error: (err) => console.log(err),
     });
@@ -122,7 +124,7 @@ export class LoginComponent implements OnInit {
     login.username = this.loginForm.get(FormFields.Username).value;
     login.password = this.loginForm.get(FormFields.Password).value;
     this.waitingForResponse = true;
-    this.loginService.postLogin(login).subscribe({
+    this.loginService.postLogin(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => this.login(res),
       error: (err) => console.log(err),
     });

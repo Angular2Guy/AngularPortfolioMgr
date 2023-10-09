@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
 import {
   FormGroup,
   FormBuilder,
@@ -21,6 +21,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
 import { ImportFinancialsData } from "../../model/import-financials-data";
 import { ConfigService } from "src/app/service/config.service";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 enum FormFields {
   Filename = "filename",
@@ -40,6 +41,7 @@ export class ImportFinancialsComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<OverviewComponent>,
     private configService: ConfigService,
+    private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: ImportFinancialsData,
     private fb: FormBuilder
   ) {
@@ -53,7 +55,7 @@ export class ImportFinancialsComponent implements OnInit {
 
   ngOnInit(): void {
     this.configService
-      .getImportPath()
+      .getImportPath().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => (this.filepath = result));
   }
 

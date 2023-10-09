@@ -62,7 +62,6 @@ export class OverviewComponent implements OnInit {
   //limit 250
   countPortfolioSymbolsByUserId = 1000000;  
   private timeoutId = -1;
-  private dialogSubscription: Subscription;
   protected profiles: string = null;
   private showPortfolioTable = true;
 
@@ -75,15 +74,14 @@ export class OverviewComponent implements OnInit {
     private quoteImportService: QuoteImportService,
     private dialog: MatDialog,
     private destroyRef: DestroyRef
-  ) {
-    this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
-  }
+  ) {}
 
   ngOnInit() {
     this.windowHeight = window.innerHeight - 84;
     this.refreshPortfolios();
     this.configService
       .getProfiles()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
 		this.profiles = !value ? "dev" : value.trim().toLowerCase();
 		//this.profiles = "dev " + this.profiles;
@@ -97,7 +95,6 @@ export class OverviewComponent implements OnInit {
   }
 
   newPortfolio() {
-    this.cleanupDialogSubcription();
     const portfolio: Portfolio = {
       id: null,
       createdAt: new Date().toISOString(),
@@ -118,7 +115,7 @@ export class OverviewComponent implements OnInit {
       width: "500px",
       data: newPortfolioData,
     });
-    this.dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
       if (result) {
         this.portfolioService.postPortfolio(result).subscribe((myPortfolio) => {
           this.portfolios = [...this.portfolios, myPortfolio];
@@ -153,7 +150,7 @@ export class OverviewComponent implements OnInit {
   }
 
   updateQuotes() {
-	  this.quoteImportService.updateAllDailyIntraDayQuotes().subscribe(xxx => console.log('updateQuotes() called.'));
+	  this.quoteImportService.updateAllDailyIntraDayQuotes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(xxx => console.log('updateQuotes() called.'));
   }
 
   private refreshPortfolios() {
@@ -177,15 +174,14 @@ export class OverviewComponent implements OnInit {
 
   addSymbol(portfolio: Portfolio) {
     const portfolioData: PortfolioData = { portfolio: portfolio };
-    this.cleanupDialogSubcription();
     const dialogRef = this.dialog.open(AddSymbolComponent, {
       width: "500px",
       disableClose: true,
       hasBackdrop: true,
       data: portfolioData,
     });
-    this.dialogSubscription = dialogRef
-      .afterClosed()
+    dialogRef
+      .afterClosed().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((symbol: Symbol) => {
         if (symbol) {
           const dialogSpinnerRef = this.dialog.open(DialogSpinnerComponent, {
@@ -205,7 +201,7 @@ export class OverviewComponent implements OnInit {
               symbol.id,
               symbol.weight,
               symbol.changedAt
-            )
+            ).pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((result) => {
               if (result) {
                 const filteredPortfolios = this.portfolios.filter(
@@ -223,7 +219,7 @@ export class OverviewComponent implements OnInit {
 
   importSymbols(): void {
     this.importingSymbols = true;
-    if (this.timeoutId >= 0) {
+    if (this.timeoutId !== -1) {
       clearTimeout(this.timeoutId);
     }
     forkJoin(
@@ -238,16 +234,16 @@ export class OverviewComponent implements OnInit {
         console.log(
           `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
         );
-        setTimeout(
+        this.timeoutId = setTimeout(
           () =>
             this.symbolImportService
-              .getIndexSymbols()
+              .getIndexSymbols().pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe((resultIndex) => {
                 console.log(`Index Symbols: ${resultIndex}`);
                 this.importingSymbols = false;
               }),
           60000
-        );
+        ) as unknown as number;
       });
   }
 
@@ -257,21 +253,14 @@ export class OverviewComponent implements OnInit {
 
   showConfig(): void {
     if (this.profiles) {
-      this.cleanupDialogSubcription();
       const myOptions = { width: "700px" };
       let dialogRef = this.profiles.toLowerCase().includes("prod")
         ? this.dialog.open(ProdConfigComponent, myOptions)
         : this.dialog.open(DevConfigComponent, myOptions);
-      this.dialogSubscription = dialogRef
+      dialogRef
         .afterClosed()
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => (dialogRef = null));
-    }
-  }
-
-  private cleanupDialogSubcription(): void {
-    if (!!this.dialogSubscription) {
-      this.dialogSubscription.unsubscribe();
-      this.dialogSubscription = null;
     }
   }
 }

@@ -10,9 +10,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, DestroyRef, Input, OnInit } from "@angular/core";
 import { DateTime, Duration } from "luxon";
 import { ChartBars, ChartBar } from "ngx-simple-charts/bar";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 import { Portfolio } from "src/app/model/portfolio";
 import { PortfolioBars } from "src/app/model/portfolio-bars";
 import { PortfolioService } from "src/app/service/portfolio.service";
@@ -52,7 +53,7 @@ export class PortfolioComparisonComponent implements OnInit {
   chartBars!: ChartBars;
   selCompIndexes: ComparisonIndex[] = [];
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(private portfolioService: PortfolioService,private destroyRef: DestroyRef,) {}
 
   ngOnInit(): void {
     this.chartPeriods = [
@@ -120,7 +121,7 @@ export class PortfolioComparisonComponent implements OnInit {
           this.selPortfolio.id,
           this.startDate,
           this.selCompIndexes
-        )
+        ).pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => this.updateChartData(result));
     }
   }

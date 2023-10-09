@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, DestroyRef, Inject, OnInit } from "@angular/core";
 import {
   AbstractControl,
   AbstractControlOptions,
@@ -24,6 +24,7 @@ import { DateTime, Duration } from "luxon";
 import { filter } from "rxjs";
 import { PortfolioElement } from "src/app/model/portfolio-element";
 import { PortfolioTableComponent } from "../portfolio-table/portfolio-table.component";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 enum FormFields {
   SymbolWeight = "symbolWeight",
@@ -44,6 +45,7 @@ export class ChangeSymbolComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioTableComponent>,
+    private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioElement,
     private fb: FormBuilder
   ) {
@@ -63,11 +65,11 @@ export class ChangeSymbolComponent implements OnInit {
         filter(
           (myChangedAt: DateTime) =>
             !!myChangedAt && myChangedAt.toMillis() > startChangedAt.toMillis()
-        )
+        ), takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((value: DateTime) => (this.changedAt = value));
     this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
-      .pipe(filter((value: number) => !!("" + value).match(/^[\d]+$/g)))
+      .pipe(filter((value: number) => !!("" + value).match(/^[\d]+$/g)), takeUntilDestroyed(this.destroyRef))
       .subscribe((value: number) => (this.newWeight = value));
   }
 

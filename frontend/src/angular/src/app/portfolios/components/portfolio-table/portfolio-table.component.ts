@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input, OnDestroy } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, DestroyRef } from "@angular/core";
 import { MatTableDataSource } from "@angular/material/table";
 import { Portfolio, CommonValues } from "../../../model/portfolio";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
@@ -20,13 +20,14 @@ import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
 import { PortfolioElement } from "src/app/model/portfolio-element";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-portfolio-table",
   templateUrl: "./portfolio-table.component.html",
   styleUrls: ["./portfolio-table.component.scss"],
 })
-export class PortfolioTableComponent implements OnInit, OnDestroy {
+export class PortfolioTableComponent implements OnInit {
   private myLocalPortfolio: Portfolio = null;
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = [
@@ -38,20 +39,19 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
     "year2",
     "year5",
     "year10",
-  ];
-  private dataSubscription: Subscription;
-  private dialogSubscription: Subscription;
+  ];  
   reloadData = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private portfolioService: PortfolioService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
-    this.dataSubscription = this.route.paramMap
+    this.route.paramMap
       .pipe(
         filter((params: ParamMap) => parseInt(params.get("portfolioId")) >= 0),
         tap(() => (this.reloadData = true)),
@@ -60,14 +60,10 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
             parseInt(params.get("portfolioId"))
           )
         ),
-        tap(() => (this.reloadData = false))
+        tap(() => (this.reloadData = false)),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((myData) => (this.localPortfolio = myData));
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe(this.dataSubscription);
-    this.unsubscribe(this.dialogSubscription);
   }
 
   private unsubscribe(subscribtion: Subscription) {
@@ -86,9 +82,8 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
       width: "500px",
       data: element,
     });
-    this.unsubscribe(this.dialogSubscription);
-    this.dialogSubscription = dialogRef
-      .afterClosed()
+    dialogRef
+      .afterClosed().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: PortfolioElement) => {
         //console.log(result);
         const myPortfolio = {
@@ -110,7 +105,7 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
               mySymbol.id,
               result.weight,
               result.changedAt
-            )
+            ).pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((myResult) => (this.localPortfolio = myResult));
         } else if (!!result && result.weight <= 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
@@ -121,7 +116,7 @@ export class PortfolioTableComponent implements OnInit, OnDestroy {
               myPortfolio,
               mySymbol.id,
               result.changedAt
-            )
+            ).pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((myResult) => (this.localPortfolio = myResult));
         }
       });

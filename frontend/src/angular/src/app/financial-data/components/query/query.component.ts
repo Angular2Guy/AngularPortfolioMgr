@@ -25,7 +25,6 @@ import {
   ItemType,
 } from "../../model/financials-data-utils";
 import { FormArray, FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Subscription } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
@@ -57,6 +56,7 @@ export class QueryComponent implements OnInit {
   @Output()
   public removeItem = new EventEmitter<number>();
   private _showType: boolean;
+  private timeoutRef = null;
   protected termQueryItems: string[] = [];
   protected stringQueryItems: string[] = [];
   protected numberQueryItems: string[] = [];
@@ -132,20 +132,23 @@ export class QueryComponent implements OnInit {
   }
 
   private getOperators(delayMillis: number): void {
-    setTimeout(() => {
+	if(!!this.timeoutRef) {
+		clearTimeout(this.timeoutRef);
+	}
+    this.timeoutRef = setTimeout(() => {
       this.financialDataService
         .getConcepts()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe
         //myValues => console.log(myValues)
         ();
-      this.configService.getNumberOperators().subscribe((values) => {
+      this.configService.getNumberOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
         this.numberQueryItems = values;
         this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(
           values.filter((myValue) => "=" === myValue)[0]
         );
       });
-      this.configService.getStringOperators().subscribe((values) => {
+      this.configService.getStringOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
         this.stringQueryItems = values;
         this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(
           values.filter((myValue) => this.containsOperator === myValue)[0]
@@ -157,7 +160,7 @@ export class QueryComponent implements OnInit {
         );
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].disable();
       } else {
-        this.configService.getQueryOperators().subscribe((values) => {
+        this.configService.getQueryOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
           this.termQueryItems = values;
           this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
             values.filter((myValue) => "And" === myValue)[0]

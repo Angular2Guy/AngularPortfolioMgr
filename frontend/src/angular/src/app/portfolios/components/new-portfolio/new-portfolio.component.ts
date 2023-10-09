@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, Inject } from "@angular/core";
 import { FormGroup, Validators, FormBuilder } from "@angular/forms";
 import { OverviewComponent } from "../overview/overview.component";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";

@@ -16,6 +16,7 @@ import {
   OnDestroy,
   EventEmitter,
   ChangeDetectorRef,
+  DestroyRef,
 } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { switchMap, tap } from "rxjs/operators";
@@ -24,32 +25,33 @@ import { Portfolio } from "../../../../model/portfolio";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { Subscription, Subject } from "rxjs";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-portfolio",
   templateUrl: "./portfolio.component.html",
   styleUrls: ["./portfolio.component.scss"],
 })
-export class PortfolioComponent implements OnInit, OnDestroy {
+export class PortfolioComponent implements OnInit {
   symbols: Symbol[] = [];
   reloadData = false;
   windowHeight = 0;
   portfolio: Portfolio;
   selSymbol: Symbol = null;
   showSymbol = true;
-  private routeParamSubscription: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private tokenService: TokenService,
     private portfolioService: PortfolioService,
     private router: Router,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
     this.windowHeight = window.innerHeight - 84;
-    this.routeParamSubscription = this.route.paramMap
+    this.route.paramMap
       .pipe(
         tap(() => (this.reloadData = true)),
         //tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
@@ -58,7 +60,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
             parseInt(params.get("portfolioId"))
           )
         ),
-        tap(() => (this.reloadData = false))
+        tap(() => (this.reloadData = false)),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((myPortfolio) => {
         this.symbols = myPortfolio.symbols;
@@ -68,10 +71,6 @@ export class PortfolioComponent implements OnInit, OnDestroy {
             : this.selSymbol;
         this.portfolio = myPortfolio;
       });
-  }
-
-  ngOnDestroy(): void {
-    this.routeParamSubscription.unsubscribe();
   }
 
   updateReloadData(state: boolean) {

@@ -174,12 +174,14 @@ export class CreateQueryComponent implements OnInit {
     });
     this.financialDataService
       .getQuarters()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values) =>
           (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
       );
     this.financialDataService
       .getCountries()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values) =>
           (this.countryQueryItems = values.map((myValue) => myValue.country))
@@ -247,6 +249,7 @@ export class CreateQueryComponent implements OnInit {
     this.showSpinner.emit(true);
     this.financialDataService
       .postSymbolFinancialsParam(symbolFinancialsParams)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
         this.processQueryResult(result, symbolFinancialsParams);
         this.showSpinner.emit(false);

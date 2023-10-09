@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, DestroyRef, Input, OnInit } from "@angular/core";
 import { DateTime } from "luxon";
 import { Portfolio } from "src/app/model/portfolio";
 import { Symbol } from "src/app/model/symbol";
@@ -18,6 +18,7 @@ import { ServiceUtils } from "src/app/model/service-utils";
 import { PortfolioService } from "src/app/service/portfolio.service";
 import { ChartItem } from "ngx-simple-charts/date-time";
 import { Item } from "../../model/item";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-portfolio-timechart",
@@ -31,11 +32,12 @@ export class PortfolioTimechartComponent implements OnInit {
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(private portfolioService: PortfolioService, private destroyRef: DestroyRef,) {}
 
   ngOnInit(): void {
     this.portfolioService
       .getPortfolioByIdWithHistory(this.selPortfolio.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
         //console.log(result);
         const myMap = result.symbols

@@ -21,6 +21,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  DestroyRef,
 } from "@angular/core";
 import { Symbol } from "../../../../model/symbol";
 import {
@@ -32,6 +33,7 @@ import { DOCUMENT, formatDate } from "@angular/common";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { forkJoin } from "rxjs";
 import { ChartPoint, ChartPoints } from "ngx-simple-charts/line";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 const enum QuotePeriodKey {
   Day,
@@ -116,6 +118,7 @@ export class SymbolComponent implements OnInit {
 
   constructor(
     private quoteService: QuoteService,
+    private destroyRef: DestroyRef,
     @Inject(DOCUMENT) private document: Document,
     @Inject(LOCALE_ID) private locale: string
   ) {
@@ -330,6 +333,7 @@ export class SymbolComponent implements OnInit {
       this.quotesLoading = true;
       this.quoteService
         .getIntraDayQuotes(this.symbol.symbol)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((myQuotes) => {
           this.quotes = myQuotes;
           this.updateSymbolData();
@@ -344,6 +348,7 @@ export class SymbolComponent implements OnInit {
       const endDate = new Date();
       this.quoteService
         .getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((myQuotes) => {
           this.quotes = myQuotes;
           this.updateSymbolData();
@@ -368,7 +373,7 @@ export class SymbolComponent implements OnInit {
                 startDate,
                 endDate
               ),
-            ]).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
+            ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
               this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
               this.compIndexes.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
               this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);

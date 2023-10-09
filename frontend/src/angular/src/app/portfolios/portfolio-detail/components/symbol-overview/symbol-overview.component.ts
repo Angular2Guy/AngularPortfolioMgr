@@ -20,15 +20,13 @@ import { Portfolio, CommonValues } from "../../../../model/portfolio";
   templateUrl: "./symbol-overview.component.html",
   styleUrls: ["./symbol-overview.component.scss"],
 })
-export class SymbolOverviewComponent implements OnInit {
+export class SymbolOverviewComponent {
   @Input()
   portfolio: Portfolio;
   private localSymbol: Symbol;
   serviceUtils = ServiceUtils;
 
   constructor() {}
-
-  ngOnInit(): void {}
 
   getPortfolioElement(): CommonValues {
     return ServiceUtils.isPortfolioSymbol(this.symbol)

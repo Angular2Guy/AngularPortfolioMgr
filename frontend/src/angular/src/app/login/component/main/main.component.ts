@@ -10,12 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, DestroyRef } from "@angular/core";
 import { Login } from "../../model/login";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginComponent } from "../login/login.component";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-main",
@@ -28,7 +29,8 @@ export class MainComponent {
   constructor(
     private dialog: MatDialog,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private destroyRef: DestroyRef
   ) {}
 
   openLoginDialog(): MatDialogRef<LoginComponent, any> {
@@ -36,7 +38,7 @@ export class MainComponent {
       width: "600px",
       data: { login: this.login },
     });
-    dialogRef.beforeClosed().subscribe((result) => {
+    dialogRef.beforeClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
       this.login = typeof result == "undefined" ? null : result;
       if (this.login) {
         this.router.navigate(["/portfolios/overview"]);

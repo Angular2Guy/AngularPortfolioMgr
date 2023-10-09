@@ -14,7 +14,6 @@ import { Component, OnInit, HostListener, DestroyRef } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
-import { Subscription } from "rxjs";
 import { ImportFinancialsComponent } from "../import-financials/import-financials.component";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { ImportFinancialsData } from "../../model/import-financials-data";
@@ -26,6 +25,7 @@ import {
   DialogSpinnerComponent,
   SpinnerData,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
   selector: "app-overview",
@@ -34,7 +34,6 @@ import {
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;
-  private dialogSubscription: Subscription;
   protected symbolFinancials: SymbolFinancials[] = [];
   protected financialElements: FinancialElementExt[] = [];
   private spinnerDialogRef: MatDialogRef<DialogSpinnerComponent, any> = null;
@@ -46,19 +45,10 @@ export class OverviewComponent implements OnInit {
     private configService: ConfigService,
     private router: Router,
     private destroyRef: DestroyRef
-  ) {
-    this.destroyRef.onDestroy(() => this.cleanupDialogSubcription());
-  }
+  ) {}
 
   ngOnInit(): void {
     this.windowHeight = window.innerHeight - 84;
-  }
-
-  private cleanupDialogSubcription(): void {
-    if (!!this.dialogSubscription) {
-      this.dialogSubscription.unsubscribe();
-      this.dialogSubscription = null;
-    }
   }
 
   @HostListener("window:resize", ["$event"])
@@ -91,7 +81,6 @@ export class OverviewComponent implements OnInit {
   }
 
   showFinancialsImport(): void {
-    this.cleanupDialogSubcription();
     this.configService.getImportPath().subscribe((result) => {
       const dialogRef = this.dialog.open(ImportFinancialsComponent, {
         width: "500px",
@@ -99,13 +88,13 @@ export class OverviewComponent implements OnInit {
         hasBackdrop: true,
         data: { filename: "", path: result } as ImportFinancialsData,
       });
-      this.dialogSubscription = dialogRef
+      dialogRef
         .afterClosed()
         .pipe(
           switchMap((result: ImportFinancialsData) =>
             this.financialDataService.putImportFinancialsData(result)
           )
-        )
+        ).pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => console.log(result));
     });
     //console.log('showFinancialsConfig()');

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
 import {
   FormGroup,
   FormBuilder,
@@ -35,6 +35,7 @@ import {
 import { QuoteImportService } from "../../../service/quote-import.service";
 import { DateTime } from "luxon";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 enum FormFields {
   SymbolSymbol = "symbolSymbol",
@@ -64,6 +65,7 @@ export class AddSymbolComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: PortfolioData,
     private symbolService: SymbolService,
     private quoteImportService: QuoteImportService,
+    private destroyRef: DestroyRef,
     private fb: FormBuilder
   ) {
     this.symbolForm = this.fb.group(
@@ -98,7 +100,8 @@ export class AddSymbolComponent implements OnInit {
                 )
             : this.clearSymbol()
         ),
-        tap(() => (this.loading = false))
+        tap(() => (this.loading = false)),
+        
       );
     this.symbolsSymbol = this.symbolForm
       .get(FormFields.SymbolSymbol)
@@ -165,7 +168,7 @@ export class AddSymbolComponent implements OnInit {
       forkJoin(
         this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
         this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol)
-      ).subscribe(([resultDaily, resultIntraDay]) => {
+      ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([resultDaily, resultIntraDay]) => {
         console.log(
           `Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`
         );
