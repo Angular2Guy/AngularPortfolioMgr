@@ -19,7 +19,7 @@ plugins {
 
 group = 'ch.xxx'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = '21'
 
 repositories {
 	mavenCentral()
@@ -51,7 +51,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.0.0'
+	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.1.0'
 			
 	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
