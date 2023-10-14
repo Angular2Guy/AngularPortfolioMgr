@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.JwtTokenService;
@@ -48,11 +49,14 @@ public class WebSecurityConfig {
 		JwtTokenFilter customFilter = new JwtTokenFilter(jwtTokenService);
 		final String blockedPath = this.activeProfile.toLowerCase().contains("prod") ? DEVPATH : PRODPATH;
 		HttpSecurity httpSecurity = http
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/rest/config/**").permitAll()
-						.requestMatchers("/rest/kedatest/**").permitAll().requestMatchers("/rest/auth/**").permitAll()
-						.requestMatchers("/rest/**").hasAuthority(DataHelper.Role.USERS.toString())
-						.requestMatchers(blockedPath).denyAll())
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+				.authorizeHttpRequests(
+						authorize -> authorize.requestMatchers(AntPathRequestMatcher.antMatcher("/rest/config/**"))
+								.permitAll().requestMatchers(AntPathRequestMatcher.antMatcher("/rest/kedatest/**"))
+								.permitAll().requestMatchers(AntPathRequestMatcher.antMatcher("/rest/auth/**"))
+								.permitAll().requestMatchers(AntPathRequestMatcher.antMatcher("/rest/**"))
+								.hasAuthority(DataHelper.Role.USERS.toString())
+								.requestMatchers(AntPathRequestMatcher.antMatcher(blockedPath)).denyAll())
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers(AntPathRequestMatcher.antMatcher("/**")).permitAll())
 				.csrf(myCsrf -> myCsrf.disable())
 				.sessionManagement(mySm -> mySm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.headers(myHeaders -> myHeaders.contentSecurityPolicy(myCsp -> myCsp.policyDirectives(
