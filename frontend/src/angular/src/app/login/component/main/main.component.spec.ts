@@ -41,7 +41,7 @@ describe("MainComponent", () => {
       imports: [
         MatDialogModule,
         MatToolbarModule,
-        RouterTestingModule.withRoutes([{ path: "**", redirectTo: "/" }]),
+        RouterTestingModule.withRoutes([{ path: "portfolios/overview", redirectTo: "/" }]),
       ],
       declarations: [MainComponent],
       providers: [
