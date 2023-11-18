@@ -90,21 +90,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "manager:build"
+            "buildTarget": "manager:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "manager:build:production"
+              "buildTarget": "manager:build:production"
             },
             "de": {
-              "browserTarget": "manager:build:de"
+              "buildTarget": "manager:build:de"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "manager:build"
+            "buildTarget": "manager:build"
           }
         },
         "test": {
