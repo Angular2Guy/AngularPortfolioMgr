@@ -13,10 +13,12 @@
 package ch.xxx.manager.dev.usecase.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.usecase.service.AppInfoService;
 
+@Primary
 @Service
 public class DevAppInfoService implements AppInfoService {
 	@Value("${spring.profiles.active:}")

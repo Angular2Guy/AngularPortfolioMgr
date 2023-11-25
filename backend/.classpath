@@ -26,32 +26,6 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="bin/aot" path="build/generated/aotResources">
-		<attributes>
-			<attribute name="gradle_scope" value="aot"/>
-			<attribute name="gradle_used_by_scope" value="main,aot"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="bin/aot" path="build/generated/aotSources">
-		<attributes>
-			<attribute name="gradle_scope" value="aot"/>
-			<attribute name="gradle_used_by_scope" value="main,aot"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="bin/aotTest" path="build/generated/aotTestResources">
-		<attributes>
-			<attribute name="gradle_scope" value="aotTest"/>
-			<attribute name="gradle_used_by_scope" value="test,aotTest"/>
-			<attribute name="test" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="bin/aotTest" path="build/generated/aotTestSources">
-		<attributes>
-			<attribute name="gradle_scope" value="aotTest"/>
-			<attribute name="gradle_used_by_scope" value="test,aotTest"/>
-			<attribute name="test" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21/"/>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="output" path="bin/default"/>
