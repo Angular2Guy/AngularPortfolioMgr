@@ -73,7 +73,7 @@ public class AuthenticationController {
 	}
 	
 	@GetMapping("/confirm/{uuid}")
-	public Boolean getConfirmUuid(@PathVariable String uuid) {
+	public Boolean getConfirmUuid(@PathVariable(name="uuid") String uuid) {
 		return this.appUserService.confirmUuid(uuid);
 	}
 
@@ -93,7 +93,7 @@ public class AuthenticationController {
 	}
 	
 	@GetMapping("/id/{id}")
-	public AppUserDto getUser(@PathVariable Long id) {
+	public AppUserDto getUser(@PathVariable(name = "id") Long id) {
 		AppUserDto appUserDto = this.appUserService.loadById(id);
 		return appUserDto;
 	}

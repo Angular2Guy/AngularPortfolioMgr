@@ -62,7 +62,7 @@ public class PortfolioController {
 
 	@GetMapping("/id/{portfolioId}")
 	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId,
-			@RequestParam(required = false) Optional<String> withHistory) {
+			@RequestParam(name = "withHistory", required = false) Optional<String> withHistory) {
 		return withHistory.stream().filter(myString -> "true".equalsIgnoreCase(myString))
 				.map(xxx -> this.portfolioMapper.toDto(this.portfolioService.getPortfolioById(portfolioId))).findFirst()
 				.orElse(this.portfolioMapper.toDtoFiltered(this.portfolioService.getPortfolioById(portfolioId)));
@@ -97,14 +97,14 @@ public class PortfolioController {
 
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
-			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
+			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
 		return this.portfolioMapper.toDto(this.portfolioService
 				.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt)).portfolio());
 	}
 
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
-			@PathVariable("weight") Long weight, @RequestParam String changedAt) {
+			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
 		return this.portfolioMapper.toDto(this.portfolioService
 				.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt))
 				.portfolio());
@@ -112,7 +112,7 @@ public class PortfolioController {
 
 	@DeleteMapping("/{id}/symbol/{symbolId}")
 	public PortfolioDto deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
-			@PathVariable("symbolId") Long symbolId, @RequestParam String removedAt) {
+			@PathVariable("symbolId") Long symbolId, @RequestParam(name = "removedAt") String removedAt) {
 		return this.portfolioMapper.toDto(this.portfolioService
 				.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt))
 				.portfolio());
