@@ -154,6 +154,7 @@ public class AppUserServiceBase {
 			ciphertext = daead.encryptDeterministically(plainText.getBytes(Charset.defaultCharset()),
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
+			LOGGER.debug("Encrypt failed.", e);
 			throw new RuntimeException(e);
 		}
 		return new String(Base64.getEncoder().encode(ciphertext), Charset.defaultCharset());

@@ -1,6 +1,6 @@
-docker pull postgres:14
-# docker run --name local-postgres-pfm -e POSTGRES_PASSWORD=sven1 -e POSTGRES_USER=sven1 -e POSTGRES_DB=portfoliomgr -p 5432:5432 -d postgres:14
-docker run --name local-postgres-pfm -e POSTGRES_PASSWORD=sven1 -e POSTGRES_USER=sven1 -e POSTGRES_DB=portfoliomgr --network=host -d postgres:14
+docker pull postgres:16
+# docker run --name local-postgres-pfm -e POSTGRES_PASSWORD=sven1 -e POSTGRES_USER=sven1 -e POSTGRES_DB=portfoliomgr -p 5432:5432 -d postgres:16
+docker run --name local-postgres-pfm -e POSTGRES_PASSWORD=sven1 -e POSTGRES_USER=sven1 -e POSTGRES_DB=portfoliomgr --network=host -d postgres:16
 
 # docker start local-postgres-pfm
 # docker stop local-postgres-pfm

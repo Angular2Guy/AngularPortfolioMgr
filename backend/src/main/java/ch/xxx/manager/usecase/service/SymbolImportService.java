@@ -84,7 +84,7 @@ public class SymbolImportService {
 
 	@PostConstruct
 	public void init() throws GeneralSecurityException {
-		//LOGGER.info(this.tinkJsonKey);
+		// LOGGER.info(this.tinkJsonKey);
 		DeterministicAeadConfig.register();
 		KeysetHandle handle = TinkJsonProtoKeysetFormat.parseKeyset(this.tinkJsonKey, InsecureSecretKeyAccess.get());
 		this.daead = handle.getPrimitive(DeterministicAead.class);
@@ -103,6 +103,10 @@ public class SymbolImportService {
 				.map(myAppUser -> new UserKeys(
 						this.decrypt(myAppUser.getAlphavantageKey(), UUID.fromString(myAppUser.getUuid())),
 						this.decrypt(myAppUser.getRapidApiKey(), UUID.fromString(myAppUser.getUuid()))))
+				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.alphavantageKey()).stream()
+						.filter(myStr -> !myStr.isBlank()).findFirst().isPresent())
+				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.RapidApiKey()).stream()
+						.filter(myStr -> !myStr.isBlank()).findFirst().isPresent())
 				.toList();
 		final AtomicLong indexDaily = new AtomicLong(-1L);
 		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
@@ -127,12 +131,15 @@ public class SymbolImportService {
 	public String decrypt(String ciphertext, UUID userUuid) {
 		byte[] decrypted;
 		try {
-			decrypted = daead.decryptDeterministically(Base64.getDecoder().decode(ciphertext.getBytes(Charset.defaultCharset())),
+			decrypted = daead.decryptDeterministically(
+					Base64.getDecoder().decode(ciphertext.getBytes(Charset.defaultCharset())),
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
-			throw new RuntimeException(e);
-		}		
-		return new String(decrypted, Charset.defaultCharset());
+			LOGGER.debug("Decryption failed: ", e);
+			decrypted = new byte[0];
+		}
+		var result = new String(decrypted, Charset.defaultCharset());		
+		return result;
 	}
 
 	public String importUsSymbols() {
