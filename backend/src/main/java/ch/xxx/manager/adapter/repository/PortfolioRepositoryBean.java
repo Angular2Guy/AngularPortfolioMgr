@@ -55,7 +55,7 @@ public class PortfolioRepositoryBean implements PortfolioRepository{
 	}
 	
 	@Override
-	public List<Portfolio> findAll() {
-		return this.jpaPortfolioRepository.findAll();
+	public List<Portfolio> findAllWithPts() {
+		return this.jpaPortfolioRepository.findAllWithPts();
 	}
 }

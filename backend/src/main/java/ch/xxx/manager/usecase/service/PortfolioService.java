@@ -120,11 +120,11 @@ public class PortfolioService {
 	}
 
 	public List<Portfolio> findAllPortfolios() {
-		return this.portfolioRepository.findAll();
+		return this.portfolioRepository.findAllWithPts();
 	}
 	
-	public PortfolioWithElements updatePortfolioValues(Portfolio portfolio) {
-		return  this.updatePortfolioElements(this.portfolioCalculationService
+	public PortfolioWithElements updatePortfolioValues(Portfolio portfolio) {		
+		return this.updatePortfolioElements(this.portfolioCalculationService
 				.calculatePortfolio(portfolio, Optional.empty()));
 	}
 	

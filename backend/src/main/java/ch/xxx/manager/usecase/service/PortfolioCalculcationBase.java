@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +46,8 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
-		return portfolioToSymbols.stream().map(pts -> pts.getSymbol()).filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol))
+		return portfolioToSymbols.stream().map(pts -> pts.getSymbol())
+				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol))
 				.collect(Collectors.toMap(Symbol::getSymbol,
 						mySymbol -> mySymbol.getDailyQuotes().stream()
 								.filter(myQuote -> mySymbol.getSymbol().equalsIgnoreCase(myQuote.getSymbolKey()))
@@ -105,10 +107,11 @@ public abstract class PortfolioCalculcationBase {
 		return dailyQuotesKeyMap.keySet().size() == 1L ? allDates
 				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
-	
+
 	protected Portfolio addDailyQuotes(Portfolio portfolio) {
 		portfolio.getPortfolioToSymbols().forEach(pts -> {
-			pts.getSymbol().getDailyQuotes().addAll(this.dailyQuoteRepository.findBySymbolId(pts.getSymbol().getId()));
+			pts.getSymbol()
+					.setDailyQuotes(new HashSet<>(this.dailyQuoteRepository.findBySymbolId(pts.getSymbol().getId())));
 		});
 		return portfolio;
 	}
