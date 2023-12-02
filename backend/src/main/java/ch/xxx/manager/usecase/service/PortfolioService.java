@@ -15,6 +15,7 @@ package ch.xxx.manager.usecase.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -118,6 +119,15 @@ public class PortfolioService {
 		return updatePortfolioElements(portfolioWithElements);
 	}
 
+	public List<Portfolio> findAllPortfolios() {
+		return this.portfolioRepository.findAll();
+	}
+	
+	public PortfolioWithElements updatePortfolioValues(Portfolio portfolio) {
+		return  this.updatePortfolioElements(this.portfolioCalculationService
+				.calculatePortfolio(portfolio, Optional.empty()));
+	}
+	
 	private Portfolio removeDailyQuotes(Portfolio portfolio, List<DailyQuote> dailyQuotesToRemove) {
 		portfolio.getPortfolioToSymbols()
 				.forEach(pts -> pts.getSymbol().getDailyQuotes().removeAll(dailyQuotesToRemove));

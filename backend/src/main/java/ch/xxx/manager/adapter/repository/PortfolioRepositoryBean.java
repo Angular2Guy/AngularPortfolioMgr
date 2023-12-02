@@ -53,4 +53,9 @@ public class PortfolioRepositoryBean implements PortfolioRepository{
 	public Long countPortfolioSymbolsByUserId(Long userId) {
 		return this.jpaPortfolioRepository.countPortfolioSymbolsByUserId(userId);
 	}
+	
+	@Override
+	public List<Portfolio> findAll() {
+		return this.jpaPortfolioRepository.findAll();
+	}
 }

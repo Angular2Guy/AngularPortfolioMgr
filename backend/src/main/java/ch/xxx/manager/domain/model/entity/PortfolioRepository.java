@@ -25,4 +25,5 @@ public interface PortfolioRepository {
 	List<PortfolioAndSymbolDto> findPortfolioCalcEntitiesByPortfolioId(Long portfolioId);
 	Portfolio save(Portfolio portfolio);
 	Long countPortfolioSymbolsByUserId(@Param(value = "userId") Long userId);
+	List<Portfolio> findAll();
 }

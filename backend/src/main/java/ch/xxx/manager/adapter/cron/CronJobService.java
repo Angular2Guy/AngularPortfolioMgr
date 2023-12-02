@@ -28,6 +28,7 @@ import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
+import ch.xxx.manager.usecase.service.PortfolioService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import ch.xxx.manager.usecase.service.SymbolImportService;
@@ -41,17 +42,19 @@ public class CronJobService {
 	private final QuoteImportService quoteImportService;
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
+	private final PortfolioService portfolioService;
 	private Environment environment;
 	@Value("${api.key}")
 	private String apiKey;
 
-	public CronJobService(SymbolImportService symbolImportService,
+	public CronJobService(SymbolImportService symbolImportService, PortfolioService portfolioService, 
 			QuoteImportService quoteImportService, CurrencyService currencyService, AppUserService appUserService,
 			Environment environment) {
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
+		this.portfolioService = portfolioService;
 		this.environment = environment;
 	}
 
@@ -101,5 +104,11 @@ public class CronJobService {
 	public void scheduledImporterQuotes() {
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
 		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
+	}
+	
+	@Scheduled(cron = "0 45 1 * * ?")
+	@SchedulerLock(name = "CronJob_portfolios", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
+	public void scheduledUpdatePortfolios() {
+		this.portfolioService.findAllPortfolios().forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
 	}
 }
