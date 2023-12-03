@@ -26,6 +26,7 @@ import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.usecase.service.FinancialDataService;
+import ch.xxx.manager.usecase.service.PortfolioService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.annotation.PostConstruct;
 
@@ -34,10 +35,12 @@ public class OnStart {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OnStart.class);
 	private final SymbolImportService symbolImportService;
 	private final FinancialDataService financialDataService;
+	private final PortfolioService portfolioService;
 
-	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService) {
+	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService, PortfolioService portfolioService) {
 		this.symbolImportService = symbolImportService;
 		this.financialDataService = financialDataImportService;
+		this.portfolioService = portfolioService;
 	}
 
 	@PostConstruct
@@ -56,5 +59,8 @@ public class OnStart {
 		LOGGER.info("Quarter count {}", sfQuarters.size());
 		List<SfCountryDto> sfCountries = this.financialDataService.findSfCountries();
 		LOGGER.info("Country count {}", sfCountries.size());
+		var portfolioList = this.portfolioService.findAllPortfolios();
+		portfolioList.forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
+		LOGGER.info("Portfolios updated {}", portfolioList.size());
 	}
 }

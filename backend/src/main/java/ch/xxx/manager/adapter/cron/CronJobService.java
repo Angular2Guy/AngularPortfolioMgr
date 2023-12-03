@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.cron;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -71,25 +72,30 @@ public class CronJobService {
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterSymbols() {
+		Instant start = Instant.now();
 		importCurrencyQuotes();
 		LOGGER.info(this.symbolImportService.importDeSymbols());
 		LOGGER.info(this.symbolImportService.importHkSymbols());
 		LOGGER.info(this.symbolImportService.importUsSymbols());
 		this.symbolImportService.refreshSymbolEntities();
+		LOGGER.info("scheduledImporterSymbols: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
 	}
 
 	private void importCurrencyQuotes() {
+		Instant start = Instant.now();
 		LOGGER.info("Import of {} Hkd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(DataHelper.CurrencyKey.HKD.toString()));
 		LOGGER.info("Import of {} Usd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(DataHelper.CurrencyKey.USD.toString()));
 		this.currencyService.initCurrencyMap();
+		LOGGER.info("importCurrencyQuotes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
 	}
 
 	@Transactional
 	@Scheduled(cron = "0 10 1 * * ?")
 	@SchedulerLock(name = "CronJob_refIndexes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterRefIndexes() {
+		Instant start = Instant.now();
 		List<String> symbols = this.symbolImportService
 				.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
 						ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
@@ -97,18 +103,23 @@ public class CronJobService {
 				mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol, new UserKeys(this.apiKey, null)))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
+		LOGGER.info("scheduledImporterRefIndexes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
 	}
 
 	@Scheduled(cron = "0 25 1 * * ?")
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
+		Instant start = Instant.now();
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
 		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
+		LOGGER.info("scheduledImporterQuotes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
 	}
 	
 	@Scheduled(cron = "0 45 1 * * ?")
 	@SchedulerLock(name = "CronJob_portfolios", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledUpdatePortfolios() {
+		Instant start = Instant.now();
 		this.portfolioService.findAllPortfolios().forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
+		LOGGER.info("scheduledUpdatePortfolios: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
 	}
 }
