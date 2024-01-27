@@ -50,9 +50,9 @@ public class StockFileClientBean implements FileClient {
 	private boolean ssdIo;
 	String financialDataImportPath;
 
-	public StockFileClientBean(AppInfoService appInfoService, CsvMapper csvMapper, QuoteImportService quoteImportService) {
+	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService) {
 		this.appInfoService = appInfoService;
-		this.csvMapper = csvMapper;
+		this.csvMapper = new CsvMapper();
 		this.quoteImportService = quoteImportService;
 	}
 
