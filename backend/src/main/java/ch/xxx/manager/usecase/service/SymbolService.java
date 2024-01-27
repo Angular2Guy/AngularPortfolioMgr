@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class SymbolService {
 	private final SymbolMapper symbolMapper;
 	private final FileClient fileClient;
 
-	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper, FileClient fileClient) {
+	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper, @Qualifier("Sec") FileClient fileClient) {
 		this.repository = repository;
 		this.symbolMapper = symbolMapper;
 		this.fileClient = fileClient;

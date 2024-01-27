@@ -17,9 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
@@ -31,12 +35,14 @@ public class QuoteService {
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final QuoteMapper quoteMapper;
+	private final FileClient fileClient;
 
 	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
-			QuoteMapper quoteMapper) {
+			QuoteMapper quoteMapper, @Qualifier("Stock") FileClient fileClient) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.intraDayQuoteRepository = intraDayQuoteRepository;
 		this.quoteMapper = quoteMapper;
+		this.fileClient = fileClient;
 	}
 
 	public List<QuoteDto> getDailyQuotes(String symbol) {
@@ -52,5 +58,11 @@ public class QuoteService {
 	public List<QuoteDto> getIntraDayQuotes(String symbol) {
 		return this.intraDayQuoteRepository.findBySymbol(symbol).stream()
 				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
+	}
+	
+	@Async
+	public boolean importUsDailyQuotes(ImportFinancialDataDto importFinancialDataDto) {
+		Boolean result = this.fileClient.importZipFile(importFinancialDataDto.getFilename());
+		return result;
 	}
 }

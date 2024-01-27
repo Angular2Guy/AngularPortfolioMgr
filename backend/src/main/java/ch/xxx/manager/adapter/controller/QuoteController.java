@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
+import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
@@ -139,5 +141,15 @@ public class QuoteController {
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
 		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
 		return 0L;
+	}
+	
+	@GetMapping(path = "/importus/data")
+//	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
+	public String importUsDailyQuotes(@RequestParam("path") String path, @RequestParam("filename") String filename) {
+		ImportFinancialDataDto importFinancialDataDto = new ImportFinancialDataDto();
+		importFinancialDataDto.setFilename(filename);
+		importFinancialDataDto.setPath(path);
+		this.quoteService.importUsDailyQuotes(importFinancialDataDto);
+		return "{\"status\": \"started\" }";
 	}
 }

@@ -41,7 +41,7 @@ import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 
-@Component
+@Component("Sec")
 public class SecFileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecFileClientBean.class);
 	private volatile boolean importDone = true; 
