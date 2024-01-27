@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -86,13 +85,11 @@ public class FileClientBean implements FileClient {
 				ZipEntry element = entries.nextElement();
 				LocalDateTime start = LocalDateTime.now();
 				if (!element.isDirectory() && element.getSize() > 10) {
-					InputStream inputStream = null;
-					try {
+					try(InputStream inputStream = initialFile.getInputStream(element)) {
 						if (first) {
 							LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
 							first = false;
 						}
-						inputStream = initialFile.getInputStream(element);
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text,
 								SymbolFinancialsDto.class);
@@ -116,8 +113,6 @@ public class FileClientBean implements FileClient {
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
 					} catch (Exception e) {
 						LOGGER.info("Exception with file: {}", element.getName(), e);
-					} finally {
-						inputStream.close();
 					}
 				}
 				if ((this.ssdIo ? symbolFinancialsDtos.size() >= 100 : symbolFinancialsDtos.size() >= 35) || !entries.hasMoreElements()) {

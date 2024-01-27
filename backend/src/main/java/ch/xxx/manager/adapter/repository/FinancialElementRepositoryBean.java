@@ -49,7 +49,6 @@ public class FinancialElementRepositoryBean implements FinancialElementRepositor
 	@Override
 	public void deleteAllBatch() {
 		this.jpaFinancialElementRepository.deleteAllInBatch();
-		;
 	}
 
 	@Override
