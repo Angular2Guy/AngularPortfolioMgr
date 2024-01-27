@@ -47,7 +47,7 @@ import com.tngtech.archunit.library.Architectures;
 import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
-import ch.xxx.manager.adapter.file.FileClientTest;
+import ch.xxx.manager.adapter.file.SecFileClientTest;
 import ch.xxx.manager.architecture.MyArchitectureTests.DoNotIncludeAotGenerated;
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -144,7 +144,7 @@ public class MyArchitectureTests {
 				.and(this.createNoFieldInjectionRule()).because("Good practice");
 		@SuppressWarnings("static-access")
 		JavaClasses classesToCheck = importedClasses
-				.that(JavaClass.Predicates.resideOutsideOfPackages("..adapter.clients.test..").and().doesNot(equivalentTo(FileClientTest.class)));
+				.that(JavaClass.Predicates.resideOutsideOfPackages("..adapter.clients.test..").and().doesNot(equivalentTo(SecFileClientTest.class)));
 		archRule.check(classesToCheck);
 		
 	}

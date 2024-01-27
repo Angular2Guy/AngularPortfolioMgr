@@ -41,8 +41,8 @@ import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataService;
 
 @Component
-public class FileClientBean implements FileClient {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FileClientBean.class);
+public class SecFileClientBean implements FileClient {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SecFileClientBean.class);
 	private volatile boolean importDone = true; 
 	private final AppInfoService appInfoService;
 	private final ObjectMapper objectMapper;
@@ -51,7 +51,7 @@ public class FileClientBean implements FileClient {
 	private boolean ssdIo;
 	String financialDataImportPath;
 
-	public FileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
+	public SecFileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
 			FinancialDataService financialDataImportService) {
 		this.appInfoService = appInfoService;
 		this.objectMapper = objectMapper;

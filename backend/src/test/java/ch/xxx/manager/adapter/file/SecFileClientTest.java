@@ -26,9 +26,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class FileClientTest {
+public class SecFileClientTest {
 	@Autowired
-	private FileClientBean fileClient;
+	private SecFileClientBean fileClient;
 	@Value("${path.financial-data}")
 	private String filePath;
 	
