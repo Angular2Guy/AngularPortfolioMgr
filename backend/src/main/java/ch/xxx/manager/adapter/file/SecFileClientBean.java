@@ -64,12 +64,13 @@ public class SecFileClientBean implements FileClient {
 	}
 
 	public Boolean importZipFile(String filename) {
+		if(!this.importDone) {
+			return false;
+		}
 		this.importDone = false;
 		Thread shutDownThread = createShutDownThread();
 		Runtime.getRuntime().addShutdownHook(shutDownThread);
-		ZipFile initialFile = null;
-		try {
-			initialFile = new ZipFile(this.financialDataImportPath + filename);
+		try(ZipFile initialFile = new ZipFile(this.financialDataImportPath + filename)) {
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
 			LocalDateTime startCleanup = LocalDateTime.now();
 			LOGGER.info("Drop indexes.");
@@ -129,9 +130,7 @@ public class SecFileClientBean implements FileClient {
 			LOGGER.info("FeConcepts updated.");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		} finally {
-			this.closeFile(initialFile);
-		}
+		} 
 		Runtime.getRuntime().removeShutdownHook(shutDownThread);
 		this.importDone = true;
 		return true;
