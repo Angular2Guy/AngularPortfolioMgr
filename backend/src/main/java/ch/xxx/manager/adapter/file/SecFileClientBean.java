@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -80,8 +81,7 @@ public class SecFileClientBean implements FileClient {
 			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
 			boolean first = true;
-			final int[] maxChildren = new int[1];
-			maxChildren[0] = 0;
+			final AtomicInteger maxChildren = new AtomicInteger(0);
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
 				LocalDateTime start = LocalDateTime.now();
@@ -107,7 +107,7 @@ public class SecFileClientBean implements FileClient {
 							int bsChildern = myFinancialsDataDto.getBalanceSheet() == null ? 0 : myFinancialsDataDto.getBalanceSheet().size();
 							int cfChildern = myFinancialsDataDto.getCashFlow() == null ? 0 : myFinancialsDataDto.getCashFlow().size();
 							int icChildern = myFinancialsDataDto.getIncome() == null ? 0 : myFinancialsDataDto.getIncome().size();
-							maxChildren[0] = bsChildern + cfChildern + icChildern > maxChildren[0] ? bsChildern + cfChildern + icChildern : maxChildren[0];
+							maxChildren.set(bsChildern + cfChildern + icChildern > maxChildren.get() ? bsChildern + cfChildern + icChildern : maxChildren.get());
 						});
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
@@ -119,7 +119,7 @@ public class SecFileClientBean implements FileClient {
 				if ((this.ssdIo ? symbolFinancialsDtos.size() >= 100 : symbolFinancialsDtos.size() >= 35) || !entries.hasMoreElements()) {
 					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 					symbolFinancialsDtos.clear();
-					LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()), maxChildren[0]);
+					LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()), maxChildren.get());
 					first = true;
 				}
 			}
@@ -156,15 +156,5 @@ public class SecFileClientBean implements FileClient {
 								.substring(myFinancialElementDto.getConcept().indexOf(':') + 1)
 						: myFinancialElementDto.getConcept());
 		return myFinancialElementDto;
-	}
-
-	private void closeFile(ZipFile zipFile) {
-		if (zipFile != null) {
-			try {
-				zipFile.close();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 }
