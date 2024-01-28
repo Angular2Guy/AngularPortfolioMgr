@@ -21,7 +21,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
 import { ConfigService } from "src/app/service/config.service";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { ImportData } from "src/app/model/import-data";
+import { ImportData, ImportDataType } from "src/app/model/import-data";
 
 enum FormFields {
   Filename = "filename",
@@ -37,9 +37,10 @@ export class ImportFinancialsComponent implements OnInit {
   protected FormFields = FormFields;
   protected filepath: string = null;
   protected filename: string = null;
+  protected ImportDataType = ImportDataType;
 
   constructor(
-    public dialogRef: MatDialogRef<OverviewComponent>,
+    private dialogRef: MatDialogRef<OverviewComponent>,
     private configService: ConfigService,
     private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: ImportData,

@@ -13,6 +13,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { ImportData } from "../model/import-data";
 
 @Injectable({ providedIn: "root" })
 export class QuoteImportService {
@@ -36,5 +37,9 @@ export class QuoteImportService {
   
   updateAllDailyIntraDayQuotes(): Observable<number> {
 	  return this.http.get<number>('/rest/quote/update/portfolio/symbols');
+  }
+  
+    putDailyQuotesImport(importData: ImportData): Observable<boolean> {
+	  return this.http.put<boolean>('/rest/quote/importus/data', importData);
   }
 }

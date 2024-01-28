@@ -26,6 +26,7 @@ import {
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 import { ImportData, ImportDataType } from "src/app/model/import-data";
+import { QuoteImportService } from "src/app/service/quote-import.service";
 
 @Component({
   selector: "app-overview",
@@ -40,6 +41,7 @@ export class OverviewComponent implements OnInit {
 
   constructor(
     private financialDataService: FinancialDataService,
+    private quoteImportService: QuoteImportService,
     private tokenService: TokenService,
     private dialog: MatDialog,
     private configService: ConfigService,
@@ -98,6 +100,25 @@ export class OverviewComponent implements OnInit {
         .subscribe((result) => console.log(result));
     });
     //console.log('showFinancialsConfig()');
+  }
+
+  showDailyQuotesImport(): void {
+    this.configService.getImportPath().subscribe((result) => {
+      const dialogRef = this.dialog.open(ImportFinancialsComponent, {
+        width: "500px",
+        disableClose: true,
+        hasBackdrop: true,
+        data: { filename: "", path: result, dataType: ImportDataType.Stocks } as ImportData,
+      });
+      dialogRef
+        .afterClosed()
+        .pipe(
+          switchMap((result: ImportData) =>
+            this.quoteImportService.putDailyQuotesImport(result)
+          )
+        ).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((result) => console.log(result));
+    });	  
   }
 
   back(): void {
