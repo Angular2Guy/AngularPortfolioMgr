@@ -21,9 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
@@ -143,12 +144,8 @@ public class QuoteController {
 		return 0L;
 	}
 	
-	@GetMapping(path = "/importus/data")
-//	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
-	public String importUsDailyQuotes(@RequestParam("path") String path, @RequestParam("filename") String filename) {
-		ImportFinancialDataDto importFinancialDataDto = new ImportFinancialDataDto();
-		importFinancialDataDto.setFilename(filename);
-		importFinancialDataDto.setPath(path);
+	@PutMapping(path = "/importus/data")
+	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
 		this.quoteService.importUsDailyQuotes(importFinancialDataDto);
 		return "{\"status\": \"started\" }";
 	}
