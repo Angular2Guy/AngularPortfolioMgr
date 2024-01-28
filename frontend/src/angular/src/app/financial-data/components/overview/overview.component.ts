@@ -25,7 +25,7 @@ import {
   SpinnerData,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { ImportData } from "src/app/model/import-data";
+import { ImportData, ImportDataType } from "src/app/model/import-data";
 
 @Component({
   selector: "app-overview",
@@ -86,7 +86,7 @@ export class OverviewComponent implements OnInit {
         width: "500px",
         disableClose: true,
         hasBackdrop: true,
-        data: { filename: "", path: result } as ImportData,
+        data: { filename: "", path: result, dataType: ImportDataType.Sec } as ImportData,
       });
       dialogRef
         .afterClosed()

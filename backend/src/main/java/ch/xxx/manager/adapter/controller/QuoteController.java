@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
-import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+import ch.xxx.manager.domain.model.dto.ImportDataDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
@@ -145,7 +145,7 @@ public class QuoteController {
 	}
 	
 	@PutMapping(path = "/importus/data")
-	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
+	public String importFinancialData(@RequestBody ImportDataDto importFinancialDataDto) {
 		this.quoteService.importUsDailyQuotes(importFinancialDataDto);
 		return "{\"status\": \"started\" }";
 	}

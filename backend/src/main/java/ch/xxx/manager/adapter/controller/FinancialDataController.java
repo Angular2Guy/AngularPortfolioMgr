@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.FeIdInfoDto;
-import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+import ch.xxx.manager.domain.model.dto.ImportDataDto;
 import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.domain.model.dto.SymbolFinancialsDto;
@@ -108,7 +108,7 @@ public class FinancialDataController {
 	}
 
 	@PutMapping(path = "/importus/data")
-	public String importFinancialData(@RequestBody ImportFinancialDataDto importFinancialDataDto) {
+	public String importFinancialData(@RequestBody ImportDataDto importFinancialDataDto) {
 		this.symbolService.importFinancialData(importFinancialDataDto);
 		return "{\"status\": \"started\" }";
 	}

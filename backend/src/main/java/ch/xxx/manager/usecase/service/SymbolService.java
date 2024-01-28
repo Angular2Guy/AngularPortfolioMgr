@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.file.FileClient;
-import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+import ch.xxx.manager.domain.model.dto.ImportDataDto;
 import ch.xxx.manager.domain.model.dto.SymbolDto;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.usecase.mapping.SymbolMapper;
@@ -64,7 +64,7 @@ public class SymbolService {
 	}
 	
 	@Async
-	public void importFinancialData(ImportFinancialDataDto importFinancialDataDto) {
+	public void importFinancialData(ImportDataDto importFinancialDataDto) {
 		try {
 			this.fileClient.importZipFile(importFinancialDataDto.getFilename());
 		} catch (Exception e) {

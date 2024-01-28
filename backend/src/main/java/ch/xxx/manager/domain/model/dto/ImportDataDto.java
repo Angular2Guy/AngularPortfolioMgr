@@ -12,9 +12,27 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-public class ImportFinancialDataDto {
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public class ImportDataDto {
+	public enum ImportDataType {
+		Sec("Sec"), Stocks("Stocks");
+
+		private final String key;
+
+		private ImportDataType(String key) {
+			this.key = key;
+		}
+
+		@JsonValue
+		public String getKey() {
+			return key;
+		}
+	}
+
 	private String filename;
 	private String path;
+	private ImportDataType importDataType;
 
 	public String getFilename() {
 		return filename;
@@ -30,5 +48,13 @@ public class ImportFinancialDataDto {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public ImportDataType getImportDataType() {
+		return importDataType;
+	}
+
+	public void setImportDataType(ImportDataType importDataType) {
+		this.importDataType = importDataType;
 	}
 }

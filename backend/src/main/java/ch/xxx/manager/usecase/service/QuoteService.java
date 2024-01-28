@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.file.FileClient;
-import ch.xxx.manager.domain.model.dto.ImportFinancialDataDto;
+import ch.xxx.manager.domain.model.dto.ImportDataDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
@@ -61,7 +61,7 @@ public class QuoteService {
 	}
 	
 	@Async
-	public boolean importUsDailyQuotes(ImportFinancialDataDto importFinancialDataDto) {
+	public boolean importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
 		Boolean result = this.fileClient.importZipFile(importFinancialDataDto.getFilename());
 		return result;
 	}
