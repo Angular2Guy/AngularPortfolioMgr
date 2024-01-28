@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -29,6 +30,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
@@ -64,6 +66,7 @@ public class ApplicationConfig {
 	}
 
 	@Bean
+	@Primary
 	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());
@@ -72,6 +75,15 @@ public class ApplicationConfig {
 		return objectMapper;
 	}
 
+	@Bean("csv")
+	public CsvMapper createCsvMapper() {
+		CsvMapper objectMapper = new CsvMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+		return objectMapper;
+	}
+	
 	@Bean
 	public ServerCodecConfigurer serverCodecConfigurer() {
 		return new DefaultServerCodecConfigurer();

@@ -21,13 +21,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
 import ch.xxx.manager.usecase.service.YahooClient;
@@ -36,12 +36,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
-	private CsvMapper csvMapper = new CsvMapper();
+	private final CsvMapper csvMapper;
 
-	@jakarta.annotation.PostConstruct
-	public void init() {
-		this.csvMapper.registerModule(new JavaTimeModule());
+	public YahooConnector(@Qualifier("csv") CsvMapper csvMapper) {
+		this.csvMapper = csvMapper;
 	}
+	
+//	@jakarta.annotation.PostConstruct
+//	public void init() {
+//		this.csvMapper.registerModule(new JavaTimeModule());
+//	}
 
 	public Mono<List<HkDailyQuoteImportDto>> getTimeseriesDailyHistory(String symbol) {
 		try {

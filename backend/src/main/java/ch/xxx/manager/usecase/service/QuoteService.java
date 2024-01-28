@@ -61,8 +61,7 @@ public class QuoteService {
 	}
 	
 	@Async
-	public boolean importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
-		Boolean result = this.fileClient.importZipFile(importFinancialDataDto.getFilename());
-		return result;
+	public void importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
+		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
 	}
 }

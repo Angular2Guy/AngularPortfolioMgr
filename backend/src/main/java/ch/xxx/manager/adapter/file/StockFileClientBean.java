@@ -26,6 +26,7 @@ import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -50,9 +51,9 @@ public class StockFileClientBean implements FileClient {
 	private boolean ssdIo;
 	String financialDataImportPath;
 
-	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService) {
+	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService, @Qualifier("csv") CsvMapper csvMapper) {
 		this.appInfoService = appInfoService;
-		this.csvMapper = new CsvMapper();
+		this.csvMapper = csvMapper;
 		this.quoteImportService = quoteImportService;
 	}
 
