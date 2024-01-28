@@ -14,6 +14,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Quote } from "../model/quote";
+import { ImportData } from "../model/import-data";
 
 export enum ComparisonIndex {
   SP500 = "IVV",
@@ -69,5 +70,9 @@ export class QuoteService {
     return this.http.get<Quote[]>(
       `/rest/quote/daily/all/portfolio/${portfolioId}/index/${comparisonIndex}`
     );
+  }
+  
+  putDailyQuotesImport(importData: ImportData): Observable<boolean> {
+	  return this.http.put<boolean>('/rest/quote/importus/data', importData);
   }
 }

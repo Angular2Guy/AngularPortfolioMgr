@@ -16,7 +16,6 @@ import { Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
 import { ImportFinancialsComponent } from "../import-financials/import-financials.component";
 import { FinancialDataService } from "../../service/financial-data.service";
-import { ImportFinancialsData } from "../../model/import-financials-data";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { TokenService } from "ngx-simple-charts/base-service";
@@ -26,6 +25,7 @@ import {
   SpinnerData,
 } from "src/app/base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { ImportData } from "src/app/model/import-data";
 
 @Component({
   selector: "app-overview",
@@ -86,12 +86,12 @@ export class OverviewComponent implements OnInit {
         width: "500px",
         disableClose: true,
         hasBackdrop: true,
-        data: { filename: "", path: result } as ImportFinancialsData,
+        data: { filename: "", path: result } as ImportData,
       });
       dialogRef
         .afterClosed()
         .pipe(
-          switchMap((result: ImportFinancialsData) =>
+          switchMap((result: ImportData) =>
             this.financialDataService.putImportFinancialsData(result)
           )
         ).pipe(takeUntilDestroyed(this.destroyRef))

@@ -19,9 +19,9 @@ import {
 } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
-import { ImportFinancialsData } from "../../model/import-financials-data";
 import { ConfigService } from "src/app/service/config.service";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { ImportData } from "src/app/model/import-data";
 
 enum FormFields {
   Filename = "filename",
@@ -42,7 +42,7 @@ export class ImportFinancialsComponent implements OnInit {
     public dialogRef: MatDialogRef<OverviewComponent>,
     private configService: ConfigService,
     private destroyRef: DestroyRef,
-    @Inject(MAT_DIALOG_DATA) public data: ImportFinancialsData,
+    @Inject(MAT_DIALOG_DATA) public data: ImportData,
     private fb: FormBuilder
   ) {
     this.financialsForm = fb.group({
@@ -63,7 +63,7 @@ export class ImportFinancialsComponent implements OnInit {
     this.dialogRef.close({
       filename: this.financialsForm.controls[FormFields.Filename].value,
       path: this.filepath,
-    } as ImportFinancialsData);
+    } as ImportData);
   }
 
   cancelClick(): void {

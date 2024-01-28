@@ -14,7 +14,6 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
-import { ImportFinancialsData } from "../model/import-financials-data";
 import { QuarterData } from "../model/quarter-data";
 import { FeConcept } from "../model/fe-concept";
 import { SymbolFinancialsQueryParams } from "../model/symbol-financials-query-params";
@@ -22,6 +21,7 @@ import { SymbolFinancials } from "../model/symbol-financials";
 import { FeCountry } from "../model/fe-country";
 import { SfSymbolName } from "../model/sf-symbol-name";
 import { FeIdInfo } from "../model/fe-id-info";
+import { ImportData } from "src/app/model/import-data";
 
 @Injectable()
 export class FinancialDataService {
@@ -33,7 +33,7 @@ export class FinancialDataService {
   constructor(private http: HttpClient) {}
 
   putImportFinancialsData(
-    importFinancialsData: ImportFinancialsData
+    importFinancialsData: ImportData
   ): Observable<string> {
     return this.http.put<string>(
       "/rest/financialdata/importus/data",

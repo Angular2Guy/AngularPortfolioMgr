@@ -11,7 +11,7 @@
    limitations under the License.
  */
 
-export interface ImportFinancialsData {
+export interface ImportData {
   filename: string;
   path?: string;
 }
