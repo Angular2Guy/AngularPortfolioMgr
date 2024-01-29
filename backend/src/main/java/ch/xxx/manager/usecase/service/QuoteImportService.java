@@ -157,14 +157,24 @@ public class QuoteImportService {
 
 	public void storeDailyQuoteData(
 			List<ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto> dailyQuoteImportDtos) {
-		this.dailyQuoteRepository.saveAll(this.map(dailyQuoteImportDtos));
+		Map<String, Symbol> symbolMap = dailyQuoteImportDtos.stream().map(myDto -> myDto.getSymbol()).distinct()
+				.map(mySym -> this.symbolRepository.findBySymbol(mySym).stream().findFirst().orElse(
+						this.symbolRepository.save(new Symbol(null, mySym, mySym, CurrencyKey.USD, QuoteSource.DATA))))
+				.filter(mySymbol -> mySymbol.getQuoteSource().equals(QuoteSource.DATA))
+				.collect(Collectors.toMap(mySym -> mySym.getSymbol(), mySym -> mySym));
+		this.dailyQuoteRepository.saveAll(this.map(
+				dailyQuoteImportDtos.stream()
+						.filter(myDto -> Optional.ofNullable(symbolMap.get(myDto.getSymbol())).isPresent()).toList(),
+				symbolMap));
 	}
 
-	public List<DailyQuote> map(
-			Collection<ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto> dailyQuoteImportDtos) {
-		return dailyQuoteImportDtos
-				.stream().map(myDto -> new DailyQuote(null, myDto.getSymbol(), myDto.getOpen(), myDto.getHigh(),
-						myDto.getLow(), myDto.getClose(), myDto.getClose(), 0L, myDto.getDate(), null, CurrencyKey.USD))
+	private List<DailyQuote> map(
+			Collection<ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto> dailyQuoteImportDtos,
+			Map<String, Symbol> symbolMap) {
+		return dailyQuoteImportDtos.stream()
+				.map(myDto -> new DailyQuote(null, myDto.getSymbol(), myDto.getOpen(), myDto.getHigh(), myDto.getLow(),
+						myDto.getClose(), myDto.getClose(), 0L, myDto.getDate(), symbolMap.get(myDto.getSymbol()),
+						CurrencyKey.USD))
 				.toList();
 	}
 

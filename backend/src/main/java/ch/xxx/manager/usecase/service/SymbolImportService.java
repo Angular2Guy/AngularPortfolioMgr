@@ -46,6 +46,7 @@ import com.google.crypto.tink.daead.DeterministicAeadConfig;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
@@ -64,6 +65,7 @@ public class SymbolImportService {
 	private final NasdaqClient nasdaqClient;
 	private final HkexClient hkexClient;
 	private final SymbolRepository repository;
+	private final DailyQuoteRepository dailyQuoteRepository;
 	private final XetraClient xetraClient;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
 	private final QuoteImportService quoteImportService;
@@ -72,7 +74,7 @@ public class SymbolImportService {
 	@Value("${tink.json.key}")
 	private String tinkJsonKey;
 
-	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository,
+	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository, DailyQuoteRepository dailyQuoteRepository,
 			XetraClient xetraClient, QuoteImportService quoteImportService, AppUserRepository appUserRepository) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;
@@ -80,6 +82,7 @@ public class SymbolImportService {
 		this.xetraClient = xetraClient;
 		this.quoteImportService = quoteImportService;
 		this.appUserRepository = appUserRepository;
+		this.dailyQuoteRepository = dailyQuoteRepository;
 	}
 
 	@PostConstruct
@@ -214,7 +217,18 @@ public class SymbolImportService {
 				.toList();
 		return symbolsToUpdate;
 	}
+	
+	public boolean deleteSymbolsWithDailyQuotes(Iterable<Symbol> symbols) {
+		List<Symbol> symbolsToDelete = this.repository.findByQuoteSource(QuoteSource.DATA);
+		this.dailyQuoteRepository.deleteAll(symbolsToDelete.stream().flatMap(mySymbol -> mySymbol.getDailyQuotes().stream()).toList());
+		this.repository.deleteAll(symbolsToDelete);		
+		return true;
+	}
 
+	public List<Symbol> findSymbolsByQuoteSource(QuoteSource quoteSource) {
+		return this.repository.findByQuoteSource(quoteSource);
+	}
+	
 	private Stream<Symbol> upsertSymbolEntity(String indexSymbol) {
 		ComparisonIndex compIndex = Stream.of(ComparisonIndex.values())
 				.filter(index -> index.getSymbol().equalsIgnoreCase(indexSymbol)).findFirst()

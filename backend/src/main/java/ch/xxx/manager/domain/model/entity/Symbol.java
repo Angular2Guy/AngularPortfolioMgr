@@ -31,7 +31,7 @@ import jakarta.validation.constraints.Size;
 @Entity
 public class Symbol extends EntityBase {
 	public enum QuoteSource {
-		ALPHAVANTAGE, YAHOO, PORTFOLIO
+		ALPHAVANTAGE, YAHOO, PORTFOLIO, DATA
 	}
 	@NotBlank
 	@Size(max=20)

@@ -17,10 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -36,9 +36,12 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import ch.xxx.manager.domain.file.FileClient;
+import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
+import ch.xxx.manager.usecase.service.SymbolImportService;
 
 @Component(value = "Stock")
 public class StockFileClientBean implements FileClient {
@@ -47,14 +50,17 @@ public class StockFileClientBean implements FileClient {
 	private final AppInfoService appInfoService;
 	private final CsvMapper csvMapper;
 	private final QuoteImportService quoteImportService;
+	private final SymbolImportService symbolImportService;
 	@Value("${ssd.io:false}")
 	private boolean ssdIo;
 	String financialDataImportPath;
 
-	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService, @Qualifier("csv") CsvMapper csvMapper) {
+	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService,
+			@Qualifier("csv") CsvMapper csvMapper, SymbolImportService symbolImportService) {
 		this.appInfoService = appInfoService;
 		this.csvMapper = csvMapper;
 		this.quoteImportService = quoteImportService;
+		this.symbolImportService = symbolImportService;
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -67,19 +73,23 @@ public class StockFileClientBean implements FileClient {
 		if (!this.importDone) {
 			return false;
 		}
+		var start = new Date();
 		this.importDone = false;
 		Thread shutDownThread = createShutDownThread();
+		LOGGER.info("Delete old Symbols.");
+		List<Symbol> symbolsToDelete = this.symbolImportService.findSymbolsByQuoteSource(QuoteSource.DATA);
+		this.symbolImportService.deleteSymbolsWithDailyQuotes(symbolsToDelete);
+		LOGGER.info("Old Symbols deleted in {}ms", new Date().getTime() - start.getTime());
 		Runtime.getRuntime().addShutdownHook(shutDownThread);
 		try (ZipFile initialFile = new ZipFile(this.financialDataImportPath + filename)) {
 			Enumeration<? extends ZipEntry> entries = initialFile.entries();
-			List<DailyQuoteImportDto> dailyQuoteImportDtos = new ArrayList<>();
-			final AtomicInteger importedRows = new AtomicInteger(0);
 			while (entries.hasMoreElements()) {
 				ZipEntry element = entries.nextElement();
-				LocalDateTime start = LocalDateTime.now();
+				LocalDateTime startElement = LocalDateTime.now();
+				List<DailyQuoteImportDto> dailyQuoteImportDtos = new ArrayList<>();
 				if (!element.isDirectory() && element.getSize() > 10) {
 					try (InputStream inputStream = initialFile.getInputStream(element)) {
-							LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
+						LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						dailyQuoteImportDtos = this.csvMapper.readerFor(DailyQuoteImportDto.class)
 								.with(CsvSchema.builder().setUseHeader(true).build())
@@ -91,19 +101,18 @@ public class StockFileClientBean implements FileClient {
 						LOGGER.info("Exception with file: {}", element.getName(), e);
 					}
 				}
-				if ((this.ssdIo ? dailyQuoteImportDtos.size() >= 25000 : dailyQuoteImportDtos.size() >= 5000)
-						|| !entries.hasMoreElements()) {
-					this.quoteImportService.storeDailyQuoteData(dailyQuoteImportDtos);
-//					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
-					dailyQuoteImportDtos.clear();
-					LOGGER.info("Persist time: {}, imported Rows: {}",
-							ChronoUnit.MILLIS.between(start, LocalDateTime.now()), importedRows.get());
-				}
+//				if ((this.ssdIo ? dailyQuoteImportDtos.size() >= 25000 : dailyQuoteImportDtos.size() >= 5000)
+//						|| !entries.hasMoreElements()) {
+				this.quoteImportService.storeDailyQuoteData(dailyQuoteImportDtos);
+				LOGGER.info("Persist time: {}, imported Rows: {}",
+						ChronoUnit.MILLIS.between(startElement, LocalDateTime.now()), dailyQuoteImportDtos.size());
+//				}
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 		Runtime.getRuntime().removeShutdownHook(shutDownThread);
+		LOGGER.info("Import Done in {}ms", new Date().getTime() - start.getTime());
 		this.importDone = true;
 		return true;
 	}

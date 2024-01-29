@@ -14,6 +14,8 @@ package ch.xxx.manager.usecase.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +63,7 @@ public class QuoteService {
 	}
 	
 	@Async
-	public void importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
-		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
+	public Future<Boolean> importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
+		return  CompletableFuture.completedFuture(this.fileClient.importZipFile(importFinancialDataDto.getFilename()));
 	}
 }

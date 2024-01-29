@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 
 public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {	
 	@Query("select s from Symbol s where lower(s.symbol) like %:symbol%")
@@ -29,4 +30,6 @@ public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {
 	List<Symbol> findByName(@Param(value = "name") String name);
 	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")
 	List<Symbol> findByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
+	@Query("select s from Symbol s join fetch s.dailyQuotes where s.quoteSource = :quoteSource")
+	List<Symbol> findByQuoteSource(@Param(value="quoteSource") QuoteSource quoteSource);
 }

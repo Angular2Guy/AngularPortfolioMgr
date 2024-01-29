@@ -15,6 +15,8 @@ package ch.xxx.manager.domain.model.entity;
 import java.util.List;
 import java.util.Optional;
 
+import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
+
 public interface SymbolRepository {
 	List<Symbol> findBySymbol(String symbol);
 	List<Symbol> findBySymbolSingle(String symbol);
@@ -24,4 +26,6 @@ public interface SymbolRepository {
 	Optional<Symbol> findById(Long id);
 	Symbol save(Symbol symbol);
 	List<Symbol> saveAll(Iterable<Symbol> symbols);
+	List<Symbol> findByQuoteSource(QuoteSource quoteSource);
+	void deleteAll(Iterable<Symbol> symbols);
 }

@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 
 @Repository
@@ -71,4 +72,13 @@ public class SymbolRepositoryBean implements SymbolRepository {
 		return this.jpaSymbolRepository.findById(id);
 	}
 
+	@Override
+	public List<Symbol> findByQuoteSource(QuoteSource quoteSource) {
+		return this.jpaSymbolRepository.findByQuoteSource(quoteSource);
+	}
+	
+	@Override
+	public void deleteAll(Iterable<Symbol> symbols) {
+		this.jpaSymbolRepository.deleteAll(symbols);
+	}
 }
