@@ -31,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,11 +45,10 @@ import ch.xxx.manager.usecase.service.JwtTokenService;
 import ch.xxx.manager.usecase.service.PortfolioService;
 import jakarta.servlet.http.HttpServletRequest;
 
-
+@DisabledInAotMode
 @WebMvcTest(PortfolioController.class)
 @ComponentScan(basePackages = "ch.xxx.manager",excludeFilters = 
 @Filter(type = FilterType.CUSTOM, classes = ComponentScanCustomFilter.class))
-//, excludeFilters = @Filter(type = FilterType.REGEX, pattern = ".*\\.(adapter|usecase)\\.(repository|service).*"))
 public class PortfolioControllerTest extends BaseControllerTest {
 	private static final String TEST_SECRECT_KEY = "l4v46cegVyPzuqCPs2bZw1egItei_5n-FrZChxcg8iYVZcEs6_2TbvtlYVtmuheU77O4AurSah3JCAyfuapG"
 			+ "CRSLpttN9dMqam85wSRjhoKDz-_QWAjbUMptwFlskNa_8vZ-DvwwnkcvbEfBSvVJSUt8_4ZrWpBq1tX56PTOobbI-oXasUk-meYdD2tLDvErmPXC"
