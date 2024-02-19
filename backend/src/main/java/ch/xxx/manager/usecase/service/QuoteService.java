@@ -14,11 +14,11 @@ package ch.xxx.manager.usecase.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import ch.xxx.manager.usecase.mapping.QuoteMapper;
 @Service
 @Transactional
 public class QuoteService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteService.class);
 	private final DailyQuoteRepository dailyQuoteRepository;
 	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final QuoteMapper quoteMapper;
@@ -63,7 +64,8 @@ public class QuoteService {
 	}
 	
 	@Async
-	public Future<Boolean> importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
-		return  CompletableFuture.completedFuture(this.fileClient.importZipFile(importFinancialDataDto.getFilename()));
+	public void importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
+//		LOGGER.info("ImportUsDailyQuotes.");
+		this.fileClient.importZipFile(importFinancialDataDto.getFilename());
 	}
 }

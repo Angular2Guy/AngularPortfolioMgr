@@ -146,7 +146,7 @@ public class QuoteController {
 	
 	@PutMapping(path = "/importus/data")
 	public String importFinancialData(@RequestBody ImportDataDto importFinancialDataDto) {
-		this.quoteService.importUsDailyQuotes(importFinancialDataDto);
+		this.quoteService.importUsDailyQuotes(importFinancialDataDto);		
 		return "{\"status\": \"started\" }";
 	}
 }

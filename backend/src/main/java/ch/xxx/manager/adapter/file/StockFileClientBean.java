@@ -70,6 +70,7 @@ public class StockFileClientBean implements FileClient {
 
 	@Override
 	public Boolean importZipFile(String filename) {
+//		LOGGER.info("Import start.");
 		if (!this.importDone) {
 			return false;
 		}
