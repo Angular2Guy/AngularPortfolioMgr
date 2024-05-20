@@ -66,6 +66,7 @@ export class ResultTreeComponent {
     "concept",
     "value",
     "currency",
+    "element-type",
     "quarter",
   ];
   protected financialElement: FinancialElement = null;
@@ -98,6 +99,10 @@ export class ResultTreeComponent {
       this.financialElement.info = (value as FeIdInfo).info;
       this.bottomSheet.open(this.bsTemplate);
     });
+  }
+
+  formatFinancialType(type: string): string {
+	return type.toLocaleLowerCase() === 'BalanceSheet'.toLowerCase() ? 'BS' : type.toLocaleLowerCase() === 'Cashflow'.toLowerCase() ? 'CF' : 'IC';
   }
 
   get symbolFinancials(): SymbolFinancials[] {

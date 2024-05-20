@@ -17,6 +17,8 @@
 
 .single-line {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
 }
 
@@ -66,7 +68,8 @@
 
 .mat-column-year,
 .mat-column-quarter,
-.mat-column-currency {
+.mat-column-currency,
+.mat-column-element-type {
   min-width: 50px;
   flex: 0 0 auto;
 }
