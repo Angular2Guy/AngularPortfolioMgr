@@ -14,6 +14,9 @@ package ch.xxx.manager.adapter.cron;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -78,7 +81,7 @@ public class CronJobService {
 		LOGGER.info(this.symbolImportService.importHkSymbols());
 		LOGGER.info(this.symbolImportService.importUsSymbols());
 		this.symbolImportService.refreshSymbolEntities();
-		LOGGER.info("scheduledImporterSymbols: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
+		LOGGER.info("scheduledImporterSymbols: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 
 	private void importCurrencyQuotes() {
@@ -88,7 +91,7 @@ public class CronJobService {
 		LOGGER.info("Import of {} Usd quotes finished.",
 				this.currencyService.importFxDailyQuoteHistory(DataHelper.CurrencyKey.USD.toString()));
 		this.currencyService.initCurrencyMap();
-		LOGGER.info("importCurrencyQuotes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
+		LOGGER.info("importCurrencyQuotes: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 
 	@Transactional
@@ -103,23 +106,30 @@ public class CronJobService {
 				mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol, new UserKeys(this.apiKey, null)))
 				.reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
-		LOGGER.info("scheduledImporterRefIndexes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
+		LOGGER.info("scheduledImporterRefIndexes: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 
-	@Scheduled(cron = "0 25 1 * * ?")
+	@Transactional
+	@Scheduled(cron = "0 20 1 * * ?")	
 	@SchedulerLock(name = "CronJob_quotes", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledImporterQuotes() {
 		Instant start = Instant.now();
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
-		this.symbolImportService.updateSymbolQuotes(symbolsToUpdate);
-		LOGGER.info("scheduledImporterQuotes: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
+		try {
+			var numSym = this.symbolImportService.updateSymbolQuotes(symbolsToUpdate).get(110L, TimeUnit.MINUTES);
+			LOGGER.info("Symbols updated: {}", numSym);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			throw new RuntimeException("SymbolImport failed.",e);
+		}
+		LOGGER.info("scheduledImporterQuotes: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 	
-	@Scheduled(cron = "0 45 1 * * ?")
+	@Transactional
+	@Scheduled(cron = "0 40 1 * * ?")
 	@SchedulerLock(name = "CronJob_portfolios", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledUpdatePortfolios() {
 		Instant start = Instant.now();
 		this.portfolioService.findAllPortfolios().forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
-		LOGGER.info("scheduledUpdatePortfolios: {}ms", start.toEpochMilli() - Instant.now().toEpochMilli());
+		LOGGER.info("scheduledUpdatePortfolios: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 }
