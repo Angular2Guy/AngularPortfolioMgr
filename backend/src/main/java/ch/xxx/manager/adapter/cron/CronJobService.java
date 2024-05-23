@@ -115,6 +115,7 @@ public class CronJobService {
 	public void scheduledImporterQuotes() {
 		Instant start = Instant.now();
 		List<Symbol> symbolsToUpdate = this.symbolImportService.findSymbolsToUpdate();
+		//LOGGER.info("Symbols to update: {}", symbolsToUpdate.size());
 		try {
 			var numSym = this.symbolImportService.updateSymbolQuotes(symbolsToUpdate).get(110L, TimeUnit.MINUTES);
 			LOGGER.info("Symbols updated: {}", numSym);

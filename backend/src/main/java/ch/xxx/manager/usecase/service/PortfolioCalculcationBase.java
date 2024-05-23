@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,16 +32,20 @@ import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 public abstract class PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioCalculcationBase.class);
 	protected final DailyQuoteRepository dailyQuoteRepository;
+	protected final SymbolRepository symbolRepository;
 	protected final CurrencyService currencyService;
 
-	public PortfolioCalculcationBase(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService) {
+	public PortfolioCalculcationBase(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
+			SymbolRepository symbolRepository) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;
+		this.symbolRepository = symbolRepository;
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
@@ -109,10 +112,8 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Portfolio addDailyQuotes(Portfolio portfolio) {
-		portfolio.getPortfolioToSymbols().forEach(pts -> {
-			pts.getSymbol()
-					.setDailyQuotes(new HashSet<>(this.dailyQuoteRepository.findBySymbolId(pts.getSymbol().getId())));
-		});
+		portfolio.getPortfolioToSymbols().forEach(pts -> pts
+				.setSymbol(this.symbolRepository.findByIdWithDailyQuotes(pts.getSymbol().getId()).orElseThrow()));
 		return portfolio;
 	}
 }

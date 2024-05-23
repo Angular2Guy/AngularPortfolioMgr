@@ -28,4 +28,5 @@ public interface SymbolRepository {
 	List<Symbol> saveAll(Iterable<Symbol> symbols);
 	List<Symbol> findByQuoteSource(QuoteSource quoteSource);
 	void deleteAll(Iterable<Symbol> symbols);
+	Optional<Symbol> findByIdWithDailyQuotes(Long symbolId);
 }

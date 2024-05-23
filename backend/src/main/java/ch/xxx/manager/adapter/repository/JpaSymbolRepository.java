@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +33,6 @@ public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {
 	List<Symbol> findByPortfolioId(@Param(value = "portfolioId") Long portfolioId);
 	@Query("select s from Symbol s join fetch s.dailyQuotes where s.quoteSource = :quoteSource")
 	List<Symbol> findByQuoteSource(@Param(value="quoteSource") QuoteSource quoteSource);
+	@Query("select s from Symbol s join fetch s.dailyQuotes where s.id = :symbolId")
+	Optional<Symbol> findByIdWithDailyQuotes(@Param(value="symbolId") Long symbolId);
 }

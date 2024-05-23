@@ -51,7 +51,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public List<Symbol> findByPortfolioId(Long portfolioId) {
 		return this.jpaSymbolRepository.findByPortfolioId(portfolioId);
 	}
-
+	
 	@Override
 	public List<Symbol> findAll() {
 		return this.jpaSymbolRepository.findAll();
@@ -80,5 +80,10 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	@Override
 	public void deleteAll(Iterable<Symbol> symbols) {
 		this.jpaSymbolRepository.deleteAll(symbols);
+	}
+
+	@Override
+	public Optional<Symbol> findByIdWithDailyQuotes(Long symbolId) {
+		return this.jpaSymbolRepository.findByIdWithDailyQuotes(symbolId);
 	}
 }

@@ -140,7 +140,7 @@ public class CurrencyService {
 								.findFirst()))
 				.peek(myOpt -> {
 					if (myOpt.isEmpty() && day.isAfter(LocalDate.of(2005, 1, 1))) {
-						LOG.info("No CurrencyValue at {} portfolio: {} symbol: {}", day.toString(),
+						LOG.debug("No CurrencyValue at {} portfolio: {} symbol: {}", day.toString(),
 								portfolioCurrencyKey.name(), symbolCurrencyKey.name());
 					}
 				}).filter(Optional::isPresent).map(Optional::get).findFirst();

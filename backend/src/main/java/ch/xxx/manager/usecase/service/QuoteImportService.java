@@ -291,6 +291,7 @@ public class QuoteImportService {
 
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
+		//LOGGER.info("DailyQuotes size: {}", wrapper.getDailyQuotes().size());
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
 				.collect(Collectors.toList());

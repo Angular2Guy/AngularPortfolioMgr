@@ -41,6 +41,7 @@ import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
+import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
@@ -68,8 +69,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	};
 
 	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
-			PortfolioStatisticService portfolioStatisticService) {
-		super(dailyQuoteRepository, currencyService);
+			PortfolioStatisticService portfolioStatisticService, SymbolRepository symbolRepository) {
+		super(dailyQuoteRepository, currencyService, symbolRepository);
 		this.portfolioStatisticService = portfolioStatisticService;
 	}
 

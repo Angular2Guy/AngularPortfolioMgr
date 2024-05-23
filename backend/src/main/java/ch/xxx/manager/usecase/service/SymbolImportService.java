@@ -111,6 +111,7 @@ public class SymbolImportService {
 				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.RapidApiKey()).stream()
 						.filter(myStr -> !myStr.isBlank()).findFirst().isPresent())
 				.toList();
+		LOGGER.info("UserKeys size: {}", allUserKeys.size());
 		final AtomicLong indexDaily = new AtomicLong(-1L);
 		Long quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
 			var myIndex = indexDaily.addAndGet(1L);

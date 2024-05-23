@@ -48,7 +48,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioStatisticService.class);
-	private final SymbolRepository symbolRepository;
 
 	private record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 	}
@@ -62,8 +61,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
 			DailyQuoteRepository dailyQuoteRepository) {
-		super(dailyQuoteRepository, currencyService);
-		this.symbolRepository = symbolRepository;
+		super(dailyQuoteRepository, currencyService, symbolRepository);		
 	}
 
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
