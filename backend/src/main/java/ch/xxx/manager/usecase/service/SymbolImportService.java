@@ -139,7 +139,7 @@ public class SymbolImportService {
 					Base64.getDecoder().decode(ciphertext.getBytes(Charset.defaultCharset())),
 					userUuid.toString().getBytes(Charset.defaultCharset()));
 		} catch (GeneralSecurityException e) {
-			LOGGER.debug("Decryption failed: ", e);
+			LOGGER.debug(String.format("Decryption failed cipherText: '%s', userUuid: '%s', charSet: %s", ciphertext, userUuid, Charset.defaultCharset().toString()), e);
 			decrypted = new byte[0];
 		}
 		var result = new String(decrypted, Charset.defaultCharset());		
