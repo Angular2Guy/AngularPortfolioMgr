@@ -72,7 +72,7 @@ public class SymbolImportService {
 	private final AppUserRepository appUserRepository;
 	private DeterministicAead daead;
 	@Value("${tink.json.key}")
-	private String tinkJsonKey;
+	String tinkJsonKey;
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository, DailyQuoteRepository dailyQuoteRepository,
 			XetraClient xetraClient, QuoteImportService quoteImportService, AppUserRepository appUserRepository) {
