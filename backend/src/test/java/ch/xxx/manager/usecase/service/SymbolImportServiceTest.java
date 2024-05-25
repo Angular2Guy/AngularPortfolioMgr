@@ -39,7 +39,7 @@ import ch.xxx.manager.domain.model.entity.SymbolRepository;
 public class SymbolImportServiceTest {
 	private static final String TINK_JSON_KEY = "{\"primaryKeyId\":1312948548,\"key\":[{\"keyData\":{\"typeUrl\":\"type.googleapis.com/google.crypto.tink.AesSivKey\",\"value\":\"EkBLmOTja91pPngXWMaiyvl3R36cYjlUy+0gUuhjC5zDAuuY/QAWpf+u8RAakr9EVQtDdCkqpLrCabqCBUJuYm8Q\",\"keyMaterialType\":\"SYMMETRIC\"},\"status\":\"ENABLED\",\"keyId\":1312948548,\"outputPrefixType\":\"TINK\"}]}";
 	private static final String TEST_STRING = "ABCDEFGHIJKLMN";
-	private static final UUID TEST_UUID = UUID.randomUUID();
+	private static final UUID TEST_UUID = UUID.fromString("db0f7305-f884-417a-b925-33e1f89cd54b");
 	private String ciphertext;
 
 	@Mock
