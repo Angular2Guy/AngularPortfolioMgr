@@ -18,26 +18,20 @@ import { AppComponent } from "./app.component";
 import { SpinnerComponent } from "./spinner/spinner.component";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import {
   NgxServiceModule,
   SimpleChartsConfig,
 } from "ngx-simple-charts/base-service";
 
-@NgModule({
-  declarations: [AppComponent, SpinnerComponent],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule,
-    MatProgressSpinnerModule,
-    BrowserAnimationsModule,
-    NgxServiceModule.forRoot({
-      tokenRefreshPath: "/rest/auth/refreshToken",
-      logoutPath: "/rest/auth/logout",
-      loginRoute: "/login",
-    }),
-  ],
-  bootstrap: [AppComponent],
-})
+@NgModule({ declarations: [AppComponent, SpinnerComponent],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        MatProgressSpinnerModule,
+        BrowserAnimationsModule,
+        NgxServiceModule.forRoot({
+            tokenRefreshPath: "/rest/auth/refreshToken",
+            logoutPath: "/rest/auth/logout",
+            loginRoute: "/login",
+        })], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}
