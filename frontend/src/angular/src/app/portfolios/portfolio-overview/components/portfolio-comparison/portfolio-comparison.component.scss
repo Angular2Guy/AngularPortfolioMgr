@@ -52,7 +52,7 @@
     theme-type: light,
     primary: mat.$green-palette,
   )));	
-  $green: mat.get-theme-color($my-theme, primary, 90);
+  $green: mat.get-theme-color($my-theme, primary, 40);
   fill: $green !important;
 }
 ::ng-deep .bar-icga {
@@ -61,7 +61,7 @@
     theme-type: light,
     primary: mat.$yellow-palette,
   )));	
-  $yellow: mat.get-theme-color($my-theme, primary, 90);
+  $yellow: mat.get-theme-color($my-theme, primary, 40);
   fill: $yellow !important;
 }
 ::ng-deep .bar-ivv {
@@ -70,6 +70,6 @@
     theme-type: light,
     primary: mat.$red-palette,
   )));	
-  $red: mat.get-theme-color($my-theme, primary, 90);
+  $red: mat.get-theme-color($my-theme, primary, 40);
   fill: $red !important;
 }

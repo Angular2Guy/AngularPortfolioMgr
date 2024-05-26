@@ -54,14 +54,14 @@
     theme-type: light,
     primary: mat.$orange-palette,
   )));      
-  $red: mat.get-theme-color($my-theme-red, primary, 90);
-  $purple: mat.get-theme-color($my-theme-purple, primary, 90);
-  $blue: mat.get-theme-color($my-theme-blue, primary, 90);
-  $cyan: mat.get-theme-color($my-theme-cyan, primary, 90);
-  $green: mat.get-theme-color($my-theme-green, primary, 90);
-  $lime: mat.get-theme-color($my-theme-yellow, primary, 90);
-  $orange: mat.get-theme-color($my-theme-orange, primary, 90);
-  $gray: mat.get-theme-color($my-theme-blue, neutral, 90);
+  $red: mat.get-theme-color($my-theme-red, primary, 70);
+  $purple: mat.get-theme-color($my-theme-purple, primary, 70);
+  $blue: mat.get-theme-color($my-theme-blue, primary, 70);
+  $cyan: mat.get-theme-color($my-theme-cyan, primary, 70);
+  $green: mat.get-theme-color($my-theme-green, primary, 70);
+  $lime: mat.get-theme-color($my-theme-yellow, primary, 70);
+  $orange: mat.get-theme-color($my-theme-orange, primary, 70);
+  $gray: mat.get-theme-color($my-theme-blue, neutral, 70);
   //@debug "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";
   &::before {
     content: "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";
