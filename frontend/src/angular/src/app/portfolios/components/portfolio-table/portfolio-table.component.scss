@@ -34,7 +34,12 @@ table {
 }
 
 .portfolio-line {
-  $blue: mat.get-color-from-palette(mat.$blue-palette, 900);
+  $my-theme-blue: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$blue-palette,
+  )));	
+  $blue: mat.get-theme-color($my-theme-blue, primary, 90);
   color: #{$blue};
 }
 

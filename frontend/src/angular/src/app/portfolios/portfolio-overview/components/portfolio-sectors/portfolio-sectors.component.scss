@@ -19,14 +19,49 @@
 }
 
 .my-content {
-  $red: mat.get-color-from-palette(mat.$red-palette, 200);
-  $purple: mat.get-color-from-palette(mat.$purple-palette, 200);
-  $blue: mat.get-color-from-palette(mat.$blue-palette, 200);
-  $cyan: mat.get-color-from-palette(mat.$cyan-palette, 200);
-  $green: mat.get-color-from-palette(mat.$green-palette, 200);
-  $lime: mat.get-color-from-palette(mat.$lime-palette, 200);
-  $orange: mat.get-color-from-palette(mat.$orange-palette, 200);
-  $gray: mat.get-color-from-palette(mat.$gray-palette, 200);
+  $my-theme-red: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$red-palette,
+  )));	
+  $my-theme-purple: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  )));
+  $my-theme-blue: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$blue-palette,
+  )));
+  $my-theme-cyan: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$cyan-palette,
+  )));
+  $my-theme-green: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$green-palette,
+  )));                  
+  $my-theme-yellow: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$yellow-palette,
+  )));
+  $my-theme-orange: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$orange-palette,
+  )));      
+  $red: mat.get-theme-color($my-theme-red, primary, 90);
+  $purple: mat.get-theme-color($my-theme-purple, primary, 90);
+  $blue: mat.get-theme-color($my-theme-blue, primary, 90);
+  $cyan: mat.get-theme-color($my-theme-cyan, primary, 90);
+  $green: mat.get-theme-color($my-theme-green, primary, 90);
+  $lime: mat.get-theme-color($my-theme-yellow, primary, 90);
+  $orange: mat.get-theme-color($my-theme-orange, primary, 90);
+  $gray: mat.get-theme-color($my-theme-blue, neutral, 90);
   //@debug "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";
   &::before {
     content: "#{$red},#{$purple},#{$blue},#{$cyan},#{$green},#{$lime},#{$orange},#{$gray}";

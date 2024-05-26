@@ -13,7 +13,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
-import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HttpClientModule, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { DialogSpinnerComponent } from "./components/dialog-spinner/dialog-spinner.component";
 

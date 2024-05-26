@@ -46,15 +46,30 @@
   height: calc(100% - 94px);
   width: 100%;
 }
-::ng-deep .bar-sxrt {
-  $green: mat.get-color-from-palette(mat.$green-palette, 900);
+::ng-deep .bar-sxrt {	
+  $my-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$green-palette,
+  )));	
+  $green: mat.get-theme-color($my-theme, primary, 90);
   fill: $green !important;
 }
 ::ng-deep .bar-icga {
-  $lime: mat.get-color-from-palette(mat.$lime-palette, 900);
-  fill: $lime !important;
+  $my-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$yellow-palette,
+  )));	
+  $yellow: mat.get-theme-color($my-theme, primary, 90);
+  fill: $yellow !important;
 }
 ::ng-deep .bar-ivv {
-  $red: mat.get-color-from-palette(mat.$red-palette, 900);
+  $my-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$red-palette,
+  )));	
+  $red: mat.get-theme-color($my-theme, primary, 90);
   fill: $red !important;
 }
