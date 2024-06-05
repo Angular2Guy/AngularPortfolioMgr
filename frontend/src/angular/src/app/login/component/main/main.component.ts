@@ -36,7 +36,9 @@ export class MainComponent {
   openLoginDialog(): MatDialogRef<LoginComponent, any> {
     const dialogRef = this.dialog.open(LoginComponent, {
       width: "600px",
-      data: { login: this.login,  hasBackdrop: true, disableClose: true },
+      hasBackdrop: true, 
+      disableClose: true,
+      data: { login: this.login },
     });
     dialogRef.beforeClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
       this.login = typeof result == "undefined" ? null : result;
