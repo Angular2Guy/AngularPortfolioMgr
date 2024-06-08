@@ -149,6 +149,10 @@ export class OverviewComponent implements OnInit {
     this.router.navigate([`/financialdata`]);
   }
 
+  showFinancialNews() {
+	console.log('hello');
+  }
+
   updateQuotes() {
 	  this.quoteImportService.updateAllDailyIntraDayQuotes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(xxx => console.log('updateQuotes() called.'));
   }

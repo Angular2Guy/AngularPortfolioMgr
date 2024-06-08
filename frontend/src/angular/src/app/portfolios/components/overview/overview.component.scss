@@ -21,15 +21,17 @@
 
 .new-portfolio {
   width: 100%;
-  height: 56px;
+  height: auto;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  flex-direction: column;
   cursor: pointer;
 }
 
 .button-margin {
-  margin: 0 5px 0 5px;
+  width: 97%;
+  margin: 5px 0 0 5px;
   padding: 5px 10px 5px 10px;
 }
 
