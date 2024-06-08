@@ -26,6 +26,7 @@ import ch.xxx.manager.domain.model.dto.FeConceptDto;
 import ch.xxx.manager.domain.model.dto.SfCountryDto;
 import ch.xxx.manager.domain.model.dto.SfQuarterDto;
 import ch.xxx.manager.usecase.service.FinancialDataService;
+import ch.xxx.manager.usecase.service.NewsFeedService;
 import ch.xxx.manager.usecase.service.PortfolioService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
 import jakarta.annotation.PostConstruct;
@@ -36,11 +37,13 @@ public class OnStart {
 	private final SymbolImportService symbolImportService;
 	private final FinancialDataService financialDataService;
 	private final PortfolioService portfolioService;
+	private final NewsFeedService newsFeedService;
 
-	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService, PortfolioService portfolioService) {
+	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService, PortfolioService portfolioService, NewsFeedService newsFeedService) {
 		this.symbolImportService = symbolImportService;
 		this.financialDataService = financialDataImportService;
 		this.portfolioService = portfolioService;
+		this.newsFeedService = newsFeedService;
 	}
 
 	@PostConstruct
@@ -62,5 +65,7 @@ public class OnStart {
 		var portfolioList = this.portfolioService.findAllPortfolios();
 		portfolioList.forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
 		LOGGER.info("Portfolios updated {}", portfolioList.size());
+		this.newsFeedService.updateSeekingAlphaNewsFeed();		
+		this.newsFeedService.updateYahooNewsFeed();
 	}
 }

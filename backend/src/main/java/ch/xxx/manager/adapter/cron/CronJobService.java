@@ -32,6 +32,7 @@ import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.usecase.service.AppUserService;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
 import ch.xxx.manager.usecase.service.CurrencyService;
+import ch.xxx.manager.usecase.service.NewsFeedService;
 import ch.xxx.manager.usecase.service.PortfolioService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
@@ -47,19 +48,21 @@ public class CronJobService {
 	private final CurrencyService currencyService;
 	private final AppUserService appUserService;
 	private final PortfolioService portfolioService;
+	private final NewsFeedService newsFeedService;
 	private Environment environment;
 	@Value("${api.key}")
 	private String apiKey;
 
 	public CronJobService(SymbolImportService symbolImportService, PortfolioService portfolioService, 
 			QuoteImportService quoteImportService, CurrencyService currencyService, AppUserService appUserService,
-			Environment environment) {
+			Environment environment, NewsFeedService newsFeedService) {
 		this.symbolImportService = symbolImportService;
 		this.quoteImportService = quoteImportService;
 		this.currencyService = currencyService;
 		this.appUserService = appUserService;
 		this.portfolioService = portfolioService;
 		this.environment = environment;
+		this.newsFeedService = newsFeedService;
 	}
 
 	@Scheduled(fixedRate = 90000)
@@ -71,6 +74,13 @@ public class CronJobService {
 		}
 	}
 
+	@Scheduled(cron = "0 */15 * * * ?")
+	@Order(2)
+	public void updateNewsFeeds() {
+		this.newsFeedService.updateSeekingAlphaNewsFeed();
+		this.newsFeedService.updateYahooNewsFeed();
+	}
+	
 	@Transactional
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
