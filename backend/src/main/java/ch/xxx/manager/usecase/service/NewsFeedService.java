@@ -51,10 +51,16 @@ public class NewsFeedService {
 	}
 	
 	public List<SyndEntry> getYahooNewsFeed() {		
-		return this.yahooNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).toList();
+		return this.yahooNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
+			myEntry.getForeignMarkup().clear();
+			return myEntry;
+		}).toList();
 	}
 	
 	public List<SyndEntry> getSeekingAlphaNewsFeed() {
-		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).toList();
+		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
+			myEntry.getForeignMarkup().clear();
+			return myEntry;
+		}).toList();
 	}
 }

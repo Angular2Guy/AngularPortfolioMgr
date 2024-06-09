@@ -10,13 +10,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NewsService } from '../../service/news.service';
+import { Observable, ReplaySubject, Subject, interval, mergeMap, of, repeat } from 'rxjs';
+import { takeUntilDestroyed } from 'src/app/base/utils/funtions';
+import { NewsItem } from '../../model/news-item';
 
 @Component({
   selector: 'app-news-list',    
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.scss'
 })
-export class NewsListComponent {
-
+export class NewsListComponent implements OnInit {
+	protected seekingAlphaSub: Subject<NewsItem[]> = new ReplaySubject(1);
+	protected yahooFinanceSub: Subject<NewsItem[]> = new ReplaySubject(1);
+	
+	constructor(private newsService: NewsService) {	}
+	
+    ngOnInit(): void {
+		this.newsService.getSeekingAlphaNews().subscribe(result => this.seekingAlphaSub.next(result));
+		this.newsService.getYahooNews().subscribe(result => this.yahooFinanceSub.next(result));                
+    }
 }

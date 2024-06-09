@@ -12,9 +12,13 @@
  */
 package ch.xxx.manager.adapter.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.rometools.rome.feed.synd.SyndEntry;
 
 import ch.xxx.manager.usecase.service.NewsFeedService;
 
@@ -28,12 +32,12 @@ public class NewsFeedController {
 	}
 	
 	@GetMapping("/yahoo-finance")
-	public void getYahooFinace() {
-		this.newsFeedService.getYahooNewsFeed();
+	public List<SyndEntry> getYahooFinace() {
+		return this.newsFeedService.getYahooNewsFeed();
 	}
 	
 	@GetMapping("/seeking-alpha")
-	public void getSeekingAlpha() {
-		this.newsFeedService.getSeekingAlphaNewsFeed();
+	public List<SyndEntry> getSeekingAlpha() {
+		return this.newsFeedService.getSeekingAlphaNewsFeed();
 	}
 }

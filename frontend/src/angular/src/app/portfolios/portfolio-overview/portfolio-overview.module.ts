@@ -29,6 +29,7 @@ import { PortfolioTimechartComponent } from "./components/portfolio-timechart/po
 
 import { CalendarService } from "./service/calendar.service";
 import { NewsListComponent } from "./components/news-list/news-list.component";
+import { NewsService } from "./service/news.service";
 
 @NgModule({
   declarations: [
@@ -51,6 +52,6 @@ import { NewsListComponent } from "./components/news-list/news-list.component";
     MatTooltipModule,
     PortfoliosOverviewRoutingModule,
   ],
-  providers: [CalendarService],
+  providers: [CalendarService, NewsService],
 })
 export class PortfolioOverviewModule {}
