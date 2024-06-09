@@ -150,7 +150,7 @@ export class OverviewComponent implements OnInit {
   }
 
   showFinancialNews() {
-	console.log('hello');
+	this.router.navigate(['/portfolios/overview/portfolio-overview/news-list']);
   }
 
   updateQuotes() {

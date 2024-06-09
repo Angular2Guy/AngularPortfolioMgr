@@ -13,12 +13,17 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { PortfolioChartsComponent } from "./components/portfolio-charts/portfolio-charts.component";
+import { NewsListComponent } from "./components/news-list/news-list.component";
 
 const routes: Routes = [
   {
     path: "portfolio-charts/:portfolioId",
     component: PortfolioChartsComponent,
   },
+  {
+    path: "news-list",
+    component: NewsListComponent,
+  },  
   { path: "**", redirectTo: "portfolio-charts" },
 ];
 
