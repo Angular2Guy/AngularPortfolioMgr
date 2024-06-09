@@ -10,12 +10,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit, DestroyRef, inject } from "@angular/core";
+import { Component, OnInit, DestroyRef } from "@angular/core";
 import { Portfolio } from "src/app/model/portfolio";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { ReplaySubject, Subject } from "rxjs";
+import { NewsItem } from "../../model/news-item";
+import { NewsService } from "../../service/news.service";
 
 @Component({
   selector: "app-portfolio-charts",
@@ -23,16 +26,21 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
   styleUrls: ["./portfolio-charts.component.scss"],
 })
 export class PortfolioChartsComponent implements OnInit {
+  protected seekingAlphaNews: NewsItem[] = [];
+  protected yahooFinanceNews: NewsItem[] = [];
   selPortfolio: Portfolio;
   reloadData = false;
 
   constructor(
     private route: ActivatedRoute,
     private portfolioService: PortfolioService,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
+    private newsService: NewsService
   ) {}
 
   ngOnInit(): void {
+	this.newsService.getSeekingAlphaNews().subscribe(result => this.seekingAlphaNews = result);
+	this.newsService.getYahooNews().subscribe(result => this.yahooFinanceNews = result);
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),

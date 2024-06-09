@@ -22,13 +22,11 @@ import { NewsItem } from '../../model/news-item';
   styleUrl: './news-list.component.scss'
 })
 export class NewsListComponent implements OnInit {
-	protected seekingAlphaSub: Subject<NewsItem[]> = new ReplaySubject(1);
-	protected yahooFinanceSub: Subject<NewsItem[]> = new ReplaySubject(1);
+	protected newsItems: NewsItem[] = []	
 	
 	constructor(private newsService: NewsService) {	}
 	
     ngOnInit(): void {
-		this.newsService.getSeekingAlphaNews().subscribe(result => this.seekingAlphaSub.next(result));
-		this.newsService.getYahooNews().subscribe(result => this.yahooFinanceSub.next(result));                
+		console.log('onInit()');                
     }
 }
