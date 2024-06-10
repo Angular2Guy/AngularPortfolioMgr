@@ -48,26 +48,18 @@
         <button
           mat-raised-button
           class="button-margin"
-          (click)="showFinancialData()"
-          i18n="@@overviewToFinancialData"
-        >
-          To Financial Data
-        </button>
-        <button
-          mat-raised-button
-          class="button-margin"
-          (click)="showFinancialNews()"
-          i18n="@@overviewToFinancialNews"
-        >
-          To Financial News
-        </button>
-        <button
-          mat-raised-button
-          class="button-margin"
           (click)="newPortfolio()"
           i18n="@@overviewNewPortfolio"
         >
           New Portfolio
+        </button>
+        <button
+          mat-raised-button
+          class="button-margin"
+          (click)="showFinancialData()"
+          i18n="@@overviewToFinancialData"
+        >
+          To Financial Data
         </button>
       </div>
       <mat-action-list *ngFor="let portfolio of portfolios">

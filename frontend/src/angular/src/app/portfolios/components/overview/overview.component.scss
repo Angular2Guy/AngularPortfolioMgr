@@ -24,14 +24,12 @@
   height: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  justify-content: space-around;
   cursor: pointer;
 }
 
 .button-margin {
-  width: 97%;
-  margin: 5px 0 0 5px;
+  margin: 5px 5px 0 5px;
   padding: 5px 10px 5px 10px;
 }
 
