@@ -21,13 +21,8 @@ import { NewsItem } from '../../model/news-item';
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.scss'
 })
-export class NewsListComponent implements OnInit {
+export class NewsListComponent {	
 	@Input()
 	protected newsItems: NewsItem[] = []	
-	
-	constructor(private newsService: NewsService) {	}
-	
-    ngOnInit(): void {
-		console.log('onInit()');                
-    }
+		
 }

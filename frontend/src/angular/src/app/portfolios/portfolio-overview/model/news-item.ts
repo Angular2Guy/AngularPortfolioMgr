@@ -12,6 +12,6 @@
  */
 export interface NewsItem {
 	link: string;
-	publishDate: string;
+	publishedDate: string;
 	title: string;
 }
