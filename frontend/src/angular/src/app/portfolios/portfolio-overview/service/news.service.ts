@@ -12,7 +12,7 @@ export class NewsService {
 	return this.httpClient.get<NewsItem[]>('/rest/newsfeed/yahoo-finance');
   }
   
-  getSeekingAlphaNews(): Observable<NewsItem[]> {
-	return this.httpClient.get<NewsItem[]>('/rest/newsfeed/seeking-alpha');
+  getCnnFinanceNews(): Observable<NewsItem[]> {
+	return this.httpClient.get<NewsItem[]>('/rest/newsfeed/cnn-finance');
   }
 }

@@ -29,7 +29,7 @@ import ch.xxx.manager.usecase.service.NewsFeedClient;
 @Component
 public class NewsFeedConnector implements NewsFeedClient {
 	public static final String YAHOO_FINANCE_URL = "https://finance.yahoo.com/news/rssindex";
-	public static final String SEEKING_ALPHA_URL = "https://seekingalpha.com/feed.xml";
+	public static final String CNN_FINANCE_URL = "http://rss.cnn.com/rss/money_news_companies.rss";
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
 	
 	@Override
@@ -45,13 +45,13 @@ public class NewsFeedConnector implements NewsFeedClient {
 	}
 	
 	@Override
-	public SyndFeed importSeekingAlphaNewsFeed() {
+	public SyndFeed importCnnFinanceNewsFeed() {
 		SyndFeed feed = null;
 		try {
 			SyndFeedInput input = new SyndFeedInput();
-			feed = input.build(new XmlReader(URI.create(SEEKING_ALPHA_URL).toURL().openStream()));
+			feed = input.build(new XmlReader(URI.create(CNN_FINANCE_URL).toURL().openStream()));
 		} catch (IllegalArgumentException | FeedException | IOException e) {
-			LOGGER.error("SeekingAlpha Feed import failed.",e);
+			LOGGER.error("CnnFinance Feed import failed.",e);
 		}
 		return feed;
 	}

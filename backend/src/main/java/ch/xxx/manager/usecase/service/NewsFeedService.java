@@ -30,7 +30,7 @@ public class NewsFeedService {
 	
 	private final NewsFeedClient newsFeedClient;
 	private volatile Optional<SyndFeed> yahooNewsFeedOptional = Optional.empty();
-	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
+	private volatile Optional<SyndFeed> cnnFinanceNewsFeedOptional = Optional.empty();
 	
 	public NewsFeedService(NewsFeedClient newsFeedClient) {
 		this.newsFeedClient = newsFeedClient;
@@ -44,10 +44,10 @@ public class NewsFeedService {
 	}
 	
 	@Async
-	public void updateSeekingAlphaNewsFeed() {
+	public void updateCnnFinanceNewsFeed() {
 		var start = Instant.now();
-		this.seekingAlphaNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSeekingAlphaNewsFeed());
-		LOGGER.info("SeekingAlpha news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
+		this.cnnFinanceNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importCnnFinanceNewsFeed());
+		LOGGER.info("CnnFinance news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 	
 	public List<SyndEntry> getYahooNewsFeed() {		
@@ -57,8 +57,8 @@ public class NewsFeedService {
 		}).toList();
 	}
 	
-	public List<SyndEntry> getSeekingAlphaNewsFeed() {
-		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
+	public List<SyndEntry> getCnnFinanceNewsFeed() {
+		return this.cnnFinanceNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
 			myEntry.getForeignMarkup().clear();
 			return myEntry;
 		}).toList();

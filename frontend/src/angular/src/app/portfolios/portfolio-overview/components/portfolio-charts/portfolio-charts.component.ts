@@ -26,7 +26,7 @@ import { NewsService } from "../../service/news.service";
   styleUrls: ["./portfolio-charts.component.scss"],
 })
 export class PortfolioChartsComponent implements OnInit {
-  protected seekingAlphaNews: NewsItem[] = [];
+  protected cnnFinanceNews: NewsItem[] = [];
   protected yahooFinanceNews: NewsItem[] = [];
   selPortfolio: Portfolio;
   reloadData = false;
@@ -39,7 +39,7 @@ export class PortfolioChartsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-	this.newsService.getSeekingAlphaNews().subscribe(result => this.seekingAlphaNews = result);
+	this.newsService.getCnnFinanceNews().subscribe(result => this.cnnFinanceNews = result);
 	this.newsService.getYahooNews().subscribe(result => this.yahooFinanceNews = result);
     this.route.paramMap
       .pipe(

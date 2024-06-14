@@ -36,8 +36,8 @@ public class NewsFeedController {
 		return this.newsFeedService.getYahooNewsFeed();
 	}
 	
-	@GetMapping("/seeking-alpha")
-	public List<SyndEntry> getSeekingAlpha() {
-		return this.newsFeedService.getSeekingAlphaNewsFeed();
+	@GetMapping("/cnn-finance")
+	public List<SyndEntry> getCnnFinance() {
+		return this.newsFeedService.getCnnFinanceNewsFeed();
 	}
 }
