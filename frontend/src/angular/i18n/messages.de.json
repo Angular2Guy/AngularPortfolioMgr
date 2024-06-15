@@ -126,6 +126,8 @@
     "year3": "3 Years",
     "portfolioChartsSectors": "Portfolio Sectors",
     "portfolioChartsTimechart": "Portfolio Timechart",
+    "portfolioChartsYahooFinance": "Yahoo Finance",
+    "portfolioChartsCnnFinance": "Cnn Finance",
     "portfolioChartsName": "Portfolio: {$INTERPOLATION}",
     "portfolioChartsStartDate": "Start Date: {$INTERPOLATION}",
     "portfolioSectorsLegendTitle": "Portfolio sector distribution",
