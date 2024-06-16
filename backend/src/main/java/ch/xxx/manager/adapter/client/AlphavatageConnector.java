@@ -12,14 +12,13 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
 
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
@@ -29,7 +28,6 @@ import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import jakarta.annotation.PostConstruct;
-import reactor.core.publisher.Mono;
 
 @Component
 public class AlphavatageConnector implements AlphavatageClient {
@@ -38,7 +36,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 	private String apiKey;
 	@Value("${show.api.key}")
 	private String showApiKey;
-	
+
 	@PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
@@ -47,64 +45,41 @@ public class AlphavatageConnector implements AlphavatageClient {
 	}
 
 	@Override
-	public Mono<AlphaOverviewImportDto> importCompanyProfile(String symbol) {
-		try {
-			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s", symbol, this.apiKey);
-			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl)).retrieve().bodyToMono(AlphaOverviewImportDto.class);
-		} catch (URISyntaxException e) {
-			LOGGER.error("importCompanyProfile failed.", e);
-		}
-		return Mono.empty();
+	public Optional<AlphaOverviewImportDto> importCompanyProfile(String symbol) {
+		final String myUrl = String.format("https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s",
+				symbol, this.apiKey);
+		LOGGER.info(myUrl);
+		return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), AlphaOverviewImportDto.class);
 	}
 
 	@Override
-	public Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys) {
-		try {
+	public Optional<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys) {
 			final String myUrl = String.format(
 					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
 					symbol, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl)).retrieve().bodyToMono(IntraDayWrapperImportDto.class);
-		} catch (URISyntaxException e) {
-			LOGGER.error("getTimeseriesHistory failed.", e);
-		}
-		return Mono.empty();
+			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), IntraDayWrapperImportDto.class);
 	}
 
 	@Override
-	public Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys) {
-		try {
+	public Optional<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys) {
 			final String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
-			final String urlBase = false ? "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s" 
-					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s"; 
-			final String myUrl = String.format(urlBase, symbol,	fullSeriesStr, userKeys.alphavantageKey());
+			final String urlBase = false
+					? "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s"
+					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s";
+			final String myUrl = String.format(urlBase, symbol, fullSeriesStr, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyWrapperImportDto.class);
-		} catch (URISyntaxException e) {
-			LOGGER.error("getTimeseriesHistory failed.", e);
-		}
-		return Mono.empty();
+			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), DailyWrapperImportDto.class);
 	}
-	
+
 	@Override
-	public Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
-		try {
+	public Optional<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries) {
 			final String from_currency = CurrencyKey.EUR.toString();
 			String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
 			final String myUrl = String.format(
 					"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
 					from_currency, to_currency, fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl)).retrieve().bodyToMono(DailyFxWrapperImportDto.class);
-		} catch (URISyntaxException e) {
-			LOGGER.error("getTimeseriesHistory failed.", e);
-		}
-		return Mono.empty();
+			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), DailyFxWrapperImportDto.class);
 	}
 }

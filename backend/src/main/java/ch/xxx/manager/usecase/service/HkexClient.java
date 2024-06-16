@@ -13,10 +13,10 @@
 package ch.xxx.manager.usecase.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
-import reactor.core.publisher.Mono;
 
 public interface HkexClient {
-	Mono<List<HkSymbolImportDto>> importSymbols();
+	Optional<List<HkSymbolImportDto>> importSymbols();
 }

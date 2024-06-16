@@ -85,11 +85,6 @@ public class ApplicationConfig {
 	}
 	
 	@Bean
-	public ServerCodecConfigurer serverCodecConfigurer() {
-		return new DefaultServerCodecConfigurer();
-	}
-
-	@Bean
 	public LockProvider lockProvider(DataSource dataSource) {
 		return new JdbcTemplateLockProvider(dataSource);
 	}

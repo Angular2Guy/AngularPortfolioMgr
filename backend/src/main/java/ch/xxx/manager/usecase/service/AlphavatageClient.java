@@ -12,16 +12,17 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.Optional;
+
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
-import reactor.core.publisher.Mono;
 
 public interface AlphavatageClient {
-	Mono<AlphaOverviewImportDto> importCompanyProfile(String symbol);
-	Mono<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys);
-	Mono<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys);
-	Mono<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries);
+	Optional<AlphaOverviewImportDto> importCompanyProfile(String symbol);
+	Optional<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys);
+	Optional<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys);
+	Optional<DailyFxWrapperImportDto> getFxTimeseriesDailyHistory(String to_currency, boolean fullSeries);
 }

@@ -12,49 +12,39 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.xxx.manager.usecase.service.XetraClient;
-import reactor.core.publisher.Mono;
 
 @Component
 public class XetraConnector implements XetraClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XetraConnector.class);
 	private static final String XETRA_URL = "https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente";
 
-	public Mono<List<String>> importXetraSymbols() {
-		try {
-			return this.getSymbolCsv(WebClient.create().get().uri(new URI(XETRA_URL)).retrieve().toEntity(String.class)
-					.flatMap(htmlPage -> Mono.just(this.findCsvUrl(htmlPage.getBody()))));
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(String.format("Page not found: %s", XETRA_URL), e);
-		}
+	@Override
+	public Optional<List<String>> importXetraSymbols() {
+		return ConnectorUtils
+				.restCall(XETRA_URL, new LinkedMultiValueMap<String, String>(), new TypeReference<List<String>>() {
+				}).stream().flatMap(values -> values.stream().map(myValue -> this.findCsvUrl(myValue))).findFirst()
+				.flatMap(myUrlStr -> this.loadSymbolsCsv(myUrlStr));
 	}
 
-	private Mono<List<String>> getSymbolCsv(Mono<String> urlStr) {
-		return urlStr.flatMap(url -> {
-			try {
-				return this.loadSymbolsCsv(url);
-			} catch (URISyntaxException e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
 
-	private Mono<List<String>> loadSymbolsCsv(String url) throws URISyntaxException {
-		return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-				.get().uri(new URI(url)).retrieve().toEntityList(String.class)
-				.flatMap(line -> Mono.justOrEmpty(line == null || !line.hasBody() ? null : line.getBody()));
+	private Optional<List<String>> loadSymbolsCsv(String url) {
+		return ConnectorUtils.restCall(url, new LinkedMultiValueMap<String, String>(),
+				new TypeReference<List<String>>() {
+				});
 	}
 
 	private String findCsvUrl(String htmlPage) {

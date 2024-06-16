@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,8 +33,6 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.utils.MyLogPrintWriter;
 import ch.xxx.manager.usecase.service.NasdaqClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Component
 public class NasdaqConnector implements NasdaqClient {
@@ -42,7 +41,9 @@ public class NasdaqConnector implements NasdaqClient {
 	private static final String DIR = "/symboldirectory/";
 	private static final List<String> IMPORT_FILES = Arrays.asList("nasdaqlisted.txt", "otherlisted.txt");
 
-	public Mono<List<String>> importSymbols() {
+	@Override
+	public ArrayList<String> importSymbols() {
+		var result = new ArrayList<String>();
 		FTPClient ftp = new FTPClient();
 		ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(new MyLogPrintWriter(LOGGER, Level.INFO))));
 		try {
@@ -59,21 +60,26 @@ public class NasdaqConnector implements NasdaqClient {
 				throw new FileNotFoundException(
 						String.format("Files: %s, %s", IMPORT_FILES.get(0), IMPORT_FILES.get(1)));
 			}
+			result.addAll(this.importSymbols(IMPORT_FILES.get(0), ftp));
+			result.addAll(this.importSymbols(IMPORT_FILES.get(1), ftp));
 		} catch (IOException e) {			
 			throw new RuntimeException(e);
+		} finally {
+			try {
+				ftp.logout();
+			} catch(IOException e) {
+				LOGGER.info(String.format("Failed to logout from ftp connection to: %s", HOST));
+			}
+			try {				
+				ftp.disconnect();
+			} catch (IOException e) {
+				throw new RuntimeException(String.format("Failed to close ftp connection to: %s", HOST));
+			}
 		}
-		return Flux.concat(this.importSymbols(IMPORT_FILES.get(0), ftp), this.importSymbols(IMPORT_FILES.get(1), ftp)).collectList()
-				.doAfterTerminate(() -> {
-					try {
-						ftp.logout();
-						ftp.disconnect();
-					} catch (IOException e) {
-						throw new RuntimeException(String.format("Failed to close ftp connection to: %s", HOST));
-					}
-				});
+		return result;
 	}
 
-	private Flux<String> importSymbols(String fileName, FTPClient ftp) {
+	private List<String> importSymbols(String fileName, FTPClient ftp) throws IOException {
 		String[] symbols = new String[0];
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			if(ftp.retrieveFile(String.format("/%s/%s", DIR, fileName), baos)) {
@@ -82,9 +88,7 @@ public class NasdaqConnector implements NasdaqClient {
 				LOGGER.warn("File import failed: {}", fileName);
 			}
 			symbols = baos.toString(Charset.defaultCharset()).split("\\r?\\n");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
-		return Flux.fromArray(symbols);
+		return Arrays.asList(symbols);
 	}
 }

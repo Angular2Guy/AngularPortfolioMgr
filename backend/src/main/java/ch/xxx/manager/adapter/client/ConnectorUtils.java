@@ -12,14 +12,32 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import java.util.Optional;
 
-public class ConnectorUtils {	
-	
-	public static ExchangeStrategies createLargeResponseStrategy() {
-		return ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs()
-                        .maxInMemorySize(10 * 1024 * 1024))
-                .build();
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+public class ConnectorUtils {
+
+	public static <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues, Class<T> typeClass) {
+		return Optional.ofNullable(createCall(url, headerValues).toEntity(typeClass).getBody());
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues,
+			TypeReference<T> valueTypeRef) {		
+		return Optional.ofNullable(((T) createCall(url, headerValues).toEntity(valueTypeRef.getClass()).getBody()));
+	}
+
+	private static ResponseSpec createCall(String url, MultiValueMap<String, String> headerValues) {
+		var factory = new HttpComponentsClientHttpRequestFactory();
+		factory.setConnectTimeout(5000);
+		factory.setConnectionRequestTimeout(5000);
+		return RestClient.builder().requestFactory(factory).build().get().uri(url)
+				.headers(headers -> headers.addAll(headerValues)).retrieve();
 	}
 }

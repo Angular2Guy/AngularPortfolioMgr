@@ -12,9 +12,10 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.util.Optional;
+
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
-import reactor.core.publisher.Mono;
 
 public interface RapidApiClient {
-	Mono<RapidOverviewImportDto> importCompanyProfile(String symbol);
+	Optional<RapidOverviewImportDto> importCompanyProfile(String symbol);
 }

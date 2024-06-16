@@ -54,7 +54,6 @@ import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import jakarta.annotation.PostConstruct;
-import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -147,8 +146,7 @@ public class SymbolImportService {
 	}
 
 	public String importUsSymbols() {
-		Long symbolCount = this.nasdaqClient.importSymbols().flatMap(nasdaq -> Mono.just(this.importUsSymbols(nasdaq)))
-				.block();
+		Long symbolCount = this.importUsSymbols(this.nasdaqClient.importSymbols());
 		return String.format("Nasdaq imported symbols: %d", symbolCount);
 	}
 
@@ -162,8 +160,7 @@ public class SymbolImportService {
 	}
 
 	public String importHkSymbols() {
-		Long symbolCount = this.hkexClient.importSymbols().flatMap(hkex -> Mono.just(this.importHkSymbols(hkex)))
-				.block();
+		Long symbolCount = this.hkexClient.importSymbols().stream().flatMap(hkex -> Stream.of((this.importHkSymbols(hkex)))).count();
 		return String.format("Hkex imported symbols: %d", symbolCount);
 	}
 
@@ -177,8 +174,7 @@ public class SymbolImportService {
 	}
 
 	public String importDeSymbols() {
-		Long symbolCount = this.xetraClient.importXetraSymbols()
-				.flatMap(xetra -> Mono.just(this.importDeSymbols(xetra))).block();
+		Long symbolCount = this.xetraClient.importXetraSymbols().stream().flatMap(xetra -> Stream.of(this.importDeSymbols(xetra))).count();
 		return String.format("Xetra imported symbols: %d", symbolCount);
 	}
 

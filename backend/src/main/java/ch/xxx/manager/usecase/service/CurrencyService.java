@@ -14,7 +14,6 @@ package ch.xxx.manager.usecase.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -42,8 +41,6 @@ import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import jakarta.annotation.PostConstruct;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -67,18 +64,18 @@ public class CurrencyService {
 
 	public Long importFxDailyQuoteHistory(String to_currency) {
 		LOG.info("importFxDailyQuoteHistory() called to currency: {}", to_currency);
-		return Flux.fromIterable(this.currencyRepository.findAll())
-				.collectMultimap(entity -> entity.getLocalDay(), entity -> entity)
-				.flatMap(myCurrencyMap -> Mono.just(this.currencyRepository
-						.saveAll(this.convert(this.alphavatageClient.getFxTimeseriesDailyHistory(to_currency, true)
-//										.delayElement(Duration.ofSeconds(3))
-								.block(Duration.ofSeconds(13)), myCurrencyMap))
-						.size()))
-				.blockOptional(Duration.ofSeconds(10)).orElse(0).longValue();
+		var myCurrencyMap = this.currencyRepository.findAll().stream()
+				.collect(Collectors.groupingBy(Currency::getLocalDay));
+		return Integer
+				.valueOf(
+						this.currencyRepository
+								.saveAll(this.convert(this.alphavatageClient
+										.getFxTimeseriesDailyHistory(to_currency, true).orElseThrow(), myCurrencyMap))
+								.size())
+				.longValue();
 	}
 
-	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto,
-			Map<LocalDate, Collection<Currency>> myCurrencyMap) {
+	private List<Currency> convert(DailyFxWrapperImportDto wrapperDto, Map<LocalDate, List<Currency>> myCurrencyMap) {
 		LOG.info("Imported Fx Quotes: " + wrapperDto.getDailyQuotes().size());
 		List<Currency> result = wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),

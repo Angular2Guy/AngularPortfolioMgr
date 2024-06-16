@@ -12,19 +12,18 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
 
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 import ch.xxx.manager.usecase.service.RapidApiClient;
 import jakarta.annotation.PostConstruct;
-import reactor.core.publisher.Mono;
 
 @Component
 public class RapidApiConnector implements RapidApiClient {
@@ -40,20 +39,14 @@ public class RapidApiConnector implements RapidApiClient {
 			LOGGER.info("RapidApiKey: " + apiKey);
 		}
 	}
-
+	
 	@Override
-	public Mono<RapidOverviewImportDto> importCompanyProfile(String symbol) {
-		try {
+	public Optional<RapidOverviewImportDto> importCompanyProfile(String symbol) {
 			final String myUrl = String.format("https://yh-finance.p.rapidapi.com/stock/v2/get-profile?symbol=%s", symbol);
 			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl))
-					.header("X-RapidAPI-Key", this.apiKey)
-					.header("X-RapidAPI-Host", "yh-finance.p.rapidapi.com")
-					.retrieve().bodyToMono(RapidOverviewImportDto.class);
-		} catch (URISyntaxException e) {
-			LOGGER.info("importCompanyProfile failed.", e);
-		}
-		return Mono.empty();
+			var headerMultiMap = new LinkedMultiValueMap<String, String>();
+			headerMultiMap.put("X-RapidAPI-Key", List.of(this.apiKey));
+			headerMultiMap.put("X-RapidAPI-Host", List.of("yh-finance.p.rapidapi.com"));
+			return ConnectorUtils.restCall(myUrl, headerMultiMap, RapidOverviewImportDto.class);					
 	}
 }

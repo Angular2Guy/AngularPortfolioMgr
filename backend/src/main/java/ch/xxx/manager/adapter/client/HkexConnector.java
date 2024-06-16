@@ -12,32 +12,29 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.usecase.service.HkexClient;
-import reactor.core.publisher.Mono;
 
 @Component
 public class HkexConnector implements HkexClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HkexConnector.class);
 
-	public Mono<List<HkSymbolImportDto>> importSymbols() {
-		try {
-			final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
-			LOGGER.info(myUrl);
-			return WebClient.create().mutate().exchangeStrategies(ConnectorUtils.createLargeResponseStrategy()).build()
-					.get().uri(new URI(myUrl)).retrieve().bodyToFlux(HkSymbolImportDto.class).collectList();
-		} catch (URISyntaxException e) {
-			LOGGER.error("Import hk symbols failed.", e);
-		}
-		return Mono.empty();
+	public Optional<List<HkSymbolImportDto>> importSymbols() {
+		final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
+		LOGGER.info(myUrl);
+		var result = ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
+				new TypeReference<List<HkSymbolImportDto>>() {
+				});
+		return result;
 	}
 }

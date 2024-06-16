@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +89,6 @@ public class QuoteImportService {
 
 	public Long importIntraDayQuotes(String symbol, Duration delay, UserKeys userKeys) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		IntraDayWrapperImportDto intraDayWrapperImportDto = new IntraDayWrapperImportDto();
 		intraDayWrapperImportDto.setDailyQuotes(new HashMap<String, IntraDayQuoteImportDto>());
 		intraDayWrapperImportDto.setMetaData(new IntraDayMetaDataImportDto());
@@ -98,12 +96,17 @@ public class QuoteImportService {
 		record SymbolAndWrapper(Symbol symbol, IntraDayWrapperImportDto intraDayWrapperImportDto) {
 		}
 
+		try {
+			Thread.sleep(myDelay);
+		} catch (InterruptedException e) {
+			new RuntimeException(e);
+		}
 		LOGGER.info("importIntraDayQuotes() called for symbol: {}", symbol);
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 				.filter(mySymbol -> QuoteSource.ALPHAVANTAGE.equals(mySymbol.getQuoteSource()))
 				.map(mySymbol -> new SymbolAndWrapper(mySymbol,
 						this.alphavatageClient.getTimeseriesIntraDay(mySymbol.getSymbol(), userKeys)
-								.delayElement(myDelay).blockOptional(myTimeout).orElse(intraDayWrapperImportDto)))
+								.orElse(intraDayWrapperImportDto)))
 				.peek(myRecord -> this
 						.deleteIntraDayQuotes(this.intraDayQuoteRepository.findBySymbol(myRecord.symbol.getSymbol())))
 				.map(myRecord -> this.convert(myRecord.symbol, myRecord.intraDayWrapperImportDto))
@@ -180,15 +183,17 @@ public class QuoteImportService {
 
 	private Symbol overviewImport(String symbol, Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
 		final Symbol mySymbolEntity = symbolEntity;
+		try {
+			Thread.sleep(myDelay);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE ->
-			this.alphavatageClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
-					.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
-		case YAHOO ->
-			this.rapidApiClient.importCompanyProfile(symbol).delayElement(myDelay).retry(1L).blockOptional(myTimeout)
-					.stream().map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+		case ALPHAVANTAGE -> this.alphavatageClient.importCompanyProfile(symbol).stream()
+				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).stream()
+				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
 		};
 		return symbolEntity;
@@ -228,26 +233,28 @@ public class QuoteImportService {
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
+		try {
+			Thread.sleep(myDelay);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
-				? this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay).blockOptional(myTimeout)
-						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
-				: this.yahooClient.getTimeseriesDailyHistory(symbol).delayElement(myDelay).blockOptional(myTimeout)
-						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).orElse(List.of())
-						.stream()
+				? this.yahooClient
+						.getTimeseriesDailyHistory(symbol).stream()
+						.filter(QuoteImportService::filterHkDto)
+						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).toList()
+				: this.yahooClient.getTimeseriesDailyHistory(symbol).stream()
+						.filter(QuoteImportService::filterHkDto)
+						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
 						.filter(dto -> symbolEntity.getDailyQuotes().stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
 						.collect(Collectors.toList());
 	}
 
-	private List<DailyQuote> convert(Symbol symbolEntity, List<HkDailyQuoteImportDto> importDtos,
-			Map<LocalDate, Collection<Currency>> currencyMap) {
-		List<DailyQuote> quotes = importDtos.stream()
-				.filter(myImportDto -> myImportDto.getAdjClose() != null && myImportDto.getVolume() != null)
-				.map(importDto -> this.convert(symbolEntity, importDto, currencyMap)).collect(Collectors.toList());
-		return quotes;
+	private static boolean filterHkDto(HkDailyQuoteImportDto dto) {
+		return dto.getAdjClose() != null && dto.getVolume() != null;
 	}
-
+	
 	private DailyQuote convert(Symbol symbolEntity, HkDailyQuoteImportDto importDto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(), importDto.getHigh(),
@@ -261,10 +268,13 @@ public class QuoteImportService {
 	private List<DailyQuote> alphavantageImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, Duration delay, UserKeys userKeys) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		final Duration myTimeout = Duration.ofSeconds(myDelay.get(ChronoUnit.SECONDS) + 10);
-		return this.alphavatageClient.getTimeseriesDailyHistory(symbol, true, userKeys).delayElement(myDelay).retry(1)
-				.blockOptional(myTimeout).map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap))
-				.orElse(List.of());
+		try {
+			Thread.sleep(myDelay);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		return this.alphavatageClient.getTimeseriesDailyHistory(symbol, true, userKeys).stream()
+				.map(wrapper -> this.convert(symbolEntity, wrapper, currencyMap)).findFirst().orElse(List.of());
 	}
 
 	private List<IntraDayQuote> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
@@ -291,7 +301,7 @@ public class QuoteImportService {
 
 	private List<DailyQuote> convert(Symbol symbolEntity, DailyWrapperImportDto wrapper,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
-		//LOGGER.info("DailyQuotes size: {}", wrapper.getDailyQuotes().size());
+		// LOGGER.info("DailyQuotes size: {}", wrapper.getDailyQuotes().size());
 		List<DailyQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
 				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue(), currencyMap))
 				.collect(Collectors.toList());
