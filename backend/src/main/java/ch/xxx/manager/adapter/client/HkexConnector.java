@@ -17,10 +17,9 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.xxx.manager.domain.model.dto.HkSymbolImportDto;
 import ch.xxx.manager.usecase.service.HkexClient;
@@ -33,7 +32,7 @@ public class HkexConnector implements HkexClient {
 		final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
 		LOGGER.info(myUrl);
 		var result = ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
-				new TypeReference<List<HkSymbolImportDto>>() {
+				new ParameterizedTypeReference<List<HkSymbolImportDto>>() {
 				});
 		return result;
 	}

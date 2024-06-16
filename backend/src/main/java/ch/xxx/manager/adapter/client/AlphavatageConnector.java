@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
@@ -49,7 +48,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		final String myUrl = String.format("https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s",
 				symbol, this.apiKey);
 		LOGGER.info(myUrl);
-		return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), AlphaOverviewImportDto.class);
+		return ConnectorUtils.restCall(myUrl, AlphaOverviewImportDto.class);
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
 					symbol, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), IntraDayWrapperImportDto.class);
+			return ConnectorUtils.restCall(myUrl, IntraDayWrapperImportDto.class);
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s";
 			final String myUrl = String.format(urlBase, symbol, fullSeriesStr, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), DailyWrapperImportDto.class);
+			return ConnectorUtils.restCall(myUrl, DailyWrapperImportDto.class);
 	}
 
 	@Override
@@ -80,6 +79,6 @@ public class AlphavatageConnector implements AlphavatageClient {
 					"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
 					from_currency, to_currency, fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), DailyFxWrapperImportDto.class);
+			return ConnectorUtils.restCall(myUrl, DailyFxWrapperImportDto.class);
 	}
 }

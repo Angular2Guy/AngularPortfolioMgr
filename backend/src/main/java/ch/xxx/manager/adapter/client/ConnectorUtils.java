@@ -14,23 +14,30 @@ package ch.xxx.manager.adapter.client;
 
 import java.util.Optional;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 public class ConnectorUtils {
 
+	public static <T> Optional<T> restCall(String url, Class<T> typeClass) {
+		return restCall(url, new LinkedMultiValueMap<String,String>(), typeClass);
+	}
+	
+	public static <T> Optional<T> restCall(String url, ParameterizedTypeReference<T> valueTypeRef) {
+		return restCall(url, new LinkedMultiValueMap<String,String>(), valueTypeRef);
+	}
+	
 	public static <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues, Class<T> typeClass) {
 		return Optional.ofNullable(createCall(url, headerValues).toEntity(typeClass).getBody());
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues,
-			TypeReference<T> valueTypeRef) {		
-		return Optional.ofNullable(((T) createCall(url, headerValues).toEntity(valueTypeRef.getClass()).getBody()));
+			ParameterizedTypeReference<T> valueTypeRef) {		
+		return Optional.ofNullable(createCall(url, headerValues).body(valueTypeRef));
 	}
 
 	private static ResponseSpec createCall(String url, MultiValueMap<String, String> headerValues) {

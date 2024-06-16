@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -52,7 +51,7 @@ public class YahooConnector implements YahooClient {
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 				toTime.toEpochSecond(OffsetDateTime.now().getOffset()));
 		LOGGER.info(myUrl);
-		return ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(), String.class).stream()
+		return ConnectorUtils.restCall(myUrl, String.class).stream()
 				.flatMap(response -> this.convert(response).stream()).toList();
 	}
 

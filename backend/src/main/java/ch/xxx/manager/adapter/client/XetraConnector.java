@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -21,9 +22,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.xxx.manager.usecase.service.XetraClient;
 
@@ -35,16 +33,13 @@ public class XetraConnector implements XetraClient {
 	@Override
 	public Optional<List<String>> importXetraSymbols() {
 		return ConnectorUtils
-				.restCall(XETRA_URL, new LinkedMultiValueMap<String, String>(), new TypeReference<List<String>>() {
-				}).stream().flatMap(values -> values.stream().map(myValue -> this.findCsvUrl(myValue))).findFirst()
+				.restCall(XETRA_URL, String.class).stream().map(str -> this.findCsvUrl(str)).findFirst()
 				.flatMap(myUrlStr -> this.loadSymbolsCsv(myUrlStr));
 	}
 
 
 	private Optional<List<String>> loadSymbolsCsv(String url) {
-		return ConnectorUtils.restCall(url, new LinkedMultiValueMap<String, String>(),
-				new TypeReference<List<String>>() {
-				});
+		return ConnectorUtils.restCall(url, String.class).stream().map(str -> str.lines().toList()).findFirst();
 	}
 
 	private String findCsvUrl(String htmlPage) {
