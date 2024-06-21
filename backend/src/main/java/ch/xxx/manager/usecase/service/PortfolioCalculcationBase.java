@@ -111,9 +111,12 @@ public abstract class PortfolioCalculcationBase {
 				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
 
-	protected Portfolio addDailyQuotes(Portfolio portfolio) {
-		portfolio.getPortfolioToSymbols().forEach(pts -> pts
-				.setSymbol(this.symbolRepository.findByIdWithDailyQuotes(pts.getSymbol().getId()).orElseThrow()));
+	public Portfolio addDailyQuotes(Portfolio portfolio) {
+		portfolio.getPortfolioToSymbols().forEach(pts -> {
+			// LOGGER.info("Symbol Id: {}", pts.getSymbol().getId());
+			pts.setSymbol(this.symbolRepository.findByIdWithDailyQuotes(pts.getSymbol().getId())
+					.orElse(this.symbolRepository.findById(pts.getSymbol().getId()).orElseThrow()));
+		});
 		return portfolio;
-	}
+	}	
 }

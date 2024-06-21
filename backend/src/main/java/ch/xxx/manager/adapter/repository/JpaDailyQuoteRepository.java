@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,7 +27,7 @@ public interface JpaDailyQuoteRepository extends JpaRepository<DailyQuote, Long>
 	List<DailyQuote> findBySymbol(@Param(value = "symbol") String symbol);
 
 	@Query("select dq from DailyQuote dq where dq.symbol.id = :symbolId order by dq.localDay asc")
-	List<DailyQuote> findBySymbolId(@Param(value = "symbolId") Long symbolId);
+	Set<DailyQuote> findBySymbolId(@Param(value = "symbolId") Long symbolId);
 
 	@Query("select dq from DailyQuote dq where dq.symbol.id = :symbolId and dq.localDay between :start and :end order by dq.localDay asc")
 	List<DailyQuote> findBySymbolId(@Param(value = "symbolId") Long symbolId, @Param(value = "start") LocalDate start,

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -32,14 +33,19 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.xxx.manager.domain.exception.ResourceForbiddenException;
 import ch.xxx.manager.domain.exception.ResourceNotFoundException;
+import ch.xxx.manager.domain.model.dto.PortfolioDto;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
+import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.CalcPortfolioElement;
@@ -48,10 +54,12 @@ import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final PortfolioStatisticService portfolioStatisticService;
+	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final PortfolioRepository portfolioRepository;
 
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
@@ -68,10 +76,12 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
 	};
 
-	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
-			PortfolioStatisticService portfolioStatisticService, SymbolRepository symbolRepository) {
+	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService, PortfolioRepository portfolioRepository,
+			PortfolioStatisticService portfolioStatisticService, SymbolRepository symbolRepository,PortfolioToSymbolRepository portfolioToSymbolRepository) {
 		super(dailyQuoteRepository, currencyService, symbolRepository);
 		this.portfolioStatisticService = portfolioStatisticService;
+		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
+		this.portfolioRepository = portfolioRepository;
 	}
 
 	public List<CalcPortfolioElement> calculatePortfolioBars(Portfolio portfolio, LocalDate cutOffDate,
@@ -121,39 +131,71 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		}).toList();
 		return resultPortfolioElements;
 	}
+	
+	public PortfolioToSymbol updatePtsEntity(PortfolioToSymbol portfolioToSymbol) {
+		return this.portfolioToSymbolRepository
+				.saveAndFlush(portfolioToSymbol);
+	}
 
-	public PortfolioWithElements calculatePortfolio(Portfolio portfolio, Optional<PortfolioToSymbol> ptsOpt) {
+	public Portfolio addPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
+		Portfolio updatedPortfolio = this.portfolioToSymbolRepository
+				.saveAndFlush(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio();
+		return updatedPortfolio;
+	}
+	
+	private PortfolioToSymbol createPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDate changedAt) {
+		Portfolio myPortfolio = this.portfolioRepository.findById(dto.getId())
+				.orElseThrow(() -> new RuntimeException(String.format("Portfolio with id %d not found.", dto.getId())));
+		if (250 >= this.countPortfolioSymbolsByUserId(myPortfolio.getAppUser().getId())) {
+			final PortfolioToSymbol entity = new PortfolioToSymbol();
+			myPortfolio.getPortfolioToSymbols().add(entity);
+			entity.setPortfolio(myPortfolio);
+			entity.setSymbol(this.symbolRepository.findById(symbolId).map(myPts -> {
+				myPts.getPortfolioToSymbols().add(entity);
+				return myPts;
+			}).orElseThrow(() -> new RuntimeException(String.format("Symbol with id %d not found", symbolId))));
+			entity.setWeight(weight);
+			entity.setChangedAt(changedAt);
+			return entity;
+		} else {
+			throw new ResourceForbiddenException("Too many Symbols in user Portfolios.");
+		}
+	}
+	
+	Long countPortfolioSymbolsByUserId(Long userId) {
+		return this.portfolioRepository.countPortfolioSymbolsByUserId(userId);
+	}
+	
+	public PortfolioWithElements calculatePortfolio(Portfolio portfolio) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
-		Portfolio myPortfolio = this.addDailyQuotes(portfolio);
-		PortfolioData myPortfolioData = this.calculatePortfolioData(myPortfolio.getPortfolioToSymbols(), ptsOpt);
+		PortfolioData myPortfolioData = this.calculatePortfolioData(portfolio.getPortfolioToSymbols());
 		LocalDate cutOffDate = LocalDate.now().minus(Period.ofMonths(1));
-		myPortfolio.setMonth1(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setMonth1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofMonths(6));
-		myPortfolio.setMonth6(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setMonth6(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(1));
-		myPortfolio.setYear1(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setYear1(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(2));
-		myPortfolio.setYear2(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setYear2(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(5));
-		myPortfolio.setYear5(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setYear5(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		cutOffDate = LocalDate.now().minus(Period.ofYears(10));
-		myPortfolio.setYear10(this.portfolioValueAtDate(myPortfolio.getPortfolioToSymbols(),
+		portfolio.setYear10(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
-		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(myPortfolio,
+		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
 				myPortfolioData.portfolioQuotes.dailyQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
 				myPortfolioData.dailyQuotesToRemove, myPortfolioData.portfolioQuotes.dailyQuotes);
 		return result;
 	}
 
-	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols,
-			Optional<PortfolioToSymbol> ptsOpt) {
+	private PortfolioData calculatePortfolioData(Set<PortfolioToSymbol> portfolioToSymbols) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbols);
 		final List<LocalDate> commonQuoteDates = this.filteredCommonQuoteDates(dailyQuotesMap);
 //		commonQuoteDates.stream().filter(myDate -> LocalDate.of(2022, 9, 1).isBefore(myDate))

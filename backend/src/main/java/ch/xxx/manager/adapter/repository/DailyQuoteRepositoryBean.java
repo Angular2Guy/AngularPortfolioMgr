@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,7 @@ public class DailyQuoteRepositoryBean implements DailyQuoteRepository {
 	}
 
 	@Override
-	public List<DailyQuote> findBySymbolId(Long symbolId) {
+	public Set<DailyQuote> findBySymbolId(Long symbolId) {
 		return this.jpaDailyQuoteRepository.findBySymbolId(symbolId);
 	}
 

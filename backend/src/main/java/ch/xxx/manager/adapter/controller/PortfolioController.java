@@ -35,6 +35,7 @@ import org.springframework.web.util.UriUtils;
 
 import ch.xxx.manager.domain.model.dto.PortfolioBarsDto;
 import ch.xxx.manager.domain.model.dto.PortfolioDto;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.mapping.PortfolioMapper;
 import ch.xxx.manager.usecase.service.ComparisonIndex;
@@ -56,16 +57,17 @@ public class PortfolioController {
 	@GetMapping("/userid/{userId}")
 	public List<PortfolioDto> getPortfoliosByUserId(@PathVariable("userId") Long userId) {
 		return this.portfolioService.getPortfoliosByUserId(userId).stream()
-				.map(entity -> this.portfolioMapper.toDto(entity))
+				.map(portWithElements -> this.portfolioMapper.toDto(portWithElements.portfolio(), portWithElements.portfolioElements()))
 				.filter(StreamHelpers.distinctByKey(PortfolioDto::getId)).collect(Collectors.toList());
 	}
 
 	@GetMapping("/id/{portfolioId}")
 	public PortfolioDto getPortfoliosById(@PathVariable("portfolioId") Long portfolioId,
 			@RequestParam(name = "withHistory", required = false) Optional<String> withHistory) {
+		PortfolioWithElements portfolioWithElements = this.portfolioService.getPortfolioById(portfolioId);
 		return withHistory.stream().filter(myString -> "true".equalsIgnoreCase(myString))
-				.map(xxx -> this.portfolioMapper.toDto(this.portfolioService.getPortfolioById(portfolioId))).findFirst()
-				.orElse(this.portfolioMapper.toDtoFiltered(this.portfolioService.getPortfolioById(portfolioId)));
+				.map(xxx -> this.portfolioMapper.toDto(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements())).findFirst()
+				.orElse(this.portfolioMapper.toDtoFiltered(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements()));
 	}
 
 	@GetMapping("/id/{portfolioId}/start/{start}")
@@ -92,30 +94,32 @@ public class PortfolioController {
 	@PostMapping
 	public PortfolioDto createPortfolio(@RequestBody PortfolioDto dto) {
 		return this.portfolioMapper
-				.toDto(this.portfolioService.addPortfolio(this.portfolioMapper.toEntity(dto, null), dto.getUserId()));
+				.toDto(this.portfolioService.addPortfolio(this.portfolioMapper.toEntity(dto, null), dto.getUserId()), List.of());
 	}
 
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService
-				.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt)).portfolio());
+		PortfolioWithElements portfolioWithElements = this.portfolioService
+		.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
+		return this.portfolioMapper.toDto(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService
-				.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt))
-				.portfolio());
+		PortfolioWithElements portfolioWithElements = this.portfolioService
+		.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
+		return this.portfolioMapper.toDto(portfolioWithElements
+				.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
 	@DeleteMapping("/{id}/symbol/{symbolId}")
 	public PortfolioDto deleteSymbolFromPortfolio(@PathVariable("id") Long portfolioId,
 			@PathVariable("symbolId") Long symbolId, @RequestParam(name = "removedAt") String removedAt) {
-		return this.portfolioMapper.toDto(this.portfolioService
-				.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt))
-				.portfolio());
+		PortfolioWithElements portfolioWithElements = this.portfolioService
+		.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
+		return this.portfolioMapper.toDto(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
 	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {

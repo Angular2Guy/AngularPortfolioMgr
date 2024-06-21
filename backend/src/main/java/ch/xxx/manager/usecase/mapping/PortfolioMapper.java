@@ -43,8 +43,8 @@ public class PortfolioMapper {
 		this.symbolMapper = symbolMapper;
 	}
 
-	public PortfolioDto toDtoFiltered(Portfolio portfolio) {
-		PortfolioDto result = this.toDto(portfolio);
+	public PortfolioDto toDtoFiltered(Portfolio portfolio, List<PortfolioElement> portfolioElements) {
+		PortfolioDto result = this.toDto(portfolio, portfolioElements);
 		@SuppressWarnings("unchecked")
 		Map<String, SymbolDto>[] mapArr = new Map[1];
 		mapArr[0] = new HashMap<String, SymbolDto>();
@@ -66,7 +66,7 @@ public class PortfolioMapper {
 		return result;
 	}
 
-	public PortfolioDto toDto(Portfolio portfolio) {
+	public PortfolioDto toDto(Portfolio portfolio, List<PortfolioElement> portfolioElements) {
 		PortfolioDto dto = new PortfolioDto();
 		dto.setCreatedAt(portfolio.getCreatedAt().atTime(LocalTime.now()));
 		dto.setId(portfolio.getId());
@@ -83,11 +83,11 @@ public class PortfolioMapper {
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
-		List<PortfolioElementDto> portfolioElements = Optional.ofNullable(portfolio.getPortfolioElements())
-				.orElse(Set.of()).stream()
+		List<PortfolioElementDto> myPortfolioElements = Optional.ofNullable(portfolioElements)
+				.orElse(List.of()).stream()
 				.flatMap(myPortfolioElement -> Stream.of(this.toPortfolioElementDto(myPortfolioElement))).toList();
 		if (!portfolioElements.isEmpty()) {
-			dto.getPortfolioElements().addAll(portfolioElements);
+			dto.getPortfolioElements().addAll(myPortfolioElements);
 		}
 		return dto;
 	}

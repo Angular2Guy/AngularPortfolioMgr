@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.domain.model.entity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PortfolioElementRepository {
@@ -19,4 +20,6 @@ public interface PortfolioElementRepository {
 	Optional<PortfolioElement> findBySymbol(String symbol);
 	Iterable<PortfolioElement> saveAll(Iterable<PortfolioElement> portfolios);
 	void delete(PortfolioElement portfolioElement);
+	Optional<PortfolioElement> findByPortfolioId(Long portfolioId);
+	List<PortfolioElement> findByPortfolioIds(List<Long> portfolioIds);
 }

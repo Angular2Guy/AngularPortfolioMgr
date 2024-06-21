@@ -14,11 +14,12 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface DailyQuoteRepository {
 	List<DailyQuote> findBySymbol(String symbol);
 
-	List<DailyQuote> findBySymbolId(Long symbolId);
+	Set<DailyQuote> findBySymbolId(Long symbolId);
 	List<DailyQuote> findBySymbolId(Long symbolId, LocalDate start, LocalDate end);
 	List<DailyQuote> findBySymbolIds(List<Long> symbolId);
 	List<DailyQuote> findBySymbolKeys(List<String> symbolKeys);

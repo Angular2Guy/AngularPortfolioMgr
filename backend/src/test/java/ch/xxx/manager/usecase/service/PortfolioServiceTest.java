@@ -27,10 +27,12 @@ import ch.xxx.manager.domain.exception.ResourceNotFoundException;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.PortfolioElementRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioServiceTest {
@@ -56,11 +58,13 @@ public class PortfolioServiceTest {
 	@Test
 	public void getPortfolioByIdFound() throws Exception {
 		Portfolio myPortfolio = this.createPortfolioEntity();
+		PortfolioElement myPortfolioElement = new PortfolioElement();
 		Mockito.when(this.portfolioRepository.findById(any(Long.class))).thenReturn(Optional.of(myPortfolio));
-		Portfolio result = this.portfolioService.getPortfolioById(1L);
+		Mockito.when(this.portfolioElementRepository.findByPortfolioId(any(Long.class))).thenReturn(Optional.of(myPortfolioElement));
+		PortfolioWithElements result = this.portfolioService.getPortfolioById(1L);
 		Assertions.assertNotNull(result);
-		Assertions.assertEquals(myPortfolio.getId(), result.getId());
-		Assertions.assertEquals(myPortfolio.getName(), result.getName());
+		Assertions.assertEquals(myPortfolio.getId(), result.portfolio().getId());
+		Assertions.assertEquals(myPortfolio.getName(), result.portfolio().getName());
 	}
 	
 	@Test

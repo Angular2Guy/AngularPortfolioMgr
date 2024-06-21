@@ -36,6 +36,7 @@ import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioBase;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
+import ch.xxx.manager.domain.model.entity.PortfolioElementRepository;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
@@ -48,6 +49,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioStatisticService.class);
+	private final PortfolioElementRepository portfolioElementRepository;
 
 	private record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 	}
@@ -60,8 +62,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	}
 
 	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
-			DailyQuoteRepository dailyQuoteRepository) {
-		super(dailyQuoteRepository, currencyService, symbolRepository);		
+			DailyQuoteRepository dailyQuoteRepository, PortfolioElementRepository portfolioElementRepository) {
+		super(dailyQuoteRepository, currencyService, symbolRepository);
+		this.portfolioElementRepository = portfolioElementRepository;
 	}
 
 	public PortfolioWithElements calculatePortfolioWithElements(final Portfolio portfolio,
@@ -78,8 +81,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.toList();
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(pts -> pts.getRemovedAt() == null)
-				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
+				.filter(pts -> pts.getRemovedAt() == null).sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 //				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
 //						.distinct().toList().forEach(mySymbolKey -> LOGGER.info("SymbolKey: {}", mySymbolKey)))
 				.map(pts -> this.createPortfolioElement(portfolio, dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts,
@@ -163,7 +165,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private PortfolioElement createPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
 			final PortfolioToSymbol portfolioToSymbol, List<Symbol> comparisonSymbols) {
-		PortfolioElement portfolioElement = portfolio.getPortfolioElements().stream()
+		Optional<PortfolioElement> portfolioElementOpt = this.portfolioElementRepository
+				.findByPortfolioId(portfolio.getId());
+		PortfolioElement portfolioElement = portfolioElementOpt.stream()
 				.filter(myPortfolioElement -> !myPortfolioElement.getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
 				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
 						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
@@ -194,10 +198,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				this.symbolValueAtDate(portfolio, dailyQuotes, LocalDate.now().minusYears(10L), symbolCurKeyOpt));
 		this.updateCorrelations(portfolio, portfolioElement, comparisonSymbols, dailyQuotes);
 		this.updateLinRegReturns(portfolio, portfolioElement, comparisonSymbols, dailyQuotes);
-		if (!portfolio.getPortfolioElements().contains(portfolioElement)) {
-			portfolio.getPortfolioElements().add(portfolioElement);
-			portfolioElement.setPortfolio(portfolio);
-		}
+		portfolioElement.setPortfolio(portfolio);
 		return portfolioElement;
 	}
 
@@ -209,7 +210,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		List<CalcValuesDay> divValuesDays = new ArrayList<>();
 		CalcValuesDay prevValues = null;
 		for (int i = 0; i < calcValuesDays.size(); i++) {
-			if (prevValues != null) {				
+			if (prevValues != null) {
 				BigDecimal quoteReturn = calcValuesDays.get(i).quote()
 						.divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
 						.multiply(BigDecimal.valueOf(100L));
@@ -283,8 +284,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.filter(myDate -> checkCurrencyQuotes(portfolio, dailyQuotesMap, comparisonDailyQuotesMap, myDate))
 				.map(myDate -> this.createCalcValuesDay(myDate, dailyQuotesMap.get(myDate),
 						comparisonDailyQuotesMap.get(myDate), portfolio))
-				.filter(myValue -> !myValue.quote().equals(BigDecimal.ZERO))
-				.toList();
+				.filter(myValue -> !myValue.quote().equals(BigDecimal.ZERO)).toList();
 		return calcValuesDays;
 	}
 

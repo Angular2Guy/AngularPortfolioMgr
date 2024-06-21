@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ch.xxx.manager.ComponentScanCustomFilter;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.Portfolio;
+import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.domain.utils.DataHelper.Role;
 import ch.xxx.manager.domain.utils.JwtUtils;
@@ -72,7 +73,7 @@ public class PortfolioControllerTest extends BaseControllerTest {
 		Mockito.when(this.jwtTokenService.getTokenUserRoles(any(Map.class))).thenCallRealMethod();
 		Mockito.when(this.jwtTokenService.getUsername(any(String.class))).thenReturn("XXX");
 		Mockito.when(this.jwtTokenService.getAuthorities(any(String.class))).thenReturn(List.of(DataHelper.Role.USERS));
-		Mockito.when(this.portfolioService.getPortfolioById(any(Long.class))).thenReturn(this.createPortfolioEntity());
+		Mockito.when(this.portfolioService.getPortfolioById(any(Long.class))).thenReturn(this.createPortfolioWithElements());
 		ReflectionTestUtils.setField(this.jwtTokenService, "secretKey", TEST_SECRECT_KEY);
 		ReflectionTestUtils.setField(this.jwtTokenService, "validityInMilliseconds", 60000);
 		Mockito.doCallRealMethod().when(this.jwtTokenService).init();
@@ -82,7 +83,7 @@ public class PortfolioControllerTest extends BaseControllerTest {
 	@Test
 	public void findPortfolioByIdNotFound() throws Exception {
 		String myToken = this.jwtTokenService.createToken("XXX", List.of(Role.USERS), Optional.empty());
-		Portfolio myPortfolio = createPortfolioEntity();
+		PortfolioWithElements myPortfolio = createPortfolioWithElements();
 		Mockito.when(this.portfolioService.getPortfolioById(any(Long.class))).thenReturn(myPortfolio);
 		this.mockMvc.perform(get("/rest/portfolio/id/{portfolioId}", 1L)
 				.header(JwtUtils.AUTHORIZATION, String.format("Bearer %s", myToken)).servletPath("/rest/portfolio/id/1"))
@@ -91,12 +92,12 @@ public class PortfolioControllerTest extends BaseControllerTest {
 				.andExpect(jsonPath("$.name").value("MyPortfolio"));
 	}
 
-	private Portfolio createPortfolioEntity() {
+	private PortfolioWithElements createPortfolioWithElements() {
 		Portfolio myPortfolio = new Portfolio();
 		ReflectionTestUtils.setField(myPortfolio, "createdAt", LocalDate.now());
 		myPortfolio.setId(1L);
 		myPortfolio.setName("MyPortfolio");
 		myPortfolio.setAppUser(new AppUser());
-		return myPortfolio;
+		return new PortfolioWithElements(myPortfolio, List.of(), List.of(), List.of());
 	}
 }

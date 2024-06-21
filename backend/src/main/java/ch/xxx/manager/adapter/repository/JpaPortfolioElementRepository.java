@@ -12,13 +12,19 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 
 public interface JpaPortfolioElementRepository extends JpaRepository<PortfolioElement, Long> {
 	Optional<PortfolioElement> findBySymbol(String symbol);
-	
+	@Query("Select pe from PortfolioElement pe where pe.portfolio.id = :portfolioId")
+	Optional<PortfolioElement> findByPortfolioId(@Param("portfolioId") Long portfolioId);
+	@Query("Select pe from PortfolioElement pe join fetch pe.portfolio where pe.portfolio.id in (:portfolioIds)")
+	List<PortfolioElement> findByPortfolioIds(@Param("portfolioIds") List<Long> portfolioIds);
 }
