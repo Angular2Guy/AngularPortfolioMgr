@@ -16,5 +16,5 @@ import com.rometools.rome.feed.synd.SyndFeed;
 
 public interface NewsFeedClient {
 	SyndFeed importYahooNewsFeed();
-	SyndFeed importCnnFinanceNewsFeed();
+	SyndFeed importCnbcFinanceNewsFeed();
 }
