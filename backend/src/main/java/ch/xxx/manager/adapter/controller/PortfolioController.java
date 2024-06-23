@@ -102,7 +102,7 @@ public class PortfolioController {
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
 		PortfolioWithElements portfolioWithElements = this.portfolioService
 		.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
-		return this.portfolioMapper.toDto(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
+		return this.portfolioMapper.toDtoFiltered(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
 	@PutMapping("/symbol/{symbolId}/weight/{weight}")
@@ -110,7 +110,7 @@ public class PortfolioController {
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
 		PortfolioWithElements portfolioWithElements = this.portfolioService
 		.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
-		return this.portfolioMapper.toDto(portfolioWithElements
+		return this.portfolioMapper.toDtoFiltered(portfolioWithElements
 				.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
@@ -119,7 +119,7 @@ public class PortfolioController {
 			@PathVariable("symbolId") Long symbolId, @RequestParam(name = "removedAt") String removedAt) {
 		PortfolioWithElements portfolioWithElements = this.portfolioService
 		.removeSymbolFromPortfolio(portfolioId, symbolId, this.isoDateTimeToLocalDateTime(removedAt));
-		return this.portfolioMapper.toDto(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
+		return this.portfolioMapper.toDtoFiltered(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
 	}
 
 	private LocalDateTime isoDateTimeToLocalDateTime(String isoString) {

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +35,7 @@ import ch.xxx.manager.domain.model.entity.Portfolio;
 import ch.xxx.manager.domain.model.entity.PortfolioElement;
 import ch.xxx.manager.domain.model.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 
 @Component
 public class PortfolioMapper {
@@ -45,20 +47,18 @@ public class PortfolioMapper {
 
 	public PortfolioDto toDtoFiltered(Portfolio portfolio, List<PortfolioElement> portfolioElements) {
 		PortfolioDto result = this.toDto(portfolio, portfolioElements);
-		@SuppressWarnings("unchecked")
-		Map<String, SymbolDto>[] mapArr = new Map[1];
-		mapArr[0] = new HashMap<String, SymbolDto>();
+		final var mapRef = new AtomicReference<Map<String, SymbolDto>>(new HashMap<String, SymbolDto>());
 		result.getSymbols().stream().forEach(mySymbolDto -> {
-			if (mapArr[0].get(mySymbolDto.getSymbol()) == null) {
-				mapArr[0].put(mySymbolDto.getSymbol(), mySymbolDto);
+			if (mapRef.get().get(mySymbolDto.getSymbol()) == null) {
+				mapRef.get().put(mySymbolDto.getSymbol(), mySymbolDto);
 			} else {
-				SymbolDto mapSymbolDto = mapArr[0].get(mySymbolDto.getSymbol());
+				SymbolDto mapSymbolDto = mapRef.get().get(mySymbolDto.getSymbol());
 				if (mapSymbolDto.getChangedAt().isBefore(mySymbolDto.getChangedAt())) {
-					mapArr[0].put(mySymbolDto.getSymbol(), mySymbolDto);
+					mapRef.get().put(mySymbolDto.getSymbol(), mySymbolDto);
 				}
 			}
 		});
-		List<SymbolDto> symbolDtos = mapArr[0].entrySet().stream()
+		List<SymbolDto> symbolDtos = mapRef.get().entrySet().stream()
 				.filter(myEntry -> myEntry.getValue().getRemovedAt() == null).map(myEntry -> myEntry.getValue())
 				.toList();
 		result.getSymbols().clear();
@@ -83,9 +83,9 @@ public class PortfolioMapper {
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
-		List<PortfolioElementDto> myPortfolioElements = Optional.ofNullable(portfolioElements)
-				.orElse(List.of()).stream()
-				.flatMap(myPortfolioElement -> Stream.of(this.toPortfolioElementDto(myPortfolioElement))).toList();
+		List<PortfolioElementDto> myPortfolioElements = Optional.ofNullable(portfolioElements).orElse(List.of())
+				.stream().filter(StreamHelpers.distinctByKey(myElement -> myElement.getSymbol()))
+				.map(this::toPortfolioElementDto).toList();
 		if (!portfolioElements.isEmpty()) {
 			dto.getPortfolioElements().addAll(myPortfolioElements);
 		}
