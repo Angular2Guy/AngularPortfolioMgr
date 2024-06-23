@@ -50,7 +50,7 @@ public class StreamHelpers {
 		return optSteam.filter(Optional::isPresent).map(Optional::get);
 	}
 
-	public static <T> Stream<T> unboxOptional(Optional<T> opt) {
+	public static <T> Stream<T> optionalStream(Optional<T> opt) {
 		return opt.stream();
 	}
 }

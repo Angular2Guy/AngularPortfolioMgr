@@ -264,9 +264,10 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<CalcPortfolioElement> portfolioElements, LocalDate cutOffDate) {
 		BigDecimal result = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
+				.filter(StreamHelpers.distinctByKey(pts ->  pts.getSymbol().getId()))
 //				.peek(pts -> LOG.info(pts.getSymbol().getSymbol()))
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
-				.flatMap(StreamHelpers::unboxOptional)
+				.flatMap(StreamHelpers::optionalStream)
 //				.peek(pe -> LOG.info("value: {}, weight: {}", pe.value(), pe.weight()))
 				.map(pe -> pe.value().multiply(BigDecimal.valueOf(pe.weight()), MathContext.DECIMAL128))
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
@@ -294,7 +295,8 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.anyMatch(myCommonDate -> myCommonDate.isEqual(myDailyQuote.getLocalDay())))
 				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, ptsWithList, portfolioQuotes))
-				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+				.flatMap(StreamHelpers::optionalStream)
+				.collect(Collectors.toList());
 	}
 
 	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote, PtsWithList ptsWithList,
