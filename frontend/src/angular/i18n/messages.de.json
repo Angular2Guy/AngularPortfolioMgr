@@ -127,7 +127,7 @@
     "portfolioChartsSectors": "Portfolio Sectors",
     "portfolioChartsTimechart": "Portfolio Timechart",
     "portfolioChartsYahooFinance": "Yahoo Finance",
-    "portfolioChartsCnnFinance": "Cnn Finance",
+    "portfolioChartsCnbcFinance": "Cnbc Finance",
     "portfolioChartsName": "Portfolio: {$INTERPOLATION}",
     "portfolioChartsStartDate": "Start Date: {$INTERPOLATION}",
     "portfolioSectorsLegendTitle": "Portfolio sector distribution",
