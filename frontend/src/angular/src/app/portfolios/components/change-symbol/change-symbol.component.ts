@@ -13,7 +13,6 @@
 import { Component, DestroyRef, Inject, OnInit } from "@angular/core";
 import {
   AbstractControl,
-  AbstractControlOptions,
   FormBuilder,
   FormGroup,
   ValidationErrors,
@@ -40,6 +39,7 @@ export class ChangeSymbolComponent implements OnInit {
   protected FormFields = FormFields;
   protected symbolForm: FormGroup;
   protected updatingQuotes = false;
+  protected deleteSymbol = false;
   private newWeight = -1;
   private changedAt = DateTime.now().minus(Duration.fromObject({ years: 100 }));
 
@@ -74,6 +74,7 @@ export class ChangeSymbolComponent implements OnInit {
   }
 
   updateClick() {
+	if(!this.deleteSymbol) {
     const startChangedAt = DateTime.now().minus(
       Duration.fromObject({ years: 100 })
     );
@@ -85,10 +86,20 @@ export class ChangeSymbolComponent implements OnInit {
       this.data.changedAt = this.changedAt.toISO().split("+")[0];
       this.dialogRef.close(this.data);
     }
+    } else {
+		this.data.changedAt = new Date().toISOString().split("+")[0];
+		this.data.weight = 0;
+		console.log(this.data);
+		//this.dialogRef.close(this.data);
+	}
   }
 
   cancelClick() {
     this.dialogRef.close();
+  }
+  
+  deleteClick() {
+	this.deleteSymbol = true;
   }
 
   private validateWeight(control: AbstractControl): ValidationErrors {
