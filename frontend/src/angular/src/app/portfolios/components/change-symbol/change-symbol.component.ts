@@ -89,8 +89,8 @@ export class ChangeSymbolComponent implements OnInit {
     } else {
 		this.data.changedAt = new Date().toISOString().split("+")[0];
 		this.data.weight = 0;
-		console.log(this.data);
-		//this.dialogRef.close(this.data);
+		//console.log(this.data);
+		this.dialogRef.close(this.data);
 	}
   }
 
