@@ -19,41 +19,62 @@
 }
 
 .my-content {
-  $my-theme-red: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$red-palette,
-  )));	
-  $my-theme-purple: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$violet-palette,
-  )));
-  $my-theme-blue: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$blue-palette,
-  )));
-  $my-theme-cyan: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$cyan-palette,
-  )));
-  $my-theme-green: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$green-palette,
-  )));                  
-  $my-theme-yellow: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$yellow-palette,
-  )));
-  $my-theme-orange: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$orange-palette,
-  )));      
+  $my-theme-red: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$red-palette,
+      ),
+    )
+  );
+  $my-theme-purple: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$violet-palette,
+      ),
+    )
+  );
+  $my-theme-blue: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$blue-palette,
+      ),
+    )
+  );
+  $my-theme-cyan: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$cyan-palette,
+      ),
+    )
+  );
+  $my-theme-green: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$green-palette,
+      ),
+    )
+  );
+  $my-theme-yellow: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$yellow-palette,
+      ),
+    )
+  );
+  $my-theme-orange: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$orange-palette,
+      ),
+    )
+  );
   $red: mat.get-theme-color($my-theme-red, primary, 70);
   $purple: mat.get-theme-color($my-theme-purple, primary, 70);
   $blue: mat.get-theme-color($my-theme-blue, primary, 70);

@@ -120,7 +120,7 @@ export class SymbolComponent implements OnInit {
     private quoteService: QuoteService,
     private destroyRef: DestroyRef,
     @Inject(DOCUMENT) private document: Document,
-    @Inject(LOCALE_ID) private locale: string
+    @Inject(LOCALE_ID) private locale: string,
   ) {
     this.quotePeriods = [
       {
@@ -176,11 +176,11 @@ export class SymbolComponent implements OnInit {
     if (value) {
       if (
         this.chartPoints.filter(
-          (myChartPoints) => myChartPoints.name === comparisonIndex
+          (myChartPoints) => myChartPoints.name === comparisonIndex,
         ).length > 0
       ) {
         this.chartPoints.filter(
-          (myChartPoints) => myChartPoints.name === comparisonIndex
+          (myChartPoints) => myChartPoints.name === comparisonIndex,
         )[0].chartPointList = this.createChartPoints(comparisonIndex);
         this.chartPoints = [...this.chartPoints];
       } else {
@@ -194,7 +194,7 @@ export class SymbolComponent implements OnInit {
       }
     } else {
       this.chartPoints = this.chartPoints.filter(
-        (myChartPoints) => myChartPoints.name !== comparisonIndex
+        (myChartPoints) => myChartPoints.name !== comparisonIndex,
       );
     }
     //console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
@@ -207,7 +207,7 @@ export class SymbolComponent implements OnInit {
         ({
           x: new Date(Date.parse(myQuote.timestamp)),
           y: myQuote.close,
-        } as ChartPoint)
+        }) as ChartPoint,
     );
   }
 
@@ -219,11 +219,11 @@ export class SymbolComponent implements OnInit {
               (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day &&
                 new Date(myQuote.timestamp).getTime() >
                   new Date(
-                    this.quotes[this.quotes.length - 1].timestamp
+                    this.quotes[this.quotes.length - 1].timestamp,
                   ).getTime() -
                     this.dayInMs +
                     this.hourInMs) ||
-              this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day
+              this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day,
           )
         : null;
     this.symbolData.start =
@@ -308,18 +308,18 @@ export class SymbolComponent implements OnInit {
           (this.selQuotePeriod.quotePeriodKey === QuotePeriodKey.Day &&
             new Date(myQuote.timestamp).getTime() >
               new Date(
-                this.quotes[this.quotes.length - 1].timestamp
+                this.quotes[this.quotes.length - 1].timestamp,
               ).getTime() -
                 this.dayInMs +
                 this.hourInMs) ||
-          this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day
+          this.selQuotePeriod.quotePeriodKey !== QuotePeriodKey.Day,
       )
       .map(
         (quote) =>
           ({
             x: new Date(Date.parse(quote.timestamp)),
             y: quote.close,
-          } as ChartPoint)
+          }) as ChartPoint,
       );
     return myChartValues;
   }
@@ -359,28 +359,33 @@ export class SymbolComponent implements OnInit {
                 this.portfolioId,
                 ComparisonIndex.EUROSTOXX50,
                 startDate,
-                endDate
+                endDate,
               ),
               this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(
                 this.portfolioId,
                 ComparisonIndex.MSCI_CHINA,
                 startDate,
-                endDate
+                endDate,
               ),
               this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(
                 this.portfolioId,
                 ComparisonIndex.SP500,
                 startDate,
-                endDate
+                endDate,
               ),
-            ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
-              this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
-              this.compIndexes.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
-              this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
-              this.updateChartData();
-              this.loadingData.emit(false);
-              this.quotesLoading = false;
-            });
+            ])
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]) => {
+                this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
+                this.compIndexes.set(
+                  ComparisonIndex.MSCI_CHINA,
+                  myQuotesMsciCh,
+                );
+                this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
+                this.updateChartData();
+                this.loadingData.emit(false);
+                this.quotesLoading = false;
+              });
           } else {
             this.showES50 = false;
             this.showMsciCH = false;

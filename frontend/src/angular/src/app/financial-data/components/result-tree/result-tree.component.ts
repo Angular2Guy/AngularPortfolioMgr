@@ -59,7 +59,7 @@ interface BySymbolElements extends ElementNode {
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];
   protected treeControl = new NestedTreeControl<ElementNode>(
-    (node) => node.children
+    (node) => node.children,
   );
   protected dataSource = new MatTreeNestedDataSource<ElementNode>();
   protected displayedColumns: string[] = [
@@ -75,7 +75,7 @@ export class ResultTreeComponent {
 
   constructor(
     private financialDataService: FinancialDataService,
-    private bottomSheet: MatBottomSheet
+    private bottomSheet: MatBottomSheet,
   ) {}
 
   protected hasChild = (_: number, node: ElementNode) =>
@@ -102,7 +102,11 @@ export class ResultTreeComponent {
   }
 
   formatFinancialType(type: string): string {
-	return type.toLocaleLowerCase() === 'BalanceSheet'.toLowerCase() ? 'BS' : type.toLocaleLowerCase() === 'Cashflow'.toLowerCase() ? 'CF' : 'IC';
+    return type.toLocaleLowerCase() === "BalanceSheet".toLowerCase()
+      ? "BS"
+      : type.toLocaleLowerCase() === "Cashflow".toLowerCase()
+        ? "CF"
+        : "IC";
   }
 
   get symbolFinancials(): SymbolFinancials[] {
@@ -117,7 +121,7 @@ export class ResultTreeComponent {
   }
 
   private createElementNodeTree(
-    symbolFinancials: SymbolFinancials[]
+    symbolFinancials: SymbolFinancials[],
   ): BySymbolElements[] {
     const bySymbolElementExtsMap = FinancialsDataUtils.groupByKey<
       FinancialElementExt,

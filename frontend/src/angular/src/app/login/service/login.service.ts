@@ -19,7 +19,10 @@ import { TokenService } from "ngx-simple-charts/base-service";
 
 @Injectable()
 export class LoginService {
-  constructor(private http: HttpClient, private tokenService: TokenService) {}
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService,
+  ) {}
 
   postLogin(login: Login): Observable<Login> {
     return this.http
@@ -32,8 +35,8 @@ export class LoginService {
           (res) =>
             (this.tokenService.secUntilNextLogin = !!res?.secUntilNexLogin
               ? res?.secUntilNexLogin
-              : 24 * 60 * 60)
-        )
+              : 24 * 60 * 60),
+        ),
       );
   }
 

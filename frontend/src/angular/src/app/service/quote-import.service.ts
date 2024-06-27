@@ -25,21 +25,21 @@ export class QuoteImportService {
 
   importIntraDayQuotes(symbol: string): Observable<number> {
     return this.http.get<number>(
-      `/rest/quote/import/intraday/symbol/${symbol}`
+      `/rest/quote/import/intraday/symbol/${symbol}`,
     );
   }
 
   importFxDailyQuotes(to_curr: string): Observable<number> {
     return this.http.get<number>(
-      `/rest/quote/import/daily/currency/${to_curr}`
+      `/rest/quote/import/daily/currency/${to_curr}`,
     );
   }
-  
+
   updateAllDailyIntraDayQuotes(): Observable<number> {
-	  return this.http.get<number>('/rest/quote/update/portfolio/symbols');
+    return this.http.get<number>("/rest/quote/update/portfolio/symbols");
   }
-  
-    putDailyQuotesImport(importData: ImportData): Observable<boolean> {
-	  return this.http.put<boolean>('/rest/quote/importus/data', importData);
+
+  putDailyQuotesImport(importData: ImportData): Observable<boolean> {
+    return this.http.put<boolean>("/rest/quote/importus/data", importData);
   }
 }

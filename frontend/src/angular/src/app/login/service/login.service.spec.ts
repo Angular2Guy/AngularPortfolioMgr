@@ -35,7 +35,7 @@ describe("LoginService", () => {
       httpSpy,
       jasmine.createSpyObj("tokenService", ["createTokenHeader"], {
         secUntilNextLogin: 60,
-      })
+      }),
     );
   });
 

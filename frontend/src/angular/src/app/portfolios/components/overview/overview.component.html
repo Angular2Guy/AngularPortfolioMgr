@@ -21,13 +21,21 @@
         mat-flat-button
         color="primary"
         (click)="updateQuotes()"
-        i18n="@@overviewUpdateQuotes">Update Quotes</button></span>
+        i18n="@@overviewUpdateQuotes"
+      >
+        Update Quotes
+      </button></span
+    >
     <span class="header-space" *ngIf="!!profiles && profiles.includes('dev')"
       ><button
         mat-flat-button
         color="primary"
         (click)="importSymbols()"
-        i18n="@@overviewImportSymbols">Import Symbols</button></span>
+        i18n="@@overviewImportSymbols"
+      >
+        Import Symbols
+      </button></span
+    >
     <span
       ><button
         mat-flat-button
@@ -67,7 +75,8 @@
           <button mat-list-item (click)="selPortfolio(portfolio)">
             {{ portfolio.name }}
           </button>
-          <button [disabled]="countPortfolioSymbolsByUserId > 200"
+          <button
+            [disabled]="countPortfolioSymbolsByUserId > 200"
             mat-list-item
             (click)="addSymbol(portfolio)"
             class="add-button"

@@ -31,7 +31,7 @@ export class FinancialsDataUtils {
   }
 
   public static toFinancialElementsExt(
-    symbolFiancials: SymbolFinancials[]
+    symbolFiancials: SymbolFinancials[],
   ): FinancialElementExt[] {
     const myResult = symbolFiancials.map((mySymbolFinancials) =>
       mySymbolFinancials.financialElements.map((myFinancialElement) => {
@@ -40,7 +40,7 @@ export class FinancialsDataUtils {
         financialElementExt.quarter = mySymbolFinancials.quarter;
         financialElementExt.symbol = mySymbolFinancials.symbol;
         return financialElementExt;
-      })
+      }),
     );
     return [].concat.apply([], myResult);
   }
@@ -48,7 +48,7 @@ export class FinancialsDataUtils {
   public static compareNumbers(
     valueA: number,
     valueB: number,
-    operator: string
+    operator: string,
   ): boolean {
     let result = !!valueA && !!valueB;
     switch (operator.trim()) {
@@ -70,7 +70,7 @@ export class FinancialsDataUtils {
   public static compareStrings(
     valueA: string,
     valueB: string,
-    operator: string
+    operator: string,
   ): boolean {
     let result = !!valueA && !!valueB;
     switch (operator.trim()) {

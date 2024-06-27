@@ -53,7 +53,10 @@ export class PortfolioComparisonComponent implements OnInit {
   chartBars!: ChartBars;
   selCompIndexes: ComparisonIndex[] = [];
 
-  constructor(private portfolioService: PortfolioService,private destroyRef: DestroyRef,) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private destroyRef: DestroyRef,
+  ) {}
 
   ngOnInit(): void {
     this.chartPeriods = [
@@ -120,8 +123,9 @@ export class PortfolioComparisonComponent implements OnInit {
         .getPortfolioBarsByIdAndStart(
           this.selPortfolio.id,
           this.startDate,
-          this.selCompIndexes
-        ).pipe(takeUntilDestroyed(this.destroyRef))
+          this.selCompIndexes,
+        )
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => this.updateChartData(result));
     }
   }
@@ -130,7 +134,7 @@ export class PortfolioComparisonComponent implements OnInit {
     this.chartsLoading = false;
     //console.log(portfolioBars);
     const chartBars = portfolioBars.portfolioBars.map(
-      (value) => ({ x: value.name, y: value.value } as ChartBar)
+      (value) => ({ x: value.name, y: value.value }) as ChartBar,
     );
     this.chartBars = {
       title: portfolioBars.title,

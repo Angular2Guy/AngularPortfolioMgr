@@ -46,30 +46,39 @@
   height: calc(100% - 94px);
   width: 100%;
 }
-::ng-deep .bar-sxrt {	
-  $my-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$green-palette,
-  )));	
+::ng-deep .bar-sxrt {
+  $my-theme: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$green-palette,
+      ),
+    )
+  );
   $green: mat.get-theme-color($my-theme, primary, 40);
   fill: $green !important;
 }
 ::ng-deep .bar-icga {
-  $my-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$yellow-palette,
-  )));	
+  $my-theme: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$yellow-palette,
+      ),
+    )
+  );
   $yellow: mat.get-theme-color($my-theme, primary, 40);
   fill: $yellow !important;
 }
 ::ng-deep .bar-ivv {
-  $my-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$red-palette,
-  )));	
+  $my-theme: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$red-palette,
+      ),
+    )
+  );
   $red: mat.get-theme-color($my-theme, primary, 40);
   fill: $red !important;
 }

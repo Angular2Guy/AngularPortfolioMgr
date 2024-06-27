@@ -38,7 +38,7 @@ export class NewPortfolioComponent {
     public dialogRef: MatDialogRef<OverviewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioData,
     private tokenService: TokenService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.portfolioForm = this.fb.group(
       {
@@ -50,7 +50,7 @@ export class NewPortfolioComponent {
       },
       {
         validator: this.validate.bind(this),
-      }
+      },
     );
   }
 

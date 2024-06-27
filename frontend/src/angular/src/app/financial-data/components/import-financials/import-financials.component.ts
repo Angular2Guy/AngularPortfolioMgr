@@ -44,7 +44,7 @@ export class ImportFinancialsComponent implements OnInit {
     private configService: ConfigService,
     private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: ImportData,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.financialsForm = fb.group({
       [FormFields.Filename]: [
@@ -56,7 +56,8 @@ export class ImportFinancialsComponent implements OnInit {
 
   ngOnInit(): void {
     this.configService
-      .getImportPath().pipe(takeUntilDestroyed(this.destroyRef))
+      .getImportPath()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => (this.filepath = result));
   }
 

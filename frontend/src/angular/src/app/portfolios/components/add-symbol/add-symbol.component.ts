@@ -66,7 +66,7 @@ export class AddSymbolComponent implements OnInit {
     private symbolService: SymbolService,
     private quoteImportService: QuoteImportService,
     private destroyRef: DestroyRef,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.symbolForm = this.fb.group(
       {
@@ -77,7 +77,7 @@ export class AddSymbolComponent implements OnInit {
       },
       {
         validators: [this.validate],
-      } as AbstractControlOptions
+      } as AbstractControlOptions,
     );
     this.portfolio = data.portfolio;
   }
@@ -95,13 +95,12 @@ export class AddSymbolComponent implements OnInit {
                 .getSymbolByName(name)
                 .pipe(
                   map((localSymbols) =>
-                    this.filterPortfolioSymbols(localSymbols)
-                  )
+                    this.filterPortfolioSymbols(localSymbols),
+                  ),
                 )
-            : this.clearSymbol()
+            : this.clearSymbol(),
         ),
         tap(() => (this.loading = false)),
-        
       );
     this.symbolsSymbol = this.symbolForm
       .get(FormFields.SymbolSymbol)
@@ -115,20 +114,20 @@ export class AddSymbolComponent implements OnInit {
                 .getSymbolBySymbol(name)
                 .pipe(
                   map((localSymbols) =>
-                    this.filterPortfolioSymbols(localSymbols)
-                  )
+                    this.filterPortfolioSymbols(localSymbols),
+                  ),
                 )
-            : this.clearSymbol()
+            : this.clearSymbol(),
         ),
-        tap(() => (this.loading = false))
+        tap(() => (this.loading = false)),
       );
   }
 
   private filterPortfolioSymbols(symbols: Symbol[]): Symbol[] {
     return symbols.filter((symbol) =>
       this.portfolio.symbols.filter(
-        (mySymbol) => symbol.symbol === mySymbol.symbol
-      )
+        (mySymbol) => symbol.symbol === mySymbol.symbol,
+      ),
     );
   }
 
@@ -141,10 +140,10 @@ export class AddSymbolComponent implements OnInit {
     //console.log(event.option.value);
     this.selSymbol = event.option.value;
     this.symbolForm.controls[FormFields.SymbolSymbol].patchValue(
-      this.selSymbol.symbol
+      this.selSymbol.symbol,
     );
     this.symbolForm.controls[FormFields.SymbolName].patchValue(
-      this.selSymbol.name
+      this.selSymbol.name,
     );
     this.updateSymbolWeight();
   }
@@ -167,14 +166,16 @@ export class AddSymbolComponent implements OnInit {
       this.selSymbol.changedAt = new Date(changedAt.toMillis()).toISOString();
       forkJoin(
         this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
-        this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol)
-      ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([resultDaily, resultIntraDay]) => {
-        console.log(
-          `Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`
-        );
-        this.importingQuotes = false;
-        this.dialogRef.close(this.selSymbol);
-      });
+        this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol),
+      )
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(([resultDaily, resultIntraDay]) => {
+          console.log(
+            `Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`,
+          );
+          this.importingQuotes = false;
+          this.dialogRef.close(this.selSymbol);
+        });
     }
   }
 

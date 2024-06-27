@@ -32,7 +32,7 @@ export class SymbolOverviewComponent {
     return ServiceUtils.isPortfolioSymbol(this.symbol)
       ? this.portfolio
       : this.portfolio.portfolioElements.filter(
-          (value) => value.symbol === this.symbol.symbol
+          (value) => value.symbol === this.symbol.symbol,
         )[0];
   }
 

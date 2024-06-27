@@ -32,7 +32,10 @@ export class PortfolioTimechartComponent implements OnInit {
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
 
-  constructor(private portfolioService: PortfolioService, private destroyRef: DestroyRef,) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private destroyRef: DestroyRef,
+  ) {}
 
   ngOnInit(): void {
     this.portfolioService
@@ -43,7 +46,7 @@ export class PortfolioTimechartComponent implements OnInit {
         const myMap = result.symbols
           .filter(
             (mySymbol) =>
-              !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER)
+              !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER),
           )
           .reduce((acc, mySymbol) => {
             const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
@@ -57,10 +60,10 @@ export class PortfolioTimechartComponent implements OnInit {
           const myStart = myValue
             .map((mySym) => new Date(mySym.changedAt))
             .reduce((acc, value) =>
-              acc.valueOf() < value.valueOf() ? value : acc
+              acc.valueOf() < value.valueOf() ? value : acc,
             );
           const myEndItem = myValue.reduce((acc, value) =>
-            acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc
+            acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc,
           );
           const myEnd = !myEndItem?.removedAt
             ? null

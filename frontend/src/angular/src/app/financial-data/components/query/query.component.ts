@@ -69,7 +69,7 @@ export class QueryComponent implements OnInit {
     private fb: FormBuilder,
     private configService: ConfigService,
     private financialDataService: FinancialDataService,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {
     this.destroyRef.onDestroy(() => {
       if (!this.showType) {
@@ -102,24 +102,24 @@ export class QueryComponent implements OnInit {
                   myConcept.concept,
                   myValue,
                   this.itemFormGroup.controls[QueryFormFields.ConceptOperator]
-                    .value
-                )
-              ))
-          )
+                    .value,
+                ),
+              )),
+          ),
       );
     this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(
-      this.queryItemType
+      this.queryItemType,
     );
     if (
       this.queryItemType === ItemType.TermStart ||
       this.queryItemType === ItemType.TermEnd
     ) {
       this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(
-        this.containsOperator
+        this.containsOperator,
       );
       this.itemFormGroup.controls[QueryFormFields.Concept].patchValue("xxx");
       this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(
-        "="
+        "=",
       );
       this.itemFormGroup.controls[QueryFormFields.NumberValue].patchValue(0);
     }
@@ -132,9 +132,9 @@ export class QueryComponent implements OnInit {
   }
 
   private getOperators(delayMillis: number): void {
-	if(!!this.timeoutRef) {
-		clearTimeout(this.timeoutRef);
-	}
+    if (!!this.timeoutRef) {
+      clearTimeout(this.timeoutRef);
+    }
     this.timeoutRef = setTimeout(() => {
       this.financialDataService
         .getConcepts()
@@ -142,30 +142,41 @@ export class QueryComponent implements OnInit {
         .subscribe
         //myValues => console.log(myValues)
         ();
-      this.configService.getNumberOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
-        this.numberQueryItems = values;
-        this.itemFormGroup.controls[QueryFormFields.NumberOperator].patchValue(
-          values.filter((myValue) => "=" === myValue)[0]
-        );
-      });
-      this.configService.getStringOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
-        this.stringQueryItems = values;
-        this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(
-          values.filter((myValue) => this.containsOperator === myValue)[0]
-        );
-      });
+      this.configService
+        .getNumberOperators()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((values) => {
+          this.numberQueryItems = values;
+          this.itemFormGroup.controls[
+            QueryFormFields.NumberOperator
+          ].patchValue(values.filter((myValue) => "=" === myValue)[0]);
+        });
+      this.configService
+        .getStringOperators()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((values) => {
+          this.stringQueryItems = values;
+          this.itemFormGroup.controls[
+            QueryFormFields.ConceptOperator
+          ].patchValue(
+            values.filter((myValue) => this.containsOperator === myValue)[0],
+          );
+        });
       if (ItemType.TermEnd === this.queryItemType) {
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
-          "End"
+          "End",
         );
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].disable();
       } else {
-        this.configService.getQueryOperators().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values) => {
-          this.termQueryItems = values;
-          this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
-            values.filter((myValue) => "And" === myValue)[0]
-          );
-        });
+        this.configService
+          .getQueryOperators()
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((values) => {
+            this.termQueryItems = values;
+            this.itemFormGroup.controls[
+              QueryFormFields.QueryOperator
+            ].patchValue(values.filter((myValue) => "And" === myValue)[0]);
+          });
       }
     }, delayMillis);
   }
@@ -184,7 +195,7 @@ export class QueryComponent implements OnInit {
     if (!this.showType) {
       const formIndex =
         this?.baseFormArray?.controls?.findIndex(
-          (myControl) => myControl === this.itemFormGroup
+          (myControl) => myControl === this.itemFormGroup,
         ) || -1;
       if (formIndex < 0) {
         console.log("showType showType(...)");
@@ -193,7 +204,7 @@ export class QueryComponent implements OnInit {
     } else {
       const formIndex =
         this?.baseFormArray?.controls?.findIndex(
-          (myControl) => myControl === this.itemFormGroup
+          (myControl) => myControl === this.itemFormGroup,
         ) || -1;
       if (formIndex >= 0) {
         console.log("showType remove showType(...)");

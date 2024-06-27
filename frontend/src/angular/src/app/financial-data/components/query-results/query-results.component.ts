@@ -39,7 +39,7 @@ export class QueryResultsComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.filterPredicate = (
       data: FinancialElementExt,
-      filter: string
+      filter: string,
     ) => data?.symbol?.trim().toLowerCase().includes(filter);
     this.dataSource.sort = this.tableSort;
   }
@@ -72,7 +72,7 @@ export class QueryResultsComponent implements AfterViewInit {
   }
 
   private removeFetDublicates(
-    financialElementExts: FinancialElementExt[]
+    financialElementExts: FinancialElementExt[],
   ): FinancialElementExt[] {
     const financialElementExtMap = new Map<string, FinancialElementExt>();
     financialElementExts.forEach((myElement) => {

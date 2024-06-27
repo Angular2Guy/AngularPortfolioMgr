@@ -120,7 +120,7 @@ export class CreateQueryComponent implements OnInit {
     private symbolService: SymbolService,
     private configService: ConfigService,
     private financialDataService: FinancialDataService,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {
     this.queryForm = fb.group(
       {
@@ -134,7 +134,7 @@ export class CreateQueryComponent implements OnInit {
       },
       {
         validators: [this.validateItemTypes()],
-      }
+      },
     );
     this.queryItemParams.formArray = this.queryForm.controls[
       FormFields.QueryItems
@@ -153,7 +153,7 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
-        switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue))
+        switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue)),
       )
       .subscribe((myValue) => (this.symbols = myValue));
     this.queryForm.controls[FormFields.Name].valueChanges
@@ -161,15 +161,15 @@ export class CreateQueryComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
         switchMap((myValue) =>
-          this.financialDataService.getSymbolNamesByCompanyName(myValue)
-        )
+          this.financialDataService.getSymbolNamesByCompanyName(myValue),
+        ),
       )
       .subscribe((myValue) => (this.sfSymbolNames = myValue));
 
     this.configService.getNumberOperators().subscribe((values) => {
       this.yearOperators = values;
       this.queryForm.controls[FormFields.YearOperator].patchValue(
-        values.filter((myValue) => myValue === "=")[0]
+        values.filter((myValue) => myValue === "=")[0],
       );
     });
     this.financialDataService
@@ -177,14 +177,14 @@ export class CreateQueryComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values) =>
-          (this.quarterQueryItems = values.map((myValue) => myValue.quarter))
+          (this.quarterQueryItems = values.map((myValue) => myValue.quarter)),
       );
     this.financialDataService
       .getCountries()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values) =>
-          (this.countryQueryItems = values.map((myValue) => myValue.country))
+          (this.countryQueryItems = values.map((myValue) => myValue.country)),
       );
   }
 
@@ -193,7 +193,7 @@ export class CreateQueryComponent implements OnInit {
       moveItemInArray(
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
       const myFormArrayItem = this.queryForm[
         FormFields.QueryItems
@@ -201,14 +201,14 @@ export class CreateQueryComponent implements OnInit {
       this.queryForm[FormFields.QueryItems].value.splice(
         event.currentIndex,
         0,
-        myFormArrayItem
+        myFormArrayItem,
       );
     } else {
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
       //console.log(event.container.data === this.todo);
       while (this.availableItems.length > 0) {
@@ -241,7 +241,7 @@ export class CreateQueryComponent implements OnInit {
       financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]
         ?.value?.length
         ? this.queryForm.controls[FormFields.QueryItems].value.map(
-            (myFormGroup) => this.createFinancialElementParam(myFormGroup)
+            (myFormGroup) => this.createFinancialElementParam(myFormGroup),
           )
         : [],
     } as SymbolFinancialsQueryParams;
@@ -258,7 +258,7 @@ export class CreateQueryComponent implements OnInit {
 
   private processQueryResult(
     result: SymbolFinancials[],
-    symbolFinancialsParams: SymbolFinancialsQueryParams
+    symbolFinancialsParams: SymbolFinancialsQueryParams,
   ): void {
     const logResults = false;
     const symbolFinancialsFilter =
@@ -279,7 +279,7 @@ export class CreateQueryComponent implements OnInit {
       }
       this.symbolFinancials.emit([]);
       this.financialElements.emit(
-        FinancialsDataUtils.toFinancialElementsExt(result)
+        FinancialsDataUtils.toFinancialElementsExt(result),
       );
     } else {
       if (!!logResults) {
@@ -291,7 +291,7 @@ export class CreateQueryComponent implements OnInit {
   }
 
   private createFinancialElementParam(
-    formGroup: FormGroup
+    formGroup: FormGroup,
   ): FinancialElementParams {
     //console.log(formGroup);
     return {
@@ -311,10 +311,10 @@ export class CreateQueryComponent implements OnInit {
   private validateItemTypes(): ValidatorFn {
     return (form: FormGroup): ValidationErrors | null => {
       let termStartCount = this.queryItems.filter(
-        (myTerm) => myTerm.queryItemType === ItemType.TermStart
+        (myTerm) => myTerm.queryItemType === ItemType.TermStart,
       ).length;
       let termEndCount = this.queryItems.filter(
-        (myTerm) => myTerm.queryItemType === ItemType.TermEnd
+        (myTerm) => myTerm.queryItemType === ItemType.TermEnd,
       ).length;
       return termStartCount != termEndCount ? { termItemsValid: false } : null;
     };

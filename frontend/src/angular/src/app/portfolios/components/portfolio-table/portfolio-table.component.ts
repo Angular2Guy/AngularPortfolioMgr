@@ -39,7 +39,7 @@ export class PortfolioTableComponent implements OnInit {
     "year2",
     "year5",
     "year10",
-  ];  
+  ];
   reloadData = false;
 
   constructor(
@@ -47,7 +47,7 @@ export class PortfolioTableComponent implements OnInit {
     private route: ActivatedRoute,
     private portfolioService: PortfolioService,
     private dialog: MatDialog,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
@@ -57,11 +57,11 @@ export class PortfolioTableComponent implements OnInit {
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId"))
-          )
+            parseInt(params.get("portfolioId")),
+          ),
         ),
         tap(() => (this.reloadData = false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((myData) => (this.localPortfolio = myData));
   }
@@ -83,7 +83,8 @@ export class PortfolioTableComponent implements OnInit {
       data: element,
     });
     dialogRef
-      .afterClosed().pipe(takeUntilDestroyed(this.destroyRef))
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: PortfolioElement) => {
         //console.log(result);
         const myPortfolio = {
@@ -97,26 +98,28 @@ export class PortfolioTableComponent implements OnInit {
         } as Portfolio;
         if (!!result && result.weight > 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
-            (mySymbol) => mySymbol.symbol === result.symbol
+            (mySymbol) => mySymbol.symbol === result.symbol,
           )[0];
           this.portfolioService
             .putSymbolToPortfolio(
               myPortfolio,
               mySymbol.id,
               result.weight,
-              result.changedAt
-            ).pipe(takeUntilDestroyed(this.destroyRef))
+              result.changedAt,
+            )
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((myResult) => (this.localPortfolio = myResult));
         } else if (!!result && result.weight <= 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
-            (mySymbol) => mySymbol.symbol === result.symbol
+            (mySymbol) => mySymbol.symbol === result.symbol,
           )[0];
           this.portfolioService
             .deleteSymbolFromPortfolio(
               myPortfolio,
               mySymbol.id,
-              result.changedAt
-            ).pipe(takeUntilDestroyed(this.destroyRef))
+              result.changedAt,
+            )
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((myResult) => (this.localPortfolio = myResult));
         }
       });

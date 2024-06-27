@@ -28,7 +28,7 @@ const routes: Routes = [
     canActivate: [MainGuard],
     loadChildren: () =>
       import("./financial-data/financial-data.module").then(
-        (m) => m.FinancialDataModule
+        (m) => m.FinancialDataModule,
       ),
   },
   {

@@ -2,14 +2,12 @@
   <form [formGroup]="financialsForm" novalidate>
     <ul class="list-style">
       <li>
-        @if(data.dataType === ImportDataType.Sec) {
-        <h1 class="mat-h1" i18n="@@financialDataImport">
-          Financialdata import
-        </h1>
+        @if (data.dataType === ImportDataType.Sec) {
+          <h1 class="mat-h1" i18n="@@financialDataImport">
+            Financialdata import
+          </h1>
         } @else {
-        <h1 class="mat-h1" i18n="@@dailyQuotesImport">
-          DailyQuotes import
-        </h1>
+          <h1 class="mat-h1" i18n="@@dailyQuotesImport">DailyQuotes import</h1>
         }
       </li>
       <li class="file-path">

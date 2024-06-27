@@ -13,19 +13,29 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
-import { HttpClientModule, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import {
+  HttpClientModule,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from "@angular/common/http";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { DialogSpinnerComponent } from "./components/dialog-spinner/dialog-spinner.component";
 
-@NgModule({ declarations: [DialogSpinnerComponent],
-    exports: [
-        CommonModule,
-        HttpClientModule,
-        FormsModule,
-        ReactiveFormsModule,
-        DialogSpinnerComponent,
-    ], imports: [CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+@NgModule({
+  declarations: [DialogSpinnerComponent],
+  exports: [
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    DialogSpinnerComponent,
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+  ],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
+})
 export class BaseModule {}

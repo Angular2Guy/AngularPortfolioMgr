@@ -55,11 +55,14 @@
         >
         <mat-cell *matCellDef="let element"> {{ element.value }} </mat-cell>
       </ng-container>
-      
+
       <ng-container matColumnDef="element-type">
         <mat-header-cell *matHeaderCellDef i18n="@@queryResultsElementType"
-          >Type</mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{ formatFinancialType(element.financialElementType) }} </mat-cell>
+          >Type</mat-header-cell
+        >
+        <mat-cell *matCellDef="let element">
+          {{ formatFinancialType(element.financialElementType) }}
+        </mat-cell>
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

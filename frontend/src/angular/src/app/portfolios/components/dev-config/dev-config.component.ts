@@ -14,7 +14,7 @@ export class DevConfigComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<OverviewComponent>,
-    private devAppInfoService: DevAppInfoService
+    private devAppInfoService: DevAppInfoService,
   ) {}
 
   ngOnInit(): void {

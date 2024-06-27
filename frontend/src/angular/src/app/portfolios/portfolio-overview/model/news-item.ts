@@ -11,7 +11,7 @@
    limitations under the License.
  */
 export interface NewsItem {
-	link: string;
-	publishedDate: string;
-	title: string;
+  link: string;
+  publishedDate: string;
+  title: string;
 }

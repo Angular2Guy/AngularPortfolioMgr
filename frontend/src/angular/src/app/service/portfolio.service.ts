@@ -40,20 +40,22 @@ export class PortfolioService {
   }
 
   countPortfolioSymbolsByUserId(userId: number): Observable<number> {
-	  return this.http.get<number>(`/rest/portfolio/countsymbols/userid/${userId}`).pipe(shareReplay(1));
+    return this.http
+      .get<number>(`/rest/portfolio/countsymbols/userid/${userId}`)
+      .pipe(shareReplay(1));
   }
 
   getPortfolioBarsByIdAndStart(
     portfolioId: number,
     start: Date,
-    compSyms: ComparisonIndex[]
+    compSyms: ComparisonIndex[],
   ): Observable<PortfolioBars> {
     const compSymStrs =
       compSyms.length === 0 ? "" : "?compSymbols=" + compSyms.join(",");
     return this.http.get<PortfolioBars>(
       `/rest/portfolio/id/${portfolioId}/start/${
         start.toISOString().split("T")[0]
-      }${compSymStrs}`
+      }${compSymStrs}`,
     );
   }
 
@@ -65,13 +67,13 @@ export class PortfolioService {
     portfolio: Portfolio,
     symbolId: number,
     weight: number,
-    changedAt: string
+    changedAt: string,
   ): Observable<Portfolio> {
     return this.http.post<Portfolio>(
       `/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(
-        changedAt
+        changedAt,
       )}`,
-      portfolio
+      portfolio,
     );
   }
 
@@ -79,26 +81,26 @@ export class PortfolioService {
     portfolio: Portfolio,
     symbolId: number,
     weight: number,
-    changedAt: string
+    changedAt: string,
   ): Observable<Portfolio> {
     return this.http.put<Portfolio>(
       `/rest/portfolio/symbol/${symbolId}/weight/${weight}?changedAt=${encodeURI(
-        changedAt
+        changedAt,
       )}`,
-      portfolio
+      portfolio,
     );
   }
 
   deleteSymbolFromPortfolio(
     portfolio: Portfolio,
     symbolId: number,
-    removedAt: string
+    removedAt: string,
   ): Observable<Portfolio> {
     const id = portfolio.id;
     return this.http.delete<Portfolio>(
       `/rest/portfolio/${id}/symbol/${symbolId}?removedAt=${encodeURI(
-        removedAt
-      )}`
+        removedAt,
+      )}`,
     );
   }
 }

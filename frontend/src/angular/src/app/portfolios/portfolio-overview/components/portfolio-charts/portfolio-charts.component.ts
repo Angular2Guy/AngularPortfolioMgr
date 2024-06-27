@@ -35,12 +35,16 @@ export class PortfolioChartsComponent implements OnInit {
     private route: ActivatedRoute,
     private portfolioService: PortfolioService,
     private destroyRef: DestroyRef,
-    private newsService: NewsService
+    private newsService: NewsService,
   ) {}
 
   ngOnInit(): void {
-	this.newsService.getCnbcFinanceNews().subscribe(result => this.cnbcFinanceNews = result);
-	this.newsService.getYahooNews().subscribe(result => this.yahooFinanceNews = result);
+    this.newsService
+      .getCnbcFinanceNews()
+      .subscribe((result) => (this.cnbcFinanceNews = result));
+    this.newsService
+      .getYahooNews()
+      .subscribe((result) => (this.yahooFinanceNews = result));
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -48,10 +52,10 @@ export class PortfolioChartsComponent implements OnInit {
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId"))
-          )
+            parseInt(params.get("portfolioId")),
+          ),
         ),
-        tap(() => (this.reloadData = false))
+        tap(() => (this.reloadData = false)),
       )
       .subscribe((myData) => (this.selPortfolio = myData));
   }

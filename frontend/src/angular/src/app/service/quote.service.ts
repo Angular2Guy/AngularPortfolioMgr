@@ -31,21 +31,21 @@ export class QuoteService {
 
   getIntraDayQuotes(symbol: string): Observable<Quote[]> {
     return this.http.get<Quote[]>(
-      `/rest/quote/intraday/symbol/${encodeURI(symbol)}`
+      `/rest/quote/intraday/symbol/${encodeURI(symbol)}`,
     );
   }
 
   getDailyQuotesFromStartToEnd(
     symbol: string,
     start: Date,
-    end: Date
+    end: Date,
   ): Observable<Quote[]> {
     const startStr = start.toISOString().split("T")[0];
     const endStr = end.toISOString().split("T")[0];
     return this.http.get<Quote[]>(
       `/rest/quote/daily/symbol/${encodeURI(
-        symbol
-      )}/start/${startStr}/end/${endStr}`
+        symbol,
+      )}/start/${startStr}/end/${endStr}`,
     );
   }
 
@@ -53,21 +53,21 @@ export class QuoteService {
     portfolioId: number,
     comparisonIndex: ComparisonIndex,
     start: Date,
-    end: Date
+    end: Date,
   ): Observable<Quote[]> {
     const startStr = start.toISOString().split("T")[0];
     const endStr = end.toISOString().split("T")[0];
     return this.http.get<Quote[]>(
-      `/rest/quote/daily/portfolio/${portfolioId}/index/${comparisonIndex}/start/${startStr}/end/${endStr}`
+      `/rest/quote/daily/portfolio/${portfolioId}/index/${comparisonIndex}/start/${startStr}/end/${endStr}`,
     );
   }
 
   getDailyQuotesForComparisonIndex(
     portfolioId: number,
-    comparisonIndex: ComparisonIndex
+    comparisonIndex: ComparisonIndex,
   ): Observable<Quote[]> {
     return this.http.get<Quote[]>(
-      `/rest/quote/daily/all/portfolio/${portfolioId}/index/${comparisonIndex}`
+      `/rest/quote/daily/all/portfolio/${portfolioId}/index/${comparisonIndex}`,
     );
   }
 }

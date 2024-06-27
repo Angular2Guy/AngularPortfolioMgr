@@ -37,7 +37,7 @@ import { NewsService } from "./service/news.service";
     PortfolioComparisonComponent,
     PortfolioSectorsComponent,
     PortfolioTimechartComponent,
-    NewsListComponent
+    NewsListComponent,
   ],
   imports: [
     BaseModule,

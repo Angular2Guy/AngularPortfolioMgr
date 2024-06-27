@@ -24,11 +24,14 @@ import { TokenService } from "ngx-simple-charts/base-service";
   providedIn: "root",
 })
 export class MainGuard {
-  constructor(private tokenService: TokenService, private router: Router) {}
+  constructor(
+    private tokenService: TokenService,
+    private router: Router,
+  ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ):
     | boolean
     | UrlTree

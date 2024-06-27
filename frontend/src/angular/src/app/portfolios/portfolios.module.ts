@@ -47,7 +47,7 @@ import { ChangeSymbolComponent } from "./components/change-symbol/change-symbol.
     PortfolioTableComponent,
     ProdConfigComponent,
     DevConfigComponent,
-    ChangeSymbolComponent    
+    ChangeSymbolComponent,
   ],
   imports: [
     BaseModule,

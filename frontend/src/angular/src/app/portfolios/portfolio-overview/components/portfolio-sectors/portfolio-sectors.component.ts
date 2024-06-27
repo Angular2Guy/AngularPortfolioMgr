@@ -110,7 +110,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
             name: pe.name,
             sector: pe.sector,
             value: pe.lastClose * pe.weight,
-          } as CalcPortfolioElement)
+          }) as CalcPortfolioElement,
       )
       .reduce((myMap, cpe) => {
         let myValue = myMap.get(cpe.sector);
@@ -133,7 +133,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
     });
     this.slicesSum = this.chartSlices.chartSlices.reduce(
       (acc, mySlice) => (acc = acc + mySlice.value),
-      0
+      0,
     );
     this.chartSlices.chartSlices = this.chartSlices.chartSlices
       .sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value)

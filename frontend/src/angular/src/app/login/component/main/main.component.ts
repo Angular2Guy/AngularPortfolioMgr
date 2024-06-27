@@ -30,22 +30,25 @@ export class MainComponent {
     private dialog: MatDialog,
     private tokenService: TokenService,
     private router: Router,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {}
 
   openLoginDialog(): MatDialogRef<LoginComponent, any> {
     const dialogRef = this.dialog.open(LoginComponent, {
       width: "600px",
-      hasBackdrop: true, 
+      hasBackdrop: true,
       disableClose: true,
       data: { login: this.login },
     });
-    dialogRef.beforeClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
-      this.login = typeof result == "undefined" ? null : result;
-      if (this.login) {
-        this.router.navigate(["/portfolios/overview"]);
-      }
-    });
+    dialogRef
+      .beforeClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        this.login = typeof result == "undefined" ? null : result;
+        if (this.login) {
+          this.router.navigate(["/portfolios/overview"]);
+        }
+      });
     return dialogRef;
   }
 

@@ -45,14 +45,16 @@ describe("MainComponent", () => {
     tokenService = jasmine.createSpyObj("tokenService", ["logout"]);
     TestBed.configureTestingModule({
       imports: [
-		BaseModule,
+        BaseModule,
         MatDialogModule,
         MatToolbarModule,
         MatInputModule,
         NoopAnimationsModule,
         MatTabsModule,
         MatButtonModule,
-        RouterTestingModule.withRoutes([{ path: "portfolios/overview", redirectTo: "/" }]),
+        RouterTestingModule.withRoutes([
+          { path: "portfolios/overview", redirectTo: "/" },
+        ]),
       ],
       declarations: [MainComponent, LoginComponent],
       providers: [
@@ -95,7 +97,7 @@ describe("MainComponent", () => {
     } as Login;
     matDialogRef.close(testLogin);
     matDialog.afterAllClosed.subscribe(() =>
-      expect(component.login).toEqual(testLogin)
+      expect(component.login).toEqual(testLogin),
     );
   }));
 });

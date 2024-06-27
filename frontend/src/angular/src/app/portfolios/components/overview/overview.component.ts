@@ -60,7 +60,7 @@ export class OverviewComponent implements OnInit {
   ];
   importingSymbols = false;
   //limit 250
-  countPortfolioSymbolsByUserId = 1000000;  
+  countPortfolioSymbolsByUserId = 1000000;
   private timeoutId = -1;
   protected profiles: string = null;
   private showPortfolioTable = true;
@@ -73,7 +73,7 @@ export class OverviewComponent implements OnInit {
     private symbolImportService: SymbolImportService,
     private quoteImportService: QuoteImportService,
     private dialog: MatDialog,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit() {
@@ -83,9 +83,9 @@ export class OverviewComponent implements OnInit {
       .getProfiles()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
-		this.profiles = !value ? "dev" : value.trim().toLowerCase();
-		//this.profiles = "dev " + this.profiles;
-      	console.log(this.profiles);
+        this.profiles = !value ? "dev" : value.trim().toLowerCase();
+        //this.profiles = "dev " + this.profiles;
+        console.log(this.profiles);
       });
   }
 
@@ -115,15 +115,20 @@ export class OverviewComponent implements OnInit {
       width: "500px",
       data: newPortfolioData,
     });
-    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
-      if (result) {
-        this.portfolioService.postPortfolio(result).subscribe((myPortfolio) => {
-          this.portfolios = [...this.portfolios, myPortfolio];
-          this.myPortfolio = myPortfolio;
-          this.selPortfolio(myPortfolio, true);
-        });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result) {
+          this.portfolioService
+            .postPortfolio(result)
+            .subscribe((myPortfolio) => {
+              this.portfolios = [...this.portfolios, myPortfolio];
+              this.myPortfolio = myPortfolio;
+              this.selPortfolio(myPortfolio, true);
+            });
+        }
+      });
   }
 
   selPortfolio(portfolio: Portfolio, showPortTab = false) {
@@ -138,7 +143,10 @@ export class OverviewComponent implements OnInit {
       this.router
         .navigate([`/portfolios/overview/${myPath}`, -1])
         .then(() =>
-          this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id])
+          this.router.navigate([
+            `/portfolios/overview/${myPath}`,
+            portfolio.id,
+          ]),
         );
     } else {
       this.router.navigate([`/portfolios/overview/${myPath}`, portfolio.id]);
@@ -150,7 +158,10 @@ export class OverviewComponent implements OnInit {
   }
 
   updateQuotes() {
-	  this.quoteImportService.updateAllDailyIntraDayQuotes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(xxx => console.log('updateQuotes() called.'));
+    this.quoteImportService
+      .updateAllDailyIntraDayQuotes()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((xxx) => console.log("updateQuotes() called."));
   }
 
   private refreshPortfolios() {
@@ -159,7 +170,7 @@ export class OverviewComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((myPortfolios) => {
         myPortfolios.forEach(
-          (port) => (port.symbols = !port.symbols ? [] : port.symbols)
+          (port) => (port.symbols = !port.symbols ? [] : port.symbols),
         );
         this.portfolios = myPortfolios;
         this.myPortfolio =
@@ -168,8 +179,10 @@ export class OverviewComponent implements OnInit {
           this.selPortfolio(this.myPortfolio, true);
         }
       });
-      this.portfolioService.countPortfolioSymbolsByUserId(this.tokenService.userId as number).pipe(takeUntilDestroyed(this.destroyRef))
-         .subscribe(result => this.countPortfolioSymbolsByUserId = result);
+    this.portfolioService
+      .countPortfolioSymbolsByUserId(this.tokenService.userId as number)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => (this.countPortfolioSymbolsByUserId = result));
   }
 
   addSymbol(portfolio: Portfolio) {
@@ -181,7 +194,8 @@ export class OverviewComponent implements OnInit {
       data: portfolioData,
     });
     dialogRef
-      .afterClosed().pipe(takeUntilDestroyed(this.destroyRef))
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((symbol: Symbol) => {
         if (symbol) {
           const dialogSpinnerRef = this.dialog.open(DialogSpinnerComponent, {
@@ -200,12 +214,13 @@ export class OverviewComponent implements OnInit {
               portfolio,
               symbol.id,
               symbol.weight,
-              symbol.changedAt
-            ).pipe(takeUntilDestroyed(this.destroyRef))
+              symbol.changedAt,
+            )
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((result) => {
               if (result) {
                 const filteredPortfolios = this.portfolios.filter(
-                  (port) => port.id !== result.id
+                  (port) => port.id !== result.id,
                 );
                 this.portfolios = [...filteredPortfolios, result];
                 this.myPortfolio = result;
@@ -227,22 +242,23 @@ export class OverviewComponent implements OnInit {
       this.symbolImportService.getSymbolImportHk(),
       this.symbolImportService.getSymbolImportDe(),
       this.quoteImportService.importFxDailyQuotes("USD"),
-      this.quoteImportService.importFxDailyQuotes("HKD")
+      this.quoteImportService.importFxDailyQuotes("HKD"),
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
         console.log(
-          `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`
+          `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`,
         );
         this.timeoutId = setTimeout(
           () =>
             this.symbolImportService
-              .getIndexSymbols().pipe(takeUntilDestroyed(this.destroyRef))
+              .getIndexSymbols()
+              .pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe((resultIndex) => {
                 console.log(`Index Symbols: ${resultIndex}`);
                 this.importingSymbols = false;
               }),
-          60000
+          60000,
         ) as unknown as number;
       });
   }

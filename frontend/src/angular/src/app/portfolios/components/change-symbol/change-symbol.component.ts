@@ -47,7 +47,7 @@ export class ChangeSymbolComponent implements OnInit {
     public dialogRef: MatDialogRef<PortfolioTableComponent>,
     private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioElement,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.symbolForm = this.fb.group({
       [FormFields.SymbolWeight]: [
@@ -64,42 +64,46 @@ export class ChangeSymbolComponent implements OnInit {
       .pipe(
         filter(
           (myChangedAt: DateTime) =>
-            !!myChangedAt && myChangedAt.toMillis() > startChangedAt.toMillis()
-        ), takeUntilDestroyed(this.destroyRef)
+            !!myChangedAt && myChangedAt.toMillis() > startChangedAt.toMillis(),
+        ),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((value: DateTime) => (this.changedAt = value));
     this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
-      .pipe(filter((value: number) => !!("" + value).match(/^[\d]+$/g)), takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        filter((value: number) => !!("" + value).match(/^[\d]+$/g)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe((value: number) => (this.newWeight = value));
   }
 
   updateClick() {
-	if(!this.deleteSymbol) {
-    const startChangedAt = DateTime.now().minus(
-      Duration.fromObject({ years: 100 })
-    );
-    if (
-      this.newWeight >= 0 &&
-      this.changedAt.toMillis() > startChangedAt.toMillis()
-    ) {
-      this.data.weight = this.newWeight;
-      this.data.changedAt = this.changedAt.toISO().split("+")[0];
+    if (!this.deleteSymbol) {
+      const startChangedAt = DateTime.now().minus(
+        Duration.fromObject({ years: 100 }),
+      );
+      if (
+        this.newWeight >= 0 &&
+        this.changedAt.toMillis() > startChangedAt.toMillis()
+      ) {
+        this.data.weight = this.newWeight;
+        this.data.changedAt = this.changedAt.toISO().split("+")[0];
+        this.dialogRef.close(this.data);
+      }
+    } else {
+      this.data.changedAt = new Date().toISOString().split("+")[0];
+      this.data.weight = 0;
+      //console.log(this.data);
       this.dialogRef.close(this.data);
     }
-    } else {
-		this.data.changedAt = new Date().toISOString().split("+")[0];
-		this.data.weight = 0;
-		//console.log(this.data);
-		this.dialogRef.close(this.data);
-	}
   }
 
   cancelClick() {
     this.dialogRef.close();
   }
-  
+
   deleteClick() {
-	this.deleteSymbol = true;
+    this.deleteSymbol = true;
   }
 
   private validateWeight(control: AbstractControl): ValidationErrors {

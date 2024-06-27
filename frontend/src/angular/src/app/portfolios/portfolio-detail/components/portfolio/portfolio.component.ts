@@ -46,7 +46,7 @@ export class PortfolioComponent implements OnInit {
     private portfolioService: PortfolioService,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
@@ -57,11 +57,11 @@ export class PortfolioComponent implements OnInit {
         //tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId"))
-          )
+            parseInt(params.get("portfolioId")),
+          ),
         ),
         tap(() => (this.reloadData = false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((myPortfolio) => {
         this.symbols = myPortfolio.symbols;

@@ -14,7 +14,7 @@ import { DestroyRef } from "@angular/core";
 import { MonoTypeOperatorFunction, Subject, takeUntil } from "rxjs";
 
 export function takeUntilDestroyed<T>(
-  destroyRef: DestroyRef
+  destroyRef: DestroyRef,
 ): MonoTypeOperatorFunction<T> {
   const subject = new Subject();
 

@@ -15,45 +15,49 @@
       </div>
     </div>
     <ul class="list-style">
-    @if(!deleteSymbol) {
-      <li>
-        <mat-form-field class="form-field">
-          <mat-label i18n="@@changeSymbolWeight">Weight</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="{{ FormFields.SymbolWeight }}"
-            i18n-placeholder="@@changeSymbolWeight"
-            placeholder="Weight"
-            tabindex="3"
-          />
-        </mat-form-field>
-      </li>
-      <li>
-        <mat-form-field>
-          <mat-label i18n="@@changeSymbolChangeDate">change date</mat-label>
-          <input
-            matInput
-            [matDatepicker]="picker1"
-            formControlName="{{ FormFields.ChangedAt }}"
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="picker1"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #picker1></mat-datepicker>
-        </mat-form-field>
-      </li>
+      @if (!deleteSymbol) {
+        <li>
+          <mat-form-field class="form-field">
+            <mat-label i18n="@@changeSymbolWeight">Weight</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="{{ FormFields.SymbolWeight }}"
+              i18n-placeholder="@@changeSymbolWeight"
+              placeholder="Weight"
+              tabindex="3"
+            />
+          </mat-form-field>
+        </li>
+        <li>
+          <mat-form-field>
+            <mat-label i18n="@@changeSymbolChangeDate">change date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker1"
+              formControlName="{{ FormFields.ChangedAt }}"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker1"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </li>
       } @else {
-      	<li>
-      		<div class="delete-text" i18n="@@changeSymbolDeleteSymbol">Delete Symbol ?</div>
-      	</li>      	
+        <li>
+          <div class="delete-text" i18n="@@changeSymbolDeleteSymbol">
+            Delete Symbol ?
+          </div>
+        </li>
       }
       <li>
         <button
           mat-button
           (click)="updateClick()"
-          [disabled]="!deleteSymbol && (symbolForm.pristine || symbolForm.invalid)"
+          [disabled]="
+            !deleteSymbol && (symbolForm.pristine || symbolForm.invalid)
+          "
           tabindex="-1"
           i18n="@@ok"
         >
@@ -67,7 +71,8 @@
         >
           Cancel
         </button>
-        <button class="delete-button"
+        <button
+          class="delete-button"
           mat-button
           (click)="deleteClick()"
           tabindex="-1"

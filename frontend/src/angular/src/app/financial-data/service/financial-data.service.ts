@@ -33,12 +33,12 @@ export class FinancialDataService {
   constructor(private http: HttpClient) {}
 
   putImportFinancialsData(
-    importFinancialsData: ImportData
+    importFinancialsData: ImportData,
   ): Observable<string> {
     return this.http.put<string>(
       "/rest/financialdata/importus/data",
       importFinancialsData,
-      { responseType: "json" }
+      { responseType: "json" },
     );
   }
 
@@ -64,19 +64,19 @@ export class FinancialDataService {
 
   getFeInfo(id: number): Observable<FeIdInfo> {
     return this.http.get<FeIdInfo>(
-      `/rest/financialdata/financialelement/id/${id}`
+      `/rest/financialdata/financialelement/id/${id}`,
     );
   }
 
   getSymbolNamesBySymbol(symbol: string): Observable<SfSymbolName[]> {
     return this.http.get<SfSymbolName[]>(
-      `/rest/financialdata/symbolfinancials/symbol/${symbol}`
+      `/rest/financialdata/symbolfinancials/symbol/${symbol}`,
     );
   }
 
   getSymbolNamesByCompanyName(symbol: string): Observable<SfSymbolName[]> {
     return this.http.get<SfSymbolName[]>(
-      `/rest/financialdata/symbolfinancials/companyname/${symbol}`
+      `/rest/financialdata/symbolfinancials/companyname/${symbol}`,
     );
   }
 
@@ -91,11 +91,11 @@ export class FinancialDataService {
   }
 
   postSymbolFinancialsParam(
-    symbolFinancialsQueryParams: SymbolFinancialsQueryParams
+    symbolFinancialsQueryParams: SymbolFinancialsQueryParams,
   ): Observable<SymbolFinancials[]> {
     return this.http.post<SymbolFinancials[]>(
       "/rest/financialdata/search/params",
-      symbolFinancialsQueryParams
+      symbolFinancialsQueryParams,
     );
   }
 }

@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private tokenService: TokenService,
     private destroyRef: DestroyRef,
-    fb: FormBuilder
+    fb: FormBuilder,
   ) {
     this.signinForm = fb.group(
       {
@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
       },
       {
         validator: this.validate.bind(this),
-      }
+      },
     );
     this.loginForm = fb.group({
       [FormFields.Username]: ["", Validators.required],
@@ -100,18 +100,23 @@ export class LoginComponent implements OnInit {
       password: null,
       username: null,
       alphavantageKey: null,
-      rapidApiKey: null
+      rapidApiKey: null,
     };
     login.username = this.signinForm.get(FormFields.Username).value;
     login.password = this.signinForm.get(FormFields.Password).value;
     login.emailAddress = this.signinForm.get(FormFields.Email).value;
-    login.alphavantageKey = this.signinForm.get(FormFields.AlphavantageKey).value;
+    login.alphavantageKey = this.signinForm.get(
+      FormFields.AlphavantageKey,
+    ).value;
     login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey).value;
     this.waitingForResponse = true;
-    this.loginService.postSignin(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => this.signin(res),
-      error: (err) => console.log(err),
-    });
+    this.loginService
+      .postSignin(login)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.signin(res),
+        error: (err) => console.log(err),
+      });
   }
 
   onLoginClick(): void {
@@ -124,10 +129,13 @@ export class LoginComponent implements OnInit {
     login.username = this.loginForm.get(FormFields.Username).value;
     login.password = this.loginForm.get(FormFields.Password).value;
     this.waitingForResponse = true;
-    this.loginService.postLogin(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => this.login(res),
-      error: (err) => console.log(err),
-    });
+    this.loginService
+      .postLogin(login)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.login(res),
+        error: (err) => console.log(err),
+      });
   }
 
   private signin(login: boolean): void {

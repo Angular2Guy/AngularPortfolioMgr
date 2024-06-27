@@ -15,7 +15,7 @@ export class ProdConfigComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<OverviewComponent>,
-    private prodAppInfoService: ProdAppInfoService
+    private prodAppInfoService: ProdAppInfoService,
   ) {}
 
   ngOnInit(): void {

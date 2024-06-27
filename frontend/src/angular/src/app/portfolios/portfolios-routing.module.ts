@@ -28,7 +28,7 @@ const routes: Routes = [
         path: "portfolio-overview",
         loadChildren: () =>
           import("./portfolio-overview/portfolio-overview.module").then(
-            (m) => m.PortfolioOverviewModule
+            (m) => m.PortfolioOverviewModule,
           ),
       },
       { path: "**", redirectTo: "table" },
@@ -38,7 +38,7 @@ const routes: Routes = [
     path: "portfolio-detail",
     loadChildren: () =>
       import("./portfolio-detail/portfolio-detail.module").then(
-        (m) => m.PortfolioDetailModule
+        (m) => m.PortfolioDetailModule,
       ),
   },
   { path: "**", redirectTo: "overview" },

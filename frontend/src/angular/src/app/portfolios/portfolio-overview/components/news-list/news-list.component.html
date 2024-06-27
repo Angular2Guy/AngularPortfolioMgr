@@ -1,11 +1,11 @@
 <div class="container">
-@for(item of newsItems; track item) {
-	<div class="news-item">
-		<h2>{{item.title}}</h2>
-		<div>{{item.publishedDate | date:'dd-MM-yyyy'}}</div>
-		<a [href]="item.link" target="_blank">Open article</a>
-	</div>
-}
+  @for (item of newsItems; track item) {
+    <div class="news-item">
+      <h2>{{ item.title }}</h2>
+      <div>{{ item.publishedDate | date: "dd-MM-yyyy" }}</div>
+      <a [href]="item.link" target="_blank">Open article</a>
+    </div>
+  }
 </div>
 <!-- 
 <div>

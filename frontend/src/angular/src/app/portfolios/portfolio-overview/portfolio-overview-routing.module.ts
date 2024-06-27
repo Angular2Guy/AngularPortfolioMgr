@@ -23,7 +23,7 @@ const routes: Routes = [
   {
     path: "news-list",
     component: NewsListComponent,
-  },  
+  },
   { path: "**", redirectTo: "portfolio-charts" },
 ];
 

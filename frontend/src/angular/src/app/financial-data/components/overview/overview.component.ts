@@ -46,7 +46,7 @@ export class OverviewComponent implements OnInit {
     private dialog: MatDialog,
     private configService: ConfigService,
     private router: Router,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
@@ -88,15 +88,20 @@ export class OverviewComponent implements OnInit {
         width: "500px",
         disableClose: true,
         hasBackdrop: true,
-        data: { filename: "", path: result, dataType: ImportDataType.Sec } as ImportData,
+        data: {
+          filename: "",
+          path: result,
+          dataType: ImportDataType.Sec,
+        } as ImportData,
       });
       dialogRef
         .afterClosed()
         .pipe(
           switchMap((result: ImportData) =>
-            this.financialDataService.putImportFinancialsData(result)
-          )
-        ).pipe(takeUntilDestroyed(this.destroyRef))
+            this.financialDataService.putImportFinancialsData(result),
+          ),
+        )
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => console.log(result));
     });
     //console.log('showFinancialsConfig()');
@@ -108,17 +113,22 @@ export class OverviewComponent implements OnInit {
         width: "500px",
         disableClose: true,
         hasBackdrop: true,
-        data: { filename: "", path: result, dataType: ImportDataType.Stocks } as ImportData,
+        data: {
+          filename: "",
+          path: result,
+          dataType: ImportDataType.Stocks,
+        } as ImportData,
       });
       dialogRef
         .afterClosed()
         .pipe(
           switchMap((result: ImportData) =>
-            this.quoteImportService.putDailyQuotesImport(result)
-          )
-        ).pipe(takeUntilDestroyed(this.destroyRef))
+            this.quoteImportService.putDailyQuotesImport(result),
+          ),
+        )
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => console.log(result));
-    });	  
+    });
   }
 
   back(): void {
