@@ -163,9 +163,9 @@ public class PortfolioService {
 		return new PortfolioWithElements(portfolio, portfolioElements, List.of(), List.of());
 	}
 
-	public PortfolioWithElements updatePortfolioSymbolWeight(PortfolioDto dto, Long symbolId, Long weight,
+	public PortfolioWithElements updatePortfolioSymbolWeight(Long portfolioId, Long symbolId, Long weight,
 			LocalDateTime changedAt) {
-		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(dto.getId(), symbolId).stream()
+		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(myEntity -> Stream.of(this.updateWeightPtsEntity(myEntity, weight, changedAt.toLocalDate())))
 				.map(newEntity -> this.portfolioCalculationService.updatePtsEntity(newEntity)).map(newEntity -> {
 					this.portfolioCalculationService.addDailyQuotes(newEntity.getPortfolio());
@@ -174,25 +174,11 @@ public class PortfolioService {
 				.map(newEntity -> this.updatePortfolioElements(
 						this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
-						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, dto.getId())));
+						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
 	}
 
 	public PortfolioWithElements removeSymbolFromPortfolio(Long portfolioId, Long symbolId, LocalDateTime removedAt) {
-		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
-				.flatMap(entity -> Stream.of(this.portfolioCalculationService
-						.updatePtsEntity(this.markAsRemovedPtsEntity(entity, removedAt.toLocalDate()))))
-				.map(newEntity -> this.removePortfolioElement(newEntity)).map(newEntity -> {
-					this.portfolioCalculationService.addDailyQuotes(newEntity.getPortfolio());
-					return newEntity;
-				}).map(newEntity -> this.portfolioCalculationService.calculatePortfolio(newEntity.getPortfolio()))
-				.peek(portfolioWithElements -> this.dailyQuoteRepository
-						.saveAll(portfolioWithElements.portfolioDailyQuotes()))
-				.peek(portfolioWithElements -> this.removeDailyQuotes(portfolioWithElements.portfolio(),
-						portfolioWithElements.dailyQuotesToRemove()))
-				.peek(portfolioWithElements -> this.dailyQuoteRepository
-						.deleteAll(portfolioWithElements.dailyQuotesToRemove()))
-				.findFirst().orElseThrow(() -> new ResourceNotFoundException(
-						String.format("Failed to remove symbol: %d from portfolio: %d", symbolId, portfolioId)));
+		return this.updatePortfolioSymbolWeight(portfolioId, symbolId, 0L, removedAt);
 	}
 
 	private PortfolioToSymbol removePortfolioElement(PortfolioToSymbol portfolioToSymbol) {
@@ -220,7 +206,7 @@ public class PortfolioService {
 
 	private PortfolioToSymbol updateWeightPtsEntity(PortfolioToSymbol entity, Long weight, LocalDate changedAt) {
 		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(),
-				weight, changedAt, null);
+				weight, changedAt, weight <= 0 ? changedAt : null);
 		return portfolioToSymbol;
 	}
 

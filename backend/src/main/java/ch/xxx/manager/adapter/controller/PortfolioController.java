@@ -109,7 +109,7 @@ public class PortfolioController {
 	public PortfolioDto updateSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
 		PortfolioWithElements portfolioWithElements = this.portfolioService
-		.updatePortfolioSymbolWeight(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
+		.updatePortfolioSymbolWeight(dto.getId(), symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 		return this.portfolioMapper.toDtoFiltered(portfolioWithElements
 				.portfolio(), portfolioWithElements.portfolioElements());
 	}
