@@ -15,7 +15,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { Portfolio, CommonValues } from "../../../model/portfolio";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { Subscription } from "rxjs";
-import { switchMap, tap, filter } from "rxjs/operators";
+import { switchMap, tap, filter, mergeMap } from "rxjs/operators";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
@@ -66,13 +66,6 @@ export class PortfolioTableComponent implements OnInit {
       .subscribe((myData) => (this.localPortfolio = myData));
   }
 
-  private unsubscribe(subscribtion: Subscription) {
-    if (!!subscribtion) {
-      subscribtion.unsubscribe();
-      subscribtion = null;
-    }
-  }
-
   updateStock(event: MouseEvent, element: CommonValues) {
     if (!!(element as Portfolio).symbols) {
       return;
@@ -119,7 +112,8 @@ export class PortfolioTableComponent implements OnInit {
               mySymbol.id,
               result.changedAt,
             )
-            .pipe(takeUntilDestroyed(this.destroyRef))
+            .pipe(mergeMap(xyz => this.portfolioService.getPortfolioById(myPortfolio.id)), 
+            	takeUntilDestroyed(this.destroyRef))
             .subscribe((myResult) => (this.localPortfolio = myResult));
         }
       });

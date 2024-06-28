@@ -74,6 +74,8 @@
     "changeSymbolCurrency": "Currency: ",
     "changeSymbolWeight": "Weight",
     "changeSymbolChangeDate": "change date",
+    "changeSymbolDeleteSymbol": "Delete Symbol ?",
+    "delete": "Delete",
     "changeSymbolUpdatingQuotes": "Updating Quotes...",
     "devConfigValues": "Dev Config Values",
     "classname": "Classname: ",

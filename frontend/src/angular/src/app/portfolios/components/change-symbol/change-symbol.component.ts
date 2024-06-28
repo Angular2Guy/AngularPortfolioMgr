@@ -41,7 +41,7 @@ export class ChangeSymbolComponent implements OnInit {
   protected updatingQuotes = false;
   protected deleteSymbol = false;
   private newWeight = -1;
-  private changedAt = DateTime.now().minus(Duration.fromObject({ years: 100 }));
+  private changedAt = DateTime.now();
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioTableComponent>,
@@ -91,7 +91,7 @@ export class ChangeSymbolComponent implements OnInit {
         this.dialogRef.close(this.data);
       }
     } else {
-      this.data.changedAt = new Date().toISOString().split("+")[0];
+	  this.data.changedAt = this.changedAt.toISO().split("+")[0];      
       this.data.weight = 0;
       //console.log(this.data);
       this.dialogRef.close(this.data);
