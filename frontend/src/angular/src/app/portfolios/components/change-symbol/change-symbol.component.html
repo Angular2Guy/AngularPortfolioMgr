@@ -22,7 +22,7 @@
             <input
               matInput
               type="text"
-              formControlName="{{ FormFields.SymbolWeight }}"
+              [formControlName]="FormFields.SymbolWeight"
               i18n-placeholder="@@changeSymbolWeight"
               placeholder="Weight"
               tabindex="3"
@@ -35,7 +35,7 @@
             <input
               matInput
               [matDatepicker]="picker1"
-              formControlName="{{ FormFields.ChangedAt }}"
+              [formControlName]="FormFields.ChangedAt"
             />
             <mat-datepicker-toggle
               matSuffix
@@ -56,7 +56,7 @@
             <input
               matInput
               [matDatepicker]="picker1"
-              formControlName="{{ FormFields.ChangedAt }}"
+              [formControlName]="FormFields.ChangedAt"
             />
             <mat-datepicker-toggle
               matSuffix

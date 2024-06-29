@@ -59,16 +59,14 @@ export class ChangeSymbolComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const startChangedAt = this.changedAt;
+    const startChangedAt = DateTime.fromISO('2000-01-01');
     this.symbolForm.controls[FormFields.ChangedAt].valueChanges
       .pipe(
         filter(
-          (myChangedAt: DateTime) =>
-            !!myChangedAt && myChangedAt.toMillis() > startChangedAt.toMillis(),
-        ),
+          (myChangedAt: DateTime) => !!myChangedAt && myChangedAt.toMillis() >= startChangedAt.toMillis()),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((value: DateTime) => (this.changedAt = value));
+      .subscribe((value: DateTime) => this.changedAt = value);
     this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
       .pipe(
         filter((value: number) => !!("" + value).match(/^[\d]+$/g)),
