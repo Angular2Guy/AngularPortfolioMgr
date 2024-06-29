@@ -34,24 +34,21 @@ public class NewsFeedConnector implements NewsFeedClient {
 	
 	@Override
 	public SyndFeed importYahooNewsFeed() {
-		SyndFeed feed = null;
-		try {
-			SyndFeedInput input = new SyndFeedInput();
-			feed = input.build(new XmlReader(URI.create(YAHOO_FINANCE_URL).toURL().openStream()));
-		} catch (IllegalArgumentException | FeedException | IOException e) {
-			LOGGER.error("YahooFinance Feed import failed.",e);
-		}
-		return feed;
+		return this.importNewsFeed(YAHOO_FINANCE_URL);
 	}
 	
 	@Override
 	public SyndFeed importCnbcFinanceNewsFeed() {
+		return this.importNewsFeed(CNBC_FINANCE_URL);
+	}
+	
+	private SyndFeed importNewsFeed(String url) {
 		SyndFeed feed = null;
 		try {
 			SyndFeedInput input = new SyndFeedInput();
-			feed = input.build(new XmlReader(URI.create(CNBC_FINANCE_URL).toURL().openStream()));
+			feed = input.build(new XmlReader(URI.create(url).toURL().openStream()));
 		} catch (IllegalArgumentException | FeedException | IOException e) {
-			LOGGER.error("Cnbc Feed import failed.",e);
+			LOGGER.error(String.format("Feed import failed. url: %s", url),e);
 		}
 		return feed;
 	}
