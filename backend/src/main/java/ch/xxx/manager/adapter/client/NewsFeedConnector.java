@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
@@ -47,7 +45,7 @@ public class NewsFeedConnector implements NewsFeedClient {
 		try {
 			SyndFeedInput input = new SyndFeedInput();
 			feed = input.build(new XmlReader(URI.create(url).toURL().openStream()));
-		} catch (IllegalArgumentException | FeedException | IOException e) {
+		} catch (Exception e) {
 			LOGGER.error(String.format("Feed import failed. url: %s", url),e);
 		}
 		return feed;
