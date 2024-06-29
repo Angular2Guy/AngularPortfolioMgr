@@ -65,7 +65,7 @@ public class OnStart {
 		var portfolioList = this.portfolioService.findAllPortfolios();
 		portfolioList.forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
 		LOGGER.info("Portfolios updated {}", portfolioList.size());
-		this.newsFeedService.updateCnnFinanceNewsFeed();		
+		this.newsFeedService.updateCnbcFinanceNewsFeed();		
 		this.newsFeedService.updateYahooNewsFeed();
 	}
 }

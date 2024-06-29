@@ -44,7 +44,7 @@ public class NewsFeedService {
 	}
 	
 	@Async
-	public void updateCnnFinanceNewsFeed() {
+	public void updateCnbcFinanceNewsFeed() {
 		var start = Instant.now();
 		this.cnbcFinanceNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importCnbcFinanceNewsFeed());
 		LOGGER.info("Cnbc news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
