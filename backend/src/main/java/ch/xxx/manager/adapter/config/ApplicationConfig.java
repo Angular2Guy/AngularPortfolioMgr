@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -44,9 +42,6 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 @EnableAsync
 public class ApplicationConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
-
-	@Value("${spring.profiles.active:}")
-	private String activeProfile;
 
 	@Value("${api.key}")
 	private String alphavantageApiKey;

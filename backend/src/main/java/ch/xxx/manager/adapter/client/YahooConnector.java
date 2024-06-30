@@ -38,10 +38,6 @@ public class YahooConnector implements YahooClient {
 		this.csvMapper = csvMapper;
 	}
 
-//	@jakarta.annotation.PostConstruct
-//	public void init() {
-//		this.csvMapper.registerModule(new JavaTimeModule());
-//	}
 	@Override
 	public List<HkDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
 		LocalDateTime toTime = LocalDateTime.now();

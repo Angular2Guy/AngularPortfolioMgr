@@ -181,27 +181,8 @@ public class PortfolioService {
 		return this.updatePortfolioSymbolWeight(portfolioId, symbolId, 0L, removedAt);
 	}
 
-	private PortfolioToSymbol removePortfolioElement(PortfolioToSymbol portfolioToSymbol) {
-		List<PortfolioElement> toRemove = portfolioToSymbol.getPortfolio().getPortfolioElements().stream()
-				.filter(myPortfolioElement -> myPortfolioElement.getSymbol()
-						.equalsIgnoreCase(portfolioToSymbol.getSymbol().getSymbol()))
-				.toList();
-		portfolioToSymbol.getPortfolio().getPortfolioElements().removeAll(toRemove);
-		toRemove.forEach(myPortfolioElement -> {
-			myPortfolioElement.setPortfolio(null);
-			this.portfolioElementRepository.delete(myPortfolioElement);
-		});
-		return portfolioToSymbol;
-	}
-
 	public Long countPortfolioSymbolsByUserId(Long userId) {
 		return this.portfolioCalculationService.countPortfolioSymbolsByUserId(userId);
-	}
-
-	private PortfolioToSymbol markAsRemovedPtsEntity(PortfolioToSymbol entity, LocalDate removedAt) {
-		PortfolioToSymbol portfolioToSymbol = new PortfolioToSymbol(null, entity.getPortfolio(), entity.getSymbol(), 0L,
-				removedAt, removedAt);
-		return portfolioToSymbol;
 	}
 
 	private PortfolioToSymbol updateWeightPtsEntity(PortfolioToSymbol entity, Long weight, LocalDate changedAt) {

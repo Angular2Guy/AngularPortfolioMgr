@@ -237,8 +237,6 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private Optional<PortfolioToSymbol> findAtDayPts(String symbolStr, LocalDate atDay,
 			Collection<PortfolioToSymbol> portfolioToSymbols) {
-//		Map<String, List<PortfolioToSymbol>> ptsMap = portfolioToSymbols.stream().filter(pts -> pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-//				.collect(Collectors.groupingBy(pts -> pts.getSymbol().getSymbol()));
 		LocalDate[] first = new LocalDate[1];
 		Optional<PortfolioToSymbol> ptsWeight = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().equalsIgnoreCase(symbolStr))

@@ -308,17 +308,6 @@ public class QuoteImportService {
 		return quotes;
 	}
 
-//	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportAdjDto dto,
-//			Map<LocalDate, Collection<Currency>> currencyMap) {
-//		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-//				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
-//				new BigDecimal(dto.getAdjustedClose()), Long.parseLong(dto.getVolume()),
-//				LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE), symbolEntity,
-//				symbolEntity.getCurrencyKey());
-//		symbolEntity.getDailyQuotes().add(entity);
-//		return entity;
-//	}
-
 	private DailyQuote convert(Symbol symbolEntity, String dateStr, DailyQuoteImportDto dto,
 			Map<LocalDate, Collection<Currency>> currencyMap) {
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),

@@ -54,6 +54,8 @@ public class OnStart {
 	@Async
 	@EventListener(ApplicationReadyEvent.class)
 	public void startupDone() throws InterruptedException, ExecutionException {
+		this.newsFeedService.updateCnbcFinanceNewsFeed();		
+		this.newsFeedService.updateYahooNewsFeed();
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
 		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
@@ -65,7 +67,5 @@ public class OnStart {
 		var portfolioList = this.portfolioService.findAllPortfolios();
 		portfolioList.forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
 		LOGGER.info("Portfolios updated {}", portfolioList.size());
-		this.newsFeedService.updateCnbcFinanceNewsFeed();		
-		this.newsFeedService.updateYahooNewsFeed();
 	}
 }
