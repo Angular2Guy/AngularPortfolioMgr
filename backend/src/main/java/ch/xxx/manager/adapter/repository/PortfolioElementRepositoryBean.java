@@ -44,6 +44,11 @@ public class PortfolioElementRepositoryBean implements PortfolioElementRepositor
 	}
 
 	@Override
+	public void deleteAll(Iterable<PortfolioElement> elements) {
+		this.jpaPortfolioElementRepository.deleteAll(elements);
+	}
+	
+	@Override
 	public Iterable<PortfolioElement> saveAll(Iterable<PortfolioElement> portfolios) {
 		return this.jpaPortfolioElementRepository.saveAll(portfolios);
 	}

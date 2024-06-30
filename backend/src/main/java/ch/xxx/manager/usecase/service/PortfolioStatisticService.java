@@ -79,14 +79,25 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr).stream())
 //				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol()))
 				.toList();
+		var ptsToDelete = portfolioToSymbols.stream().filter(pts -> pts.getRemovedAt() != null)
+				.filter(pts -> pts.getWeight() <= 0)
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();		
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(pts -> pts.getRemovedAt() == null).sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
+				.filter(pts -> ptsToDelete.stream().noneMatch(ptsDelete -> ptsDelete.getSymbol().getSymbol().equals(pts.getSymbol().getSymbol())))
+				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
+				.filter(StreamHelpers.distinctByKey(pts -> pts.getSymbol().getSymbol()))
 //				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
 //						.distinct().toList().forEach(mySymbolKey -> LOGGER.info("SymbolKey: {}", mySymbolKey)))
 				.map(pts -> this.createPortfolioElement(portfolio, dailyQuotesMap.get(pts.getSymbol().getSymbol()), pts,
 						comparisionSymbols))
 				.collect(Collectors.toList());
+		var portfolioElementsToDelete = this.portfolioElementRepository.findByPortfolioId(portfolio.getId()).stream()
+				.filter(pe -> ptsToDelete.stream().anyMatch(pts -> pts.getSymbol().getSymbol().equals(pe.getSymbol())))
+				.toList();
+		if (!portfolioElementsToDelete.isEmpty()) {
+			this.portfolioElementRepository.deleteAll(portfolioElementsToDelete);
+		}
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of(),

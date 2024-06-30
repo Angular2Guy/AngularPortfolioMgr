@@ -22,4 +22,5 @@ public interface PortfolioElementRepository {
 	void delete(PortfolioElement portfolioElement);
 	Optional<PortfolioElement> findByPortfolioId(Long portfolioId);
 	List<PortfolioElement> findByPortfolioIds(List<Long> portfolioIds);
+	void deleteAll(Iterable<PortfolioElement> elements);
 }
