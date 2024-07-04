@@ -27,11 +27,16 @@ import ch.xxx.manager.usecase.service.HkexClient;
 @Component
 public class HkexConnector implements HkexClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HkexConnector.class);
+	private final ConnectorClient connectorClient;
+	
+	public HkexConnector(ConnectorClient connectorClient) {
+		this.connectorClient = connectorClient;
+	}
 
 	public Optional<List<HkSymbolImportDto>> importSymbols() {
 		final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
 		LOGGER.info(myUrl);
-		var result = ConnectorUtils.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
+		var result = this.connectorClient.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
 				new ParameterizedTypeReference<List<HkSymbolImportDto>>() {
 				});
 		return result;

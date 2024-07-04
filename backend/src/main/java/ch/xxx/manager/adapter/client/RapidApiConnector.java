@@ -32,6 +32,11 @@ public class RapidApiConnector implements RapidApiClient {
 	private String apiKey;
 	@Value("${show.api.key}")
 	private String showApiKey;
+	private final ConnectorClient connectorClient;
+	
+	public RapidApiConnector(ConnectorClient connectorClient) {
+		this.connectorClient = connectorClient;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -47,6 +52,6 @@ public class RapidApiConnector implements RapidApiClient {
 			var headerMultiMap = new LinkedMultiValueMap<String, String>();
 			headerMultiMap.put("X-RapidAPI-Key", List.of(this.apiKey));
 			headerMultiMap.put("X-RapidAPI-Host", List.of("yh-finance.p.rapidapi.com"));
-			return ConnectorUtils.restCall(myUrl, headerMultiMap, RapidOverviewImportDto.class);					
+			return this.connectorClient.restCall(myUrl, headerMultiMap, RapidOverviewImportDto.class);					
 	}
 }

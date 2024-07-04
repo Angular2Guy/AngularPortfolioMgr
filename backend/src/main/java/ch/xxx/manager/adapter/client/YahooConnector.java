@@ -33,9 +33,11 @@ import ch.xxx.manager.usecase.service.YahooClient;
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private final CsvMapper csvMapper;
+	private final ConnectorClient connectorClient;
 
-	public YahooConnector(@Qualifier("csv") CsvMapper csvMapper) {
+	public YahooConnector(@Qualifier("csv") CsvMapper csvMapper, ConnectorClient connectorClient) {
 		this.csvMapper = csvMapper;
+		this.connectorClient = connectorClient;
 	}
 
 	@Override
@@ -47,7 +49,7 @@ public class YahooConnector implements YahooClient {
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 				toTime.toEpochSecond(OffsetDateTime.now().getOffset()));
 		LOGGER.info(myUrl);
-		return ConnectorUtils.restCall(myUrl, String.class).stream()
+		return this.connectorClient.restCall(myUrl, String.class).stream()
 				.flatMap(response -> this.convert(response).stream()).toList();
 	}
 

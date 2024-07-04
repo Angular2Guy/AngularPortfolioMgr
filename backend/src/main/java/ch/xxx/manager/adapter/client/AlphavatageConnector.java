@@ -35,7 +35,12 @@ public class AlphavatageConnector implements AlphavatageClient {
 	private String apiKey;
 	@Value("${show.api.key}")
 	private String showApiKey;
-
+	private final ConnectorClient connectorClient;
+	
+	public AlphavatageConnector(ConnectorClient connectorClient) {
+		this.connectorClient = connectorClient;
+	}
+	
 	@PostConstruct
 	public void init() {
 		if ("true".equalsIgnoreCase(this.showApiKey)) {
@@ -48,7 +53,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		final String myUrl = String.format("https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s",
 				symbol, this.apiKey);
 		LOGGER.info(myUrl);
-		return ConnectorUtils.restCall(myUrl, AlphaOverviewImportDto.class);
+		return this.connectorClient.restCall(myUrl, AlphaOverviewImportDto.class);
 	}
 
 	@Override
@@ -57,7 +62,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
 					symbol, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, IntraDayWrapperImportDto.class);
+			return this.connectorClient.restCall(myUrl, IntraDayWrapperImportDto.class);
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s";
 			final String myUrl = String.format(urlBase, symbol, fullSeriesStr, userKeys.alphavantageKey());
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, DailyWrapperImportDto.class);
+			return this.connectorClient.restCall(myUrl, DailyWrapperImportDto.class);
 	}
 
 	@Override
@@ -79,6 +84,6 @@ public class AlphavatageConnector implements AlphavatageClient {
 					"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
 					from_currency, to_currency, fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
-			return ConnectorUtils.restCall(myUrl, DailyFxWrapperImportDto.class);
+			return this.connectorClient.restCall(myUrl, DailyFxWrapperImportDto.class);
 	}
 }

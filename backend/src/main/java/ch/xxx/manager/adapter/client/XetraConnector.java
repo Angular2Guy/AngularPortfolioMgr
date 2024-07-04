@@ -13,7 +13,6 @@
 package ch.xxx.manager.adapter.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -29,17 +28,22 @@ import ch.xxx.manager.usecase.service.XetraClient;
 public class XetraConnector implements XetraClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XetraConnector.class);
 	private static final String XETRA_URL = "https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente";
+	private final ConnectorClient connectorClient;
+	
+	public XetraConnector(ConnectorClient connectorClient) {
+		this.connectorClient = connectorClient;
+	}
 
 	@Override
 	public Optional<List<String>> importXetraSymbols() {
-		return ConnectorUtils
+		return this.connectorClient
 				.restCall(XETRA_URL, String.class).stream().map(str -> this.findCsvUrl(str)).findFirst()
 				.flatMap(myUrlStr -> this.loadSymbolsCsv(myUrlStr));
 	}
 
 
 	private Optional<List<String>> loadSymbolsCsv(String url) {
-		return ConnectorUtils.restCall(url, String.class).stream().map(str -> str.lines().toList()).findFirst();
+		return this.connectorClient.restCall(url, String.class).stream().map(str -> str.lines().toList()).findFirst();
 	}
 
 	private String findCsvUrl(String htmlPage) {
