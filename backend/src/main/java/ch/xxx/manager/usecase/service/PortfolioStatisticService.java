@@ -60,6 +60,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
 	}
+	
+	record ComparisonSymbols(Symbol es50Symbol, Symbol msciChinaSymbol, Symbol sp500Symbol) {
+	}
 
 	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
 			DailyQuoteRepository dailyQuoteRepository, PortfolioElementRepository portfolioElementRepository) {
@@ -107,39 +110,44 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	}
 
 	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
-			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
-				
+			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {		
+		var comparisonSyms = getComparisonSymbols(comparisonSymbols);
+	}
+	
+	private ComparisonSymbols getComparisonSymbols(Collection<Symbol> comparisonSymbols) {
+		final Symbol es50Symbol = this.filterSymbol(ComparisonIndex.EUROSTOXX50, comparisonSymbols);
+		final Symbol msciChinaSymbol = this.filterSymbol(ComparisonIndex.MSCI_CHINA, comparisonSymbols);
+		final Symbol sp500Symbol = this.filterSymbol(ComparisonIndex.SP500, comparisonSymbols);
+		return new ComparisonSymbols(es50Symbol, msciChinaSymbol, sp500Symbol);
 	}
 	
 	private void updateLinRegReturns(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
-		final Symbol es50Symbol = this.filterSymbol(ComparisonIndex.EUROSTOXX50, comparisonSymbols);
-		final Symbol msciChinaSymbol = this.filterSymbol(ComparisonIndex.MSCI_CHINA, comparisonSymbols);
-		final Symbol sp500Symbol = this.filterSymbol(ComparisonIndex.SP500, comparisonSymbols);
+		var comparisonSyms = getComparisonSymbols(comparisonSymbols);
 		portfolioBase.setYear10LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear10LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear10LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, sp500Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear5LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear5LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear5LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear2LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear2LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear2LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear1LinRegReturnEuroStoxx50(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear1LinRegReturnMsciChina(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear1LinRegReturnSp500(this.calcLinRegReturn(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 	}
 
 	private Symbol filterSymbol(ComparisonIndex comparisionIndex, Collection<Symbol> comparisonSymbols) {
@@ -151,33 +159,31 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private void updateCorrelations(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			List<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
-		final Symbol es50Symbol = this.filterSymbol(ComparisonIndex.EUROSTOXX50, comparisonSymbols);
-		final Symbol msciChinaSymbol = this.filterSymbol(ComparisonIndex.MSCI_CHINA, comparisonSymbols);
-		final Symbol sp500Symbol = this.filterSymbol(ComparisonIndex.SP500, comparisonSymbols);
+		var comparisonSyms = getComparisonSymbols(comparisonSymbols);
 		portfolioBase.setYear10CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear10CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear10CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(10L),
-				portfolioQuotes, sp500Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear5CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear5CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, sp500Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear5CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(5L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear2CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear2CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, sp500Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear2CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(2L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 		portfolioBase.setYear1CorrelationEuroStoxx50(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, es50Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.es50Symbol().getDailyQuotes()));
 		portfolioBase.setYear1CorrelationSp500(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, sp500Symbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.sp500Symbol().getDailyQuotes()));
 		portfolioBase.setYear1CorrelationMsciChina(this.calcCorrelation(portfolio, LocalDate.now().minusYears(1L),
-				portfolioQuotes, msciChinaSymbol.getDailyQuotes()));
+				portfolioQuotes, comparisonSyms.msciChinaSymbol().getDailyQuotes()));
 	}
 
 	private PortfolioElement createPortfolioElement(final Portfolio portfolio, final List<DailyQuote> dailyQuotes,
