@@ -23,6 +23,7 @@
 	<include file="changes/db.changelog-5.xml" relativeToChangelogFile="true"/>
 	<include file="changes/db.changelog-6.xml" relativeToChangelogFile="true"/>
 	<include file="changes/db.changelog-7.xml" relativeToChangelogFile="true"/>
+	<include file="changes/db.changelog-8.xml" relativeToChangelogFile="true"/>
 	
 	<include file="db.changelog-loaddata.xml" relativeToChangelogFile="true"/>
 	

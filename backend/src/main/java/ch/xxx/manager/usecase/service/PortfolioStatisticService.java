@@ -100,11 +100,17 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		}
 		updateCorrelations(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		updateLinRegReturns(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
+		updateSigmas(portfolio, portfolio, comparisionSymbols, portfolioQuotes);
 		PortfolioWithElements result = new PortfolioWithElements(portfolio, portfolioElements, List.of(),
 				portfolioQuotes);
 		return result;
 	}
 
+	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
+			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
+				
+	}
+	
 	private void updateLinRegReturns(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
 		final Symbol es50Symbol = this.filterSymbol(ComparisonIndex.EUROSTOXX50, comparisonSymbols);
