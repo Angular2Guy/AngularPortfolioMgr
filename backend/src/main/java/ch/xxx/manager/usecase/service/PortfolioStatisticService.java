@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.google.common.util.concurrent.AtomicDouble;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
@@ -60,7 +63,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	record CalcValuesDay(LocalDate day, BigDecimal quote, BigDecimal compQuote) {
 	}
-	
+
 	record ComparisonSymbols(Symbol es50Symbol, Symbol msciChinaSymbol, Symbol sp500Symbol) {
 	}
 
@@ -84,10 +87,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.toList();
 		var ptsToDelete = portfolioToSymbols.stream().filter(pts -> pts.getRemovedAt() != null)
 				.filter(pts -> pts.getWeight() <= 0)
-				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();		
+				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(pts -> ptsToDelete.stream().noneMatch(ptsDelete -> ptsDelete.getSymbol().getSymbol().equals(pts.getSymbol().getSymbol())))
+				.filter(pts -> ptsToDelete.stream()
+						.noneMatch(ptsDelete -> ptsDelete.getSymbol().getSymbol().equals(pts.getSymbol().getSymbol())))
 				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 				.filter(StreamHelpers.distinctByKey(pts -> pts.getSymbol().getSymbol()))
 //				.peek(pts -> dailyQuotesMap.get(pts.getSymbol().getSymbol()).stream().map(DailyQuote::getSymbolKey)
@@ -110,17 +114,50 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	}
 
 	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
-			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {		
-		var comparisonSyms = getComparisonSymbols(comparisonSymbols);
+			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
+		final var adjClosePercents = this.calcClosePercentages(portfolioQuotes);
+		final var standardDeviation = calcStandardDiviation(adjClosePercents);
+		final var sd = standardDeviation;
 	}
-	
+
+	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {		
+		final var adjCloseMean = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
+				.reduce(BigDecimal.ZERO, (acc, value) -> value.add(acc))
+				.divide(BigDecimal.valueOf(adjClosePercents.entrySet().size()), 25, RoundingMode.HALF_EVEN);
+		final var divisor = BigDecimal.ONE.divide(
+				BigDecimal.valueOf(adjClosePercents.entrySet().size()).subtract(BigDecimal.ONE), 25,
+				RoundingMode.HALF_EVEN);
+		final var standardDeviation = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
+				.map(myValue -> myValue.subtract(adjCloseMean)).map(myValue -> myValue.multiply(myValue))
+				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(acc)).multiply(divisor, MathContext.DECIMAL128)
+				.sqrt(MathContext.DECIMAL128);
+		return standardDeviation;
+	}
+
+	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes) {
+		record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
+		}
+		final var lastValue = new AtomicReference<BigDecimal>(new BigDecimal(-1000L));
+		final var closeAdjPercents = portfolioQuotes.stream().map(myQuote -> {
+			var result = new BigDecimal(-1000L);
+			if (lastValue.get().longValue() > -900L) {
+				result = myQuote.getAdjClose().divide(lastValue.get(), 25, RoundingMode.HALF_EVEN)
+						.multiply(new BigDecimal(100L));
+			}
+			lastValue.set(myQuote.getAdjClose());
+			return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
+		}).filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
+				.collect(Collectors.toMap(myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent()));
+		return closeAdjPercents;
+	}
+
 	private ComparisonSymbols getComparisonSymbols(Collection<Symbol> comparisonSymbols) {
 		final Symbol es50Symbol = this.filterSymbol(ComparisonIndex.EUROSTOXX50, comparisonSymbols);
 		final Symbol msciChinaSymbol = this.filterSymbol(ComparisonIndex.MSCI_CHINA, comparisonSymbols);
 		final Symbol sp500Symbol = this.filterSymbol(ComparisonIndex.SP500, comparisonSymbols);
 		return new ComparisonSymbols(es50Symbol, msciChinaSymbol, sp500Symbol);
 	}
-	
+
 	private void updateLinRegReturns(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
 		var comparisonSyms = getComparisonSymbols(comparisonSymbols);
