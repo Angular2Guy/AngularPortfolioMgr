@@ -115,9 +115,14 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
-		final var adjClosePercents = this.calcClosePercentages(portfolioQuotes);
-		final var standardDeviation = calcStandardDiviation(adjClosePercents);
-		final var sd = standardDeviation;
+		var adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(10L));
+		final var sigma10Y = calcStandardDiviation(adjClosePercents);
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(5L));
+		final var sigma5Y = calcStandardDiviation(adjClosePercents);
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(2L));
+		final var sigma2Y = calcStandardDiviation(adjClosePercents);
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(1L));
+		final var sigma1Y = calcStandardDiviation(adjClosePercents);
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {		
@@ -134,11 +139,13 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return standardDeviation;
 	}
 
-	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes) {
+	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes, final LocalDate cutOffDate) {
 		record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
 		}
 		final var lastValue = new AtomicReference<BigDecimal>(new BigDecimal(-1000L));
-		final var closeAdjPercents = portfolioQuotes.stream().map(myQuote -> {
+		final var closeAdjPercents = portfolioQuotes.stream()
+				.filter(myQuote -> cutOffDate.isAfter(myQuote.getLocalDay()))
+				.map(myQuote -> {
 			var result = new BigDecimal(-1000L);
 			if (lastValue.get().longValue() > -900L) {
 				result = myQuote.getAdjClose().divide(lastValue.get(), 25, RoundingMode.HALF_EVEN)
