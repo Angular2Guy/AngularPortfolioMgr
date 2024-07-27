@@ -115,23 +115,27 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
-		var adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(10L));
+		var adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(10L));
 		final var sigma10Y = calcStandardDiviation(adjClosePercents);
-		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(5L));
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(5L));
 		final var sigma5Y = calcStandardDiviation(adjClosePercents);
-		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(2L));
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(2L));
 		final var sigma2Y = calcStandardDiviation(adjClosePercents);
-		adjClosePercents = this.calcClosePercentages(portfolioQuotes,LocalDate.now().minusYears(1L));
+		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
 		final var sigma1Y = calcStandardDiviation(adjClosePercents);
+		final var lastValue = portfolioQuotes.stream()
+				.sorted((calcValues1, calcValues2) -> calcValues1.getLocalDay().compareTo(calcValues2.getLocalDay()))
+				.toList().reversed().stream().findFirst().orElseThrow();
 	}
 
-	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {		
+	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
 		final var adjCloseMean = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
 				.reduce(BigDecimal.ZERO, (acc, value) -> value.add(acc))
 				.divide(BigDecimal.valueOf(adjClosePercents.entrySet().size()), 25, RoundingMode.HALF_EVEN);
 		final var divisor = BigDecimal.ONE.divide(
-				BigDecimal.valueOf(adjClosePercents.entrySet().size()).subtract(BigDecimal.ONE), 25,
-				RoundingMode.HALF_EVEN);
+				BigDecimal.valueOf(adjClosePercents.entrySet().size() < 2 ? 2 : adjClosePercents.entrySet().size())
+						.subtract(BigDecimal.ONE),
+				25, RoundingMode.HALF_EVEN);
 		final var standardDeviation = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
 				.map(myValue -> myValue.subtract(adjCloseMean)).map(myValue -> myValue.multiply(myValue))
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(acc)).multiply(divisor, MathContext.DECIMAL128)
@@ -139,21 +143,21 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return standardDeviation;
 	}
 
-	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes, final LocalDate cutOffDate) {
+	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes,
+			final LocalDate cutOffDate) {
 		record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
 		}
 		final var lastValue = new AtomicReference<BigDecimal>(new BigDecimal(-1000L));
 		final var closeAdjPercents = portfolioQuotes.stream()
-				.filter(myQuote -> cutOffDate.isAfter(myQuote.getLocalDay()))
-				.map(myQuote -> {
-			var result = new BigDecimal(-1000L);
-			if (lastValue.get().longValue() > -900L) {
-				result = myQuote.getAdjClose().divide(lastValue.get(), 25, RoundingMode.HALF_EVEN)
-						.multiply(new BigDecimal(100L));
-			}
-			lastValue.set(myQuote.getAdjClose());
-			return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
-		}).filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
+				.filter(myQuote -> cutOffDate.isAfter(myQuote.getLocalDay())).map(myQuote -> {
+					var result = new BigDecimal(-1000L);
+					if (lastValue.get().longValue() > -900L) {
+						result = myQuote.getAdjClose().divide(lastValue.get(), 25, RoundingMode.HALF_EVEN)
+								.multiply(new BigDecimal(100L));
+					}
+					lastValue.set(myQuote.getAdjClose());
+					return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
+				}).filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
 				.collect(Collectors.toMap(myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent()));
 		return closeAdjPercents;
 	}
