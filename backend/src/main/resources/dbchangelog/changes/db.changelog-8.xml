@@ -29,24 +29,10 @@
 	</changeSet>
 	<changeSet id="42" author="angular2guy">
 		<addColumn tableName="portfolio">
-			<column name="year1sigma" type="double" />
-			<column name="year2sigma" type="double" />
-			<column name="year5sigma" type="double" />
-			<column name="year10sigma" type="double" />
-		</addColumn>
-		<dropColumn tableName="portfolio">
-			<column name="year1sigma_sp500" type="double" />
-			<column name="year1sigma_msci_china" type="double" />
-			<column name="year1sigma_euro_stoxx50" type="double" />
-			<column name="year2sigma_sp500" type="double" />
-			<column name="year2sigma_msci_china" type="double" />
-			<column name="year2sigma_euro_stoxx50" type="double" />
-			<column name="year5sigma_sp500" type="double" />
-			<column name="year5sigma_msci_china" type="double" />
-			<column name="year5sigma_euro_stoxx50" type="double" />
-			<column name="year10sigma_sp500" type="double" />
-			<column name="year10sigma_msci_china" type="double" />
-			<column name="year10sigma_euro_stoxx50" type="double" />
-		</dropColumn>
+			<column name="year1sigma_portfolio" type="double" />
+			<column name="year2sigma_portfolio" type="double" />
+			<column name="year5sigma_portfolio" type="double" />
+			<column name="year10sigma_portfolio" type="double" />
+		</addColumn>	
 	</changeSet>
 </databaseChangeLog>

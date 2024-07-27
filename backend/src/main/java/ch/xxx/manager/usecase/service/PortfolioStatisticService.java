@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +31,6 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.google.common.util.concurrent.AtomicDouble;
 
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
@@ -117,15 +116,16 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
 		var adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(10L));
 		final var sigma10Y = calcStandardDiviation(adjClosePercents);
+		portfolio.setYear10SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma10Y, 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(5L));
 		final var sigma5Y = calcStandardDiviation(adjClosePercents);
+		portfolio.setYear5SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma5Y, 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(2L));
 		final var sigma2Y = calcStandardDiviation(adjClosePercents);
+		portfolio.setYear2SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma2Y, 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
 		final var sigma1Y = calcStandardDiviation(adjClosePercents);
-		final var lastValue = portfolioQuotes.stream()
-				.sorted((calcValues1, calcValues2) -> calcValues1.getLocalDay().compareTo(calcValues2.getLocalDay()))
-				.toList().reversed().stream().findFirst().orElseThrow();
+		portfolio.setYear1SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma1Y, 25, RoundingMode.HALF_EVEN).doubleValue());
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
@@ -143,7 +143,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return standardDeviation;
 	}
 
-	private Map<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes,
+	private LinkedHashMap<LocalDate, BigDecimal> calcClosePercentages(List<DailyQuote> portfolioQuotes,
 			final LocalDate cutOffDate) {
 		record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
 		}
@@ -157,8 +157,10 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 					}
 					lastValue.set(myQuote.getAdjClose());
 					return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
-				}).filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
-				.collect(Collectors.toMap(myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent()));
+				})
+				.sorted((a,b) -> a.localDate().compareTo(b.localDate()))
+				.filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
+				.collect(Collectors.toMap(myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent(), (x, y) -> y, LinkedHashMap::new));
 		return closeAdjPercents;
 	}
 
