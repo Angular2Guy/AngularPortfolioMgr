@@ -66,6 +66,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	record ComparisonSymbols(Symbol es50Symbol, Symbol msciChinaSymbol, Symbol sp500Symbol) {
 	}
 
+	record SymbolSigmas(BigDecimal sigma10Y, BigDecimal sigma5Y, BigDecimal sigma2Y, BigDecimal sigma1Y) {
+	}
+
 	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
 			DailyQuoteRepository dailyQuoteRepository, PortfolioElementRepository portfolioElementRepository) {
 		super(dailyQuoteRepository, currencyService, symbolRepository);
@@ -114,18 +117,62 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private void updateSigmas(final Portfolio portfolio, final PortfolioBase portfolioBase,
 			Collection<Symbol> comparisonSymbols, List<DailyQuote> portfolioQuotes) {
+		this.calcPortfolioSigmas(portfolio, portfolioQuotes);
+		var result = this.calcSymbolSigmas(portfolio, ComparisonIndex.SP500.getSymbol(), comparisonSymbols);
+		portfolio.setYear10SigmaSp500(result.sigma10Y().doubleValue());
+		portfolio.setYear5SigmaSp500(result.sigma5Y().doubleValue());
+		portfolio.setYear2SigmaSp500(result.sigma2Y().doubleValue());
+		portfolio.setYear1SigmaSp500(result.sigma1Y().doubleValue());
+		result = this.calcSymbolSigmas(portfolio, ComparisonIndex.EUROSTOXX50.getSymbol(), comparisonSymbols);
+		portfolio.setYear10SigmaEuroStoxx50(result.sigma10Y().doubleValue());
+		portfolio.setYear5SigmaEuroStoxx50(result.sigma5Y().doubleValue());
+		portfolio.setYear2SigmaEuroStoxx50(result.sigma2Y().doubleValue());
+		portfolio.setYear1SigmaEuroStoxx50(result.sigma1Y().doubleValue());
+		result = this.calcSymbolSigmas(portfolio, ComparisonIndex.MSCI_CHINA.getSymbol(), comparisonSymbols);
+		portfolio.setYear10SigmaMsciChina(result.sigma10Y().doubleValue());
+		portfolio.setYear5SigmaMsciChina(result.sigma5Y().doubleValue());
+		portfolio.setYear2SigmaMsciChina(result.sigma2Y().doubleValue());
+		portfolio.setYear1SigmaMsciChina(result.sigma1Y().doubleValue());
+	}
+
+	private SymbolSigmas calcSymbolSigmas(final Portfolio portfolio, String symbolKey,
+			Collection<Symbol> comparisonSymbols) {
+		var adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
+				LocalDate.now().minusYears(10L));
+		final var sigma10Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
+				RoundingMode.HALF_EVEN);
+		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
+				LocalDate.now().minusYears(5L));
+		final var sigma5Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
+				RoundingMode.HALF_EVEN);
+		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
+				LocalDate.now().minusYears(2L));
+		final var sigma2Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
+				RoundingMode.HALF_EVEN);
+		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
+				LocalDate.now().minusYears(1L));
+		final var sigma1Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
+				RoundingMode.HALF_EVEN);
+		return new SymbolSigmas(sigma10Y, sigma5Y, sigma2Y, sigma1Y);
+	}
+
+	private void calcPortfolioSigmas(final Portfolio portfolio, List<DailyQuote> portfolioQuotes) {
 		var adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(10L));
-		final var sigma10Y = calcStandardDiviation(adjClosePercents);
-		portfolio.setYear10SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma10Y, 25, RoundingMode.HALF_EVEN).doubleValue());
+		portfolio.setYear10SigmaPortfolio(adjClosePercents.lastEntry().getValue()
+				.divide(calcStandardDiviation(adjClosePercents), 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(5L));
-		final var sigma5Y = calcStandardDiviation(adjClosePercents);
-		portfolio.setYear5SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma5Y, 25, RoundingMode.HALF_EVEN).doubleValue());
+		portfolio.setYear5SigmaPortfolio(adjClosePercents.lastEntry().getValue()
+				.divide(calcStandardDiviation(adjClosePercents), 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(2L));
-		final var sigma2Y = calcStandardDiviation(adjClosePercents);
-		portfolio.setYear2SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma2Y, 25, RoundingMode.HALF_EVEN).doubleValue());
+		portfolio.setYear2SigmaPortfolio(adjClosePercents.lastEntry().getValue()
+				.divide(calcStandardDiviation(adjClosePercents), 25, RoundingMode.HALF_EVEN).doubleValue());
 		adjClosePercents = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
-		final var sigma1Y = calcStandardDiviation(adjClosePercents);
-		portfolio.setYear1SigmaPortfolio(adjClosePercents.lastEntry().getValue().divide(sigma1Y, 25, RoundingMode.HALF_EVEN).doubleValue());
+		portfolio.setYear1SigmaPortfolio(adjClosePercents.lastEntry().getValue()
+				.divide(calcStandardDiviation(adjClosePercents), 25, RoundingMode.HALF_EVEN).doubleValue());
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
@@ -157,10 +204,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 					}
 					lastValue.set(myQuote.getAdjClose());
 					return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
-				})
-				.sorted((a,b) -> a.localDate().compareTo(b.localDate()))
-				.filter(myValue -> myValue.closeAdjPercent().longValue() < -900L)
-				.collect(Collectors.toMap(myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent(), (x, y) -> y, LinkedHashMap::new));
+				}).sorted((a, b) -> a.localDate().compareTo(b.localDate()))
+				.filter(myValue -> myValue.closeAdjPercent().longValue() < -900L).collect(Collectors.toMap(
+						myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent(), (x, y) -> y, LinkedHashMap::new));
 		return closeAdjPercents;
 	}
 

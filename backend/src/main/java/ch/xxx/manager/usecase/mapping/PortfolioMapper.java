@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.mapping;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -78,6 +79,18 @@ public class PortfolioMapper {
 		dto.setYear2(portfolio.getYear2());
 		dto.setYear5(portfolio.getYear5());
 		dto.setYear10(portfolio.getYear10());
+
+		final var years = List.of("10", "5", "2", "1");
+
+		final var methods = List.of("%sYear%sCorrelationEuroStoxx50", "%sYear%sCorrelationMsciChina",
+				"%sYear%sCorrelationSp500", "%sYear%sLinRegReturnEuroStoxx50", "%sYear%sLinRegReturnMsciChina",
+				"%sYear%sLinRegReturnSp500", "%sYear%sSigmaEuroStoxx50", "%sYear%sSigmaMsciChina", "%sYear%sSigmaSp500",
+				"%sYear%sSigmaPortfolio");
+
+		years.forEach(myYear -> methods.forEach(myMethodStr -> this.setValue(String.format(myMethodStr, "set", myYear),
+				this.getValue(String.format(myMethodStr, "get", myYear), Double.class, portfolio.getClass()),
+				dto.getClass())));
+
 		dto.setCurrencyKey(portfolio.getCurrencyKey());
 		dto.getSymbols()
 				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
@@ -90,6 +103,27 @@ public class PortfolioMapper {
 			dto.getPortfolioElements().addAll(myPortfolioElements);
 		}
 		return dto;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T, A> T getValue(String methodName, Class<T> returnClass, Class<A> dtoClass) {
+		T result;
+		try {
+			var method = this.getClass().getMethod(methodName);
+			result = (T) method.invoke(dtoClass);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
+	private <A> void setValue(String methodName, Object value, Class<A> dtoClass) {
+		try {
+			var method = this.getClass().getMethod(methodName, value.getClass());
+			method.invoke(dtoClass, value);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Portfolio toEntity(PortfolioDto dto, AppUser appUser) {
