@@ -88,8 +88,7 @@ public class PortfolioMapper {
 				"%sYear%sSigmaPortfolio");
 
 		years.forEach(myYear -> methods.forEach(myMethodStr -> this.setValue(String.format(myMethodStr, "set", myYear),
-				this.getValue(String.format(myMethodStr, "get", myYear), Double.class, portfolio.getClass()),
-				dto.getClass())));
+				Optional.ofNullable(this.getValue(String.format(myMethodStr, "get", myYear), Double.class, portfolio)), dto)));
 
 		dto.setCurrencyKey(portfolio.getCurrencyKey());
 		dto.getSymbols()
@@ -106,24 +105,26 @@ public class PortfolioMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A> T getValue(String methodName, Class<T> returnClass, Class<A> dtoClass) {
+	private <T> T getValue(String methodName, Class<T> returnClass, Object myObject) {
 		T result;
 		try {
-			var method = this.getClass().getMethod(methodName);
-			result = (T) method.invoke(dtoClass);
+			var method = myObject.getClass().getMethod(methodName);
+			result = (T) method.invoke(myObject);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 		return result;
 	}
 
-	private <A> void setValue(String methodName, Object value, Class<A> dtoClass) {
-		try {
-			var method = this.getClass().getMethod(methodName, value.getClass());
-			method.invoke(dtoClass, value);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
+	private void setValue(String methodName, Optional<Object> value, Object myObject) {
+		value.ifPresent(myValue -> {
+			try {
+				var method = myObject.getClass().getMethod(methodName, value.getClass());
+				method.invoke(myObject, value);
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	public Portfolio toEntity(PortfolioDto dto, AppUser appUser) {
