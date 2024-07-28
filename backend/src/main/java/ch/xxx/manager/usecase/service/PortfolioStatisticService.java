@@ -172,7 +172,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.divide(calcStandardDiviation(adjClosePercents2Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
 		final var adjClosePercents1Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
 		portfolio.setYear1SigmaPortfolio(Optional.ofNullable(adjClosePercents1Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
-				.divide(calcStandardDiviation(adjClosePercents1Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
+				.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
