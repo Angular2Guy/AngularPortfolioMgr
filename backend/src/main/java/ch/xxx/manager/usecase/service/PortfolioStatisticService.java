@@ -137,42 +137,58 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 
 	private SymbolSigmas calcSymbolSigmas(final Portfolio portfolio, String symbolKey,
 			Collection<Symbol> comparisonSymbols) {
-		var adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+		final var adjClosePercents10Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(10L));
-		final var sigma10Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
-				RoundingMode.HALF_EVEN);
-		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+		final var sigma10Y = Optional
+				.ofNullable(adjClosePercents10Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN))
+				.orElse(BigDecimal.ZERO);
+		final var adjClosePercents5Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(5L));
-		final var sigma5Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
-				RoundingMode.HALF_EVEN);
-		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+		final var sigma5Y = Optional
+				.ofNullable(adjClosePercents5Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents5Y), 25, RoundingMode.HALF_EVEN))
+				.orElse(BigDecimal.ZERO);
+		final var adjClosePercents2Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(2L));
-		final var sigma2Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
-				RoundingMode.HALF_EVEN);
-		adjClosePercents = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
+		final var sigma2Y = Optional
+				.ofNullable(adjClosePercents2Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents2Y), 25, RoundingMode.HALF_EVEN))
+				.orElse(BigDecimal.ZERO);
+		final var adjClosePercents1Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(1L));
-		final var sigma1Y = adjClosePercents.lastEntry().getValue().divide(calcStandardDiviation(adjClosePercents), 25,
-				RoundingMode.HALF_EVEN);
+		final var sigma1Y = Optional
+				.ofNullable(adjClosePercents1Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents1Y), 25, RoundingMode.HALF_EVEN))
+				.orElse(BigDecimal.ZERO);
 		return new SymbolSigmas(sigma10Y, sigma5Y, sigma2Y, sigma1Y);
 	}
 
 	private void calcPortfolioSigmas(final Portfolio portfolio, List<DailyQuote> portfolioQuotes) {
 		final var adjClosePercents10Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(10L));
-		portfolio.setYear10SigmaPortfolio(Optional.ofNullable(adjClosePercents10Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
-				.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
+		portfolio.setYear10SigmaPortfolio(Optional.ofNullable(adjClosePercents10Y.lastEntry())
+				.map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN).doubleValue())
+				.orElse(0.0D));
 		final var adjClosePercents5Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(5L));
-		portfolio.setYear5SigmaPortfolio(Optional.ofNullable(adjClosePercents5Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
-				.divide(calcStandardDiviation(adjClosePercents5Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
+		portfolio.setYear5SigmaPortfolio(Optional.ofNullable(adjClosePercents5Y.lastEntry())
+				.map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents5Y), 25, RoundingMode.HALF_EVEN).doubleValue())
+				.orElse(0.0D));
 		final var adjClosePercents2Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(2L));
-		portfolio.setYear2SigmaPortfolio(Optional.ofNullable(adjClosePercents2Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
-				.divide(calcStandardDiviation(adjClosePercents2Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
+		portfolio.setYear2SigmaPortfolio(Optional.ofNullable(adjClosePercents2Y.lastEntry())
+				.map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents2Y), 25, RoundingMode.HALF_EVEN).doubleValue())
+				.orElse(0.0D));
 		final var adjClosePercents1Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
-		portfolio.setYear1SigmaPortfolio(Optional.ofNullable(adjClosePercents1Y.lastEntry()).map(lastEntry -> lastEntry.getValue()
-				.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN).doubleValue()).orElse(0.0D));
+		portfolio.setYear1SigmaPortfolio(Optional.ofNullable(adjClosePercents1Y.lastEntry())
+				.map(lastEntry -> lastEntry.getValue()
+						.divide(calcStandardDiviation(adjClosePercents10Y), 25, RoundingMode.HALF_EVEN).doubleValue())
+				.orElse(0.0D));
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {

@@ -119,8 +119,8 @@ public class PortfolioMapper {
 	private void setValue(String methodName, Optional<Object> value, Object myObject) {
 		value.ifPresent(myValue -> {
 			try {
-				var method = myObject.getClass().getMethod(methodName, value.getClass());
-				method.invoke(myObject, value);
+				var method = myObject.getClass().getMethod(methodName, myValue.getClass());
+				method.invoke(myObject, myValue);
 			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
