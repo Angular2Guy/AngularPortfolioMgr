@@ -87,6 +87,7 @@ public class PortfolioMapper {
 				"%sYear%sLinRegReturnSp500", "%sYear%sSigmaEuroStoxx50", "%sYear%sSigmaMsciChina", "%sYear%sSigmaSp500",
 				"%sYear%sSigmaPortfolio");
 
+		//not a Jvm hotspot
 		years.forEach(myYear -> methods.forEach(myMethodStr -> this.setValue(String.format(myMethodStr, "set", myYear),
 				Optional.ofNullable(this.getValue(String.format(myMethodStr, "get", myYear), Double.class, portfolio)), dto)));
 
