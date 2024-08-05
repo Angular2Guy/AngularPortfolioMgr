@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HkDailyQuoteImportDto {
+public class YahooDailyQuoteImportDto {
 	@JsonProperty("Date")
 	@JsonFormat
     (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

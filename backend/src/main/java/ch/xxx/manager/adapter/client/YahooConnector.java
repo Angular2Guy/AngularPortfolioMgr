@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
-import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.usecase.service.YahooClient;
 
 @Component
@@ -41,7 +41,7 @@ public class YahooConnector implements YahooClient {
 	}
 
 	@Override
-	public List<HkDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
+	public List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
 		LocalDateTime toTime = LocalDateTime.now();
 		LocalDateTime fromTime = toTime.minusYears(10);
 		final String myUrl = String.format(
@@ -53,9 +53,9 @@ public class YahooConnector implements YahooClient {
 				.flatMap(response -> this.convert(response).stream()).toList();
 	}
 
-	private List<HkDailyQuoteImportDto> convert(String linesStr) {
+	private List<YahooDailyQuoteImportDto> convert(String linesStr) {
 		try {
-			MappingIterator<HkDailyQuoteImportDto> mappingIterator = csvMapper.readerFor(HkDailyQuoteImportDto.class)
+			MappingIterator<YahooDailyQuoteImportDto> mappingIterator = csvMapper.readerFor(YahooDailyQuoteImportDto.class)
 					.with(CsvSchema.emptySchema().withHeader()).readValues(linesStr);
 			return mappingIterator.readAll();
 		} catch (IOException e) {

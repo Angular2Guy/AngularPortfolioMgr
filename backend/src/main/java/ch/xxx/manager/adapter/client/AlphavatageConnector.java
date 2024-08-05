@@ -21,11 +21,8 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
-import ch.xxx.manager.domain.model.dto.DailyWrapperImportDto;
-import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.usecase.service.AlphavatageClient;
-import ch.xxx.manager.usecase.service.QuoteImportService.UserKeys;
 import jakarta.annotation.PostConstruct;
 
 @Component
@@ -54,26 +51,6 @@ public class AlphavatageConnector implements AlphavatageClient {
 				symbol, this.apiKey);
 		LOGGER.info(myUrl);
 		return this.connectorClient.restCall(myUrl, AlphaOverviewImportDto.class);
-	}
-
-	@Override
-	public Optional<IntraDayWrapperImportDto> getTimeseriesIntraDay(String symbol, UserKeys userKeys) {
-			final String myUrl = String.format(
-					"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&outputsize=full&apikey=%s",
-					symbol, userKeys.alphavantageKey());
-			LOGGER.info(myUrl);
-			return this.connectorClient.restCall(myUrl, IntraDayWrapperImportDto.class);
-	}
-
-	@Override
-	public Optional<DailyWrapperImportDto> getTimeseriesDailyHistory(String symbol, boolean fullSeries, UserKeys userKeys) {
-			final String fullSeriesStr = fullSeries ? "&outputsize=full" : "";
-			final String urlBase = false
-					? "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s%s&apikey=%s"
-					: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s%s&apikey=%s";
-			final String myUrl = String.format(urlBase, symbol, fullSeriesStr, userKeys.alphavantageKey());
-			LOGGER.info(myUrl);
-			return this.connectorClient.restCall(myUrl, DailyWrapperImportDto.class);
 	}
 
 	@Override

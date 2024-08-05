@@ -120,13 +120,7 @@ public class QuoteController {
 	@GetMapping("/import/intraday/symbol/{symbol}")
 	public Long importIntraDayQuotes(@PathVariable("symbol") String symbol,
 			@RequestHeader("authorization") String token) {
-		AppUserDto appUserDto = this.appUserService.loadByName(this.jwtTokenProvider.getUsername(this.jwtTokenProvider
-				.resolveToken(token).orElseThrow(() -> new AuthenticationException("Invalid token."))), true);		
-		String alphavantageKey = this.symbolImportService.decrypt(appUserDto.getAlphavantageKey(),
-				UUID.fromString(appUserDto.getUuid()));
-		String rapidApiKey = this.symbolImportService.decrypt(appUserDto.getRapidApiKey(),
-				UUID.fromString(appUserDto.getUuid()));
-		return this.quoteImportService.importIntraDayQuotes(symbol, new UserKeys(alphavantageKey, rapidApiKey));
+		return 0L;
 	}
 
 	@GetMapping("/import/daily/currency/{to_curr}")

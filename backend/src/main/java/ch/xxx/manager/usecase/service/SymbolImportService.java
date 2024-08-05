@@ -119,14 +119,6 @@ public class SymbolImportService {
 					Duration.ofSeconds(20), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Daily Quote import done for: {}", quoteCount);
-		final AtomicLong indexIntraDay = new AtomicLong(symbolsToUpdate.size());
-		quoteCount = symbolsToUpdate.stream().flatMap(mySymbol -> {
-			var myIndex = indexIntraDay.addAndGet(-1L);
-			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
-			return Stream.of(this.quoteImportService.importIntraDayQuotes(mySymbol.getSymbol(), Duration.ofSeconds(20),
-					allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
-		}).reduce(0L, (acc, value) -> acc + value);
-		LOGGER.info("Intraday Quote import done for: {}", quoteCount);
 		LOGGER.info("updateSymbolQuotes done.");
 		return CompletableFuture.completedFuture(quoteCount);
 	}
@@ -284,7 +276,7 @@ public class SymbolImportService {
 				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));
 		Symbol entity = new Symbol(null, symbol,
 				strParts[2].substring(0, strParts[2].length() < 100 ? strParts[2].length() : 100), CurrencyKey.EUR,
-				QuoteSource.ALPHAVANTAGE);
+				QuoteSource.YAHOO);
 		return Stream.of(entity);
 	}
 
@@ -293,7 +285,7 @@ public class SymbolImportService {
 		Symbol entity = new Symbol(null,
 				strParts[0].substring(0, strParts[0].length() < 15 ? strParts[0].length() : 15),
 				strParts[1].substring(0, strParts[1].length() < 100 ? strParts[1].length() : 100), CurrencyKey.USD,
-				QuoteSource.ALPHAVANTAGE);
+				QuoteSource.YAHOO);
 		return Stream.of(entity);
 	}
 }

@@ -14,8 +14,8 @@ package ch.xxx.manager.usecase.service;
 
 import java.util.List;
 
-import ch.xxx.manager.domain.model.dto.HkDailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 
 public interface YahooClient {
-	List<HkDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol);
+	List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol);
 }
