@@ -21,7 +21,6 @@ import ch.xxx.manager.adapter.repository.JpaAppUserRepository;
 import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
 import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
 import ch.xxx.manager.adapter.repository.JpaFinancialElementRepository;
-import ch.xxx.manager.adapter.repository.JpaIntraDayQuoteRepository;
 import ch.xxx.manager.adapter.repository.JpaPortfolioElementRepository;
 import ch.xxx.manager.adapter.repository.JpaPortfolioRepository;
 import ch.xxx.manager.adapter.repository.JpaPortfolioToSymbolRepository;
@@ -67,8 +66,6 @@ public class BaseControllerTest {
 	protected JpaDailyQuoteRepository jpaDailyQuoteRepository;
 	@MockBean
 	protected JpaFinancialElementRepository jpaFinancialElementRepository;
-	@MockBean
-	protected JpaIntraDayQuoteRepository jpaIntraDayQuoteRepository;
 	@MockBean
 	protected JpaPortfolioElementRepository jpaPortfolioElementRepository;
 	@MockBean

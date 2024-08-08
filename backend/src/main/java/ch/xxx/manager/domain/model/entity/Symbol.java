@@ -56,8 +56,6 @@ public class Symbol extends EntityBase {
 	private QuoteSource quoteSource;
 	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
 	private Set<DailyQuote> dailyQuotes = new HashSet<>();
-	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
-	private Set<IntraDayQuote> intraDayQuotes = new HashSet<>();
 	@OneToMany(mappedBy = "symbol")
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
 
@@ -104,14 +102,6 @@ public class Symbol extends EntityBase {
 
 	public void setDailyQuotes(Set<DailyQuote> dailyQuotes) {
 		this.dailyQuotes = dailyQuotes;
-	}
-
-	public Set<IntraDayQuote> getIntraDayQuotes() {
-		return intraDayQuotes;
-	}
-
-	public void setIntraDayQuotes(Set<IntraDayQuote> intraDayQuotes) {
-		this.intraDayQuotes = intraDayQuotes;
 	}
 
 	public Set<PortfolioToSymbol> getPortfolioToSymbols() {

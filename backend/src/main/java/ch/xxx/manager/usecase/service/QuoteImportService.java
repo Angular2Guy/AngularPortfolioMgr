@@ -12,13 +12,9 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,18 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
-import ch.xxx.manager.domain.model.dto.IntraDayMetaDataImportDto;
-import ch.xxx.manager.domain.model.dto.IntraDayQuoteImportDto;
-import ch.xxx.manager.domain.model.dto.IntraDayWrapperImportDto;
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.Currency;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
-import ch.xxx.manager.domain.model.entity.IntraDayQuote;
-import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
 import ch.xxx.manager.domain.model.entity.Sector;
 import ch.xxx.manager.domain.model.entity.SectorRepository;
 import ch.xxx.manager.domain.model.entity.Symbol;
@@ -58,23 +48,19 @@ public class QuoteImportService {
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
-	private final AlphavatageClient alphavatageClient;
 	private final YahooClient yahooClient;
 	private final RapidApiClient rapidApiClient;
 	private final DailyQuoteRepository dailyQuoteRepository;
-	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final SymbolRepository symbolRepository;
 	private final CurrencyService currencyService;
 	private final SectorRepository sectorRepository;
 
-	public QuoteImportService(AlphavatageClient alphavatageConnector, YahooClient yahooConnector,
-			DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
+	public QuoteImportService(YahooClient yahooConnector,
+			DailyQuoteRepository dailyQuoteRepository, 
 			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
 			SectorRepository sectorRepository, AppUserRepository appUserRepository) {
-		this.alphavatageClient = alphavatageConnector;
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
-		this.intraDayQuoteRepository = intraDayQuoteRepository;
 		this.symbolRepository = symbolRepository;
 		this.currencyService = currencyService;
 		this.rapidApiClient = rapidApiClient;
@@ -158,8 +144,8 @@ public class QuoteImportService {
 			throw new RuntimeException(e);
 		}
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE -> this.alphavatageClient.importCompanyProfile(symbol).stream()
-				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+		case ALPHAVANTAGE -> this.rapidApiClient.importCompanyProfile(symbol).stream()
+		.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).stream()
 				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
@@ -177,21 +163,6 @@ public class QuoteImportService {
 		symbol.setSectorStr(dto.getAssetProfile().getSector());
 		Sector sector = new Sector();
 		sector.setYahooName(dto.getAssetProfile().getSector());
-		sector.getSymbols().add(symbol);
-		sector = this.sectorRepository.save(sector);
-		symbol.setSector(sector);
-		return symbol;
-	}
-
-	private Symbol updateSymbol(AlphaOverviewImportDto dto, Symbol symbol) {
-		LOGGER.info("AlphaOverviewImportDto {}", dto);
-		symbol.setAddress(dto.getAddress());
-		symbol.setCountry(dto.getCountry());
-		symbol.setDescription(dto.getDescription());
-		symbol.setIndustry(dto.getIndustry());
-		symbol.setSectorStr(dto.getSector());
-		Sector sector = new Sector();
-		sector.setAlphavantageName(dto.getSector());
 		sector.getSymbols().add(symbol);
 		sector = this.sectorRepository.save(sector);
 		symbol.setSector(sector);
@@ -230,39 +201,11 @@ public class QuoteImportService {
 		return entity;
 	}
 
-	private List<IntraDayQuote> convert(Symbol symbolEntity, IntraDayWrapperImportDto wrapper) {
-		List<IntraDayQuote> quotes = wrapper.getDailyQuotes().entrySet().stream()
-				.map(entry -> this.convert(symbolEntity, entry.getKey(), entry.getValue()))
-				.collect(Collectors.toList());
-		return quotes;
-	}
-
-	private IntraDayQuote convert(Symbol symbolEntity, String dateStr, IntraDayQuoteImportDto dto) {
-		IntraDayQuote entity = new IntraDayQuote(null, symbolEntity.getSymbol(), new BigDecimal(dto.getOpen()),
-				new BigDecimal(dto.getHigh()), new BigDecimal(dto.getLow()), new BigDecimal(dto.getClose()),
-				Long.parseLong(dto.getVolume()),
-				LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), symbolEntity,
-				symbolEntity.getCurrencyKey());
-		symbolEntity.getIntraDayQuotes().add(entity);
-		return entity;
-	}
-
-	private List<IntraDayQuote> saveAllIntraDayQuotes(Collection<IntraDayQuote> entities) {
-		LOGGER.info("importIntraDayQuotes() {} to import", entities.size());
-		return this.intraDayQuoteRepository.saveAll(entities);
-	}
-
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
 		if (entities != null && !entities.isEmpty()) {
 			this.dailyQuoteRepository.deleteAll(this.dailyQuoteRepository.findBySymbol(entities.get(0).getSymbolKey()));
 		}
 		return this.dailyQuoteRepository.saveAll(entities);
-	}
-
-	private Long deleteIntraDayQuotes(List<IntraDayQuote> entities) {
-		LOGGER.info("deleteIntraDayQuotes() {} to delete", entities.size());
-		this.intraDayQuoteRepository.deleteAll(entities);
-		return Integer.valueOf(entities.size()).longValue();
 	}
 }

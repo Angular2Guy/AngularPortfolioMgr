@@ -28,7 +28,6 @@ import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.dto.ImportDataDto;
 import ch.xxx.manager.domain.model.dto.QuoteDto;
 import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
-import ch.xxx.manager.domain.model.entity.IntraDayQuoteRepository;
 import ch.xxx.manager.usecase.mapping.QuoteMapper;
 
 @Service
@@ -36,14 +35,12 @@ import ch.xxx.manager.usecase.mapping.QuoteMapper;
 public class QuoteService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteService.class);
 	private final DailyQuoteRepository dailyQuoteRepository;
-	private final IntraDayQuoteRepository intraDayQuoteRepository;
 	private final QuoteMapper quoteMapper;
 	private final FileClient fileClient;
 
-	public QuoteService(DailyQuoteRepository dailyQuoteRepository, IntraDayQuoteRepository intraDayQuoteRepository,
+	public QuoteService(DailyQuoteRepository dailyQuoteRepository, 
 			QuoteMapper quoteMapper, @Qualifier("Stock") FileClient fileClient) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
-		this.intraDayQuoteRepository = intraDayQuoteRepository;
 		this.quoteMapper = quoteMapper;
 		this.fileClient = fileClient;
 	}
@@ -59,8 +56,7 @@ public class QuoteService {
 	}
 
 	public List<QuoteDto> getIntraDayQuotes(String symbol) {
-		return this.intraDayQuoteRepository.findBySymbol(symbol).stream()
-				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
+		return List.of();
 	}
 	
 	@Async
