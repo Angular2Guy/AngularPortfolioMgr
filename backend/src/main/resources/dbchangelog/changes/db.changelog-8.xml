@@ -35,4 +35,7 @@
 			<column name="year10sigma_portfolio" type="double" />
 		</addColumn>	
 	</changeSet>
+	<changeSet id="43" author="angular2guy">
+		<dropTable tableName="intra_day_quote"/>
+	</changeSet>
 </databaseChangeLog>
