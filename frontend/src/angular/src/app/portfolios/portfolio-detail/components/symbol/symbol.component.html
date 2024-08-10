@@ -68,11 +68,6 @@
         class="my-radio-button"
         *ngFor="let myQuotePeriod of quotePeriods"
         [value]="myQuotePeriod"
-        [disabled]="
-          !quotesLoading &&
-          !isIntraDayDataAvailiable(symbol) &&
-          myQuotePeriod.quotePeriodKey === quotePeriodKeyDay
-        "
       >
         {{ myQuotePeriod.periodText }}
       </mat-radio-button>

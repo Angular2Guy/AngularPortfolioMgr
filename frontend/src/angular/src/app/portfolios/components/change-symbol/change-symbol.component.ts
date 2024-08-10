@@ -59,14 +59,17 @@ export class ChangeSymbolComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const startChangedAt = DateTime.fromISO('2000-01-01');
+    const startChangedAt = DateTime.fromISO("2000-01-01");
     this.symbolForm.controls[FormFields.ChangedAt].valueChanges
       .pipe(
         filter(
-          (myChangedAt: DateTime) => !!myChangedAt && myChangedAt.toMillis() >= startChangedAt.toMillis()),
+          (myChangedAt: DateTime) =>
+            !!myChangedAt &&
+            myChangedAt.toMillis() >= startChangedAt.toMillis(),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((value: DateTime) => this.changedAt = value);
+      .subscribe((value: DateTime) => (this.changedAt = value));
     this.symbolForm.controls[FormFields.SymbolWeight].valueChanges
       .pipe(
         filter((value: number) => !!("" + value).match(/^[\d]+$/g)),
@@ -89,11 +92,11 @@ export class ChangeSymbolComponent implements OnInit {
         this.dialogRef.close(this.data);
       }
     } else {
-	  try {
-	  	this.data.changedAt = this.changedAt.toISO().split("+")[0];
-	  } catch(e) {
-		this.data.changedAt = DateTime.now().toISO().split("+")[0];
-	  }      
+      try {
+        this.data.changedAt = this.changedAt.toISO().split("+")[0];
+      } catch (e) {
+        this.data.changedAt = DateTime.now().toISO().split("+")[0];
+      }
       this.data.weight = 0;
       //console.log(this.data);
       this.dialogRef.close(this.data);

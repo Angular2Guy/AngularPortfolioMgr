@@ -17,7 +17,7 @@ export interface Portfolio extends CommonValues {
   userId: number;
   symbols: Symbol[];
   portfolioElements: PortfolioElement[];
-  
+
   year1CorrelationSp500?: number;
   year1CorrelationMsciChina?: number;
   year1CorrelationEuroStoxx50?: number;

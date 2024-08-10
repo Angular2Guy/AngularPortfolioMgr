@@ -29,12 +29,6 @@ export class QuoteService {
     return this.http.get<Quote[]>(`/rest/quote/daily/all/symbol/${symbol}`);
   }
 
-  getIntraDayQuotes(symbol: string): Observable<Quote[]> {
-    return this.http.get<Quote[]>(
-      `/rest/quote/intraday/symbol/${encodeURI(symbol)}`,
-    );
-  }
-
   getDailyQuotesFromStartToEnd(
     symbol: string,
     start: Date,

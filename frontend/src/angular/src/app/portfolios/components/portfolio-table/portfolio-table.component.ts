@@ -112,8 +112,12 @@ export class PortfolioTableComponent implements OnInit {
               mySymbol.id,
               result.changedAt,
             )
-            .pipe(mergeMap(xyz => this.portfolioService.getPortfolioById(myPortfolio.id)), 
-            	takeUntilDestroyed(this.destroyRef))
+            .pipe(
+              mergeMap((xyz) =>
+                this.portfolioService.getPortfolioById(myPortfolio.id),
+              ),
+              takeUntilDestroyed(this.destroyRef),
+            )
             .subscribe((myResult) => (this.localPortfolio = myResult));
         }
       });
