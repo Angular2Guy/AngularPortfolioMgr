@@ -81,11 +81,6 @@ public class QuoteController {
 				.map(DailyQuoteEntityDto::dto).toList();
 	}
 
-	@GetMapping("/intraday/symbol/{symbol}")
-	public List<QuoteDto> getIntraDayQuotes(@PathVariable("symbol") String symbol) {
-		return this.quoteService.getIntraDayQuotes(symbol);
-	}
-
 	@GetMapping("/daily/symbol/{symbol}/start/{start}/end/{end}")
 	public List<QuoteDto> getDailyQuotesFromStartToEnd(@PathVariable("symbol") String symbol,
 			@PathVariable("start") String isodateStart, @PathVariable("end") String isodateEnd) {

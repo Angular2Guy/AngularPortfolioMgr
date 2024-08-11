@@ -55,10 +55,6 @@ public class QuoteService {
 				.flatMap(quote -> Stream.of(this.quoteMapper.convert(quote))).collect(Collectors.toList());
 	}
 
-	public List<QuoteDto> getIntraDayQuotes(String symbol) {
-		return List.of();
-	}
-	
 	@Async
 	public void importUsDailyQuotes(ImportDataDto importFinancialDataDto) {
 //		LOGGER.info("ImportUsDailyQuotes.");
