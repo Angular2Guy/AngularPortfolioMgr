@@ -30,6 +30,7 @@ import { PortfolioTimechartComponent } from "./components/portfolio-timechart/po
 import { CalendarService } from "./service/calendar.service";
 import { NewsListComponent } from "./components/news-list/news-list.component";
 import { NewsService } from "./service/news.service";
+import { PortfolioStatsComponent } from "./components/portfolio-stats/portfolio-stats.component";
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { NewsService } from "./service/news.service";
     PortfolioSectorsComponent,
     PortfolioTimechartComponent,
     NewsListComponent,
+	PortfolioStatsComponent
   ],
   imports: [
     BaseModule,
