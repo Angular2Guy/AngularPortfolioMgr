@@ -27,6 +27,14 @@
         ></app-portfolio-timechart>
       </ng-template>
     </mat-tab>
+    <mat-tab i18n-label="@@portfolioChartsStats"
+      label="Portfolio Stats">
+    	<ng-template matTabContent>
+        <app-portfolio-stats
+          [selPortfolio]="selPortfolio"
+        ></app-portfolio-stats>
+      </ng-template>
+    </mat-tab>
     <mat-tab label="Yahoo Finance" i18n-label="@@portfolioChartsYahooFinance"
       ><app-news-list [newsItems]="yahooFinanceNews"></app-news-list
     ></mat-tab>
