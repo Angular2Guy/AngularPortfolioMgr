@@ -27,13 +27,6 @@ secret:
   nameApp: app-env-secret
   nameDb: db-env-secret
   nameKafka: kafka-env-secret
-  nameZookeeper: zookeeper-env-secret
-
-envZookeeper:
-  normal: 
-    ALLOW_ANONYMOUS_LOGIN: yes
-  secret:
-   ZOOKEEPER_TICK_TIME: "2000"
     
 envKafka:
   normal: 

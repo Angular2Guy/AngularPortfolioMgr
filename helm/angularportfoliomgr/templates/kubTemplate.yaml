@@ -28,16 +28,6 @@ data:
   {{ $key }}: {{ $val | b64enc }}
   {{- end}}
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Values.secret.nameZookeeper }}
-type: Opaque
-data:
-  {{- range $key, $val := .Values.envZookeeper.secret }}
-  {{ $key }}: {{ $val | b64enc }}
-  {{- end}}
----
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -123,51 +113,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.zookeeperName }}
-  labels:
-    app: {{ .Values.zookeeperName }}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Values.zookeeperName }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.zookeeperName }}
-    spec:
-      containers:
-      - name: {{ .Values.zookeeperName }}
-        image: "{{ .Values.zookeeperImageName }}:{{ .Values.zookeeperImageVersion }}"
-        resources:
-          limits:
-            memory: "512M"
-            cpu: "0.3"
-          requests:
-            memory: "384M"
-            cpu: "0.1"
-        env:
-          {{- include "helpers.list-envZookeeper-variables" . | indent 10 }}
-        ports:
-        - containerPort: 2181
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Values.zookeeperServiceName }}
-  labels:
-    app: {{ .Values.zookeeperServiceName }}
-spec:
-  ports:
-  - port: 2181
-    protocol: TCP
-  selector:
-    app: {{ .Values.zookeeperName }}
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: {{ .Values.kafkaName }}
   labels:
     app: {{ .Values.kafkaName }}
@@ -208,8 +153,13 @@ metadata:
     app: {{ .Values.kafkaServiceName }}
 spec:
   ports:
-  - port: 9092
+  - name: tcp-client
+    port: 9092
     protocol: TCP
+  - name: tcp-interbroker
+    port: 9093
+    protocol: TCP
+    targetPort: 9093
   selector:
     app: {{ .Values.kafkaName }}    
 ---
