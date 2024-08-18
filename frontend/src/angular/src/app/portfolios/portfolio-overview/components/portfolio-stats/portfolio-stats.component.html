@@ -1,25 +1,25 @@
 <h1 i18n="@@portfolioStatsHeading">Portfolio Statistics</h1>
 <div class="grid-container">
 	@for(year of years; track year) {
-	<div class="grid-element">Year{{year}}CorrelationSp500:</div>
+	<div class="grid-element" i18n="@@portfolioStatsCorrelationSp500">Year{{year}}CorrelationSp500:</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationSp500'] || 0}}</div>
-	<div class="grid-element">Year{{year}}CorrelationMsciChina</div>
+	<div class="grid-element" i18n="@@portfolioStatsCorrelationMsciChina">Year{{year}}CorrelationMsciChina</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationMsciChina'] || 0}}</div>
-	<div class="grid-element">Year{{year}}CorrelationEuroStoxx50</div>
+	<div class="grid-element" i18n="@@portfolioStatsCorrelationEuroStoxx50">Year{{year}}CorrelationEuroStoxx50</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationEuroStoxx50'] || 0}}</div>
-	<div class="grid-element">Year{{year}}LinRegReturnSp500</div>
+	<div class="grid-element" i18n="@@portfolioStatsLinRegReturnSp500">Year{{year}}LinRegReturnSp500</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'LinRegReturnSp500'] || 0}}</div>
-	<div class="grid-element">year{{year}}LinRegReturnMsciChina</div>
+	<div class="grid-element" i18n="@@portfolioStatsLinRegMsciChina">year{{year}}LinRegReturnMsciChina</div>
 	<div class="grid-element">{{selPortfolio['year'+year+'LinRegReturnMsciChina'] || 0}}</div>
-	<div class="grid-element">Year{{year}}LinRegReturnEuroStoxx50</div>
+	<div class="grid-element" i18n="@@portfolioStatsLinRegEuroStoxx50">Year{{year}}LinRegReturnEuroStoxx50</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'LinRegReturnEuroStoxx50'] || 0}}</div>
-	<div class="grid-element">Year{{year}}SigmaSp500</div>
+	<div class="grid-element" i18n="@@portfolioStatsSigmaSp500">Year{{year}}SigmaSp500</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaSp500'] || 0}}</div>
-	<div class="grid-element">Year{{year}}SigmaMsciChina</div>
+	<div class="grid-element" i18n="@@portfolioStatsSigmaMsciChina">Year{{year}}SigmaMsciChina</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaMsciChina'] || 0}}</div>
-	<div class="grid-element">Year{{year}}SigmaEuroStoxx50</div>
+	<div class="grid-element" i18n="@@portfolioStatsSigmaEuroStoxx50">Year{{year}}SigmaEuroStoxx50</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaEuroStoxx50'] || 0}}</div>
-	<div class="grid-element">Year{{year}}SigmaPortfolio</div>
+	<div class="grid-element" i18n="@@portfolioStatsSigmaPortfolio">Year{{year}}SigmaPortfolio</div>
 	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaPortfolio'] || 0}}</div>
 	<div class="grid-element"></div>
 	<div class="grid-element"></div>
