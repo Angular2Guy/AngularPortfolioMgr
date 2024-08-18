@@ -30,11 +30,11 @@ public class ConnectorClient {
 	private RestClient restClient;
 	
 	public ConnectorClient() {
-		var requestConfig = RequestConfig.custom().setResponseTimeout(Timeout.ofMilliseconds(5000)).build();
+		var requestConfig = RequestConfig.custom().setResponseTimeout(Timeout.ofMilliseconds(10000)).build();
 		var httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 		var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-		factory.setConnectTimeout(2000);
-		factory.setConnectionRequestTimeout(2000);
+		factory.setConnectTimeout(5000);
+		factory.setConnectionRequestTimeout(5000);
 		this.restClient = RestClient.builder().requestFactory(factory).build();
 	}
 
