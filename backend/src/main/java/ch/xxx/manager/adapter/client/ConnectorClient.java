@@ -15,7 +15,9 @@ package ch.xxx.manager.adapter.client;
 import java.util.Optional;
 
 import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -28,10 +30,12 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 @Component
 public class ConnectorClient {
 	private RestClient restClient;
-	
+
 	public ConnectorClient() {
 		var requestConfig = RequestConfig.custom().setResponseTimeout(Timeout.ofMilliseconds(10000)).build();
-		var httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+		var httpClient = HttpClientBuilder.create()
+				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(1, TimeValue.ofSeconds(1)))
+				.setDefaultRequestConfig(requestConfig).build();
 		var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 		factory.setConnectTimeout(5000);
 		factory.setConnectionRequestTimeout(5000);
@@ -56,7 +60,6 @@ public class ConnectorClient {
 	}
 
 	private ResponseSpec createCall(String url, MultiValueMap<String, String> headerValues) {
-		return this.restClient.get().uri(url)
-				.headers(headers -> headers.addAll(headerValues)).retrieve();
+		return this.restClient.get().uri(url).headers(headers -> headers.addAll(headerValues)).retrieve();
 	}
 }
