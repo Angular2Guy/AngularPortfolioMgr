@@ -1,2 +1,35 @@
-<p>portfolio-stats works!</p>
-{{ selPortfolio | json }}
+<h1 i18n="@@portfolioStatsHeading">Portfolio Statistics</h1>
+<div class="grid-container">
+	@for(year of years; track year) {
+	<div class="grid-element">Year{{year}}CorrelationSp500:</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationSp500'] || 0}}</div>
+	<div class="grid-element">Year{{year}}CorrelationMsciChina</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationMsciChina'] || 0}}</div>
+	<div class="grid-element">Year{{year}}CorrelationEuroStoxx50</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'CorrelationEuroStoxx50'] || 0}}</div>
+	<div class="grid-element">Year{{year}}LinRegReturnSp500</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'LinRegReturnSp500'] || 0}}</div>
+	<div class="grid-element">year{{year}}LinRegReturnMsciChina</div>
+	<div class="grid-element">{{selPortfolio['year'+year+'LinRegReturnMsciChina'] || 0}}</div>
+	<div class="grid-element">Year{{year}}LinRegReturnEuroStoxx50</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'LinRegReturnEuroStoxx50'] || 0}}</div>
+	<div class="grid-element">Year{{year}}SigmaSp500</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaSp500'] || 0}}</div>
+	<div class="grid-element">Year{{year}}SigmaMsciChina</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaMsciChina'] || 0}}</div>
+	<div class="grid-element">Year{{year}}SigmaEuroStoxx50</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaEuroStoxx50'] || 0}}</div>
+	<div class="grid-element">Year{{year}}SigmaPortfolio</div>
+	<div class="grid-element">{{ selPortfolio['year'+year+'SigmaPortfolio'] || 0}}</div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	<div class="grid-element"></div>
+	}	
+</div>

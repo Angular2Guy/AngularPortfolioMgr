@@ -10,4 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
- 
+ .grid-container {
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(3, 25% 8.3%);
+ }
+ .grid-element {
+	padding: 5px;
+	min-height: 10px;
+ }
