@@ -33,6 +33,8 @@
 }
 
 .cell:hover {
+  color: blue;
+  cursor: pointer;
   .popup {
     display: block;
     width: 160px;
@@ -46,8 +48,6 @@
     color: blue;
     border: solid 1px black;
   }
-  color: blue;
-  cursor: pointer;
 }
 
 .example-container {
