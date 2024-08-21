@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.file;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -72,7 +73,7 @@ public class SecFileClientBean implements FileClient {
 		Thread shutDownThread = createShutDownThread();
 		Runtime.getRuntime().addShutdownHook(shutDownThread);
 		try(ZipFile initialFile = new ZipFile(this.financialDataImportPath + filename)) {
-			Enumeration<? extends ZipEntry> entries = initialFile.entries();
+			Enumeration<? extends ZipEntry> entries = initialFile.entries();			
 			LocalDateTime startCleanup = LocalDateTime.now();
 			LOGGER.info("Drop indexes.");
 			this.financialDataImportService.dropFeIndexes();
@@ -86,7 +87,7 @@ public class SecFileClientBean implements FileClient {
 				ZipEntry element = entries.nextElement();
 				LocalDateTime start = LocalDateTime.now();
 				if (!element.isDirectory() && element.getSize() > 10) {
-					try(InputStream inputStream = initialFile.getInputStream(element)) {
+					try(InputStream inputStream = new BufferedInputStream(initialFile.getInputStream(element))) {
 						if (first) {
 							LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
 							first = false;
