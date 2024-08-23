@@ -43,7 +43,7 @@ public class YahooConnector implements YahooClient {
 	@Override
 	public List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
 		LocalDateTime toTime = LocalDateTime.now();
-		LocalDateTime fromTime = toTime.minusYears(10);
+		LocalDateTime fromTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 		final String myUrl = String.format(
 				"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),

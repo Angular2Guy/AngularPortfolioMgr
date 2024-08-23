@@ -55,8 +55,7 @@ public class QuoteImportService {
 	private final CurrencyService currencyService;
 	private final SectorRepository sectorRepository;
 
-	public QuoteImportService(YahooClient yahooConnector,
-			DailyQuoteRepository dailyQuoteRepository, 
+	public QuoteImportService(YahooClient yahooConnector, DailyQuoteRepository dailyQuoteRepository,
 			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
 			SectorRepository sectorRepository, AppUserRepository appUserRepository) {
 		this.yahooClient = yahooConnector;
@@ -138,14 +137,16 @@ public class QuoteImportService {
 	private Symbol overviewImport(String symbol, Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Symbol mySymbolEntity = symbolEntity;
-		try {
-			Thread.sleep(myDelay);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+		if (!Duration.ZERO.equals(myDelay)) {
+			try {
+				Thread.sleep(myDelay);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
 		case ALPHAVANTAGE -> this.rapidApiClient.importCompanyProfile(symbol).stream()
-		.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
+				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).stream()
 				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
@@ -172,15 +173,19 @@ public class QuoteImportService {
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
 			Symbol symbolEntity, Duration delay) {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		try {
-			Thread.sleep(myDelay);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+		if (!Duration.ZERO.equals(myDelay)) {
+			try {
+				Thread.sleep(myDelay);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
-				? this.yahooClient.getTimeseriesDailyHistory(symbol).stream().filter(QuoteImportService::filterEmptyValuesDto)
+				? this.yahooClient.getTimeseriesDailyHistory(symbol).stream()
+						.filter(QuoteImportService::filterEmptyValuesDto)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).toList()
-				: this.yahooClient.getTimeseriesDailyHistory(symbol).stream().filter(QuoteImportService::filterEmptyValuesDto)
+				: this.yahooClient.getTimeseriesDailyHistory(symbol).stream()
+						.filter(QuoteImportService::filterEmptyValuesDto)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
 						.filter(dto -> symbolEntity.getDailyQuotes().stream()
 								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
