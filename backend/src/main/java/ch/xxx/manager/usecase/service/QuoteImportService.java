@@ -84,7 +84,7 @@ public class QuoteImportService {
 		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, delay);
 		default -> List.of();
 		};
-		LOGGER.info("{} Dailyquotes for Symbol {} imported", result.size(), symbol);
+		LOGGER.info("{} Dailyquotes for Symbol {} imported from {}", result.size(), symbol, symbolEntity.getQuoteSource());
 		return result;
 	}
 
@@ -105,7 +105,7 @@ public class QuoteImportService {
 //						mySymbol, delay).stream()).count());
 		return symbols.stream()
 				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
-						.flatMap(mySymbol -> Stream.of(this.customImport(symbols.iterator().next().toLowerCase(),
+						.flatMap(mySymbol -> Stream.of(this.customImport(mySymbol.getSymbol().toLowerCase(),
 								this.currencyService.getCurrencyMap(), mySymbol, delay, userKeys)))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
@@ -139,6 +139,7 @@ public class QuoteImportService {
 		final Symbol mySymbolEntity = symbolEntity;
 		if (!Duration.ZERO.equals(myDelay)) {
 			try {
+				LOGGER.info("Sleeping for {}ms(2)", myDelay.toMillis());
 				Thread.sleep(myDelay);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
@@ -175,7 +176,8 @@ public class QuoteImportService {
 		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		if (!Duration.ZERO.equals(myDelay)) {
 			try {
-				Thread.sleep(myDelay);
+				LOGGER.info("Sleeping for {}ms(1)", myDelay.toMillis());
+				Thread.sleep(myDelay);				
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
