@@ -55,9 +55,9 @@ public class XetraConnector implements XetraClient {
 			hrefs.add(matcher.group(1));
 		}
 		// create csv url for the xetra stocks
-		String csvUrl = hrefs.stream().filter(href -> href.contains("allTradableInstruments.csv"))
+		String csvUrl = hrefs.stream().filter(href -> href.contains("t7-xetr-allTradableInstruments.csv"))
 				.map(href -> this.createCsvUrl(href)).findFirst()
-				.orElseThrow(() -> new RuntimeException("allTradableInstruments.csv not found."));
+				.orElseThrow(() -> new RuntimeException("t7-xetr-allTradableInstruments.csv not found."));
 		LOGGER.info(csvUrl);
 		return csvUrl;
 	}

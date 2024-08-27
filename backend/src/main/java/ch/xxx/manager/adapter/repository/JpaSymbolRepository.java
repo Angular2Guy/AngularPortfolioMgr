@@ -25,8 +25,8 @@ import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {	
 	@Query("select s from Symbol s where lower(s.symbol) like %:symbol%")
 	List<Symbol> findBySymbol(@Param(value = "symbol") String symbol);
-	@Query("select s from Symbol s join fetch s.dailyQuotes where lower(s.symbol) = :symbol")
-	List<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
+	@Query("select s from Symbol s where s.quoteSource =  lower(s.symbol) = :symbol")
+	Optional<Symbol> findBySymbolSingle(@Param(value = "symbol") String symbol);
 	@Query("select s from Symbol s where lower(s.name) like %:name%")
 	List<Symbol> findByName(@Param(value = "name") String name);
 	@Query("select s from Symbol s, PortfolioToSymbol pts where s.id = pts.symbol.id and pts.portfolio.id = :portfolioId")

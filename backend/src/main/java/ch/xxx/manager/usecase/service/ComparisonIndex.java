@@ -16,9 +16,9 @@ import ch.xxx.manager.domain.utils.DataHelper;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
 
 public enum ComparisonIndex {
-	SP500("IVV", "S&P 500 ETF", DataHelper.CurrencyKey.USD, QuoteSource.ALPHAVANTAGE),
-	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", DataHelper.CurrencyKey.EUR, QuoteSource.ALPHAVANTAGE),
-	MSCI_CHINA("ICGA.DE", "Msci China ETF", DataHelper.CurrencyKey.USD, QuoteSource.ALPHAVANTAGE);
+	SP500("IVV", "S&P 500 ETF", DataHelper.CurrencyKey.USD, QuoteSource.YAHOO),
+	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", DataHelper.CurrencyKey.EUR, QuoteSource.YAHOO),
+	MSCI_CHINA("ICGA.DE", "Msci China ETF", DataHelper.CurrencyKey.USD, QuoteSource.YAHOO);
 
 	private String symbol;
 	private String name;

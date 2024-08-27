@@ -36,9 +36,11 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	}
 
 	@Override
-	public List<Symbol> findBySymbolSingle(String symbol) {
-		return symbol == null || symbol.isBlank() ? List.of()
-				: this.jpaSymbolRepository.findBySymbolSingle(symbol.trim().toLowerCase());
+	public Optional<Symbol> findBySymbolSingle(String symbol) {
+		return Optional.ofNullable(symbol).stream()
+				.flatMap(
+						mySymbol -> this.jpaSymbolRepository.findBySymbolSingle(mySymbol.trim().toLowerCase()).stream())
+				.findFirst();
 	}
 
 	@Override
@@ -51,7 +53,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public List<Symbol> findByPortfolioId(Long portfolioId) {
 		return this.jpaSymbolRepository.findByPortfolioId(portfolioId);
 	}
-	
+
 	@Override
 	public List<Symbol> findAll() {
 		return this.jpaSymbolRepository.findAll();
@@ -61,7 +63,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public Symbol save(Symbol symbol) {
 		return this.jpaSymbolRepository.save(symbol);
 	}
-	
+
 	@Override
 	public List<Symbol> saveAll(Iterable<Symbol> symbols) {
 		return this.jpaSymbolRepository.saveAll(symbols);
@@ -76,7 +78,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public List<Symbol> findByQuoteSource(QuoteSource quoteSource) {
 		return this.jpaSymbolRepository.findByQuoteSource(quoteSource);
 	}
-	
+
 	@Override
 	public void deleteAll(Iterable<Symbol> symbols) {
 		this.jpaSymbolRepository.deleteAll(symbols);
