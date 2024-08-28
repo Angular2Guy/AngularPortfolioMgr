@@ -36,11 +36,11 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	}
 
 	@Override
-	public Optional<Symbol> findBySymbolSingle(String symbol) {
+	public List<Symbol> findBySymbolSingle(String symbol) {
 		return Optional.ofNullable(symbol).stream()
 				.flatMap(
 						mySymbol -> this.jpaSymbolRepository.findBySymbolSingle(mySymbol.trim().toLowerCase()).stream())
-				.findFirst();
+				.toList();
 	}
 
 	@Override
