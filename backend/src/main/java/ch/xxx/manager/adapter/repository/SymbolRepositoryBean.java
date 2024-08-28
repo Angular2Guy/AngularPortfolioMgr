@@ -88,4 +88,9 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public Optional<Symbol> findByIdWithDailyQuotes(Long symbolId) {
 		return this.jpaSymbolRepository.findByIdWithDailyQuotes(symbolId);
 	}
+
+	@Override
+	public List<Symbol> findBySymbolSingleWithQuotes(String symbol) {
+		return this.jpaSymbolRepository.findBySymbolSingleWithQuotes(symbol);
+	}
 }

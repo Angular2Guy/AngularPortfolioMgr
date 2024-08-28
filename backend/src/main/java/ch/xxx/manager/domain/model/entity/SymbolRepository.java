@@ -20,6 +20,7 @@ import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
 public interface SymbolRepository {
 	List<Symbol> findBySymbol(String symbol);
 	List<Symbol> findBySymbolSingle(String symbol);
+	List<Symbol> findBySymbolSingleWithQuotes(String symbol);
 	List<Symbol> findByName(String name);
 	List<Symbol> findByPortfolioId(Long portfolioId);
 	List<Symbol> findAll();

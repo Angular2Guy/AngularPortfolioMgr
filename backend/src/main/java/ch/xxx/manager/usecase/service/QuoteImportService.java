@@ -104,13 +104,19 @@ public class QuoteImportService {
 //				.flatMap(mySymbol -> this.customImport(symbols.iterator().next().toLowerCase(), this.currencyService.getCurrencyMap(),
 //						mySymbol, delay).stream()).count());
 		return symbols.stream()
-				.flatMap(symbol -> Stream.of(this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
+				.flatMap(symbol -> Stream.of(this.findSymbolsFor(symbol.toLowerCase()).stream()
 						.flatMap(mySymbol -> Stream.of(this.customImport(mySymbol.getSymbol().toLowerCase(),
 								this.currencyService.getCurrencyMap(), mySymbol, delay, userKeys)))
 						.map(values -> this.saveAllDailyQuotes(values)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}
 
+	private List<Symbol> findSymbolsFor(String symbol) {
+		var withQuotes = this.symbolRepository.findBySymbolSingleWithQuotes(symbol.toLowerCase());
+		var result = withQuotes.isEmpty() ? this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()) : withQuotes;
+		return result;
+	}
+	
 	public void storeDailyQuoteData(
 			List<ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto> dailyQuoteImportDtos) {
 		Map<String, Symbol> symbolMap = dailyQuoteImportDtos.stream().map(myDto -> myDto.getSymbol()).distinct()
