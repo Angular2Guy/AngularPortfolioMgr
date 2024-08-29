@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class AlphavatageConnector implements AlphavatageClient {
 		final String myUrl = String.format("https://www.alphavantage.co/query?function=OVERVIEW&symbol=%s&apikey=%s",
 				symbol, this.apiKey);
 		LOGGER.info(myUrl);
-		return this.connectorClient.restCall(myUrl, AlphaOverviewImportDto.class);
+		return this.connectorClient.restCall(myUrl, AlphaOverviewImportDto.class, Duration.ofMillis(100));
 	}
 
 	@Override
@@ -61,6 +62,6 @@ public class AlphavatageConnector implements AlphavatageClient {
 					"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=%s%s&apikey=%s",
 					from_currency, to_currency, fullSeriesStr, this.apiKey);
 			LOGGER.info(myUrl);
-			return this.connectorClient.restCall(myUrl, DailyFxWrapperImportDto.class);
+			return this.connectorClient.restCall(myUrl, DailyFxWrapperImportDto.class, Duration.ofMillis(100));
 	}
 }

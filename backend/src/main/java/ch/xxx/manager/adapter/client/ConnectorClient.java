@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -19,6 +20,8 @@ import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,7 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 
 @Component
 public class ConnectorClient {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorClient.class);
 	private RestClient restClient;
 
 	public ConnectorClient() {
@@ -42,24 +46,42 @@ public class ConnectorClient {
 		this.restClient = RestClient.builder().requestFactory(factory).build();
 	}
 
+	public <T> Optional<T> restCall(String url, Class<T> typeClass, Duration delay) {
+		return restCall(url, new LinkedMultiValueMap<String, String>(), typeClass, delay);
+	}
+	
 	public <T> Optional<T> restCall(String url, Class<T> typeClass) {
-		return restCall(url, new LinkedMultiValueMap<String, String>(), typeClass);
+		return restCall(url, new LinkedMultiValueMap<String, String>(), typeClass, Duration.ZERO);
 	}
 
 	public <T> Optional<T> restCall(String url, ParameterizedTypeReference<T> valueTypeRef) {
 		return restCall(url, new LinkedMultiValueMap<String, String>(), valueTypeRef);
 	}
 
-	public <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues, Class<T> typeClass) {
-		return Optional.ofNullable(createCall(url, headerValues).toEntity(typeClass).getBody());
+	public <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues, Class<T> typeClass, Duration delay) {
+		return Optional.ofNullable(createCall(url, headerValues, delay).toEntity(typeClass).getBody());
 	}
 
 	public <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues,
 			ParameterizedTypeReference<T> valueTypeRef) {
-		return Optional.ofNullable(createCall(url, headerValues).body(valueTypeRef));
+		return Optional.ofNullable(createCall(url, headerValues, Duration.ZERO).body(valueTypeRef));
 	}
 
-	private ResponseSpec createCall(String url, MultiValueMap<String, String> headerValues) {
+	public <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues,
+			ParameterizedTypeReference<T> valueTypeRef, Duration delay) {
+		return Optional.ofNullable(createCall(url, headerValues, delay).body(valueTypeRef));
+	}
+	
+	private ResponseSpec createCall(String url, MultiValueMap<String, String> headerValues, Duration delay) {
+		var myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
+		if (!Duration.ZERO.equals(myDelay)) {
+			try {
+				LOGGER.info("Sleeping for {}", myDelay.toMillis());
+				Thread.sleep(myDelay);				
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return this.restClient.get().uri(url).headers(headers -> headers.addAll(headerValues)).retrieve();
 	}
 }

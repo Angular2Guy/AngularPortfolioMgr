@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class HkexConnector implements HkexClient {
 		LOGGER.info(myUrl);
 		var result = this.connectorClient.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
 				new ParameterizedTypeReference<List<HkSymbolImportDto>>() {
-				});
+				}, Duration.ofMillis(100));
 		return result;
 	}
 }

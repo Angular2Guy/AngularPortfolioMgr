@@ -116,7 +116,7 @@ public class SymbolImportService {
 			var myIndex = indexDaily.addAndGet(1L);
 			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
 			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
-					Duration.ZERO, allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
+					Duration.ofMillis(100), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
 		}).reduce(0L, (acc, value) -> acc + value);
 		LOGGER.info("Daily Quote import done for: {}", quoteCount);
 		LOGGER.info("updateSymbolQuotes done.");

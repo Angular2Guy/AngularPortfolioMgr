@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,12 +47,12 @@ public class RapidApiConnector implements RapidApiClient {
 	}
 	
 	@Override
-	public Optional<RapidOverviewImportDto> importCompanyProfile(String symbol) {
+	public Optional<RapidOverviewImportDto> importCompanyProfile(String symbol, Duration delay) {
 			final String myUrl = String.format("https://yh-finance.p.rapidapi.com/stock/v2/get-profile?symbol=%s", symbol);
 			LOGGER.info(myUrl);
 			var headerMultiMap = new LinkedMultiValueMap<String, String>();
 			headerMultiMap.put("X-RapidAPI-Key", List.of(this.apiKey));
 			headerMultiMap.put("X-RapidAPI-Host", List.of("yh-finance.p.rapidapi.com"));
-			return this.connectorClient.restCall(myUrl, headerMultiMap, RapidOverviewImportDto.class);					
+			return this.connectorClient.restCall(myUrl, headerMultiMap, RapidOverviewImportDto.class, delay);					
 	}
 }

@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,13 +38,13 @@ public class XetraConnector implements XetraClient {
 	@Override
 	public Optional<List<String>> importXetraSymbols() {
 		return this.connectorClient
-				.restCall(XETRA_URL, String.class).stream().map(str -> this.findCsvUrl(str)).findFirst()
+				.restCall(XETRA_URL, String.class, Duration.ofMillis(100)).stream().map(str -> this.findCsvUrl(str)).findFirst()
 				.flatMap(myUrlStr -> this.loadSymbolsCsv(myUrlStr));
 	}
 
 
 	private Optional<List<String>> loadSymbolsCsv(String url) {
-		return this.connectorClient.restCall(url, String.class).stream().map(str -> str.lines().toList()).findFirst();
+		return this.connectorClient.restCall(url, String.class, Duration.ofMillis(100)).stream().map(str -> str.lines().toList()).findFirst();
 	}
 
 	private String findCsvUrl(String htmlPage) {

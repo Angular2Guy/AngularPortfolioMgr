@@ -12,10 +12,11 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 
 public interface RapidApiClient {
-	Optional<RapidOverviewImportDto> importCompanyProfile(String symbol);
+	Optional<RapidOverviewImportDto> importCompanyProfile(String symbol, Duration delay);
 }

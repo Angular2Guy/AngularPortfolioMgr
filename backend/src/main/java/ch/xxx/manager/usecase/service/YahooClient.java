@@ -12,10 +12,11 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.time.Duration;
 import java.util.List;
 
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 
 public interface YahooClient {
-	List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol);
+	List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol, Duration delay);
 }

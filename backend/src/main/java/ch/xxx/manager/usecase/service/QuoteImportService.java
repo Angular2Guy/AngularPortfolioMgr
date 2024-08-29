@@ -70,7 +70,7 @@ public class QuoteImportService {
 		LOGGER.info("importQuoteHistory() called for symbol: {}", symbol);
 		return this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()).stream()
 				.map(mySymbolEntity -> this.symbolRepository
-						.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofSeconds(1L))))
+						.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofMillis(200))))
 				.flatMap(symbolEntity -> Stream.of(
 						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity, null, userKeys))
 						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
@@ -90,7 +90,7 @@ public class QuoteImportService {
 
 	public Long importUpdateDailyQuotes(String symbol, UserKeys userKeys) {
 		LOGGER.info("importNewDailyQuotes() called for symbol: {}", symbol);
-		return this.importUpdateDailyQuotes(Set.of(symbol), null, userKeys);
+		return this.importUpdateDailyQuotes(Set.of(symbol), Duration.ofMillis(100), userKeys);
 	}
 
 	public Long importUpdateDailyQuotes(String symbol, Duration delay, UserKeys userKeys) {
@@ -141,20 +141,11 @@ public class QuoteImportService {
 	}
 
 	private Symbol overviewImport(String symbol, Symbol symbolEntity, Duration delay) {
-		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
 		final Symbol mySymbolEntity = symbolEntity;
-		if (!Duration.ZERO.equals(myDelay)) {
-			try {
-				LOGGER.info("Sleeping for {}ms(2)", myDelay.toMillis());
-				Thread.sleep(myDelay);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
 		symbolEntity = switch (mySymbolEntity.getQuoteSource()) {
-		case ALPHAVANTAGE -> this.rapidApiClient.importCompanyProfile(symbol).stream()
+		case ALPHAVANTAGE -> this.rapidApiClient.importCompanyProfile(symbol, delay).stream()
 				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
-		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol).stream()
+		case YAHOO -> this.rapidApiClient.importCompanyProfile(symbol, delay).stream()
 				.map(myDto -> this.updateSymbol(myDto, mySymbolEntity)).findFirst().orElse(mySymbolEntity);
 		default -> Optional.of(mySymbolEntity).get();
 		};
@@ -178,28 +169,23 @@ public class QuoteImportService {
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, Duration delay) {
-		final Duration myDelay = Optional.ofNullable(delay).orElse(Duration.ZERO);
-		if (!Duration.ZERO.equals(myDelay)) {
-			try {
-				LOGGER.info("Sleeping for {}ms(1)", myDelay.toMillis());
-				Thread.sleep(myDelay);				
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+			Symbol symbolEntity, Duration delay) {		
 		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
-				? this.yahooClient.getTimeseriesDailyHistory(symbol).stream()
+				? this.yahooClient.getTimeseriesDailyHistory(symbol, delay).stream()
 						.filter(QuoteImportService::filterEmptyValuesDto)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).toList()
-				: this.yahooClient.getTimeseriesDailyHistory(symbol).stream()
+				: this.yahooClient.getTimeseriesDailyHistory(symbol, delay).stream()
 						.filter(QuoteImportService::filterEmptyValuesDto)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
-						.filter(dto -> symbolEntity.getDailyQuotes().stream()
-								.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dto.getLocalDay())))
+						.filter(entity -> this.filterEntities(symbolEntity, entity))
 						.collect(Collectors.toList());
 	}
 
+	private boolean filterEntities(Symbol symbolEntity, DailyQuote dailyQuoteEntity) {
+		return symbolEntity.getDailyQuotes().stream()						
+		.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dailyQuoteEntity.getLocalDay()));
+	}
+	
 	private static boolean filterEmptyValuesDto(YahooDailyQuoteImportDto dto) {
 		return dto.getAdjClose() != null && dto.getVolume() != null;
 	}

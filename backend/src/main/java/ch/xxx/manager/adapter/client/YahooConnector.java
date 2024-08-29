@@ -13,6 +13,7 @@
 package ch.xxx.manager.adapter.client;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -41,7 +42,7 @@ public class YahooConnector implements YahooClient {
 	}
 
 	@Override
-	public List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol) {
+	public List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol, Duration delay) {
 		LocalDateTime toTime = LocalDateTime.now();
 		LocalDateTime fromTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 		final String myUrl = String.format(
