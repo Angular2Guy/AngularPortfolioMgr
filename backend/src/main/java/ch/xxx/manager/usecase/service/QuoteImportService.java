@@ -73,7 +73,7 @@ public class QuoteImportService {
 						.save(this.overviewImport(symbol, mySymbolEntity, Duration.ofMillis(200))))
 				.flatMap(symbolEntity -> Stream.of(
 						this.customImport(symbol, this.currencyService.getCurrencyMap(), symbolEntity, null, userKeys))
-						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value))))
+						.flatMap(value -> Stream.of(this.saveAllDailyQuotes(value, true))))
 				.count();
 	}
 
@@ -84,7 +84,8 @@ public class QuoteImportService {
 		case YAHOO -> this.yahooImport(symbol, currencyMap, symbolEntity, delay);
 		default -> List.of();
 		};
-		LOGGER.info("{} Dailyquotes for Symbol {} imported from {}", result.size(), symbol, symbolEntity.getQuoteSource());
+		LOGGER.info("{} Dailyquotes for Symbol {} imported from {}", result.size(), symbol,
+				symbolEntity.getQuoteSource());
 		return result;
 	}
 
@@ -107,7 +108,7 @@ public class QuoteImportService {
 				.flatMap(symbol -> Stream.of(this.findSymbolsFor(symbol.toLowerCase()).stream()
 						.flatMap(mySymbol -> Stream.of(this.customImport(mySymbol.getSymbol().toLowerCase(),
 								this.currencyService.getCurrencyMap(), mySymbol, delay, userKeys)))
-						.map(values -> this.saveAllDailyQuotes(values)).count()))
+						.map(values -> this.saveAllDailyQuotes(values, false)).count()))
 				.reduce(0L, (a, b) -> a + b);
 	}
 
@@ -116,7 +117,7 @@ public class QuoteImportService {
 		var result = withQuotes.isEmpty() ? this.symbolRepository.findBySymbolSingle(symbol.toLowerCase()) : withQuotes;
 		return result;
 	}
-	
+
 	public void storeDailyQuoteData(
 			List<ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto> dailyQuoteImportDtos) {
 		Map<String, Symbol> symbolMap = dailyQuoteImportDtos.stream().map(myDto -> myDto.getSymbol()).distinct()
@@ -169,23 +170,23 @@ public class QuoteImportService {
 	}
 
 	private List<DailyQuote> yahooImport(String symbol, Map<LocalDate, Collection<Currency>> currencyMap,
-			Symbol symbolEntity, Duration delay) {		
+			Symbol symbolEntity, Duration delay) {
 		return symbolEntity.getDailyQuotes() == null || symbolEntity.getDailyQuotes().isEmpty()
 				? this.yahooClient.getTimeseriesDailyHistory(symbol, delay).stream()
 						.filter(QuoteImportService::filterEmptyValuesDto)
 						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap)).toList()
 				: this.yahooClient.getTimeseriesDailyHistory(symbol, delay).stream()
 						.filter(QuoteImportService::filterEmptyValuesDto)
-						.map(importDtos -> this.convert(symbolEntity, importDtos, currencyMap))
-						.filter(entity -> this.filterEntities(symbolEntity, entity))
+						.filter(dto -> this.filterEntities(symbolEntity, dto))
+						.map(importDto -> this.convert(symbolEntity, importDto, currencyMap))
 						.collect(Collectors.toList());
 	}
 
-	private boolean filterEntities(Symbol symbolEntity, DailyQuote dailyQuoteEntity) {
-		return symbolEntity.getDailyQuotes().stream()						
-		.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(dailyQuoteEntity.getLocalDay()));
+	private boolean filterEntities(Symbol symbolEntity, YahooDailyQuoteImportDto importDto) {
+		return symbolEntity.getDailyQuotes().stream()
+				.noneMatch(myEntity -> myEntity.getLocalDay().isEqual(importDto.getDate()));
 	}
-	
+
 	private static boolean filterEmptyValuesDto(YahooDailyQuoteImportDto dto) {
 		return dto.getAdjClose() != null && dto.getVolume() != null;
 	}
@@ -200,9 +201,9 @@ public class QuoteImportService {
 		return entity;
 	}
 
-	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities) {
+	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities, boolean clearOldQuotes) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
-		if (entities != null && !entities.isEmpty()) {
+		if (clearOldQuotes && entities != null && !entities.isEmpty()) {
 			this.dailyQuoteRepository.deleteAll(this.dailyQuoteRepository.findBySymbol(entities.get(0).getSymbolKey()));
 		}
 		return this.dailyQuoteRepository.saveAll(entities);
