@@ -8,6 +8,7 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 [![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
 
 ## Articles
+* [RestClient with Delays on Virtual Threads](https://angular2guy.wordpress.com/2024/08/30/restclient-with-delays-on-virtual-threads/)
 * [Using KRaft Kafka for development and Kubernetes deployment](https://angular2guy.wordpress.com/2024/08/17/using-kraft-kafka-for-development-and-kubernetes-deployment/)
 * [Using RSS News Feeds with the Rome Library and Angular/Spring Boot](https://angular2guy.wordpress.com/2024/06/29/implementing-rss-news-feeds-with-the-rome-library-and-angular-spring-boot/)
 * [A scrolling Date/Timeline Chart with Angular Material Components](https://angular2guy.wordpress.com/2023/07/01/a-scrolling-date-timeline-chart-with-angular-material-components/)
@@ -28,7 +29,7 @@ The goal is to provide a Portfolio Management Application to compare different p
 ## Current state of the project
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
 * The Gradle build is done. 
-* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revokation. The error handling for problems with Kafka events is implemented with transaction rollback.
+* The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revocation. The error handling for problems with Kafka events is implemented with transaction rollback.
 * The Angular fronted displays several D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
 * The import of the Kaggle SEC Filings dataset is implemented and optimized. 
 * The UI for the search in the SEC Filings data set uses Drag and Drop and displays the results in a Angular Components table or in an Angular Components tree of Angular Components tables.
