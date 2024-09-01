@@ -8,7 +8,7 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 [![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
 
 ## Articles
-* [RestClient with Delays on Virtual Threads](https://angular2guy.wordpress.com/2024/08/30/restclient-with-delays-on-virtual-threads/)
+* [Spring RestClient with Delays on Virtual Threads](https://angular2guy.wordpress.com/2024/08/30/restclient-with-delays-on-virtual-threads/)
 * [Using KRaft Kafka for development and Kubernetes deployment](https://angular2guy.wordpress.com/2024/08/17/using-kraft-kafka-for-development-and-kubernetes-deployment/)
 * [Using RSS News Feeds with the Rome Library and Angular/Spring Boot](https://angular2guy.wordpress.com/2024/06/29/implementing-rss-news-feeds-with-the-rome-library-and-angular-spring-boot/)
 * [A scrolling Date/Timeline Chart with Angular Material Components](https://angular2guy.wordpress.com/2023/07/01/a-scrolling-date-timeline-chart-with-angular-material-components/)
