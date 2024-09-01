@@ -43,7 +43,7 @@ import {
   FinancialElementParams,
   FilterNumber,
 } from "../../model/symbol-financials-query-params";
-import { switchMap, debounceTime, delay } from "rxjs/operators";
+import { switchMap, debounceTime, delay, filter } from "rxjs/operators";
 import { SymbolService } from "src/app/service/symbol.service";
 import { ConfigService } from "src/app/service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
@@ -153,6 +153,7 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
+		filter(myValue => !!myValue),
         switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue)),
       )
       .subscribe((myValue) => (this.symbols = myValue));
@@ -160,6 +161,7 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
+		filter(myValue => !!myValue),
         switchMap((myValue) =>
           this.financialDataService.getSymbolNamesByCompanyName(myValue),
         ),
