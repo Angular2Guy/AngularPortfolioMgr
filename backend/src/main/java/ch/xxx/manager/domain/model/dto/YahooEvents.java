@@ -12,8 +12,6 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.util.List;
-
-public record YahooEvents(List<YahooEventsDividends> events, List<YahooEventsSplits> splits) {
+public record YahooEvents(YahooEventsDividends dividends, YahooEventsSplits splits) {
 
 }
