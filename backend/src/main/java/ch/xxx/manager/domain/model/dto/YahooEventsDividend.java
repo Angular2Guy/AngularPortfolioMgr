@@ -14,6 +14,6 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.math.BigDecimal;
 
-public record YahooEventsDividend(BigDecimal amount, Long data) {
+public record YahooEventsDividend(BigDecimal amount, Long date) {
 
 }

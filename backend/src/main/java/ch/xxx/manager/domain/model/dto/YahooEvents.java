@@ -12,6 +12,11 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-public record YahooEvents(YahooEventsDividends dividends, YahooEventsSplits splits) {
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+
+public record YahooEvents(@JsonAnyGetter @JsonAnySetter Map<Long, YahooEventsDividend> dividends, @JsonAnyGetter @JsonAnySetter Map<Long, YahooEventsSplit> splits) {
 
 }
