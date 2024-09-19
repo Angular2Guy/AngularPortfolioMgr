@@ -17,27 +17,26 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.YahooDailyQuoteWrapper;
 import ch.xxx.manager.usecase.service.YahooClient;
 
 @Component
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
-	private final CsvMapper csvMapper;
+	private final ObjectMapper objectMapper;
 	private final ConnectorClient connectorClient;
 
-	public YahooConnector(@Qualifier("csv") CsvMapper csvMapper, ConnectorClient connectorClient) {
-		this.csvMapper = csvMapper;
+	public YahooConnector(ObjectMapper objectMapper, ConnectorClient connectorClient) {
+		this.objectMapper = objectMapper;
 		this.connectorClient = connectorClient;
 	}
 
@@ -45,22 +44,28 @@ public class YahooConnector implements YahooClient {
 	public List<YahooDailyQuoteImportDto> getTimeseriesDailyHistory(String symbol, Duration delay) {
 		LocalDateTime toTime = LocalDateTime.now();
 		LocalDateTime fromTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+		// https://query1.finance.yahoo.com/v8/finance/chart/IBM?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=1d&period1=1378684800&period2=1726501463&symbol=IBM&userYfid=true&lang=en-US&region=US
 		final String myUrl = String.format(
-				"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
+				"https://query1.finance.yahoo.com/v8/finance/chart/%s?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=%d&period1=%d&period2=%d&symbol=%s&userYfid=true&lang=en-US&region=US",
+				//"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
-				toTime.toEpochSecond(OffsetDateTime.now().getOffset()));
+				toTime.toEpochSecond(OffsetDateTime.now().getOffset()),symbol);
 		LOGGER.info(myUrl);
-		return this.connectorClient.restCall(myUrl, String.class).stream()
-				.flatMap(response -> this.convert(response).stream()).toList();
+		return this.connectorClient.restCall(myUrl, String.class).stream().map(response -> this.convert(response))
+				.flatMap(YahooConnector::convert).toList();
 	}
 
-	private List<YahooDailyQuoteImportDto> convert(String linesStr) {
+	private YahooDailyQuoteWrapper convert(String jsonStr) {
 		try {
-			MappingIterator<YahooDailyQuoteImportDto> mappingIterator = csvMapper.readerFor(YahooDailyQuoteImportDto.class)
-					.with(CsvSchema.emptySchema().withHeader()).readValues(linesStr);
-			return mappingIterator.readAll();
+			YahooDailyQuoteWrapper mappingIterator = this.objectMapper.readValue(jsonStr,
+					YahooDailyQuoteWrapper.class);
+			return mappingIterator;
 		} catch (IOException e) {
 			throw new RuntimeException("Csv import failed.", e);
 		}
+	}
+	
+	private static Stream<YahooDailyQuoteImportDto> convert(YahooDailyQuoteWrapper dto) {
+		return Stream.ofNullable(null);
 	}
 }
