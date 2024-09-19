@@ -12,8 +12,9 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonKey;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-public record YahooResultWrapper(YahooMetaData meta, List<Long> timestamp, YahooEvents events, YahooIndicators indicators) {
+public record YahooEventsSplits(@JsonKey Long timestamp, @JsonValue YahooEventsSplit split) {
 
 }

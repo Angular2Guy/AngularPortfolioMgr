@@ -12,8 +12,8 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.util.List;
+import java.math.BigDecimal;
 
-public record YahooResultWrapper(YahooMetaData meta, List<Long> timestamp, YahooEvents events, YahooIndicators indicators) {
+public record YahooEventsDividend(BigDecimal amount, Long data) {
 
 }

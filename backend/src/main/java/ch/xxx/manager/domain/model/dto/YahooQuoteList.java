@@ -12,8 +12,12 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public record YahooResultWrapper(YahooMetaData meta, List<Long> timestamp, YahooEvents events, YahooIndicators indicators) {
+import com.fasterxml.jackson.annotation.JsonKey;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public record YahooQuoteList(@JsonKey String key, @JsonValue List<BigDecimal> value) {
 
 }
