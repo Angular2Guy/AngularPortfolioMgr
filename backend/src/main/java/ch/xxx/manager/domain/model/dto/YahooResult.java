@@ -14,6 +14,6 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.util.List;
 
-public record YahooResult(List<YahooResultWrapper> result) {
+public record YahooResult(List<YahooResultWrapper> result, String error) {
 
 }
