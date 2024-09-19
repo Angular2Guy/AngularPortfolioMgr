@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.xxx.manager.domain.model.dto.YahooChartWrapper;
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.domain.model.dto.YahooDailyQuoteWrapper;
 import ch.xxx.manager.usecase.service.YahooClient;
 
 @Component
@@ -46,7 +46,7 @@ public class YahooConnector implements YahooClient {
 		LocalDateTime fromTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 		// https://query1.finance.yahoo.com/v8/finance/chart/IBM?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=1d&period1=1378684800&period2=1726501463&symbol=IBM&userYfid=true&lang=en-US&region=US
 		final String myUrl = String.format(
-				"https://query1.finance.yahoo.com/v8/finance/chart/%s?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=%d&period1=%d&period2=%d&symbol=%s&userYfid=true&lang=en-US&region=US",
+				"https://query1.finance.yahoo.com/v8/finance/chart/%s?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=1d&period1=%d&period2=%d&symbol=%s&userYfid=true&lang=en-US&region=US",
 				//"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 				toTime.toEpochSecond(OffsetDateTime.now().getOffset()),symbol);
@@ -55,17 +55,17 @@ public class YahooConnector implements YahooClient {
 				.flatMap(YahooConnector::convert).toList();
 	}
 
-	private YahooDailyQuoteWrapper convert(String jsonStr) {
+	private YahooChartWrapper convert(String jsonStr) {
 		try {
-			YahooDailyQuoteWrapper mappingIterator = this.objectMapper.readValue(jsonStr,
-					YahooDailyQuoteWrapper.class);
+			var mappingIterator = this.objectMapper.readValue(jsonStr,
+					YahooChartWrapper.class);
 			return mappingIterator;
 		} catch (IOException e) {
-			throw new RuntimeException("Csv import failed.", e);
+			throw new RuntimeException("Json import failed.", e);
 		}
 	}
 	
-	private static Stream<YahooDailyQuoteImportDto> convert(YahooDailyQuoteWrapper dto) {
+	private static Stream<YahooDailyQuoteImportDto> convert(YahooChartWrapper dto) {
 		return Stream.ofNullable(null);
 	}
 }
