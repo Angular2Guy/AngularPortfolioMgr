@@ -15,26 +15,25 @@ package ch.xxx.manager.domain.model.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class YahooDailyQuoteImportDto {
-	@JsonProperty("Date")
-	@JsonFormat
-    (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+//	@JsonProperty("Date")
+//	@JsonFormat
+//    (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate date;
-	@JsonProperty("Open")
+//	@JsonProperty("Open")
 	private BigDecimal open;
-	@JsonProperty("High")
+//	@JsonProperty("High")
 	private BigDecimal high;
-	@JsonProperty("Low")
+//	@JsonProperty("Low")
 	private BigDecimal low;
-	@JsonProperty("Close")
+//	@JsonProperty("Close")
 	private BigDecimal close;
-	@JsonProperty("Adj Close")
+//	@JsonProperty("Adj Close")
 	private BigDecimal adjClose;
-	@JsonProperty("Volume")
+//	@JsonProperty("Volume")
 	private Long volume;
+	private BigDecimal split;
+	private BigDecimal dividend;
 	
 	public LocalDate getDate() {
 		return date;
@@ -78,10 +77,23 @@ public class YahooDailyQuoteImportDto {
 	public void setVolume(Long volume) {
 		this.volume = volume;
 	}
+	public BigDecimal getSplit() {
+		return split;
+	}
+	public void setSplit(BigDecimal split) {
+		this.split = split;
+	}
+	public BigDecimal getDividend() {
+		return dividend;
+	}
+	public void setDividend(BigDecimal dividend) {
+		this.dividend = dividend;
+	}
+
 	@Override
 	public String toString() {
-		return "HkDailyQuoteImportDto [date=" + date + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
-				+ close + ", adjClose=" + adjClose + ", volume=" + volume + "]";
+		return "YahooDailyQuoteImportDto [date=" + date + ", open=" + open + ", high=" + high + ", low=" + low
+				+ ", close=" + close + ", adjClose=" + adjClose + ", volume=" + volume + ", split=" + split
+				+ ", dividend=" + dividend + "]";
 	}
-	
 }

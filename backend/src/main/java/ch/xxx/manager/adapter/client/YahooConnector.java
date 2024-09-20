@@ -12,32 +12,28 @@
  */
 package ch.xxx.manager.adapter.client;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.xxx.manager.domain.model.dto.YahooChartWrapper;
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
+import ch.xxx.manager.usecase.mapping.YahooDtoMapper;
 import ch.xxx.manager.usecase.service.YahooClient;
 
 @Component
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
-	private final ObjectMapper objectMapper;
 	private final ConnectorClient connectorClient;
+	private final YahooDtoMapper yahooDtoMapper;
 
-	public YahooConnector(ObjectMapper objectMapper, ConnectorClient connectorClient) {
-		this.objectMapper = objectMapper;
+	public YahooConnector(YahooDtoMapper yahooDtoMapper, ConnectorClient connectorClient) {
 		this.connectorClient = connectorClient;
+		this.yahooDtoMapper = yahooDtoMapper;
 	}
 
 	@Override
@@ -47,25 +43,11 @@ public class YahooConnector implements YahooClient {
 		// https://query1.finance.yahoo.com/v8/finance/chart/IBM?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=1d&period1=1378684800&period2=1726501463&symbol=IBM&userYfid=true&lang=en-US&region=US
 		final String myUrl = String.format(
 				"https://query1.finance.yahoo.com/v8/finance/chart/%s?events=capitalGain|div|split&formatted=true&includeAdjustedClose=true&interval=1d&period1=%d&period2=%d&symbol=%s&userYfid=true&lang=en-US&region=US",
-				//"https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
+				// "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%d&period2=%d&interval=1d&events=history",
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
-				toTime.toEpochSecond(OffsetDateTime.now().getOffset()),symbol);
+				toTime.toEpochSecond(OffsetDateTime.now().getOffset()), symbol);
 		LOGGER.info(myUrl);
-		return this.connectorClient.restCall(myUrl, String.class).stream().map(response -> this.convert(response))
-				.flatMap(YahooConnector::convert).toList();
-	}
-
-	private YahooChartWrapper convert(String jsonStr) {
-		try {
-			var mappingIterator = this.objectMapper.readValue(jsonStr,
-					YahooChartWrapper.class);
-			return mappingIterator;
-		} catch (IOException e) {
-			throw new RuntimeException("Json import failed.", e);
-		}
-	}
-	
-	private static Stream<YahooDailyQuoteImportDto> convert(YahooChartWrapper dto) {
-		return Stream.ofNullable(null);
+		return this.connectorClient.restCall(myUrl, String.class).stream().map(response -> this.yahooDtoMapper.convert(response))
+				.flatMap(YahooDtoMapper::convert).toList();
 	}
 }
