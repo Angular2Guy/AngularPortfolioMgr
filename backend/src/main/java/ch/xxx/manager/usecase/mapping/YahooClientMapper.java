@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -103,24 +104,36 @@ public class YahooClientMapper {
 	private static DateToDto addQuoteProperties(final YahooResultWrapper dto, DateToDto myDto) {
 		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
 			myDto.dto()
-					.setOpen(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.Open.toString()).get(myDto.index())).findFirst()
-							.orElse(BigDecimal.ZERO));
+					.setOpen(
+							Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
+									.map(myMap -> myMap.getOrDefault(JsonKey.Open.toString(),
+											new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
+									.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
+									.orElse(BigDecimal.ZERO));
 			myDto.dto()
-					.setHigh(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.High.toString()).get(myDto.index())).findFirst()
-							.orElse(BigDecimal.ZERO));
+					.setHigh(
+							Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
+									.map(myMap -> myMap.getOrDefault(JsonKey.High.toString(),
+											new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
+									.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
+									.orElse(BigDecimal.ZERO));
 			myDto.dto()
 					.setVolume(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.Volume.toString()).get(myDto.index()))
+							.map(myMap -> myMap.getOrDefault(JsonKey.Volume.toString(),
+									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
+							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO))
 							.map(myValue -> myValue.longValue()).findFirst().orElse(0L));
-			myDto.dto()
-					.setLow(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.Low.toString()).get(myDto.index())).findFirst()
-							.orElse(BigDecimal.ZERO));
+			myDto.dto().setLow(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
+					.map(myMap -> myMap
+							.getOrDefault(JsonKey.Low.toString(), new ArrayList<BigDecimal>(myDto.index() + 1))
+							.get(myDto.index()))
+					.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
+					.orElse(BigDecimal.ZERO));
 			myDto.dto()
 					.setClose(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.Close.toString()).get(myDto.index())).findFirst()
+							.map(myMap -> myMap.getOrDefault(JsonKey.Close.toString(),
+									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
+							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
 							.orElse(BigDecimal.ZERO));
 		});
 		return myDto;
@@ -130,7 +143,9 @@ public class YahooClientMapper {
 		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
 			myDto.dto()
 					.setAdjClose(Optional.ofNullable(myIndicators.adjclose()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.get(JsonKey.AdjClose.toString()).get(myDto.index())).findFirst()
+							.map(myMap -> myMap.getOrDefault(JsonKey.AdjClose.toString(),
+									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
+							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
 							.orElse(BigDecimal.ZERO));
 		});
 		return myDto;
