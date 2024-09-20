@@ -29,7 +29,7 @@ import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.YahooResultWrapper;
 
 @Component
-public class YahooDtoMapper {
+public class YahooClientMapper {
 	private enum JsonKey {
 		AdjClose("adjclose"), Open("open"), High("high"), Volume("volume"), Low("low"), Close("close");
 
@@ -48,7 +48,7 @@ public class YahooDtoMapper {
 	private record DateToDto(Long timestamp, Integer index, YahooDailyQuoteImportDto dto) {	}
 	private final ObjectMapper objectMapper;
 	
-	public YahooDtoMapper(ObjectMapper objectMapper) {
+	public YahooClientMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 	
@@ -62,7 +62,7 @@ public class YahooDtoMapper {
 	}
 
 	public static Stream<YahooDailyQuoteImportDto> convert(YahooChartWrapper dto) {
-		return dto.chart().result().stream().flatMap(YahooDtoMapper::convert);
+		return dto.chart().result().stream().flatMap(YahooClientMapper::convert);
 	}
 
 	private static Stream<YahooDailyQuoteImportDto> convert(final YahooResultWrapper dto) {

@@ -22,16 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.usecase.mapping.YahooDtoMapper;
+import ch.xxx.manager.usecase.mapping.YahooClientMapper;
 import ch.xxx.manager.usecase.service.YahooClient;
 
 @Component
 public class YahooConnector implements YahooClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(YahooConnector.class);
 	private final ConnectorClient connectorClient;
-	private final YahooDtoMapper yahooDtoMapper;
+	private final YahooClientMapper yahooDtoMapper;
 
-	public YahooConnector(YahooDtoMapper yahooDtoMapper, ConnectorClient connectorClient) {
+	public YahooConnector(YahooClientMapper yahooDtoMapper, ConnectorClient connectorClient) {
 		this.connectorClient = connectorClient;
 		this.yahooDtoMapper = yahooDtoMapper;
 	}
@@ -48,6 +48,6 @@ public class YahooConnector implements YahooClient {
 				toTime.toEpochSecond(OffsetDateTime.now().getOffset()), symbol);
 		LOGGER.info(myUrl);
 		return this.connectorClient.restCall(myUrl, String.class).stream().map(response -> this.yahooDtoMapper.convert(response))
-				.flatMap(YahooDtoMapper::convert).toList();
+				.flatMap(YahooClientMapper::convert).toList();
 	}
 }
