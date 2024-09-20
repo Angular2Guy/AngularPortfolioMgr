@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -45,13 +47,15 @@ public class YahooClientMapper {
 		}
 	}
 
-	private record DateToDto(Long timestamp, Integer index, YahooDailyQuoteImportDto dto) {	}
+	private record DateToDto(Long timestamp, Integer index, YahooDailyQuoteImportDto dto) {
+	}
+
 	private final ObjectMapper objectMapper;
-	
+
 	public YahooClientMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
-	
+
 	public YahooChartWrapper convert(String jsonStr) {
 		try {
 			var mappingIterator = this.objectMapper.readValue(jsonStr, YahooChartWrapper.class);
@@ -82,45 +86,63 @@ public class YahooClientMapper {
 	}
 
 	private static DateToDto addEventProperties(final YahooResultWrapper dto, DateToDto myDto) {
-		myDto.dto().setDividend(Optional.ofNullable(dto.events().dividends().get(myDto.timestamp())).stream()
-				.map(myValue -> myValue.amount()).findFirst().orElse(BigDecimal.ZERO));
-		myDto.dto()
-				.setSplit(Optional.ofNullable(dto.events().splits().get(myDto.timestamp())).stream()
-						.map(myValue -> myValue.denominator() != 0 ? BigDecimal.valueOf(myValue.numerator())
-								.divide(BigDecimal.valueOf(myValue.denominator())) : BigDecimal.ZERO)
-						.findFirst().orElse(BigDecimal.ZERO));
+		Optional.ofNullable(dto.events()).ifPresent(myEvents -> {
+			myDto.dto()
+					.setDividend(Optional
+							.ofNullable(Optional.ofNullable(myEvents.dividends())
+									.orElse(Map.of()).get(myDto.timestamp()))
+							.stream().map(myValue -> myValue.amount()).findFirst().orElse(BigDecimal.ZERO));
+			myDto.dto()
+					.setSplit(Optional.ofNullable(Optional.ofNullable(myEvents.splits())
+							.orElse(Map.of()).get(myDto.timestamp())).stream().map(
+									myValue -> myValue.denominator() != 0
+											? BigDecimal.valueOf(myValue.numerator())
+													.divide(BigDecimal.valueOf(myValue.denominator()))
+											: BigDecimal.ZERO)
+							.findFirst().orElse(BigDecimal.ZERO));
+		});
 		return myDto;
 	}
 
 	private static DateToDto addQuoteProperties(final YahooResultWrapper dto, DateToDto myDto) {
-		myDto.dto()
-				.setOpen(dto.indicators().quote().stream()
-						.map(myMap -> myMap.get(JsonKey.Open.toString()).get(myDto.index())).findFirst()
-						.orElse(BigDecimal.ZERO));
-		myDto.dto()
-				.setHigh(dto.indicators().quote().stream()
-						.map(myMap -> myMap.get(JsonKey.High.toString()).get(myDto.index())).findFirst()
-						.orElse(BigDecimal.ZERO));
-		myDto.dto()
-				.setVolume(dto.indicators().quote().stream()
-						.map(myMap -> myMap.get(JsonKey.Volume.toString()).get(myDto.index()))
-						.map(myValue -> myValue.longValue()).findFirst().orElse(0L));
-		myDto.dto()
-				.setLow(dto.indicators().quote().stream()
-						.map(myMap -> myMap.get(JsonKey.Low.toString()).get(myDto.index())).findFirst()
-						.orElse(BigDecimal.ZERO));
-		myDto.dto()
-				.setClose(dto.indicators().quote().stream()
-						.map(myMap -> myMap.get(JsonKey.Close.toString()).get(myDto.index())).findFirst()
-						.orElse(BigDecimal.ZERO));
+		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
+			myDto.dto()
+					.setOpen(Optional.ofNullable(myIndicators.quote())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.Open.toString()).get(myDto.index())).findFirst()
+							.orElse(BigDecimal.ZERO));
+			myDto.dto()
+					.setHigh(Optional.ofNullable(myIndicators.quote())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.High.toString()).get(myDto.index())).findFirst()
+							.orElse(BigDecimal.ZERO));
+			myDto.dto()
+					.setVolume(Optional.ofNullable(myIndicators.quote())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.Volume.toString()).get(myDto.index()))
+							.map(myValue -> myValue.longValue()).findFirst().orElse(0L));
+			myDto.dto()
+					.setLow(Optional.ofNullable(myIndicators.quote())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.Low.toString()).get(myDto.index())).findFirst()
+							.orElse(BigDecimal.ZERO));
+			myDto.dto()
+					.setClose(Optional.ofNullable(myIndicators.quote())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.Close.toString()).get(myDto.index())).findFirst()
+							.orElse(BigDecimal.ZERO));
+		});
 		return myDto;
 	}
 
 	private static DateToDto addAdjClose(final YahooResultWrapper dto, DateToDto myDto) {
-		myDto.dto()
-				.setAdjClose(dto.indicators().adjclose().stream()
-						.map(myMap -> myMap.get(JsonKey.AdjClose.toString()).get(myDto.index())).findFirst()
-						.orElse(BigDecimal.ZERO));
+		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
+			myDto.dto()
+					.setAdjClose(Optional.ofNullable(myIndicators.adjclose())
+							.orElse(List.of(Map.of())).stream()
+							.map(myMap -> myMap.get(JsonKey.AdjClose.toString()).get(myDto.index())).findFirst()
+							.orElse(BigDecimal.ZERO));
+		});
 		return myDto;
 	}
 }
