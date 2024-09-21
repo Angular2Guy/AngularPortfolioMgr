@@ -18,4 +18,6 @@ export interface Quote {
   volume: number;
   timestamp: string;
   symbol: string;
+  split: number;
+  dividend: number;
 }

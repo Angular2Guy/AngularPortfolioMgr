@@ -57,6 +57,7 @@ interface SymbolData {
   high: number;
   low: number;
   close: number;
+  accDividend: number;
   avgVolume: number;
   avgClose: number;
   medianClose: number;
@@ -91,6 +92,7 @@ export class SymbolComponent implements OnInit {
     high: null,
     low: null,
     open: null,
+	accDividend: null,
     start: null,
     avgClose: null,
     medianClose: null,
@@ -236,6 +238,8 @@ export class SymbolComponent implements OnInit {
             .map((quote) => quote.volume)
             .reduce((result, volume) => result + volume, 0) / localQuotes.length
         : null;
+	this.symbolData.accDividend = localQuotes && localQuotes.length > 0 ? 
+	localQuotes.map((quote) => quote.dividend).reduce((result, dividend) => result + dividend, 0) : 0;
     this.symbolData.avgClose =
       localQuotes && localQuotes.length > 0
         ? localQuotes
