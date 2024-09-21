@@ -40,8 +40,8 @@
 	</changeSet>
 	<changeSet id="44" author="angular2guy">
 		<addColumn tableName="daily_quote">
-			<column name="split" type="numeric(6,10)" />
-			<column name="dividend" type="numeric(6,10)" />
+			<column name="split" type="numeric(6,5)" />
+			<column name="dividend" type="numeric(6,5)" />
 		</addColumn>
 		<update tableName="daily_quote">
 			<column name="split" value="0" />
