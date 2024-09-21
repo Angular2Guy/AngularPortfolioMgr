@@ -113,6 +113,7 @@
     "symbolHigh": "High: {$INTERPOLATION}",
     "symbolLow": "Low: {$INTERPOLATION}",
     "symbolClose": "Close: {$INTERPOLATION}",
+    "symbolAccDividend": "Acc. Dividends: {$INTERPOLATION}",
     "symbolCurrency": "Currency: {$INTERPOLATION}",
     "symbolAvgVolume": "Average Volume: {$INTERPOLATION}",
     "symbolAvgClose": "Average Close: {$INTERPOLATION}",
