@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.usecase.service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -137,7 +138,7 @@ public class QuoteImportService {
 		return dailyQuoteImportDtos.stream()
 				.map(myDto -> new DailyQuote(null, myDto.getSymbol(), myDto.getOpen(), myDto.getHigh(), myDto.getLow(),
 						myDto.getClose(), myDto.getClose(), 0L, myDto.getDate(), symbolMap.get(myDto.getSymbol()),
-						CurrencyKey.USD))
+						CurrencyKey.USD, BigDecimal.ZERO, BigDecimal.ZERO))
 				.toList();
 	}
 
@@ -196,7 +197,7 @@ public class QuoteImportService {
 		DailyQuote entity = new DailyQuote(null, symbolEntity.getSymbol(), importDto.getOpen(), importDto.getHigh(),
 				importDto.getLow(), importDto.getClose(), importDto.getAdjClose(),
 				importDto.getVolume() == null ? null : importDto.getVolume().longValue(), importDto.getDate(),
-				symbolEntity, symbolEntity.getCurrencyKey());
+				symbolEntity, symbolEntity.getCurrencyKey(), importDto.getSplit(), importDto.getDividend());
 		symbolEntity.getDailyQuotes().add(entity);
 		return entity;
 	}

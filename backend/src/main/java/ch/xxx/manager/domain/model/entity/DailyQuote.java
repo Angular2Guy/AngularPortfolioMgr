@@ -46,13 +46,15 @@ public class DailyQuote extends EntityBase {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private DataHelper.CurrencyKey currencyKey;
+	private BigDecimal split;
+	private BigDecimal dividend;
 
 	public DailyQuote() {
 		super();
 	}
 
 	public DailyQuote(Long id, String symbolKey, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal adjClose,
-			Long volume, LocalDate localDay, Symbol symbol, DataHelper.CurrencyKey currencyKey) {
+			Long volume, LocalDate localDay, Symbol symbol, DataHelper.CurrencyKey currencyKey, BigDecimal split, BigDecimal dividend) {
 		super();
 		super.setId(id);
 		this.symbolKey = symbolKey;
@@ -65,6 +67,8 @@ public class DailyQuote extends EntityBase {
 		this.localDay = localDay;
 		this.symbol = symbol;
 		this.currencyKey = currencyKey;
+		this.split = split;
+		this.dividend = dividend;
 	}
 
 
@@ -147,4 +151,21 @@ public class DailyQuote extends EntityBase {
 	public void setAdjClose(BigDecimal adjClose) {
 		this.adjClose = adjClose;
 	}
+
+	public BigDecimal getSplit() {
+		return split;
+	}
+
+	public void setSplit(BigDecimal split) {
+		this.split = split;
+	}
+
+	public BigDecimal getDividend() {
+		return dividend;
+	}
+
+	public void setDividend(BigDecimal dividend) {
+		this.dividend = dividend;
+	}
+
 }

@@ -33,9 +33,19 @@
 			<column name="year2sigma_portfolio" type="double" />
 			<column name="year5sigma_portfolio" type="double" />
 			<column name="year10sigma_portfolio" type="double" />
-		</addColumn>	
+		</addColumn>
 	</changeSet>
 	<changeSet id="43" author="angular2guy">
-		<dropTable tableName="intra_day_quote"/>
+		<dropTable tableName="intra_day_quote" />
+	</changeSet>
+	<changeSet id="44" author="angular2guy">
+		<addColumn tableName="daily_quote">
+			<column name="split" type="numeric(6,10)" />
+			<column name="dividend" type="numeric(6,10)" />
+		</addColumn>
+		<update tableName="daily_quote">
+			<column name="split" value="0" />
+			<column name="dividend" value="0" />
+		</update>
 	</changeSet>
 </databaseChangeLog>
