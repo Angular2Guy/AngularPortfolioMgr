@@ -24,12 +24,14 @@ public class QuoteDto {
 	private Long volume;
 	private LocalDateTime timestamp;
 	private String symbol;
+	private BigDecimal split;
+	private BigDecimal dividend;
 	
 	public QuoteDto() {		
 	}
 
 	public QuoteDto(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal adjClose, Long volume,
-			LocalDateTime timestamp, String symbol) {
+			LocalDateTime timestamp, String symbol, BigDecimal split, BigDecimal dividend) {
 		super();
 		this.open = open;
 		this.high = high;
@@ -39,6 +41,8 @@ public class QuoteDto {
 		this.volume = volume;
 		this.timestamp = timestamp;
 		this.symbol = symbol;
+		this.split = split;
+		this.dividend = dividend;
 	}
 
 	public BigDecimal getOpen() {
@@ -103,5 +107,21 @@ public class QuoteDto {
 
 	public void setAdjClose(BigDecimal adjClose) {
 		this.adjClose = adjClose;
+	}
+
+	public BigDecimal getSplit() {
+		return split;
+	}
+
+	public void setSplit(BigDecimal split) {
+		this.split = split;
+	}
+
+	public BigDecimal getDividend() {
+		return dividend;
+	}
+
+	public void setDividend(BigDecimal dividend) {
+		this.dividend = dividend;
 	}
 }

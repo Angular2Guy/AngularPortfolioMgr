@@ -22,7 +22,7 @@ import ch.xxx.manager.domain.model.entity.dto.DailyQuoteEntityDto;
 public class QuoteMapper {
 	public QuoteDto convert(DailyQuote entity) {
 		return new QuoteDto(entity.getOpen(), entity.getHigh(), entity.getLow(), entity.getClose(), entity.getAdjClose(), entity.getVolume(),
-				entity.getLocalDay().atStartOfDay(), entity.getSymbol().getSymbol());
+				entity.getLocalDay().atStartOfDay(), entity.getSymbol().getSymbol(), entity.getSplit(), entity.getDividend());
 	}
 	
 	public QuoteDto convert(DailyQuoteEntityDto myRecord) {

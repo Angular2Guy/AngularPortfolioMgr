@@ -158,10 +158,10 @@ public class PortfolioToIndexService {
 				dailyQuote.getOpen().multiply(currentWeight.get()), dailyQuote.getHigh().multiply(currentWeight.get()),
 				dailyQuote.getLow().multiply(currentWeight.get()), dailyQuote.getClose().multiply(currentWeight.get()),
 				dailyQuote.getAdjClose().multiply(currentWeight.get()), 0L, dailyQuote.getLocalDay().atStartOfDay(),
-				dailyQuote.getSymbolKey())
+				dailyQuote.getSymbolKey(), dailyQuote.getSplit(), dailyQuote.getDividend())
 				: portfolioChangesMap.get(day).stream().map(pts -> this.createQuote(day, pts, dailyQuote))
 						.reduce(new QuoteDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-								BigDecimal.ZERO, -1L, day.atStartOfDay(), dailyQuote.getSymbol().getSymbol()),
+								BigDecimal.ZERO, -1L, day.atStartOfDay(), dailyQuote.getSymbol().getSymbol(), BigDecimal.ZERO, BigDecimal.ZERO),
 								(acc, value) -> {
 									acc.setOpen(acc.getOpen()
 											.add(Optional.ofNullable(value.getOpen()).orElse(BigDecimal.ZERO)));
@@ -174,6 +174,8 @@ public class PortfolioToIndexService {
 									acc.setAdjClose(acc.getAdjClose()
 											.add(Optional.ofNullable(value.getAdjClose()).orElse(BigDecimal.ZERO)));
 									acc.setVolume(0L);
+									acc.setSplit(BigDecimal.ZERO);
+									acc.setDividend(BigDecimal.ZERO);
 									return acc;
 								});
 	}
@@ -197,7 +199,7 @@ public class PortfolioToIndexService {
 				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange.getWeight()))
 				.multiply(dailyQuote.getAdjClose());
 		return new QuoteDto(null, null, null, change.subtract(changeOld), changeAdj.subtract(changeAdjOld), 0L,
-				day.atStartOfDay(), portfolioToSymbol.ptsChange.getSymbol().getSymbol());
+				day.atStartOfDay(), portfolioToSymbol.ptsChange.getSymbol().getSymbol(), null, null);
 	}
 
 	public List<DailyQuoteEntityDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex,
