@@ -52,9 +52,10 @@ interface BySymbolElements extends ElementNode {
 }
 
 @Component({
-  selector: "app-result-tree",
-  templateUrl: "./result-tree.component.html",
-  styleUrls: ["./result-tree.component.scss"],
+    selector: "app-result-tree",
+    templateUrl: "./result-tree.component.html",
+    styleUrls: ["./result-tree.component.scss"],
+    standalone: false
 })
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];

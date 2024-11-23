@@ -19,9 +19,10 @@ import { Router } from "@angular/router";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-  selector: "app-main",
-  templateUrl: "./main.component.html",
-  styleUrls: ["./main.component.scss"],
+    selector: "app-main",
+    templateUrl: "./main.component.html",
+    styleUrls: ["./main.component.scss"],
+    standalone: false
 })
 export class MainComponent {
   login: Login = null;

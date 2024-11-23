@@ -36,9 +36,10 @@ interface ChartPeriod {
 }
 
 @Component({
-  selector: "app-portfolio-comparison",
-  templateUrl: "./portfolio-comparison.component.html",
-  styleUrls: ["./portfolio-comparison.component.scss"],
+    selector: "app-portfolio-comparison",
+    templateUrl: "./portfolio-comparison.component.html",
+    styleUrls: ["./portfolio-comparison.component.scss"],
+    standalone: false
 })
 export class PortfolioComparisonComponent implements OnInit {
   localSelPortfolio: Portfolio;

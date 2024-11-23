@@ -22,9 +22,10 @@ export interface SpinnerData {
 }
 
 @Component({
-  selector: "app-dialog-spinner",
-  templateUrl: "./dialog-spinner.component.html",
-  styleUrls: ["./dialog-spinner.component.scss"],
+    selector: "app-dialog-spinner",
+    templateUrl: "./dialog-spinner.component.html",
+    styleUrls: ["./dialog-spinner.component.scss"],
+    standalone: false
 })
 export class DialogSpinnerComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) {}

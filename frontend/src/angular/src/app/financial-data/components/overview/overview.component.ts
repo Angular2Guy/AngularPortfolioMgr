@@ -29,9 +29,10 @@ import { ImportData, ImportDataType } from "src/app/model/import-data";
 import { QuoteImportService } from "src/app/service/quote-import.service";
 
 @Component({
-  selector: "app-overview",
-  templateUrl: "./overview.component.html",
-  styleUrls: ["./overview.component.scss"],
+    selector: "app-overview",
+    templateUrl: "./overview.component.html",
+    styleUrls: ["./overview.component.scss"],
+    standalone: false
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;

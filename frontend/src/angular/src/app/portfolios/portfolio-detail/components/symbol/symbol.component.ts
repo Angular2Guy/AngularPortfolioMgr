@@ -65,9 +65,10 @@ interface SymbolData {
 }
 
 @Component({
-  selector: "app-symbol",
-  templateUrl: "./symbol.component.html",
-  styleUrls: ["./symbol.component.scss"],
+    selector: "app-symbol",
+    templateUrl: "./symbol.component.html",
+    styleUrls: ["./symbol.component.scss"],
+    standalone: false
 })
 export class SymbolComponent implements OnInit {
   private readonly dayInMs = 24 * 60 * 60 * 1000;

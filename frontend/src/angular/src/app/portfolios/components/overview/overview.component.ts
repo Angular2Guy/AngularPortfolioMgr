@@ -40,9 +40,10 @@ import {
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-  selector: "app-overview",
-  templateUrl: "./overview.component.html",
-  styleUrls: ["./overview.component.scss"],
+    selector: "app-overview",
+    templateUrl: "./overview.component.html",
+    styleUrls: ["./overview.component.scss"],
+    standalone: false
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;

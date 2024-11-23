@@ -76,9 +76,10 @@ enum FormFields {
 }
 
 @Component({
-  selector: "app-create-query",
-  templateUrl: "./create-query.component.html",
-  styleUrls: ["./create-query.component.scss"],
+    selector: "app-create-query",
+    templateUrl: "./create-query.component.html",
+    styleUrls: ["./create-query.component.scss"],
+    standalone: false
 })
 export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [

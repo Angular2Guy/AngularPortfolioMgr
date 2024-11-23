@@ -31,9 +31,10 @@ enum FormFields {
 }
 
 @Component({
-  selector: "app-change-symbol",
-  templateUrl: "./change-symbol.component.html",
-  styleUrls: ["./change-symbol.component.scss"],
+    selector: "app-change-symbol",
+    templateUrl: "./change-symbol.component.html",
+    styleUrls: ["./change-symbol.component.scss"],
+    standalone: false
 })
 export class ChangeSymbolComponent implements OnInit {
   protected FormFields = FormFields;

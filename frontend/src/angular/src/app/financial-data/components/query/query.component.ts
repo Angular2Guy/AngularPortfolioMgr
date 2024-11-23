@@ -41,9 +41,10 @@ export enum QueryFormFields {
 }
 
 @Component({
-  selector: "app-query",
-  templateUrl: "./query.component.html",
-  styleUrls: ["./query.component.scss"],
+    selector: "app-query",
+    templateUrl: "./query.component.html",
+    styleUrls: ["./query.component.scss"],
+    standalone: false
 })
 export class QueryComponent implements OnInit {
   protected readonly containsOperator = "*=*";

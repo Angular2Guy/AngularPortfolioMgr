@@ -5,9 +5,10 @@ import { DevAppInfoService } from "../../service/dev-app-info.service";
 import { OverviewComponent } from "../overview/overview.component";
 
 @Component({
-  selector: "app-dev-config",
-  templateUrl: "./dev-config.component.html",
-  styleUrls: ["./dev-config.component.scss"],
+    selector: "app-dev-config",
+    templateUrl: "./dev-config.component.html",
+    styleUrls: ["./dev-config.component.scss"],
+    standalone: false
 })
 export class DevConfigComponent implements OnInit {
   classNameObs: Observable<string>;

@@ -17,9 +17,10 @@ import { MatTableDataSource } from "@angular/material/table";
 import { MatSort } from "@angular/material/sort";
 
 @Component({
-  selector: "app-query-results",
-  templateUrl: "./query-results.component.html",
-  styleUrls: ["./query-results.component.scss"],
+    selector: "app-query-results",
+    templateUrl: "./query-results.component.html",
+    styleUrls: ["./query-results.component.scss"],
+    standalone: false
 })
 export class QueryResultsComponent implements AfterViewInit {
   treeSymbolFinancials: SymbolFinancials[] = [];

@@ -6,9 +6,10 @@ import { ProdAppInfoService } from "../../service/prod-app-info.service";
 import { OverviewComponent } from "../overview/overview.component";
 
 @Component({
-  selector: "app-prod-config",
-  templateUrl: "./prod-config.component.html",
-  styleUrls: ["./prod-config.component.scss"],
+    selector: "app-prod-config",
+    templateUrl: "./prod-config.component.html",
+    styleUrls: ["./prod-config.component.scss"],
+    standalone: false
 })
 export class ProdConfigComponent implements OnInit {
   classNameObs: Observable<string>;

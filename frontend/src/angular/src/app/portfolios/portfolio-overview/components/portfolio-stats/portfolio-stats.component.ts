@@ -14,9 +14,10 @@ import { Component, Input } from '@angular/core';
 import { Portfolio } from 'src/app/model/portfolio';
 
 @Component({
-  selector: 'app-portfolio-stats',
-  templateUrl: './portfolio-stats.component.html',
-  styleUrl: './portfolio-stats.component.scss'
+    selector: 'app-portfolio-stats',
+    templateUrl: './portfolio-stats.component.html',
+    styleUrl: './portfolio-stats.component.scss',
+    standalone: false
 })
 export class PortfolioStatsComponent {
 	protected readonly years = [1,2,5,10];

@@ -16,9 +16,10 @@ import { Symbol } from "../../../../model/symbol";
 import { Portfolio, CommonValues } from "../../../../model/portfolio";
 
 @Component({
-  selector: "app-symbol-overview",
-  templateUrl: "./symbol-overview.component.html",
-  styleUrls: ["./symbol-overview.component.scss"],
+    selector: "app-symbol-overview",
+    templateUrl: "./symbol-overview.component.html",
+    styleUrls: ["./symbol-overview.component.scss"],
+    standalone: false
 })
 export class SymbolOverviewComponent {
   @Input()

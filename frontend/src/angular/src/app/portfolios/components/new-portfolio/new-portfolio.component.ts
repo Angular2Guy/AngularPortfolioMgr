@@ -25,9 +25,10 @@ enum FormFields {
 }
 
 @Component({
-  selector: "app-new-portfolio",
-  templateUrl: "./new-portfolio.component.html",
-  styleUrls: ["./new-portfolio.component.scss"],
+    selector: "app-new-portfolio",
+    templateUrl: "./new-portfolio.component.html",
+    styleUrls: ["./new-portfolio.component.scss"],
+    standalone: false
 })
 export class NewPortfolioComponent {
   portfolioForm: FormGroup;

@@ -28,9 +28,10 @@ enum FormFields {
 }
 
 @Component({
-  selector: "app-import-financials",
-  templateUrl: "./import-financials.component.html",
-  styleUrls: ["./import-financials.component.scss"],
+    selector: "app-import-financials",
+    templateUrl: "./import-financials.component.html",
+    styleUrls: ["./import-financials.component.scss"],
+    standalone: false
 })
 export class ImportFinancialsComponent implements OnInit {
   protected financialsForm: FormGroup;

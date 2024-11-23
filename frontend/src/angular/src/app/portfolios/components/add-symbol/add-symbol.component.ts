@@ -45,9 +45,10 @@ enum FormFields {
 }
 
 @Component({
-  selector: "app-add-symbol",
-  templateUrl: "./add-symbol.component.html",
-  styleUrls: ["./add-symbol.component.scss"],
+    selector: "app-add-symbol",
+    templateUrl: "./add-symbol.component.html",
+    styleUrls: ["./add-symbol.component.scss"],
+    standalone: false
 })
 export class AddSymbolComponent implements OnInit {
   private portfolio: Portfolio = null;

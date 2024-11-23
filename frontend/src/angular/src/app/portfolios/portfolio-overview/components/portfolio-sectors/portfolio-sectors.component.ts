@@ -37,20 +37,21 @@ interface CalcPortfolioElement {
 }
 
 @Component({
-  selector: "app-portfolio-sectors",
-  templateUrl: "./portfolio-sectors.component.html",
-  styleUrls: ["./portfolio-sectors.component.scss"],
-  animations: [
-    trigger("fadeInGrow", [
-      transition("* => ready", [
-        style({ opacity: 0, transform: "scale(0.1)" }),
-        group([
-          animate("300ms linear", style({ opacity: 1 })),
-          animate("1000ms linear", style({ transform: "scale(1)" })),
+    selector: "app-portfolio-sectors",
+    templateUrl: "./portfolio-sectors.component.html",
+    styleUrls: ["./portfolio-sectors.component.scss"],
+    animations: [
+        trigger("fadeInGrow", [
+            transition("* => ready", [
+                style({ opacity: 0, transform: "scale(0.1)" }),
+                group([
+                    animate("300ms linear", style({ opacity: 1 })),
+                    animate("1000ms linear", style({ transform: "scale(1)" })),
+                ]),
+            ]),
         ]),
-      ]),
-    ]),
-  ],
+    ],
+    standalone: false
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   localSelPortfolio: Portfolio;

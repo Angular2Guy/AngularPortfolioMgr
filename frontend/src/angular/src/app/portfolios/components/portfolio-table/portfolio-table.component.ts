@@ -23,9 +23,10 @@ import { PortfolioElement } from "src/app/model/portfolio-element";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-  selector: "app-portfolio-table",
-  templateUrl: "./portfolio-table.component.html",
-  styleUrls: ["./portfolio-table.component.scss"],
+    selector: "app-portfolio-table",
+    templateUrl: "./portfolio-table.component.html",
+    styleUrls: ["./portfolio-table.component.scss"],
+    standalone: false
 })
 export class PortfolioTableComponent implements OnInit {
   private myLocalPortfolio: Portfolio = null;

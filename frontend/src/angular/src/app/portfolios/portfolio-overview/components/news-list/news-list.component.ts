@@ -25,9 +25,10 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 import { NewsItem } from "../../model/news-item";
 
 @Component({
-  selector: "app-news-list",
-  templateUrl: "./news-list.component.html",
-  styleUrl: "./news-list.component.scss",
+    selector: "app-news-list",
+    templateUrl: "./news-list.component.html",
+    styleUrl: "./news-list.component.scss",
+    standalone: false
 })
 export class NewsListComponent {
   @Input()

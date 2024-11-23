@@ -21,9 +21,10 @@ import { Item } from "../../model/item";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-  selector: "app-portfolio-timechart",
-  templateUrl: "./portfolio-timechart.component.html",
-  styleUrls: ["./portfolio-timechart.component.scss"],
+    selector: "app-portfolio-timechart",
+    templateUrl: "./portfolio-timechart.component.html",
+    styleUrls: ["./portfolio-timechart.component.scss"],
+    standalone: false
 })
 export class PortfolioTimechartComponent implements OnInit {
   @Input({ required: true })

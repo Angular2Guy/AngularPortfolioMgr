@@ -21,9 +21,10 @@ import { NewsItem } from "../../model/news-item";
 import { NewsService } from "../../service/news.service";
 
 @Component({
-  selector: "app-portfolio-charts",
-  templateUrl: "./portfolio-charts.component.html",
-  styleUrls: ["./portfolio-charts.component.scss"],
+    selector: "app-portfolio-charts",
+    templateUrl: "./portfolio-charts.component.html",
+    styleUrls: ["./portfolio-charts.component.scss"],
+    standalone: false
 })
 export class PortfolioChartsComponent implements OnInit {
   protected cnbcFinanceNews: NewsItem[] = [];
