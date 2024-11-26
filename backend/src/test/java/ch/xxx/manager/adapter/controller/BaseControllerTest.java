@@ -14,8 +14,8 @@ package ch.xxx.manager.adapter.controller;
 
 import javax.sql.DataSource;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import ch.xxx.manager.adapter.repository.JpaAppUserRepository;
 import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
@@ -39,50 +39,50 @@ import ch.xxx.manager.usecase.service.SymbolService;
 import jakarta.persistence.EntityManager;
 
 public class BaseControllerTest {
-	@MockBean	
+	@MockitoBean	
 	protected AppUserServiceDb appUserServiceDb;
-	@MockBean
+	@MockitoBean
 	protected SymbolService symbolService;
-	@MockBean 
+	@MockitoBean 
 	protected FinancialDataService financialDataService;
-	@MockBean
+	@MockitoBean
 	protected QuoteService quoteService;
-	@MockBean
+	@MockitoBean
 	protected QuoteImportService quoteImportService;
-	@MockBean
+	@MockitoBean
 	protected PortfolioToIndexService portfolioToIndexService;
-	@MockBean
+	@MockitoBean
 	protected CurrencyService currencyService;
-	@MockBean
+	@MockitoBean
 	protected SymbolImportService symbolImportService;
-	@MockBean
+	@MockitoBean
 	protected KafkaTemplate kafkaTemplate;
 	
-	@MockBean
+	@MockitoBean
 	protected JpaAppUserRepository jpaAppUserRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaCurrencyRepository jpaCurrencyRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaDailyQuoteRepository jpaDailyQuoteRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaFinancialElementRepository jpaFinancialElementRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaPortfolioElementRepository jpaPortfolioElementRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaPortfolioRepository jpaPortfolioRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaPortfolioToSymbolRepository jpaPortfolioToSymbolRepository;
-	@MockBean 
+	@MockitoBean 
 	protected JpaRevokedTokenRepository jpaRevokedTokenRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaSectorRepository jpaSectorRepository;
-	@MockBean
+	@MockitoBean
 	protected JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
-	@MockBean
+	@MockitoBean
 	protected EntityManager entityManager;
-	@MockBean
+	@MockitoBean
 	protected JpaSymbolRepository jpaSymbolRepository;
-	@MockBean
+	@MockitoBean
 	protected DataSource dataSource;
 	
 }

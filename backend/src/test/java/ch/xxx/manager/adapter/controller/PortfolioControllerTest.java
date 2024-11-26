@@ -27,11 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -55,9 +55,9 @@ public class PortfolioControllerTest extends BaseControllerTest {
 			+ "CRSLpttN9dMqam85wSRjhoKDz-_QWAjbUMptwFlskNa_8vZ-DvwwnkcvbEfBSvVJSUt8_4ZrWpBq1tX56PTOobbI-oXasUk-meYdD2tLDvErmPXC"
 			+ "ntTSqGB7c4jcoPT3IX1mUsNZp5hYPUWpZjXDSmx2Os1JhY2ezTJJBpMq0o559aSJPs1rkqH1zEFrYDs41-mFTujaIrxv4iC8wGsXqvixamg9mC0P8n"
 			+ "645McBJ6Q3X0PElFGbF6gmKtvrOqpQHA==";
-	@MockBean
+	@MockitoBean
 	private PortfolioService portfolioService;
-	@MockBean
+	@MockitoBean
 	private JwtTokenService jwtTokenService;
 	@Autowired
 	private MockMvc mockMvc;
