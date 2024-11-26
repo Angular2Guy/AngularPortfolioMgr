@@ -11,9 +11,8 @@
    limitations under the License.
  */
 plugins {
-	id 'org.springframework.boot' version '3.3.0'
-	id 'io.spring.dependency-management' version '1.1.5'
-	id 'org.graalvm.buildtools.native' version '0.10.2'
+	id 'org.springframework.boot' version '3.4.0'
+	id 'io.spring.dependency-management' version '1.1.6'
 	id 'java'    
 }
 
@@ -42,15 +41,15 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
-	implementation 'net.javacrumbs.shedlock:shedlock-spring:5.10.0'
-	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.10.0'
-	implementation 'com.google.crypto.tink:tink:1.11.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-spring:6.0.1'
+	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.1'
+	implementation 'com.google.crypto.tink:tink:1.15.0'
 	implementation 'com.rometools:rome:2.1.0'
 	implementation 'org.apache.httpcomponents.client5:httpclient5'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.2.0'
+	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.3.0'
 			
 	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
