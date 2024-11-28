@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -106,9 +107,9 @@ public class SymbolImportService {
 						this.decrypt(myAppUser.getAlphavantageKey(), UUID.fromString(myAppUser.getUuid())),
 						this.decrypt(myAppUser.getRapidApiKey(), UUID.fromString(myAppUser.getUuid()))))
 				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.alphavantageKey()).stream()
-						.filter(myStr -> !myStr.isBlank()).findFirst().isPresent())
+						.filter(Predicate.not(String::isBlank)).findFirst().isPresent())
 				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.RapidApiKey()).stream()
-						.filter(myStr -> !myStr.isBlank()).findFirst().isPresent())
+						.filter(Predicate.not(String::isBlank)).findFirst().isPresent())
 				.toList();
 		LOGGER.info("UserKeys size: {}", allUserKeys.size());
 		final AtomicLong indexDaily = new AtomicLong(-1L);
@@ -174,7 +175,7 @@ public class SymbolImportService {
 		this.refreshSymbolEntities();
 		LOGGER.info("importDeSymbols() called.");
 		List<Symbol> result = this.repository.saveAll(xetra.stream().filter(this::filter).filter(this::filterXetra)
-				.flatMap(line -> this.convertXetra(line)).collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet()
+				.flatMap(SymbolImportService::convertXetra).collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet()
 				.stream()
 				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
 				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
@@ -270,7 +271,7 @@ public class SymbolImportService {
 		return line.contains("DEUTSCHLAND") || line.contains("DAX");
 	}
 
-	private Stream<Symbol> convertXetra(String symbolLine) {
+	private static Stream<Symbol> convertXetra(String symbolLine) {
 		String[] strParts = symbolLine.split(";");
 		String symbol = String.format("%s.DEX",
 				strParts[7].substring(0, strParts[7].length() < 15 ? strParts[7].length() : 15));

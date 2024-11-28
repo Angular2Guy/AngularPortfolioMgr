@@ -56,7 +56,7 @@ public class NasdaqConnector implements NasdaqClient {
 				throw new SocketException(String.format("Failed to connect to %s", HOST));
 			}
 			FTPFile[] files = ftp.listFiles(DIR);
-			if (2 != Arrays.stream(files).map(FTPFile::getName).filter(file -> IMPORT_FILES.contains(file)).count()) {
+			if (2 != Arrays.stream(files).map(FTPFile::getName).filter(IMPORT_FILES::contains).count()) {
 				throw new FileNotFoundException(
 						String.format("Files: %s, %s", IMPORT_FILES.get(0), IMPORT_FILES.get(1)));
 			}

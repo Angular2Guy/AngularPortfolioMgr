@@ -13,6 +13,7 @@
 package ch.xxx.manager.usecase.mapping;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import ch.xxx.manager.domain.model.entity.Symbol;
 
@@ -24,8 +25,8 @@ public class MappingUtils {
 			String result = myEntity.getYahooName() != null && !myEntity.getYahooName().isBlank()
 					? myEntity.getYahooName()
 					: switch (entity.getQuoteSource()) {
-					case ALPHAVANTAGE -> Optional.ofNullable(myEntity.getAlphavantageName()).filter(myName -> !myName.isBlank()).orElse(SECTOR_PORTFOLIO);
-					case YAHOO -> Optional.ofNullable(myEntity.getYahooName()).filter(myName -> !myName.isBlank()).orElse(SECTOR_PORTFOLIO);
+					case ALPHAVANTAGE -> Optional.ofNullable(myEntity.getAlphavantageName()).filter(Predicate.not(String::isBlank)).orElse(SECTOR_PORTFOLIO);
+					case YAHOO -> Optional.ofNullable(myEntity.getYahooName()).filter(Predicate.not(String::isBlank)).orElse(SECTOR_PORTFOLIO);
 					default -> SECTOR_PORTFOLIO;
 					};
 			return result;

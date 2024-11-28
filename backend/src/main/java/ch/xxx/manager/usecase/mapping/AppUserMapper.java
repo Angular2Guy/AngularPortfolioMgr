@@ -14,6 +14,7 @@ package ch.xxx.manager.usecase.mapping;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.springframework.stereotype.Component;
 
@@ -44,9 +45,9 @@ public class AppUserMapper {
 		myEntity.setUserRole(dto.getUserRole());
 		myEntity.setUuid(dto.getUuid());
 		myEntity.setAlphavantageKey(Optional.ofNullable(dto.getAlphavantageKey()).stream()
-				.filter(myString -> !myString.isBlank()).findFirst().orElse(myEntity.getAlphavantageKey()));
+				.filter(Predicate.not(String::isBlank)).findFirst().orElse(myEntity.getAlphavantageKey()));
 		myEntity.setRapidApiKey(Optional.ofNullable(dto.getRapidApiKey()).stream()
-				.filter(myString -> !myString.isBlank()).findFirst().orElse(myEntity.getRapidApiKey()));
+				.filter(Predicate.not(String::isBlank)).findFirst().orElse(myEntity.getRapidApiKey()));
 		return myEntity;
 	}
 

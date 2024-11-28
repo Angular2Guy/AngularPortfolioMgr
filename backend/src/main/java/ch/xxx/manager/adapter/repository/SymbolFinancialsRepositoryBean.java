@@ -169,14 +169,15 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		Optional.ofNullable(symbolFinancialsQueryParams.getSymbol()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, false, SYMBOL)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().filter(myValue -> !myValue.trim().isBlank())
+		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
 				.forEach(
 						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams.getName(), root, false, NAME)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().filter(myValue -> !myValue.trim().isBlank())
+		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
 				.forEach(
 						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams.getCity(), root, false, CITY)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()
-				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
+		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()				
+				.map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
+				.forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams.getCountry(), root, false, COUNTRY)));
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
