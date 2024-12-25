@@ -40,6 +40,7 @@ import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.domain.utils.StreamHelpers;
 import jakarta.annotation.PostConstruct;
 
 @Service
@@ -80,9 +81,9 @@ public class CurrencyService {
 		List<Currency> result = wrapperDto.getDailyQuotes().entrySet().stream().flatMap(
 				entry -> Stream.of(this.convert(entry, CurrencyKey.valueOf(wrapperDto.getMetadata().getFromSymbol()),
 						CurrencyKey.valueOf(wrapperDto.getMetadata().getToSymbol()))))
-				.filter(entity -> myCurrencyMap.get(entity.getLocalDay()) == null
-						|| myCurrencyMap.get(entity.getLocalDay()).stream()
-								.noneMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
+				.filter(entity -> Optional.ofNullable(myCurrencyMap.get(entity.getLocalDay())).stream()
+						.flatMap(List::stream)
+						.noneMatch(mapEntity -> entity.getToCurrKey().equals(mapEntity.getToCurrKey())))
 				.collect(Collectors.toList());
 		LOG.info("Stored Fx Quotes: " + result.size());
 		return result;
@@ -140,7 +141,7 @@ public class CurrencyService {
 						LOG.debug("No CurrencyValue at {} portfolio: {} symbol: {}", day.toString(),
 								portfolioCurrencyKey.name(), symbolCurrencyKey.name());
 					}
-				}).filter(Optional::isPresent).map(Optional::get).findFirst();
+				}).flatMap(Optional::stream).findFirst();
 	}
 
 	public ImmutableSortedMap<LocalDate, Collection<Currency>> getCurrencyMap() {

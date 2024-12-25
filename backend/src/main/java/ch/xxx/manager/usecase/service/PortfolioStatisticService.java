@@ -141,47 +141,40 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		final var adjClosePercents10Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(10L));
-		final var sigma10Y = Optional
-				.ofNullable(adjClosePercents10Y.lastEntry()).map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents10Y, lastEntry))
+		final var sigma10Y = Optional.ofNullable(adjClosePercents10Y.lastEntry())
+				.map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents10Y, lastEntry))
 				.orElse(BigDecimal.ZERO);
 		final var adjClosePercents5Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(5L));
-		final var sigma5Y = Optional
-				.ofNullable(adjClosePercents5Y.lastEntry()).map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents5Y, lastEntry))
-				.orElse(BigDecimal.ZERO);
+		final var sigma5Y = Optional.ofNullable(adjClosePercents5Y.lastEntry())
+				.map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents5Y, lastEntry)).orElse(BigDecimal.ZERO);
 		final var adjClosePercents2Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(2L));
-		final var sigma2Y = Optional
-				.ofNullable(adjClosePercents2Y.lastEntry()).map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents2Y, lastEntry))
-				.orElse(BigDecimal.ZERO);
+		final var sigma2Y = Optional.ofNullable(adjClosePercents2Y.lastEntry())
+				.map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents2Y, lastEntry)).orElse(BigDecimal.ZERO);
 		final var adjClosePercents1Y = this.calcClosePercentages(List.copyOf(comparisonSymbols.stream()
 				.filter(mySymbol -> symbolKey.equals(mySymbol.getSymbol())).findFirst().orElseThrow().getDailyQuotes()),
 				LocalDate.now().minusYears(1L));
-		final var sigma1Y = Optional
-				.ofNullable(adjClosePercents1Y.lastEntry()).map(lastEntry ->this.zeroSafeDivideBigDecimal(adjClosePercents1Y, lastEntry))
-				.orElse(BigDecimal.ZERO);
+		final var sigma1Y = Optional.ofNullable(adjClosePercents1Y.lastEntry())
+				.map(lastEntry -> this.zeroSafeDivideBigDecimal(adjClosePercents1Y, lastEntry)).orElse(BigDecimal.ZERO);
 		return new SymbolSigmas(sigma10Y, sigma5Y, sigma2Y, sigma1Y);
 	}
 
 	private void calcPortfolioSigmas(final Portfolio portfolio, List<DailyQuote> portfolioQuotes) {
 		final var adjClosePercents10Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(10L));
 		portfolio.setYear10SigmaPortfolio(Optional.ofNullable(adjClosePercents10Y.lastEntry())
-				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents10Y, lastEntry))
-				.orElse(0.0D));
+				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents10Y, lastEntry)).orElse(0.0D));
 		final var adjClosePercents5Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(5L));
 		portfolio.setYear5SigmaPortfolio(Optional.ofNullable(adjClosePercents5Y.lastEntry())
-				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents5Y, lastEntry))
-				.orElse(0.0D));
+				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents5Y, lastEntry)).orElse(0.0D));
 		final var adjClosePercents2Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(2L));
 		portfolio.setYear2SigmaPortfolio(Optional.ofNullable(adjClosePercents2Y.lastEntry())
-				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents2Y, lastEntry))
-				.orElse(0.0D));
+				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents2Y, lastEntry)).orElse(0.0D));
 		final var adjClosePercents1Y = this.calcClosePercentages(portfolioQuotes, LocalDate.now().minusYears(1L));
 		portfolio.setYear1SigmaPortfolio(Optional.ofNullable(adjClosePercents1Y.lastEntry())
-				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents1Y, lastEntry))
-				.orElse(0.0D));
+				.map(lastEntry -> this.zeroSafeDivideDouble(adjClosePercents1Y, lastEntry)).orElse(0.0D));
 	}
 
 	private Double zeroSafeDivideDouble(final LinkedHashMap<LocalDate, BigDecimal> adjClosePercentsXY,
@@ -195,7 +188,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		}
 		return result;
 	}
-	
+
 	private BigDecimal zeroSafeDivideBigDecimal(final LinkedHashMap<LocalDate, BigDecimal> adjClosePercentsXY,
 			Entry<LocalDate, BigDecimal> lastEntry) {
 		BigDecimal result;
@@ -509,7 +502,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		return symbolCurrencyKeyOpt.stream()
 				.map(symbolCurrencyKey -> this.currencyService.getCurrencyQuote(myDailyQuote.getLocalDay(),
 						portfolio.getCurrencyKey(), symbolCurrencyKey))
-				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
+				.flatMap(Optional::stream).findFirst().orElseGet(() -> {
 					if (symbolCurrencyKeyOpt.isPresent()
 							&& !myDailyQuote.getCurrencyKey().equals(symbolCurrencyKeyOpt.get())) {
 						LOGGER.info("getCurrencyValue at {} returns 1 values.", myDailyQuote.getLocalDay().toString());

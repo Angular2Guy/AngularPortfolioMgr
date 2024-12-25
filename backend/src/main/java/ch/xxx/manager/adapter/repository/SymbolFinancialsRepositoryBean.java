@@ -140,7 +140,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		if ((symbolFinancialsQueryParams.getFinancialElementParams() == null
 				|| symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
 				&& (symbolFinancialsQueryParams.getSymbol() == null
-						|| symbolFinancialsQueryParams.getSymbol().isBlank()) 
+						|| symbolFinancialsQueryParams.getSymbol().isBlank())
 				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isBlank())) {
 			symbolFinancialsQueryParams.setSymbol("A");
 			results = List.of(this.createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, true, SYMBOL));
@@ -169,15 +169,14 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		Optional.ofNullable(symbolFinancialsQueryParams.getSymbol()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, false, SYMBOL)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
-				.forEach(
-						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams.getName(), root, false, NAME)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
-				.forEach(
-						myValue -> predicates.add(createColumnCriteria(symbolFinancialsQueryParams.getCity(), root, false, CITY)));
-		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream()				
-				.map(String::trim).filter(java.util.function.Predicate.not(String::isBlank))
-				.forEach(myValue -> predicates
+		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().map(String::trim)
+				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getName(), root, false, NAME)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().map(String::trim)
+				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getCity(), root, false, CITY)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream().map(String::trim)
+				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams.getCountry(), root, false, COUNTRY)));
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
 			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
@@ -200,8 +199,8 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 		return predicates;
 	}
 
-	private Predicate createColumnCriteria(String queryParamStr,
-			final Root<SymbolFinancials> root, boolean uselike, String columnName) {
+	private Predicate createColumnCriteria(String queryParamStr, final Root<SymbolFinancials> root, boolean uselike,
+			String columnName) {
 		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(columnName));
 		String lowerStr = queryParamStr.trim().toLowerCase();
 		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
@@ -230,7 +229,7 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 					Optional<Predicate> conceptClauseOpt = financialElementConceptClause(fePath, myDto);
 					Optional<Predicate> valueClauseOpt = financialElementValueClause(fePath, myDto);
 					List<Predicate> myPredicates = List.of(conceptClauseOpt, valueClauseOpt).stream()
-							.filter(Optional::isPresent).map(Optional::get).toList();
+							.flatMap(Optional::stream).toList();
 					if (myPredicates.size() > 1) {
 						localResult.add(
 								this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0])));
