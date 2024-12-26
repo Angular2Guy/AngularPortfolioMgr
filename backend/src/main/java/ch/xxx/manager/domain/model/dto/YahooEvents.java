@@ -14,9 +14,8 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record YahooEvents(@JsonAnyGetter @JsonAnySetter Map<Long, YahooEventsDividend> dividends, @JsonAnyGetter @JsonAnySetter Map<Long, YahooEventsSplit> splits) {
+public record YahooEvents(@JsonProperty Map<Long, YahooEventsDividend> dividends, @JsonProperty Map<Long, YahooEventsSplit> splits) {
 
 }
