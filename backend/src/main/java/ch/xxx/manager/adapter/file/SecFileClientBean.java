@@ -19,11 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;
+import ch.xxx.manager.domain.model.entity.dto.FinancialsDataDto;
 import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.AppInfoService;
@@ -72,8 +75,7 @@ public class SecFileClientBean implements FileClient {
 		this.importDone = false;
 		Thread shutDownThread = createShutDownThread();
 		Runtime.getRuntime().addShutdownHook(shutDownThread);
-		try(ZipFile initialFile = new ZipFile(this.financialDataImportPath + filename)) {
-			Enumeration<? extends ZipEntry> entries = initialFile.entries();			
+		try(ZipFile initialFile = new ZipFile(this.financialDataImportPath + filename)) {					
 			LocalDateTime startCleanup = LocalDateTime.now();
 			LOGGER.info("Drop indexes.");
 			this.financialDataImportService.dropFeIndexes();
@@ -81,49 +83,40 @@ public class SecFileClientBean implements FileClient {
 			this.financialDataImportService.clearFinancialsData();
 			LOGGER.info("Clear time: {}", ChronoUnit.MILLIS.between(startCleanup, LocalDateTime.now()));
 			List<SymbolFinancialsDto> symbolFinancialsDtos = new ArrayList<>();
-			boolean first = true;
-			final AtomicInteger maxChildren = new AtomicInteger(0);
-			while (entries.hasMoreElements()) {
-				ZipEntry element = entries.nextElement();
-				LocalDateTime start = LocalDateTime.now();
-				if (!element.isDirectory() && element.getSize() > 10) {
-					try(InputStream inputStream = new BufferedInputStream(initialFile.getInputStream(element))) {
-						if (first) {
-							LOGGER.info("Filename: {}, Filesize: {}", element.getName(), element.getSize());
-							first = false;
+			final var first = new AtomicBoolean(true);
+			final var maxChildren = new AtomicInteger(0);
+			final var start = new AtomicReference<LocalDateTime>(LocalDateTime.now());			
+			StreamHelpers.convert(initialFile.entries()).forEach(zipEntry -> {
+				start.set(LocalDateTime.now());
+				if (!zipEntry.isDirectory() && zipEntry.getSize() > 10) {
+					try(InputStream inputStream = new BufferedInputStream(initialFile.getInputStream(zipEntry))) {
+						if (first.get()) {
+							LOGGER.info("Filename: {}, Filesize: {}", zipEntry.getName(), zipEntry.getSize());
+							first.set(false);
 						}
 						String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 						SymbolFinancialsDto symbolFinancialsDto = this.objectMapper.readValue(text,
-								SymbolFinancialsDto.class);
-						StreamHelpers.toStream(symbolFinancialsDto.getData()).forEach(myFinancialsDataDto -> {
-							myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
-									.map(this::fixConcept)
-									.collect(Collectors.toSet()));
-							myFinancialsDataDto.setCashFlow(myFinancialsDataDto.getCashFlow().stream()
-									.map(this::fixConcept)
-									.collect(Collectors.toSet()));
-							myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
-									.map(this::fixConcept)
-									.collect(Collectors.toSet()));
-							int bsChildern = myFinancialsDataDto.getBalanceSheet() == null ? 0 : myFinancialsDataDto.getBalanceSheet().size();
-							int cfChildern = myFinancialsDataDto.getCashFlow() == null ? 0 : myFinancialsDataDto.getCashFlow().size();
-							int icChildern = myFinancialsDataDto.getIncome() == null ? 0 : myFinancialsDataDto.getIncome().size();
-							maxChildren.set(bsChildern + cfChildern + icChildern > maxChildren.get() ? bsChildern + cfChildern + icChildern : maxChildren.get());
-						});
+								SymbolFinancialsDto.class);						
+						maxChildren.set(StreamHelpers.toStream(symbolFinancialsDto.getData())
+						.map(myFinancialsDataDto -> {
+							cleanDto(myFinancialsDataDto);
+							int bsChildern = Optional.ofNullable(myFinancialsDataDto.getBalanceSheet()).stream().map(Set::size).findFirst().orElse(0);
+							int cfChildern = Optional.ofNullable(myFinancialsDataDto.getCashFlow()).stream().map(Set::size).findFirst().orElse(0); 
+							int icChildern = Optional.ofNullable(myFinancialsDataDto.getIncome()).stream().map(Set::size).findFirst().orElse(0);
+							return bsChildern + cfChildern + icChildern;
+						}).max(Integer::compareTo).orElse(0));						
 						symbolFinancialsDtos.add(symbolFinancialsDto);
 //						LOGGER.info(symbolFinancialsDto.toString());
 //						LOGGER.info(text != null ? text.substring(0, 100) : "");
 					} catch (Exception e) {
-						LOGGER.info("Exception with file: {}", element.getName(), e);
+						LOGGER.info("Exception with file: {}", zipEntry.getName(), e);
 					}
 				}
-				if ((this.ssdIo ? symbolFinancialsDtos.size() >= 100 : symbolFinancialsDtos.size() >= 35) || !entries.hasMoreElements()) {
-					this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
-					symbolFinancialsDtos.clear();
-					LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start, LocalDateTime.now()), maxChildren.get());
-					first = true;
+				if ((this.ssdIo ? symbolFinancialsDtos.size() >= 100 : symbolFinancialsDtos.size() >= 35)) {
+					storeEntries(symbolFinancialsDtos, first, maxChildren, start);
 				}
-			}
+			});
+			storeEntries(symbolFinancialsDtos, first, maxChildren, start);
 			LOGGER.info("Recreate indexes.");
 			this.financialDataImportService.createFeIndexes();
 			LOGGER.info("Indexes ready.");
@@ -135,6 +128,26 @@ public class SecFileClientBean implements FileClient {
 		Runtime.getRuntime().removeShutdownHook(shutDownThread);
 		this.importDone = true;
 		return true;
+	}
+
+	private void cleanDto(FinancialsDataDto myFinancialsDataDto) {
+		myFinancialsDataDto.setBalanceSheet(myFinancialsDataDto.getBalanceSheet().stream()
+				.map(this::fixConcept)
+				.collect(Collectors.toSet()));
+		myFinancialsDataDto.setCashFlow(myFinancialsDataDto.getCashFlow().stream()
+				.map(this::fixConcept)
+				.collect(Collectors.toSet()));
+		myFinancialsDataDto.setIncome(myFinancialsDataDto.getIncome().stream()
+				.map(this::fixConcept)
+				.collect(Collectors.toSet()));
+	}
+
+	private void storeEntries(List<SymbolFinancialsDto> symbolFinancialsDtos, final AtomicBoolean first,
+			final AtomicInteger maxChildren, AtomicReference<LocalDateTime> start) {
+		this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
+		symbolFinancialsDtos.clear();
+		LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start.get(), LocalDateTime.now()), maxChildren.get());
+		first.set(true);
 	}
 
 	private Thread createShutDownThread() {

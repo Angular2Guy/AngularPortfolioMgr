@@ -13,9 +13,11 @@
 package ch.xxx.manager.domain.utils;
 
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -47,10 +49,18 @@ public class StreamHelpers {
 	}
 
 	public static <T> Stream<T> unboxOptionals(Stream<Optional<T>> optSteam) {
-		return optSteam.filter(Optional::isPresent).map(Optional::get);
+		return optSteam.flatMap(Optional::stream);
 	}
 
 	public static <T> Stream<T> optionalStream(Optional<T> opt) {
 		return opt.stream();
+	}
+	
+	public static <T> Stream<T> convert(Enumeration<T> enumeration) {
+	    EnumerationSpliterator<T> spliterator 
+	      = new EnumerationSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED, enumeration);
+	    Stream<T> stream = StreamSupport.stream(spliterator, false);
+
+	    return stream;
 	}
 }
