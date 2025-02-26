@@ -74,7 +74,7 @@ public class CronJobService {
 		}
 	}
 
-	@Scheduled(cron = "0 */15 * * * ?")
+	@Scheduled(cron = "0 1 * * * ?")
 	@Order(2)
 	public void updateNewsFeeds() {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();
