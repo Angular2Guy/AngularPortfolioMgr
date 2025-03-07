@@ -40,7 +40,6 @@ import ch.xxx.manager.domain.model.entity.CurrencyRepository;
 import ch.xxx.manager.domain.model.entity.DailyQuote;
 import ch.xxx.manager.domain.model.entity.PortfolioToSymbol;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.domain.utils.StreamHelpers;
 import jakarta.annotation.PostConstruct;
 
 @Service

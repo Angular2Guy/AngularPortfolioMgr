@@ -133,7 +133,7 @@ public class FinancialDataService {
 	public Collection<SymbolFinancials> findSymbolFinancialsByName(String companyName) {
 		return companyName == null || companyName.trim().isBlank() ? List.of()
 				: this.symbolFinancialsRepository.findByName(companyName).stream()
-						.filter(StreamHelpers.distinctByKey(value -> value.getName())).toList();
+						.filter(StreamHelpers.distinctByKey(SymbolFinancials::getName)).toList();
 	}
 
 	@Transactional
@@ -145,7 +145,7 @@ public class FinancialDataService {
 	public Collection<SymbolFinancials> findSymbolFinancialsBySymbol(String symbol) {
 		return symbol == null || symbol.trim().isBlank() ? List.of()
 				: this.symbolFinancialsRepository.findBySymbol(symbol).stream()
-				.filter(StreamHelpers.distinctByKey(value -> value.getSymbol())).toList();
+				.filter(StreamHelpers.distinctByKey(SymbolFinancials::getSymbol)).toList();
 	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
