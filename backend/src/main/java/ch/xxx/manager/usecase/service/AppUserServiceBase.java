@@ -233,7 +233,7 @@ public class AppUserServiceBase {
 
 	public Boolean logout(String bearerStr) {
 		Optional<RevokedToken> revokedTokenOpt = this.logoutToken(bearerStr).stream()
-				.peek(revokedToken -> this.revokedTokenRepository.save(revokedToken)).findAny();
+				.peek(this.revokedTokenRepository::save).findAny();
 		return revokedTokenOpt.isPresent();
 	}
 
