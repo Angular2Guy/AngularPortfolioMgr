@@ -49,7 +49,7 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected Map<String, List<DailyQuote>> createDailyQuotesKeyMap(Set<PortfolioToSymbol> portfolioToSymbols) {
-		return portfolioToSymbols.stream().filter(pts -> pts.getRemovedAt() == null).filter(pts -> pts.getWeight() > 0).map(pts -> pts.getSymbol())
+		return portfolioToSymbols.stream().filter(pts -> pts.getRemovedAt() == null).filter(pts -> pts.getWeight() > 0).map(PortfolioToSymbol::getSymbol)
 				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol))
 				.collect(Collectors.toMap(Symbol::getSymbol,
 						mySymbol -> mySymbol.getDailyQuotes().stream()
@@ -60,9 +60,9 @@ public abstract class PortfolioCalculcationBase {
 	protected Map<String, List<DailyQuote>> createDailyQuotesSymbolKeyMap(List<String> symbolStrs) {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.dailyQuoteRepository.findBySymbolKeys(symbolStrs).stream()
 				.sorted(Comparator.comparing(DailyQuote::getSymbolKey))
-				.filter(StreamHelpers.distinctByKey(myQuote -> myQuote.getSymbolKey()))
+				.filter(StreamHelpers.distinctByKey(DailyQuote::getSymbolKey))
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
-				.collect(Collectors.groupingBy(myDailyQuote -> myDailyQuote.getSymbolKey()));
+				.collect(Collectors.groupingBy(DailyQuote::getSymbolKey));
 		final record MyKeyValue(String key, List<DailyQuote> quotes) {
 		}
 		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
@@ -106,7 +106,7 @@ public abstract class PortfolioCalculcationBase {
 						.allMatch(myResult -> myResult.equals(Boolean.TRUE)))
 				.collect(Collectors.toSet()).stream().sorted().toList();
 		List<LocalDate> allDates = dailyQuotesKeyMap.values().stream().flatMap(List::stream)
-				.map(myQuote -> myQuote.getLocalDay()).toList();
+				.map(DailyQuote::getLocalDay).toList();
 		return dailyQuotesKeyMap.keySet().size() == 1L ? allDates
 				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
