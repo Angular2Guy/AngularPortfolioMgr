@@ -14,6 +14,7 @@ package ch.xxx.manager.usecase.service;
 
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
+import ch.xxx.manager.domain.model.dto.LogoutEvent;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
+import ch.xxx.manager.domain.model.dto.SigninEvent;
 import ch.xxx.manager.domain.model.entity.AppUser;
 import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
@@ -37,35 +40,47 @@ import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 public class AppUserServiceEvents extends AppUserServiceBase implements AppUserService {
 	private static final long LOGOUT_TIMEOUT = 95L;
 	private final EventProducer eventProducer;
-	
-	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper, RevokedTokenMapper revokedTokenMapper,
-			JavaMailSender javaMailSender, RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
-			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService) {
-		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);
+	private final ApplicationEventPublisher applicationEventPublisher;
+
+	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper,
+			RevokedTokenMapper revokedTokenMapper, JavaMailSender javaMailSender,
+			RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
+			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService,
+			ApplicationEventPublisher applicationEventPublisher) {
+		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider,
+				myService, revokedTokenMapper);
 		this.eventProducer = messageProducer;
+		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	@Override
 	public void updateLoggedOutUsers() {
 		this.updateLoggedOutUsers(LOGOUT_TIMEOUT);
 	}
-	
+
 	@Override
 	public Boolean signin(AppUserDto appUserDto) {
 		Optional<AppUser> appUserOpt = super.signin(appUserDto, false, true);
-		appUserOpt.ifPresent(myAppUser -> this.eventProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser)));
+		appUserOpt.ifPresent(myAppUser -> this.applicationEventPublisher
+				.publishEvent(new SigninEvent(this.appUserMapper.convert(myAppUser)))
+		// myAppUser ->
+		// this.eventProducer.sendNewUserMsg(this.appUserMapper.convert(myAppUser))
+		);
 		return appUserOpt.isPresent();
 	}
 
 	public Boolean signinMsg(AppUserDto appUserDto) {
 		return super.signin(appUserDto, true, false).isPresent();
 	}
-	
+
 	@Override
 	public Boolean logout(String bearerStr) {
 		Optional<RevokedToken> logoutTokenOpt = this.logoutToken(bearerStr);
-		logoutTokenOpt.ifPresent(revokedToken -> 
-			this.eventProducer.sendLogoutMsg(this.revokedTokenMapper.convert(revokedToken)));		
+		logoutTokenOpt.ifPresent(revokedToken -> this.applicationEventPublisher
+				.publishEvent(new LogoutEvent(this.revokedTokenMapper.convert(revokedToken)))
+		// revokedToken ->
+		// this.eventProducer.sendLogoutMsg(this.revokedTokenMapper.convert(revokedToken))
+		);
 		return logoutTokenOpt.isPresent();
 	}
 
@@ -74,7 +89,7 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 		this.updateLoggedOutUsers();
 		return result;
 	}
-	
+
 	public void sendKafkaEvent(KafkaEventDto kafkaEventDto) {
 		this.eventProducer.sendKafkaEvent(kafkaEventDto);
 	}

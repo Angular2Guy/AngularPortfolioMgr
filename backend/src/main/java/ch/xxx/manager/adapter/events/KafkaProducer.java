@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,8 +34,11 @@ import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
+import ch.xxx.manager.domain.model.dto.LogoutEvent;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
+import ch.xxx.manager.domain.model.dto.SigninEvent;
 import ch.xxx.manager.domain.producer.EventProducer;
+import jakarta.transaction.Transactional;
 
 @Service
 @Profile("kafka | prod-kafka")
@@ -49,6 +54,13 @@ public class KafkaProducer implements EventProducer {
 		this.adminClient = adminClient;
 	}
 	
+	@Async
+	@Transactional
+	@TransactionalEventListener
+	public void receiveLogoutEvent(LogoutEvent logoutEvent) {
+		this.sendLogoutMsg(logoutEvent.revokedTokenDto());
+	}	
+	
 	@Override
 	public void sendLogoutMsg(RevokedTokenDto revokedTokenDto) {		
 		try {
@@ -60,6 +72,13 @@ public class KafkaProducer implements EventProducer {
 			throw new AuthenticationException("Logout failed.");
 		}
 		LOGGER.info("send logout msg: {}", revokedTokenDto.toString());
+	}
+	
+	@Async
+	@Transactional
+	@TransactionalEventListener
+	public void receiveSigninEvent(SigninEvent signinEvent) {
+		this.sendNewUserMsg(signinEvent.appUserDto());
 	}
 	
 	@Override
