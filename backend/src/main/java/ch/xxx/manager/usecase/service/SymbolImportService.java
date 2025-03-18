@@ -147,8 +147,8 @@ public class SymbolImportService {
 		this.refreshSymbolEntities();
 		LOGGER.info("importUsSymbols() called.");
 		List<Symbol> result = this.repository
-				.saveAll(nasdaq.stream().filter(this::filter).flatMap(symbolStr -> this.convert(symbolStr))
-						.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+				.saveAll(nasdaq.stream().filter(this::filter).flatMap(this::convert)
+						.flatMap(this::replaceEntity).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
 	}
 
@@ -161,8 +161,8 @@ public class SymbolImportService {
 		this.refreshSymbolEntities();
 		LOGGER.info("importHkSymbols() called.");
 		List<Symbol> result = this.repository
-				.saveAll(hkex.stream().filter(this::filter).flatMap(myDto -> this.convert(myDto))
-						.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+				.saveAll(hkex.stream().filter(this::filter).flatMap(this::convert)
+						.flatMap(this::replaceEntity).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
 	}
 
@@ -178,7 +178,7 @@ public class SymbolImportService {
 				.flatMap(SymbolImportService::convertXetra).collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet()
 				.stream()
 				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
-				.flatMap(entity -> this.replaceEntity(entity)).collect(Collectors.toList()));
+				.flatMap(this::replaceEntity).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
 	}
 
@@ -187,11 +187,11 @@ public class SymbolImportService {
 		final List<String> localSymbolStrs = symbolStrs;
 		final Set<String> symbolStrsToImport = new HashSet<>();
 		List<Symbol> result = this.repository.saveAll(
-				localSymbolStrs.stream().flatMap(indexSymbol -> upsertSymbolEntity(indexSymbol)).map(entity -> {
+				localSymbolStrs.stream().flatMap(this::upsertSymbolEntity).map(entity -> {
 					symbolStrsToImport.add(entity.getSymbol());
 					return entity;
 				}).collect(Collectors.toList()));
-		return result.stream().map(myEntity -> myEntity.getSymbol()).collect(Collectors.toList());
+		return result.stream().map(Symbol::getSymbol).collect(Collectors.toList());
 	}
 
 	public List<Symbol> findSymbolsToUpdate() {
