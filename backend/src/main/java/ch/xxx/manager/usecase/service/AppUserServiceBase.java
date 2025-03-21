@@ -104,6 +104,14 @@ public class AppUserServiceBase {
 		this.daead = handle.getPrimitive(DeterministicAead.class);
 	}
 
+	public void cleanup() {
+
+	}
+	
+	public void eventRetry() {
+		
+	}
+	
 	public void updateLoggedOutUsers() {
 		this.updateLoggedOutUsers(LOGOUT_TIMEOUT);
 	}

@@ -31,6 +31,7 @@ import ch.xxx.manager.domain.model.entity.AppUserRepository;
 import ch.xxx.manager.domain.model.entity.RevokedToken;
 import ch.xxx.manager.domain.model.entity.RevokedTokenRepository;
 import ch.xxx.manager.domain.producer.EventProducer;
+import ch.xxx.manager.domain.producer.EventPublications;
 import ch.xxx.manager.usecase.mapping.AppUserMapper;
 import ch.xxx.manager.usecase.mapping.RevokedTokenMapper;
 
@@ -41,18 +42,30 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 	private static final long LOGOUT_TIMEOUT = 95L;
 	private final EventProducer eventProducer;
 	private final ApplicationEventPublisher applicationEventPublisher;
+	private final EventPublications eventPublications;
 
 	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper,
 			RevokedTokenMapper revokedTokenMapper, JavaMailSender javaMailSender,
 			RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
 			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService,
-			ApplicationEventPublisher applicationEventPublisher) {
+			ApplicationEventPublisher applicationEventPublisher, EventPublications eventPublications) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider,
 				myService, revokedTokenMapper);
 		this.eventProducer = messageProducer;
 		this.applicationEventPublisher = applicationEventPublisher;
+		this.eventPublications = eventPublications;
 	}
 
+	@Override
+	public void cleanup() {
+		this.eventPublications.clearPublishedEvents();
+	}
+	
+	@Override
+	public void eventRetry() {
+		this.eventPublications.resubmitUnpublishedEvents();
+	}
+	
 	@Override
 	public void updateLoggedOutUsers() {
 		this.updateLoggedOutUsers(LOGOUT_TIMEOUT);

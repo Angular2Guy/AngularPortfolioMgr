@@ -33,4 +33,6 @@ public interface AppUserService {
 	List<AppUserDto> loadAll();
 	AppUserDto loadByName(String name, boolean showApiKeys);
 	void sendKafkaEvent(KafkaEventDto kafkaEventDto);
+	void cleanup();
+	void eventRetry();
 }

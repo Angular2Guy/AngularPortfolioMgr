@@ -81,6 +81,22 @@ public class CronJobService {
 		this.newsFeedService.updateYahooNewsFeed();
 	}
 	
+	@Scheduled(cron = "5 0 1 * * ?")
+	@SchedulerLock(name = "CleanUp_scheduledTask", lockAtLeastFor = "PT2H", lockAtMostFor = "PT3H")
+	public void dbCleanup() {
+		LOGGER.info("Start cleanup Job");
+		this.appUserService.cleanup();
+		LOGGER.info("End cleanup Job");
+	}
+	
+	@Scheduled(cron = "10 0 * * * ?")
+	@SchedulerLock(name = "EventRetry_scheduledTask", lockAtLeastFor = "PT45M", lockAtMostFor = "PT55M")
+	public void eventRetry() {
+		LOGGER.info("Start eventretry Job");
+		this.appUserService.eventRetry();
+		LOGGER.info("End eventretry Job");
+	}
+	
 	@Transactional
 	@Scheduled(cron = "0 0 1 * * ?")
 	@SchedulerLock(name = "CronJob_symbols", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")

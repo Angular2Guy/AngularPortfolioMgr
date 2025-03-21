@@ -48,4 +48,21 @@
 			<column name="dividend" value="0" />
 		</update>
 	</changeSet>
+	<changeSet id="45" author="angular2guy">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="event_publication" />
+			</not>
+		</preConditions>
+		<createTable tableName="event_publication">
+			<column name="id" type="uuid">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="completion_date" type="datetime"></column>
+			<column name="event_type" type="varchar(4096)"></column>
+			<column name="listener_id" type="varchar(4096)"></column>
+			<column name="publication_date" type="datetime"></column>
+			<column name="serialized_event" type="varchar(32767)"></column>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

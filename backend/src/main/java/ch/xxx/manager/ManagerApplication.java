@@ -17,12 +17,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.modulith.Modulithic;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 
 
 @SpringBootApplication
+@Modulithic
 @ComponentScan(basePackages = "ch.xxx.manager", excludeFilters = 
 @Filter(type = FilterType.CUSTOM, classes = ComponentScanCustomFilter.class))
 @OpenAPIDefinition(info = @Info(title = "AngularPortfolioMgr API", version = "1.0", description = "AngularPortfolioMgr Api Information"))
