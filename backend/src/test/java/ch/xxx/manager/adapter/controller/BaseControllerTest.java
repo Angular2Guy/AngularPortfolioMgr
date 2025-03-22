@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import ch.xxx.manager.adapter.events.EventPublicationsBean;
 import ch.xxx.manager.adapter.repository.JpaAppUserRepository;
 import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
 import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
@@ -84,5 +85,7 @@ public class BaseControllerTest {
 	protected JpaSymbolRepository jpaSymbolRepository;
 	@MockitoBean
 	protected DataSource dataSource;
+	@MockitoBean
+	protected EventPublicationsBean eventPublicationsBean;
 	
 }
