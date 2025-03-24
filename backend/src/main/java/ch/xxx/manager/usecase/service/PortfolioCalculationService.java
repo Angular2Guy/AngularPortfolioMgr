@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -114,18 +115,18 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.flatMap(pe -> this.findValueAtDate(portfolioElements, cutOffDate, pe.symbolId()).stream())
 				.filter(StreamHelpers.distinctByKey(CalcPortfolioElement::symbolId)).toList();
 		List<CalcPortfolioElement> maxPEs = portfolioElements.stream()
-				.collect(Collectors.groupingBy(pe -> pe.symbolId())).entrySet().stream()
+				.collect(Collectors.groupingBy(CalcPortfolioElement::symbolId)).entrySet().stream()
 				.flatMap(entry -> StreamHelpers
 						.toStream(entry.getValue().stream().max(Comparator.comparing(CalcPortfolioElement::localDate))
 								.orElseThrow(NoSuchElementException::new)))
 				.toList();
 		List<CalcPortfolioElement> resultPortfolioElements = maxPEs.stream().map(pe -> {
 			BigDecimal value = cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-					.map(myPe -> myPe.value()).findFirst().isEmpty()
+					.map(CalcPortfolioElement::value).findFirst().isEmpty()
 							? BigDecimal.ZERO
 							: pe.value()
 									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-											.map(myPe -> myPe.value()).findFirst().get(), 8, RoundingMode.HALF_EVEN)
+											.map(CalcPortfolioElement::value).findFirst().get(), 8, RoundingMode.HALF_EVEN)
 									.subtract(BigDecimal.ONE).multiply(BigDecimal.valueOf(100));
 			return new CalcPortfolioElement(pe.symbolId(), pe.localDate(), value, pe.symbolName(), pe.weight());
 		}).toList();
@@ -189,9 +190,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		portfolio.setYear10(this.portfolioValueAtDate(portfolio.getPortfolioToSymbols(),
 				myPortfolioData.portfolioElements(), cutOffDate));
 		PortfolioWithElements temp = this.portfolioStatisticService.calculatePortfolioWithElements(portfolio,
-				myPortfolioData.portfolioQuotes.dailyQuotes);
+				myPortfolioData.portfolioQuotes().dailyQuotes());
 		PortfolioWithElements result = new PortfolioWithElements(temp.portfolio(), temp.portfolioElements(),
-				myPortfolioData.dailyQuotesToRemove, myPortfolioData.portfolioQuotes.dailyQuotes);
+				myPortfolioData.dailyQuotesToRemove(), myPortfolioData.portfolioQuotes().dailyQuotes());
 		return result;
 	}
 
@@ -236,13 +237,13 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	}
 
 	private Optional<PortfolioToSymbol> findAtDayPts(String symbolStr, LocalDate atDay,
-			Collection<PortfolioToSymbol> portfolioToSymbols) {
-		LocalDate[] first = new LocalDate[1];
+			Collection<PortfolioToSymbol> portfolioToSymbols) {		
+		AtomicReference<LocalDate> firstRef = new AtomicReference<>();
 		Optional<PortfolioToSymbol> ptsWeight = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().equalsIgnoreCase(symbolStr))
 				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
-				.peek(pts -> first[0] = first[0] == null ? pts.getChangedAt() : first[0])
-				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0).filter(pts -> atDay.compareTo(first[0]) >= 0)
+				.peek(pts -> firstRef.set(firstRef.get() == null ? pts.getChangedAt() : firstRef.get()))
+				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0).filter(pts -> atDay.compareTo(firstRef.get()) >= 0)
 				.filter(pts -> Optional.ofNullable(pts.getRemovedAt()).stream()
 						.noneMatch(myRemovedAt -> myRemovedAt.compareTo(LocalDate.now()) <= 0))
 				.max((pts1,pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()));
@@ -319,7 +320,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 
 	private DailyQuote upsertPortfolioQuote(Currency currencyQuote, DailyQuote dailyQuote,
 			PortfolioToSymbol portfolioToSymbol, PortfolioSymbolWithDailyQuotes portfolioQuotes) {
-		DailyQuote portfolioQuote = portfolioQuotes.dailyQuotes.stream()
+		DailyQuote portfolioQuote = portfolioQuotes.dailyQuotes().stream()
 				.filter(myDailyQuote -> myDailyQuote.getLocalDay().isEqual(dailyQuote.getLocalDay())).findFirst()
 				.orElse(new DailyQuote());
 		portfolioQuote.setClose(this.calcValue(Currency::getClose, currencyQuote, DailyQuote::getClose, dailyQuote,
