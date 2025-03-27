@@ -108,7 +108,8 @@ public abstract class PortfolioCalculcationBase {
 		List<LocalDate> allDates = dailyQuotesKeyMap.values().stream().flatMap(List::stream)
 				.map(DailyQuote::getLocalDay).toList();
 		return dailyQuotesKeyMap.keySet().size() == 1L ? allDates
-				: commonQuoteDates.stream().filter(myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
+				: commonQuoteDates.stream().filter(
+						myLocalDate -> !LocalDate.now().equals(myLocalDate)).toList();
 	}
 
 	public Portfolio addDailyQuotes(Portfolio portfolio) {
