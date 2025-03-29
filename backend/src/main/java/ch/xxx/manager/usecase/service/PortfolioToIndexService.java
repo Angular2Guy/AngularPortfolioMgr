@@ -181,25 +181,25 @@ public class PortfolioToIndexService {
 	}
 
 	private QuoteDto createQuote(LocalDate day, PtsChangePair portfolioToSymbol, DailyQuote dailyQuote) {
-		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange, dailyQuote)
+		Currency currencyChange = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange(), dailyQuote)
 				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
-		Currency currencyChangeOld = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange, dailyQuote)
+		Currency currencyChangeOld = this.currencyService.getCurrencyQuote(portfolioToSymbol.ptsChange(), dailyQuote)
 				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
 		BigDecimal changeOld = currencyChangeOld.getClose()
 				.multiply(
-						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld.map(PortfolioToSymbol::getWeight).orElse(0L)))
+						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld().map(PortfolioToSymbol::getWeight).orElse(0L)))
 				.multiply(dailyQuote.getClose());
 		BigDecimal change = currencyChange.getClose()
-				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange.getWeight())).multiply(dailyQuote.getClose());
+				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange().getWeight())).multiply(dailyQuote.getClose());
 		BigDecimal changeAdjOld = currencyChangeOld.getClose()
 				.multiply(
-						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld.map(PortfolioToSymbol::getWeight).orElse(0L)))
+						BigDecimal.valueOf(portfolioToSymbol.ptsChangeOld().map(PortfolioToSymbol::getWeight).orElse(0L)))
 				.multiply(dailyQuote.getAdjClose());
 		BigDecimal changeAdj = currencyChange.getClose()
-				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange.getWeight()))
+				.multiply(BigDecimal.valueOf(portfolioToSymbol.ptsChange().getWeight()))
 				.multiply(dailyQuote.getAdjClose());
 		return new QuoteDto(null, null, null, change.subtract(changeOld), changeAdj.subtract(changeAdjOld), 0L,
-				day.atStartOfDay(), portfolioToSymbol.ptsChange.getSymbol().getSymbol(), null, null);
+				day.atStartOfDay(), portfolioToSymbol.ptsChange().getSymbol().getSymbol(), null, null);
 	}
 
 	public List<DailyQuoteEntityDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex,
