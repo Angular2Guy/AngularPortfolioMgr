@@ -88,7 +88,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr).stream())
 //				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol()))
 				.toList();
-		var ptsToDelete = portfolioToSymbols.stream().filter(pts -> pts.getRemovedAt() != null)
+		var ptsToDelete = portfolioToSymbols.stream().filter(pts -> Optional.ofNullable(pts.getRemovedAt()).isPresent())
 				.filter(pts -> pts.getWeight() <= 0)
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER)).toList();
 		List<PortfolioElement> portfolioElements = portfolioToSymbols.stream()
@@ -201,14 +201,14 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	}
 
 	private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
-		final var adjCloseMean = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
+		final var adjCloseMean = adjClosePercents.entrySet().stream().map(Entry::getValue)
 				.reduce(BigDecimal.ZERO, (acc, value) -> value.add(acc))
 				.divide(BigDecimal.valueOf(adjClosePercents.entrySet().size()), 25, RoundingMode.HALF_EVEN);
 		final var divisor = BigDecimal.ONE.divide(
 				BigDecimal.valueOf(adjClosePercents.entrySet().size() < 2 ? 2 : adjClosePercents.entrySet().size())
 						.subtract(BigDecimal.ONE),
 				25, RoundingMode.HALF_EVEN);
-		final var standardDeviation = adjClosePercents.entrySet().stream().map(myEntry -> myEntry.getValue())
+		final var standardDeviation = adjClosePercents.entrySet().stream().map(Entry::getValue)
 				.map(myValue -> myValue.subtract(adjCloseMean)).map(myValue -> myValue.multiply(myValue))
 				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(acc)).multiply(divisor, MathContext.DECIMAL128)
 				.sqrt(MathContext.DECIMAL128);
@@ -219,6 +219,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 			final LocalDate cutOffDate) {
 		record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
 		}
+		//TODO use gatherer
 		final var lastValue = new AtomicReference<BigDecimal>(new BigDecimal(-1000L));
 		final var closeAdjPercents = portfolioQuotes.stream()
 				.filter(myQuote -> cutOffDate.isAfter(myQuote.getLocalDay())).map(myQuote -> {
@@ -231,7 +232,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 					return new DateToCloseAdjPercent(myQuote.getLocalDay(), result);
 				}).sorted((a, b) -> a.localDate().compareTo(b.localDate()))
 				.filter(myValue -> myValue.closeAdjPercent().longValue() < -900L).collect(Collectors.toMap(
-						myVal -> myVal.localDate(), myVal -> myVal.closeAdjPercent(), (x, y) -> y, LinkedHashMap::new));
+						DateToCloseAdjPercent::localDate, DateToCloseAdjPercent::closeAdjPercent, (x, y) -> y, LinkedHashMap::new));
 		return closeAdjPercents;
 	}
 
@@ -456,14 +457,14 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	double calculateCorrelation(List<CalcValuesDay> calcValuesDays) {
 		BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
 		BigDecimal sumMultQuotes = calcValuesDays.stream()
-				.map(myValue -> new BigDecimalValues(myValue.quote.subtract(meanValues.daily),
-						myValue.compQuote.subtract(meanValues.comp)))
-				.map(myRecord -> myRecord.daily.multiply(myRecord.comp)).reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+				.map(myValue -> new BigDecimalValues(myValue.quote().subtract(meanValues.daily),
+						myValue.compQuote.subtract(meanValues.comp())))
+				.map(myRecord -> myRecord.daily().multiply(myRecord.comp())).reduce(BigDecimal.ZERO, BigDecimal::add).abs();
 		BigDecimal squaredMeanDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
-				.map(myValue -> myValue.subtract(meanValues.daily)).map(myValue -> myValue.multiply(myValue))
+				.map(myValue -> myValue.subtract(meanValues.daily())).map(myValue -> myValue.multiply(myValue))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal squaredMeanCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
-				.map(myValue -> myValue.subtract(meanValues.comp)).map(myValue -> myValue.multiply(myValue))
+				.map(myValue -> myValue.subtract(meanValues.comp())).map(myValue -> myValue.multiply(myValue))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal devisor = squaredMeanCompQuotes.multiply(squaredMeanDailyQuotes).sqrt(MathContext.DECIMAL128);
 		double correlation = sumMultQuotes.divide((devisor.compareTo(BigDecimal.ZERO) <= 0 ? BigDecimal.ONE : devisor),
