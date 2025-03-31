@@ -77,8 +77,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
 	};
 
-	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService, PortfolioRepository portfolioRepository,
-			PortfolioStatisticService portfolioStatisticService, SymbolRepository symbolRepository,PortfolioToSymbolRepository portfolioToSymbolRepository) {
+	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
+			PortfolioRepository portfolioRepository, PortfolioStatisticService portfolioStatisticService,
+			SymbolRepository symbolRepository, PortfolioToSymbolRepository portfolioToSymbolRepository) {
 		super(dailyQuoteRepository, currencyService, symbolRepository);
 		this.portfolioStatisticService = portfolioStatisticService;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
@@ -126,16 +127,16 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 							? BigDecimal.ZERO
 							: pe.value()
 									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-											.map(CalcPortfolioElement::value).findFirst().get(), 8, RoundingMode.HALF_EVEN)
+											.map(CalcPortfolioElement::value).findFirst().get(), 8,
+											RoundingMode.HALF_EVEN)
 									.subtract(BigDecimal.ONE).multiply(BigDecimal.valueOf(100));
 			return new CalcPortfolioElement(pe.symbolId(), pe.localDate(), value, pe.symbolName(), pe.weight());
 		}).toList();
 		return resultPortfolioElements;
 	}
-	
+
 	public PortfolioToSymbol updatePtsEntity(PortfolioToSymbol portfolioToSymbol) {
-		return this.portfolioToSymbolRepository
-				.saveAndFlush(portfolioToSymbol);
+		return this.portfolioToSymbolRepository.saveAndFlush(portfolioToSymbol);
 	}
 
 	public Portfolio addPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDateTime changedAt) {
@@ -143,7 +144,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.saveAndFlush(this.createPtsEntity(dto, symbolId, weight, changedAt.toLocalDate())).getPortfolio();
 		return updatedPortfolio;
 	}
-	
+
 	private PortfolioToSymbol createPtsEntity(PortfolioDto dto, Long symbolId, Long weight, LocalDate changedAt) {
 		Portfolio myPortfolio = this.portfolioRepository.findById(dto.getId())
 				.orElseThrow(() -> new RuntimeException(String.format("Portfolio with id %d not found.", dto.getId())));
@@ -162,11 +163,11 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			throw new ResourceForbiddenException("Too many Symbols in user Portfolios.");
 		}
 	}
-	
+
 	Long countPortfolioSymbolsByUserId(Long userId) {
 		return this.portfolioRepository.countPortfolioSymbolsByUserId(userId);
 	}
-	
+
 	public PortfolioWithElements calculatePortfolio(Portfolio portfolio) {
 		Optional.ofNullable(portfolio).orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
 		LOG.info("Portfolio calculation called for: {}", portfolio.getId());
@@ -237,16 +238,18 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	}
 
 	private Optional<PortfolioToSymbol> findAtDayPts(String symbolStr, LocalDate atDay,
-			Collection<PortfolioToSymbol> portfolioToSymbols) {		
+			Collection<PortfolioToSymbol> portfolioToSymbols) {
+		// TODO replace with gatherer
 		AtomicReference<LocalDate> firstRef = new AtomicReference<>();
 		Optional<PortfolioToSymbol> ptsWeight = portfolioToSymbols.stream()
 				.filter(pts -> pts.getSymbol().getSymbol().equalsIgnoreCase(symbolStr))
 				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 				.peek(pts -> firstRef.set(firstRef.get() == null ? pts.getChangedAt() : firstRef.get()))
-				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0).filter(pts -> atDay.compareTo(firstRef.get()) >= 0)
+				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0)
+				.filter(_ -> atDay.compareTo(firstRef.get()) >= 0)
 				.filter(pts -> Optional.ofNullable(pts.getRemovedAt()).stream()
 						.noneMatch(myRemovedAt -> myRemovedAt.compareTo(LocalDate.now()) <= 0))
-				.max((pts1,pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()));
+				.max((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()));
 		return ptsWeight;
 	}
 
@@ -263,7 +266,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<CalcPortfolioElement> portfolioElements, LocalDate cutOffDate) {
 		BigDecimal result = portfolioToSymbols.stream()
 				.filter(pts -> !pts.getSymbol().getSymbol().contains(ServiceUtils.PORTFOLIO_MARKER))
-				.filter(StreamHelpers.distinctByKey(pts ->  pts.getSymbol().getId()))
+				.filter(StreamHelpers.distinctByKey(pts -> pts.getSymbol().getId()))
 //				.peek(pts -> LOG.info(pts.getSymbol().getSymbol()))
 				.map(pts -> findValueAtDate(portfolioElements, cutOffDate, pts.getSymbol().getId()))
 				.flatMap(StreamHelpers::optionalStream)
@@ -294,8 +297,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.filter(myDailyQuote -> commonQuoteDates.stream()
 						.anyMatch(myCommonDate -> myCommonDate.isEqual(myDailyQuote.getLocalDay())))
 				.map(myDailyQuote -> this.calculatePortfolioElement(myDailyQuote, ptsWithList, portfolioQuotes))
-				.flatMap(StreamHelpers::optionalStream)
-				.collect(Collectors.toList());
+				.flatMap(StreamHelpers::optionalStream).collect(Collectors.toList());
 	}
 
 	private Optional<CalcPortfolioElement> calculatePortfolioElement(DailyQuote dailyQuote, PtsWithList ptsWithList,
@@ -338,8 +340,12 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 		portfolioQuote.setSymbol(portfolioQuotes.symbol());
 		portfolioQuote.setSymbolKey(portfolioQuotes.symbol().getSymbol());
 		portfolioQuote.setVolume(1L);
-		portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
-		portfolioQuotes.dailyQuotes.add(portfolioQuote);
+		// ignore close values of null or zero -> bankrupt companies
+		if (portfolioQuote.getAdjClose().compareTo(new BigDecimal("0.01")) >= 0
+				&& portfolioQuote.getClose().compareTo(new BigDecimal("0.01")) >= 0) {
+			portfolioToSymbol.getSymbol().getDailyQuotes().add(portfolioQuote);
+			portfolioQuotes.dailyQuotes().add(portfolioQuote);
+		}
 		return portfolioQuote;
 	}
 
