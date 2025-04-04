@@ -246,7 +246,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.sorted(Comparator.comparing(PortfolioToSymbol::getChangedAt))
 				.peek(pts -> firstRef.set(firstRef.get() == null ? pts.getChangedAt() : firstRef.get()))
 				.filter(pts -> pts.getChangedAt().compareTo(atDay) <= 0)
-				.filter(_ -> atDay.compareTo(firstRef.get()) >= 0)
+				.filter(x -> atDay.compareTo(firstRef.get()) >= 0)
 				.filter(pts -> Optional.ofNullable(pts.getRemovedAt()).stream()
 						.noneMatch(myRemovedAt -> myRemovedAt.compareTo(LocalDate.now()) <= 0))
 				.max((pts1, pts2) -> pts1.getChangedAt().compareTo(pts2.getChangedAt()));
