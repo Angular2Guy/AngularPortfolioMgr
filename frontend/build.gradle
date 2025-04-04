@@ -16,7 +16,7 @@
  
 group = 'ch.xxx'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '24'
+sourceCompatibility = '21'
 
 task cleanAngular {
 	if(project.hasProperty('withAngular')) {	
