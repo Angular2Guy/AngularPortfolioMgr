@@ -62,7 +62,7 @@ jobs:
     - if: matrix.language == 'java' 
       name: Build Java
       run: |
-        gradle build -PwithAngular=true 
+        gradlew build -PwithAngular=true 
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
