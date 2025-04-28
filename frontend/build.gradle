@@ -16,19 +16,18 @@
  
 group = 'ch.xxx'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '21'
 
-task cleanAngular {
+task cleanAngular {	
 	if(project.hasProperty('withAngular')) {	
-		logger.info('Task cleanAngular')	
+		println('Task cleanAngular')	
 		delete('src/angular/node_modules')
 	}
 }
 
 task buildAngular {
 	if(project.hasProperty('withAngular')) {		
-		providers.exec {
-			logger.info('Task buildAngular - npm install')		
+		exec {
+			println('Task buildAngular - npm install')		
 			workingDir 'src/angular'
 			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
 				commandLine('npm.cmd', 'install')
@@ -36,8 +35,8 @@ task buildAngular {
 				commandLine('npm', 'install')
 			}
 		}
-		providers.exec {
-			logger.info('Task buildAngular - npm run build')
+		exec {
+			println('Task buildAngular - npm run build')
 			workingDir 'src/angular'
 			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
 				commandLine('npm.cmd', 'run', 'build')
@@ -50,17 +49,17 @@ task buildAngular {
 
 task testAngular {
 	if(project.hasProperty('withAngular')) {		
-		providers.exec {
+		exec {
 			workingDir 'src/angular'
 			if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-				logger.info('Task buildAngular - npm run test')		
+				println('Task buildAngular - npm run test')		
 				commandLine('npm.cmd', 'run', 'test')
 			} else {
 				if(project.hasProperty("useChromium")) {
-					logger.info('Task buildAngular - npm run test-chromium') 
+					println('Task buildAngular - npm run test-chromium') 
 					commandLine('npm', 'run', 'test-chromium')
 				} else {
-					logger.info('Task buildAngular - npm run test')
+					println('Task buildAngular - npm run test')
 					commandLine('npm', 'run', 'test')
 				}
 			}

@@ -12,7 +12,7 @@
  */
 plugins {
 	id 'org.springframework.boot' version '3.4.0'
-	id 'io.spring.dependency-management' version '1.1.6'
+	id 'io.spring.dependency-management' version '1.1.7'
 	id 'java'    
 }
 
@@ -21,7 +21,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
@@ -55,7 +55,7 @@ dependencies {
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '1.4.0'
+	testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.0'
 			
 	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
