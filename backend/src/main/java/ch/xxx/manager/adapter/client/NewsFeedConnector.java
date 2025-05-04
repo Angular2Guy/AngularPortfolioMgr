@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.client;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
@@ -26,13 +28,15 @@ import ch.xxx.manager.usecase.service.NewsFeedClient;
 
 @Component
 public class NewsFeedConnector implements NewsFeedClient {
+	public static final String SEEKING_ALPHA_URL = "https://seekingalpha.com/market_currents.xml";
 	public static final String YAHOO_FINANCE_URL = "https://finance.yahoo.com/news/rssindex";
 	public static final String CNBC_FINANCE_URL = "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664";
+	public static final String SEC_EDGAR_USGAAP = "https://www.sec.gov/Archives/edgar/usgaap.rss.xml";
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
 	
 	@Override
-	public SyndFeed importYahooNewsFeed() {
-		return this.importNewsFeed(YAHOO_FINANCE_URL);
+	public SyndFeed importSeekingAlphaFeed() {
+		return this.importNewsFeed(SEEKING_ALPHA_URL);
 	}
 	
 	@Override
@@ -40,12 +44,16 @@ public class NewsFeedConnector implements NewsFeedClient {
 		return this.importNewsFeed(CNBC_FINANCE_URL);
 	}
 	
+	@Override
+	public SyndFeed importSecEdgarUsGaapNewsFeed() {
+		return this.importNewsFeed(SEC_EDGAR_USGAAP);
+	}
+
 	private SyndFeed importNewsFeed(String url) {
 		SyndFeed feed = null;
-		try {
-			SyndFeedInput input = new SyndFeedInput();
-			feed = input.build(new XmlReader(URI.create(url).toURL().openStream()));
-		} catch (Exception e) {
+		try {			
+			feed = new SyndFeedInput().build(new XmlReader(URI.create(url).toURL().openStream()));
+		} catch (FeedException | IOException | IllegalArgumentException e) {
 			LOGGER.error(String.format("Feed import failed. url: %s", url),e);
 		}
 		return feed;

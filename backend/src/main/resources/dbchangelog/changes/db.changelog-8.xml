@@ -65,4 +65,12 @@
 			<column name="serialized_event" type="varchar(32767)"></column>
 		</createTable>
 	</changeSet>
+	<changeSet id="46" author="angular2guy">
+		<preConditions>
+			<tableExists tableName="symbol" />			
+		</preConditions>
+		<addColumn tableName="symbol">			
+			<column name="cik" type="varchar(10)" />
+		</addColumn>	
+	</changeSet>
 </databaseChangeLog>

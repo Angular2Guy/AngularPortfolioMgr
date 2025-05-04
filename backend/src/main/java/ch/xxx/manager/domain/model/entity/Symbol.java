@@ -48,6 +48,7 @@ public class Symbol extends EntityBase {
 	private String description;
 	private String address;
 	private String country;
+	private String cik;
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private DataHelper.CurrencyKey currencyKey;
@@ -70,6 +71,14 @@ public class Symbol extends EntityBase {
 		this.name = name;
 		this.currencyKey = currencyKey;
 		this.quoteSource = quoteSource;
+	}
+
+	public String getCik() {
+		return cik;
+	}
+	
+	public void setCik(String cik) {
+		this.cik = cik;
 	}
 
 	public String getSymbol() {

@@ -15,6 +15,7 @@ package ch.xxx.manager.usecase.service;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 public interface NewsFeedClient {
-	SyndFeed importYahooNewsFeed();
+	SyndFeed importSeekingAlphaFeed();
 	SyndFeed importCnbcFinanceNewsFeed();
+  SyndFeed importSecEdgarUsGaapNewsFeed();
 }

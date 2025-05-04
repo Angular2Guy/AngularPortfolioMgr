@@ -29,7 +29,7 @@ public class NewsFeedService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedService.class);
 	
 	private final NewsFeedClient newsFeedClient;
-	private volatile Optional<SyndFeed> yahooNewsFeedOptional = Optional.empty();
+	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
 	private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
 	
 	public NewsFeedService(NewsFeedClient newsFeedClient) {
@@ -37,10 +37,10 @@ public class NewsFeedService {
 	}
 
 	@Async
-	public void updateYahooNewsFeed() {
+	public void updateSeekingAlphaNewsFeed() {
 		var start = Instant.now();
-		this.yahooNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importYahooNewsFeed());
-		LOGGER.info("YahooFinancial news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli()); 
+		this.seekingAlphaNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSeekingAlphaFeed());
+		LOGGER.info("Seeking Alpha news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli()); 
 	}
 	
 	@Async
@@ -50,8 +50,8 @@ public class NewsFeedService {
 		LOGGER.info("Cnbc news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 	
-	public List<SyndEntry> getYahooNewsFeed() {		
-		return this.yahooNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
+	public List<SyndEntry> getSeekingAlphaNewsFeed() {		
+		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
 			myEntry.getForeignMarkup().clear();
 			return myEntry;
 		}).toList();

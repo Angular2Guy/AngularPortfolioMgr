@@ -55,7 +55,7 @@ public class OnStart {
 	@EventListener(ApplicationReadyEvent.class)
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();		
-		this.newsFeedService.updateYahooNewsFeed();
+		this.newsFeedService.updateSeekingAlphaNewsFeed();
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
 		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
