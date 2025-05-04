@@ -74,7 +74,7 @@ public class PortfolioService {
 	public List<PortfolioWithElements> getPortfoliosByUserId(Long userId) {
 		List<Portfolio> portfolios = this.portfolioRepository.findByUserId(userId);
 		List<PortfolioElement> portfolioElements = this.portfolioElementRepository
-				.findByPortfolioIds(portfolios.stream().map(myPortfolio -> myPortfolio.getId()).toList());
+				.findByPortfolioIds(portfolios.stream().map(Portfolio::getId).toList());
 		return portfolios.stream()
 				.map(myPortfolio -> new PortfolioWithElements(myPortfolio,
 						portfolioElements.stream()
@@ -167,7 +167,7 @@ public class PortfolioService {
 			LocalDateTime changedAt) {
 		return this.portfolioToSymbolRepository.findByPortfolioIdAndSymbolId(portfolioId, symbolId).stream()
 				.flatMap(myEntity -> Stream.of(this.updateWeightPtsEntity(myEntity, weight, changedAt.toLocalDate())))
-				.map(newEntity -> this.portfolioCalculationService.updatePtsEntity(newEntity)).map(newEntity -> {
+				.map(this.portfolioCalculationService::updatePtsEntity).map(newEntity -> {
 					this.portfolioCalculationService.addDailyQuotes(newEntity.getPortfolio());
 					return newEntity;
 				})

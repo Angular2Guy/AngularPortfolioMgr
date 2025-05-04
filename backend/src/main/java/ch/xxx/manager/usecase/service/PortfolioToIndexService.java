@@ -103,7 +103,7 @@ public class PortfolioToIndexService {
 						pts -> Stream.of(new PtsChangePair(pts.ptsChange, pts.ptsChangeOld)), Collectors.toList())));
 		SortedMap<LocalDate, List<PtsChangePair>> sortedPortfolioChangesMap = ImmutableSortedMap
 				.copyOf(portfolioChangesMap, (date1, date2) -> date1.compareTo(date2));
-		return dailyQuotes.stream().filter(val -> currentWeight.get().compareTo(BigDecimal.ZERO) > 0)
+		return dailyQuotes.stream().filter(x -> currentWeight.get().compareTo(BigDecimal.ZERO) > 0)
 				.map(myDailyQuote -> new DailyQuoteEntityDto(myDailyQuote,
 						this.calcQuote(myDailyQuote.getLocalDay(), sortedPortfolioChangesMap, myDailyQuote,
 								currentWeight)))
@@ -129,7 +129,7 @@ public class PortfolioToIndexService {
 		final Currency currencyChange = indexQuoteOpt
 				.map(indexQuote -> this.currencyService.getCurrencyQuote(portfolioPts, indexQuote))
 				.orElse(Optional.of(new Currency(null, null, null, null, null, null, BigDecimal.ONE))).get();
-		final BigDecimal iqAdjClose = indexQuoteOpt.stream().map(myIndexQuote -> myIndexQuote.getAdjClose()).findFirst()
+		final BigDecimal iqAdjClose = indexQuoteOpt.stream().map(DailyQuote::getAdjClose).findFirst()
 				.orElse(BigDecimal.ONE);
 		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(firstDailyQuotePortfolioOpt
 				.map(myDailyQuote -> myDailyQuote.getAdjClose()
@@ -205,8 +205,8 @@ public class PortfolioToIndexService {
 	public List<DailyQuoteEntityDto> calculateIndexComparison(Long portfolioId, ComparisonIndex comparisonIndex,
 			LocalDate from, LocalDate to) {
 		List<PortfolioToSymbol> portfolioChanges = portfolioToSymbolRepository.findByPortfolioId(portfolioId);
-		List<DailyQuote> dailyQuotes = Optional.ofNullable(from).filter(xxx -> Optional.ofNullable(to).isPresent())
-				.map(xxx -> this.dailyQuoteRepository.findBySymbolAndDayBetween(comparisonIndex.getSymbol(), from, to))
+		List<DailyQuote> dailyQuotes = Optional.ofNullable(from).filter(x -> Optional.ofNullable(to).isPresent())
+				.map(x -> this.dailyQuoteRepository.findBySymbolAndDayBetween(comparisonIndex.getSymbol(), from, to))
 				.orElse(this.dailyQuoteRepository.findBySymbol(comparisonIndex.getSymbol()));
 		List<DailyQuoteEntityDto> result = compareToIndex(portfolioChanges, dailyQuotes);
 		return result;

@@ -33,7 +33,7 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 @Component
 public class ConnectorClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorClient.class);
-	private RestClient restClient;
+	private final RestClient restClient;
 
 	public ConnectorClient() {
 		var requestConfig = RequestConfig.custom().setResponseTimeout(Timeout.ofMilliseconds(10000)).build();
@@ -51,7 +51,7 @@ public class ConnectorClient {
 	}
 	
 	public <T> Optional<T> restCall(String url, Class<T> typeClass) {
-		return restCall(url, new LinkedMultiValueMap<String, String>(), typeClass, Duration.ZERO);
+		return restCall(url, new LinkedMultiValueMap<>(), typeClass, Duration.ZERO);
 	}
 
 	public <T> Optional<T> restCall(String url, ParameterizedTypeReference<T> valueTypeRef) {
