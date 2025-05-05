@@ -129,7 +129,7 @@
     "portfolioChartsSectors": "Portfolio Sectors",
     "portfolioChartsTimechart": "Portfolio Timechart",
     "portfolioChartsStats": "Portfolio Stats",
-    "portfolioChartsYahooFinance": "Yahoo Finance",
+    "portfolioChartsSeekingAlpha": "Seeking Alpha",
     "portfolioChartsCnbcFinance": "Cnbc Finance",
     "portfolioChartsName": "Portfolio: {$INTERPOLATION}",
     "portfolioChartsStartDate": "Start Date: {$INTERPOLATION}",

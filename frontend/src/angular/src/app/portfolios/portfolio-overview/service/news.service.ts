@@ -7,8 +7,8 @@ import { NewsItem } from "../model/news-item";
 export class NewsService {
   constructor(private httpClient: HttpClient) {}
 
-  getYahooNews(): Observable<NewsItem[]> {
-    return this.httpClient.get<NewsItem[]>("/rest/newsfeed/yahoo-finance");
+  getSeekingAlphaNews(): Observable<NewsItem[]> {
+    return this.httpClient.get<NewsItem[]>("/rest/newsfeed/seeking-alpha");
   }
 
   getCnbcFinanceNews(): Observable<NewsItem[]> {

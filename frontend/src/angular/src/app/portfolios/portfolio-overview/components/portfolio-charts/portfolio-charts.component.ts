@@ -28,7 +28,7 @@ import { NewsService } from "../../service/news.service";
 })
 export class PortfolioChartsComponent implements OnInit {
   protected cnbcFinanceNews: NewsItem[] = [];
-  protected yahooFinanceNews: NewsItem[] = [];
+  protected seekingAlphaNews: NewsItem[] = [];
   selPortfolio: Portfolio;
   reloadData = false;
 
@@ -44,8 +44,8 @@ export class PortfolioChartsComponent implements OnInit {
       .getCnbcFinanceNews()
       .subscribe((result) => (this.cnbcFinanceNews = result));
     this.newsService
-      .getYahooNews()
-      .subscribe((result) => (this.yahooFinanceNews = result));
+      .getSeekingAlphaNews()
+      .subscribe((result) => (this.seekingAlphaNews = result));
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
