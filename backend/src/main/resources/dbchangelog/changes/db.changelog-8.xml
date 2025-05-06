@@ -73,4 +73,33 @@
 			<column name="cik" type="varchar(10)" />
 		</addColumn>	
 	</changeSet>
+	<changeSet id="47" author="angular2guy">
+		<preConditions>
+			<not>
+				<tableExists tableName="company_report" />			
+			</not>
+		</preConditions>
+		<createTable tableName="company_report">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" />
+			</column>
+		<column name="report_type" type="varchar(10)"></column>
+		<column name="report_date" type="datetime"></column>
+		<column name="report_url" type="varchar(4096)"></column>
+		<column name="report_blob" type="blob"></column>
+		<column name="symbol_id" type="bigint"></column>
+		</createTable>
+		</changeSet>
+	<changeSet id="48" author="angular2guy">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="company_report"
+					indexName="ix_company_report_symbol" />
+			</not>
+		</preConditions>
+		<createIndex indexName="ix_company_report_symbol"
+			tableName="company_report">
+			<column name="symbol_id" />
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>

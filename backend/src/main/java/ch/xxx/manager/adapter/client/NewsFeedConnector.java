@@ -28,10 +28,9 @@ import ch.xxx.manager.usecase.service.NewsFeedClient;
 
 @Component
 public class NewsFeedConnector implements NewsFeedClient {
-	public static final String SEEKING_ALPHA_URL = "https://seekingalpha.com/market_currents.xml";
-	public static final String YAHOO_FINANCE_URL = "https://finance.yahoo.com/news/rssindex";
-	public static final String CNBC_FINANCE_URL = "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664";
-	public static final String SEC_EDGAR_USGAAP = "https://www.sec.gov/Archives/edgar/usgaap.rss.xml";
+	private static final String SEEKING_ALPHA_URL = "https://seekingalpha.com/market_currents.xml";
+	private static final String CNBC_FINANCE_URL = "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664";
+	private static final String SEC_EDGAR_USGAAP = "https://www.sec.gov/Archives/edgar/usgaap.rss.xml";
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
 	
 	@Override

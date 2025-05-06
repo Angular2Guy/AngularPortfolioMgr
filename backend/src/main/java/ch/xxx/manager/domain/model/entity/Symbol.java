@@ -59,6 +59,8 @@ public class Symbol extends EntityBase {
 	private Set<DailyQuote> dailyQuotes = new HashSet<>();
 	@OneToMany(mappedBy = "symbol")
 	private Set<PortfolioToSymbol> portfolioToSymbols = new HashSet<>();
+	@OneToMany(mappedBy = "symbol", orphanRemoval = true)
+	private Set<CompanyReport> companyReports = new HashSet<>();
 
 	public Symbol() {
 		super();
@@ -71,7 +73,15 @@ public class Symbol extends EntityBase {
 		this.name = name;
 		this.currencyKey = currencyKey;
 		this.quoteSource = quoteSource;
-	}
+	}	
+
+    public Set<CompanyReport> getCompanyReports() {
+        return companyReports;
+    }
+
+    public void setCompanyReports(Set<CompanyReport> companyReports) {
+        this.companyReports = companyReports;
+    }
 
 	public String getCik() {
 		return cik;
