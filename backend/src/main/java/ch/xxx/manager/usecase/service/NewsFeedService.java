@@ -31,6 +31,7 @@ public class NewsFeedService {
 	private final NewsFeedClient newsFeedClient;
 	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
 	private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
+	private volatile Optional<SyndFeed> secEdgarUsGaapNewsFeedOptional = Optional.empty();
 	
 	public NewsFeedService(NewsFeedClient newsFeedClient) {
 		this.newsFeedClient = newsFeedClient;
@@ -50,6 +51,20 @@ public class NewsFeedService {
 		LOGGER.info("Cnbc news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 	
+	@Async
+	public void updateSecEdgarUsGaapNewsFeed() {
+		var start = Instant.now();
+		this.secEdgarUsGaapNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSecEdgarUsGaapNewsFeed());
+		LOGGER.info("Sec Edgar news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
+	}
+
+	public List<SyndEntry> getSecEdgarUsGaapNewsFeed() {
+		return this.secEdgarUsGaapNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
+			myEntry.getForeignMarkup().clear();
+			return myEntry;
+		}).toList();
+	}
+
 	public List<SyndEntry> getSeekingAlphaNewsFeed() {		
 		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
 			myEntry.getForeignMarkup().clear();
