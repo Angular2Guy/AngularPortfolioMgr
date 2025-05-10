@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,5 +83,10 @@ public class ApplicationConfig {
 	@Bean
 	public LockProvider lockProvider(DataSource dataSource) {
 		return new JdbcTemplateLockProvider(dataSource);
+	}
+
+	@Bean
+	public RestClient restClient() {
+		return RestClient.create();
 	}
 }

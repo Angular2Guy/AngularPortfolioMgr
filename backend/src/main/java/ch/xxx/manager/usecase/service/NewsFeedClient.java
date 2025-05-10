@@ -17,5 +17,5 @@ import com.rometools.rome.feed.synd.SyndFeed;
 public interface NewsFeedClient {
 	SyndFeed importSeekingAlphaFeed();
 	SyndFeed importCnbcFinanceNewsFeed();
-  SyndFeed importSecEdgarUsGaapNewsFeed();
+  String importSecEdgarUsGaapNewsFeed();
 }

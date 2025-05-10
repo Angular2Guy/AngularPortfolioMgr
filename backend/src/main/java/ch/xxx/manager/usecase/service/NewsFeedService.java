@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class NewsFeedService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedService.class);
@@ -31,7 +33,6 @@ public class NewsFeedService {
 	private final NewsFeedClient newsFeedClient;
 	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
 	private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
-	private volatile Optional<SyndFeed> secEdgarUsGaapNewsFeedOptional = Optional.empty();
 	
 	public NewsFeedService(NewsFeedClient newsFeedClient) {
 		this.newsFeedClient = newsFeedClient;
@@ -52,17 +53,12 @@ public class NewsFeedService {
 	}
 	
 	@Async
+	@Transactional
 	public void updateSecEdgarUsGaapNewsFeed() {
 		var start = Instant.now();
-		this.secEdgarUsGaapNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSecEdgarUsGaapNewsFeed());
+		var secEdgarUsGaapNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSecEdgarUsGaapNewsFeed());
+		LOGGER.info(secEdgarUsGaapNewsFeedOptional.orElse("No news feed available"));
 		LOGGER.info("Sec Edgar news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
-	}
-
-	public List<SyndEntry> getSecEdgarUsGaapNewsFeed() {
-		return this.secEdgarUsGaapNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
-			myEntry.getForeignMarkup().clear();
-			return myEntry;
-		}).toList();
 	}
 
 	public List<SyndEntry> getSeekingAlphaNewsFeed() {		

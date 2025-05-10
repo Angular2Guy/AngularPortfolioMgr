@@ -18,6 +18,7 @@ import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
@@ -32,6 +33,11 @@ public class NewsFeedConnector implements NewsFeedClient {
 	private static final String CNBC_FINANCE_URL = "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664";
 	private static final String SEC_EDGAR_USGAAP = "https://www.sec.gov/Archives/edgar/usgaap.rss.xml";
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
+	private final RestClient restClient;
+
+	public NewsFeedConnector(RestClient restClient) {
+		this.restClient = restClient;
+	}
 	
 	@Override
 	public SyndFeed importSeekingAlphaFeed() {
@@ -44,8 +50,23 @@ public class NewsFeedConnector implements NewsFeedClient {
 	}
 	
 	@Override
-	public SyndFeed importSecEdgarUsGaapNewsFeed() {
-		return this.importNewsFeed(SEC_EDGAR_USGAAP);
+	public String importSecEdgarUsGaapNewsFeed() {
+		var result =this.restClient.get().uri(SEC_EDGAR_USGAAP)
+		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+		.header("Accept-Encoding", "gzip, deflate")
+		.header("accept-language","en-US,en;q=0.9")
+		.header("priority", "u=0, i")
+		.header("user-agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
+		.header("upgrade-insecure-requests", "1")
+		.header("sec-fetch-user","?1")
+		.header("sec-fetch-site","none")
+		.header("sec-fetch-mode","navigate")
+		.header("sec-fetch-dest","document")
+		.header("sec-ch-ua-platform","Linux")
+		.header("sec-ch-ua-mobile","?0")
+		.header("sec-ch-ua","Not.A/Brand;v=99", "Chromium;v=136")
+		.retrieve().body(String.class);
+		return result;
 	}
 
 	private SyndFeed importNewsFeed(String url) {
