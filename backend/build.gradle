@@ -47,6 +47,7 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 	implementation 'net.javacrumbs.shedlock:shedlock-spring:6.0.1'
 	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.1'
 	implementation 'com.google.crypto.tink:tink:1.15.0'

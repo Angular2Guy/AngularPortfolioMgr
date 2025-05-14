@@ -17,9 +17,11 @@ import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
@@ -34,9 +36,11 @@ public class NewsFeedConnector implements NewsFeedClient {
 	private static final String SEC_EDGAR_USGAAP = "https://www.sec.gov/Archives/edgar/usgaap.rss.xml";
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
 	private final RestClient restClient;
+	private final XmlMapper xmlMapper;
 
-	public NewsFeedConnector(RestClient restClient) {
+	public NewsFeedConnector(RestClient restClient, @Qualifier("xml") XmlMapper xmsMapper) {
 		this.restClient = restClient;
+		this.xmlMapper = xmsMapper;
 	}
 	
 	@Override
@@ -66,6 +70,7 @@ public class NewsFeedConnector implements NewsFeedClient {
 		.header("sec-ch-ua-mobile","?0")
 		.header("sec-ch-ua","Not.A/Brand;v=99", "Chromium;v=136")
 		.retrieve().body(String.class);
+		//this.xmlMapper.readValue(result, SyndFeed.class);
 		return result;
 	}
 
