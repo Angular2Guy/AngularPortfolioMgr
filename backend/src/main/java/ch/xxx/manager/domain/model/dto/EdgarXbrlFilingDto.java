@@ -20,7 +20,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 @JacksonXmlRootElement(localName = "xbrlFiling", namespace="edgar")
 public record EdgarXbrlFilingDto(@JacksonXmlProperty(localName="companyName", namespace="edgar") String companyName, @JacksonXmlProperty(localName="formType", namespace="edgar") String formType, 
-    @JacksonXmlProperty(localName="filingDate", namespace="edgar") String filingDate, 
+    @JacksonXmlProperty(localName="filingDate", namespace="edgar") String filingDate, @JacksonXmlProperty(localName="otherCikNumbers", namespace="edgar") String otherCikNumbers,
     @JacksonXmlProperty(localName="cikNumber", namespace="edgar") String cikNumber, @JacksonXmlProperty(localName="accessionNumber", namespace="edgar") String accessionNumber, 
     @JacksonXmlProperty(localName="fileNumber", namespace="edgar") String fileNumber, @JacksonXmlProperty(localName="acceptanceDatetime", namespace="edgar") String acceptanceDatetime, 
     @JacksonXmlProperty(localName="period", namespace="edgar") String period, @JacksonXmlProperty(localName="assistantDirector", namespace="edgar") String assistantDirector,
