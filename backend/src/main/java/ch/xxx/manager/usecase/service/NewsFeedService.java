@@ -57,7 +57,7 @@ public class NewsFeedService {
 	public void updateSecEdgarUsGaapNewsFeed() {
 		var start = Instant.now();
 		var secEdgarUsGaapNewsFeedOptional = Optional.ofNullable(this.newsFeedClient.importSecEdgarUsGaapNewsFeed());
-		LOGGER.info(secEdgarUsGaapNewsFeedOptional.orElse("No news feed available"));
+		//LOGGER.info(secEdgarUsGaapNewsFeedOptional.orElse("No news feed available"));
 		LOGGER.info("Sec Edgar news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 

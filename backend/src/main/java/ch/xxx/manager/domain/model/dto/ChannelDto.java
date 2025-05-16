@@ -12,7 +12,10 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 @JsonRootName("channel")
-  public record ChannelDto(String title, String link, AtomLinkDto atomLink, String description, String language, String pubDate, String lastBuildDate) {}    
+public record ChannelDto(String title, String link, AtomLinkDto atomLink, String description, String language, String pubDate, String lastBuildDate, @JacksonXmlElementWrapper(useWrapping=false) List<ItemDto> item) {}    

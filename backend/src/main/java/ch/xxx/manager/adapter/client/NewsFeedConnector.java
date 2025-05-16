@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
@@ -72,14 +73,13 @@ public class NewsFeedConnector implements NewsFeedClient {
                 .header("sec-ch-ua-mobile", "?0")
                 .header("sec-ch-ua", "Not.A/Brand;v=99", "Chromium;v=136")
                 .retrieve().body(String.class);
-        RssDto rssDto = null;
-		/*
+        RssDto rssDto = null;		
 		try {
             rssDto = this.xmlMapper.readValue(result, RssDto.class);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Failed to parse XML response", ex);
         }
-		*/
+		
         return result;
     }
 

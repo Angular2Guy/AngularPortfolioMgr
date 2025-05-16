@@ -25,4 +25,4 @@ public record EdgarXbrlFilingDto(@JacksonXmlProperty(localName="companyName", na
     @JacksonXmlProperty(localName="fileNumber", namespace="edgar") String fileNumber, @JacksonXmlProperty(localName="acceptanceDatetime", namespace="edgar") String acceptanceDatetime, 
     @JacksonXmlProperty(localName="period", namespace="edgar") String period, @JacksonXmlProperty(localName="assistantDirector", namespace="edgar") String assistantDirector,
     @JacksonXmlProperty(localName="assignedSic", namespace="edgar") String assignedSic, @JacksonXmlProperty(localName="fiscalYearEnd", namespace="edgar") String fiscalYearEnd, 
-    @JacksonXmlElementWrapper(localName="xbrlFiles", namespace="edgar") List<EdgarXbrlFileDto> edgarXbrlFiles) {}  
+    @JacksonXmlElementWrapper(localName="xbrlFiles", namespace="edgar") List<EdgarXbrlFileDto> xbrlFiles) {}  

@@ -15,4 +15,4 @@ package ch.xxx.manager.domain.model.dto;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("item")
-  public record ItemDto(String title, String link, String guid, EnclosureDto enclosure, String description, String pubDate) {}
+public record ItemDto(String title, String link, String guid, EnclosureDto enclosure, String description, String pubDate, EdgarXbrlFilingDto xbrlFiling) {}

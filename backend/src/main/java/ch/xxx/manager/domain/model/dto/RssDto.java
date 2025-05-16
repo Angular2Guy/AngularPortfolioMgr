@@ -12,10 +12,8 @@
  */
 package ch.xxx.manager.domain.model.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
   @JsonRootName("rss")
-  public record RssDto(@JacksonXmlProperty(isAttribute = true) String version, List<ChannelDto> channel) { }
+  public record RssDto(@JacksonXmlProperty(isAttribute = true) String version, ChannelDto channel) { }
