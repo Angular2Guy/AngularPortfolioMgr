@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,6 +74,10 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	public Optional<Symbol> findById(Long id) {
 		return this.jpaSymbolRepository.findById(id);
 	}
+	@Override
+    public List<Symbol> findByCikIn(Collection<String> ciks) {
+		return this.jpaSymbolRepository.findByCikIn(ciks);
+	}	
 
 	@Override
 	public List<Symbol> findByQuoteSource(QuoteSource quoteSource) {

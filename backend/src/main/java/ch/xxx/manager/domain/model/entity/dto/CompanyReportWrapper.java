@@ -10,17 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.domain.model.entity.dto;
 
-import java.util.List;
+import ch.xxx.manager.domain.model.entity.CompanyReport;
 
-import com.rometools.rome.feed.synd.SyndFeed;
-
-import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
-
-public interface NewsFeedClient {
-	SyndFeed importSeekingAlphaFeed();
-	SyndFeed importCnbcFinanceNewsFeed();  
-  List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed();
-  byte[] loadCompanyReportZip(String url);
+public record CompanyReportWrapper(String cik, String reportZipUrl, CompanyReport companyReport) {
 }

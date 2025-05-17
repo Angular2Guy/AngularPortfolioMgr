@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,4 +38,5 @@ public interface JpaSymbolRepository extends JpaRepository<Symbol, Long> {
 	List<Symbol> findByQuoteSource(@Param(value="quoteSource") QuoteSource quoteSource);
 	@Query("select s from Symbol s join fetch s.dailyQuotes where s.id = :symbolId")
 	Optional<Symbol> findByIdWithDailyQuotes(@Param(value="symbolId") Long symbolId);
+	List<Symbol> findByCikIn(Collection<String> ciks);
 }

@@ -14,6 +14,8 @@ package ch.xxx.manager.adapter.client;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,8 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
 import ch.xxx.manager.domain.model.dto.RssDto;
+import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
+import ch.xxx.manager.usecase.mapping.NewsFeedMapper;
 import ch.xxx.manager.usecase.service.NewsFeedClient;
 
 @Component
@@ -40,10 +44,12 @@ public class NewsFeedConnector implements NewsFeedClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedConnector.class);
     private final RestClient restClient;
     private final XmlMapper xmlMapper;
+    private final NewsFeedMapper newsFeedMapper;
 
-    public NewsFeedConnector(RestClient restClient, @Qualifier("xml") XmlMapper xmsMapper) {
+    public NewsFeedConnector(RestClient restClient, @Qualifier("xml") XmlMapper xmsMapper, NewsFeedMapper newsFeedMapper) {
         this.restClient = restClient;
         this.xmlMapper = xmsMapper;
+        this.newsFeedMapper = newsFeedMapper;
     }
 
     @Override
@@ -57,8 +63,30 @@ public class NewsFeedConnector implements NewsFeedClient {
     }
 
     @Override
-    public RssDto importSecEdgarUsGaapNewsFeed() {
-        var result = this.restClient.get().uri(SEC_EDGAR_USGAAP)
+    public List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed() {
+        var result = this.loadFile(SEC_EDGAR_USGAAP, String.class);
+        RssDto rssDto = null;		
+		try {
+            rssDto = this.xmlMapper.readValue(result, RssDto.class);
+            LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
+            LOGGER.info("Xml mapping successful");
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Failed to parse XML response", ex);
+        }
+		
+        return Optional.ofNullable(rssDto)
+                .map(myRssDto -> this.newsFeedMapper.convert(
+                    myRssDto))
+                .orElse(List.of());
+    }
+
+    @Override
+    public byte[] loadCompanyReportZip(String url) {
+        return this.loadFile(url, byte[].class);
+    }
+
+    private <T> T loadFile(String url, Class<T> classType) {
+        var result = this.restClient.get().uri(url)
                 .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                 .header("Accept-Encoding", "gzip, deflate")
                 .header("accept-language", "en-US,en;q=0.9")
@@ -72,17 +100,8 @@ public class NewsFeedConnector implements NewsFeedClient {
                 .header("sec-ch-ua-platform", "Linux")
                 .header("sec-ch-ua-mobile", "?0")
                 .header("sec-ch-ua", "Not.A/Brand;v=99", "Chromium;v=136")
-                .retrieve().body(String.class);
-        RssDto rssDto = null;		
-		try {
-            rssDto = this.xmlMapper.readValue(result, RssDto.class);
-            LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
-            LOGGER.info("Xml mapping successful");
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Failed to parse XML response", ex);
-        }
-		
-        return rssDto;
+                .retrieve().body(classType);
+        return result;
     }
 
     private SyndFeed importNewsFeed(String url) {

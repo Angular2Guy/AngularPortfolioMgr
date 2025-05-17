@@ -13,19 +13,37 @@
 package ch.xxx.manager.usecase.mapping;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.RssDto;
 import ch.xxx.manager.domain.model.entity.CompanyReport;
+import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
 
 @Component
 public class NewsFeedMapper {
 
-    public CompanyReport convert(RssDto rssDto) {
-        CompanyReport companyReport = new CompanyReport();
-        companyReport.setReportDate(LocalDateTime.now());
-        
-        return companyReport;
+    public List<CompanyReportWrapper> convert(RssDto rssDto) {  
+      var result =  rssDto.channel().item().stream().filter(myItem -> 
+         CompanyReport.ReportType.ANNUAL.toString().equalsIgnoreCase(myItem.xbrlFiling().formType().trim()) 
+         || CompanyReport.ReportType.QUARTERLY.toString().equalsIgnoreCase(myItem.xbrlFiling().formType().trim())
+      ) .map(myItem -> {
+          var period = myItem.xbrlFiling().period();
+          var year = Long.getLong(period.substring(0, 3));
+          var month = Long.getLong(period.substring(4, 5));
+          var day = Long.getLong(period.substring(6, 7));
+          var localDateTime = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
+          var companyReport = new CompanyReport();
+          companyReport.setReportDate(localDateTime);
+          companyReport.setReportType(CompanyReport.ReportType.valueOf(myItem.xbrlFiling().formType().trim()));
+          myItem.xbrlFiling().xbrlFiles().stream()
+          .filter(xbrlFile -> xbrlFile.type().trim().equalsIgnoreCase(myItem.xbrlFiling().formType().trim()))
+          .findFirst().ifPresent(xbrlFile -> {
+              companyReport.setReportUrl(xbrlFile.url());
+          });          
+          return new CompanyReportWrapper(myItem.xbrlFiling().cikNumber().trim(), myItem.enclosure().url(), companyReport);
+        }).toList();
+        return result;
     }
 }
