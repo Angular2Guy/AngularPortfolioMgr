@@ -57,7 +57,7 @@ public class NewsFeedConnector implements NewsFeedClient {
     }
 
     @Override
-    public String importSecEdgarUsGaapNewsFeed() {
+    public RssDto importSecEdgarUsGaapNewsFeed() {
         var result = this.restClient.get().uri(SEC_EDGAR_USGAAP)
                 .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                 .header("Accept-Encoding", "gzip, deflate")
@@ -82,7 +82,7 @@ public class NewsFeedConnector implements NewsFeedClient {
             LOGGER.error("Failed to parse XML response", ex);
         }
 		
-        return result;
+        return rssDto;
     }
 
     private SyndFeed importNewsFeed(String url) {

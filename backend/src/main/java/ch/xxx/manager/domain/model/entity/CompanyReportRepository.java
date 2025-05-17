@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.mapping;
+package ch.xxx.manager.domain.model.entity;
 
-import org.springframework.stereotype.Component;
-
-@Component
-public class RssFeedMapper {
-
-    public void convert(String rssFeed) {
-    }
+/**
+ *
+ * @author sven
+ */
+public interface CompanyReportRepository {
+    void save(CompanyReport companyReport);    
+    Iterable<CompanyReport> findAll();
 }

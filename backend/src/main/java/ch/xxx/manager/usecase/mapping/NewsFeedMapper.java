@@ -10,14 +10,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.usecase.mapping;
 
-import com.rometools.rome.feed.synd.SyndFeed;
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.domain.model.dto.RssDto;
+import ch.xxx.manager.domain.model.entity.CompanyReport;
 
-public interface NewsFeedClient {
-	SyndFeed importSeekingAlphaFeed();
-	SyndFeed importCnbcFinanceNewsFeed();
-  RssDto importSecEdgarUsGaapNewsFeed();
+@Component
+public class NewsFeedMapper {
+
+    public CompanyReport convert(RssDto rssDto) {
+        CompanyReport companyReport = new CompanyReport();
+        companyReport.setReportDate(LocalDateTime.now());
+        
+        return companyReport;
+    }
 }

@@ -10,14 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.adapter.repository;
 
-import com.rometools.rome.feed.synd.SyndFeed;
+import org.springframework.data.repository.CrudRepository;
 
-import ch.xxx.manager.domain.model.dto.RssDto;
+import ch.xxx.manager.domain.model.entity.CompanyReport;
 
-public interface NewsFeedClient {
-	SyndFeed importSeekingAlphaFeed();
-	SyndFeed importCnbcFinanceNewsFeed();
-  RssDto importSecEdgarUsGaapNewsFeed();
+public interface JpaCompanyReportRepository extends CrudRepository<CompanyReport, Long> {
+
 }
