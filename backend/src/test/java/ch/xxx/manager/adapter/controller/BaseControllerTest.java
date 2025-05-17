@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import ch.xxx.manager.adapter.events.EventPublicationsBean;
 import ch.xxx.manager.adapter.repository.JpaAppUserRepository;
+import ch.xxx.manager.adapter.repository.JpaCompanyReportRepository;
 import ch.xxx.manager.adapter.repository.JpaCurrencyRepository;
 import ch.xxx.manager.adapter.repository.JpaDailyQuoteRepository;
 import ch.xxx.manager.adapter.repository.JpaFinancialElementRepository;
@@ -87,5 +88,7 @@ public class BaseControllerTest {
 	protected DataSource dataSource;
 	@MockitoBean
 	protected EventPublicationsBean eventPublicationsBean;
+	@MockitoBean
+	protected JpaCompanyReportRepository jpaCompanyReportRepository;
 	
 }
