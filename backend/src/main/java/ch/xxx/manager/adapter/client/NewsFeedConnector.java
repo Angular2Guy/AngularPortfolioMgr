@@ -30,8 +30,8 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
-import ch.xxx.manager.domain.model.dto.RssDto;
 import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
+import ch.xxx.manager.domain.model.entity.dto.RssDto;
 import ch.xxx.manager.usecase.mapping.NewsFeedMapper;
 import ch.xxx.manager.usecase.service.NewsFeedClient;
 

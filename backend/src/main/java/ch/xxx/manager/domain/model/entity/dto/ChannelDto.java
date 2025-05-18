@@ -10,9 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.domain.model.dto;
+package ch.xxx.manager.domain.model.entity.dto;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
-@JsonRootName("item")
-public record ItemDto(String title, String link, String guid, EnclosureDto enclosure, String description, String pubDate, EdgarXbrlFilingDto xbrlFiling) {}
+@JsonRootName("channel")
+public record ChannelDto(String title, String link, AtomLinkDto atomLink, String description, String language, String pubDate, String lastBuildDate, @JacksonXmlElementWrapper(useWrapping=false) List<ItemDto> item) {}    

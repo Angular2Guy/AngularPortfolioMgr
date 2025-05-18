@@ -10,10 +10,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.domain.model.dto;
+package ch.xxx.manager.domain.model.entity.dto;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-  @JsonRootName("rss")
-  public record RssDto(@JacksonXmlProperty(isAttribute = true) String version, ChannelDto channel) { }
+  @JacksonXmlRootElement(localName = "link", namespace="atom")
+  public record AtomLinkDto(@JacksonXmlProperty(isAttribute = true) String href, @JacksonXmlProperty(isAttribute = true) String rel, @JacksonXmlProperty(isAttribute = true) String type) {}
