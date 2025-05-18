@@ -17,5 +17,5 @@ import org.springframework.data.repository.CrudRepository;
 import ch.xxx.manager.domain.model.entity.CompanyReport;
 
 public interface JpaCompanyReportRepository extends CrudRepository<CompanyReport, Long> {
-
+  Iterable<CompanyReport> findByReportUrlIn(Iterable<String> reportUrls);
 }

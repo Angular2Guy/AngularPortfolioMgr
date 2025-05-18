@@ -19,4 +19,6 @@ package ch.xxx.manager.domain.model.entity;
 public interface CompanyReportRepository {
     void save(CompanyReport companyReport);    
     Iterable<CompanyReport> findAll();
+    Iterable<CompanyReport> findByReportUrlIn(Iterable<String> reportUrls);    
+    Iterable<CompanyReport> saveAll(Iterable<CompanyReport> companyReports);
 }

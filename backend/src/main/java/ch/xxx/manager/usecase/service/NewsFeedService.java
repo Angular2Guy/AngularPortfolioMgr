@@ -15,6 +15,7 @@ package ch.xxx.manager.usecase.service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
+import ch.xxx.manager.domain.model.entity.CompanyReport;
+import ch.xxx.manager.domain.model.entity.CompanyReportRepository;
 import ch.xxx.manager.domain.model.entity.SymbolRepository;
 import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
 import jakarta.transaction.Transactional;
@@ -34,12 +37,14 @@ public class NewsFeedService {
 	
 	private final NewsFeedClient newsFeedClient;
 	private final SymbolRepository symbolRepository;
+	private final CompanyReportRepository companyReportRepository;
 	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
 	private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
 	
-	public NewsFeedService(NewsFeedClient newsFeedClient, SymbolRepository symbolRepository) {
+	public NewsFeedService(NewsFeedClient newsFeedClient, SymbolRepository symbolRepository, CompanyReportRepository companyReportRepository) {
 		this.newsFeedClient = newsFeedClient;
 		this.symbolRepository = symbolRepository;
+		this.companyReportRepository = companyReportRepository;
 	}
 
 	@Async
@@ -64,17 +69,22 @@ public class NewsFeedService {
 		var ciks = cikToCompanyReport.stream().map(CompanyReportWrapper::cik).toList();
 		var symbols = this.symbolRepository.findByCikIn(ciks);
 		
-		var companyReports = cikToCompanyReport.stream().map(entry -> {
+		final var companyReports = cikToCompanyReport.stream().filter(item -> CompanyReport.ReportType.ANNUAL.equals(item.companyReport().getReportType()) 
+		  || CompanyReport.ReportType.QUARTERLY.equals(item.companyReport().getReportType())).map(entry -> {
 			var symbol = symbols.stream().filter(mySymbol -> mySymbol.getCik().equals(entry.cik())).findFirst().orElse(null);
 			var companyReport = entry.companyReport();
 			companyReport.setSymbol(symbol);
 			companyReport.setReportBlob(this.newsFeedClient.loadCompanyReportZip(entry.reportZipUrl()));			
 			return companyReport;
-		}).toList();
+		}).filter(myCompanyReport -> myCompanyReport.getSymbol() != null).toList();		
+
+		var companyReportsFiltered = companyReports.stream().filter(myCompanyReport -> 
+		  StreamSupport.stream(this.companyReportRepository.findByReportUrlIn(companyReports.stream().map(CompanyReport::getReportUrl).toList()).spliterator(), false)
+		  .map(CompanyReport::getReportUrl).noneMatch(myCompanyReport.getReportUrl()::equals)).toList();
 		
-		
-		//LOGGER.info(secEdgarUsGaapNewsFeedOptional.orElse("No news feed available"));
-		LOGGER.info("Sec Edgar news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
+		companyReportsFiltered = StreamSupport.stream(this.companyReportRepository.saveAll(companyReportsFiltered).spliterator(), false).toList();
+
+		LOGGER.info("Sec Company Reports imported: {} in {}ms", companyReportsFiltered.size(), Instant.now().toEpochMilli() - start.toEpochMilli());		
 	}
 
 	public List<SyndEntry> getSeekingAlphaNewsFeed() {		

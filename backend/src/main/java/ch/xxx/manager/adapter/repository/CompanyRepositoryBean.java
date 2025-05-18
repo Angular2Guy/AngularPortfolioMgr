@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.adapter.repository;
 
+import java.util.Collection;
+
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.domain.model.entity.CompanyReport;
@@ -24,12 +26,23 @@ public class CompanyRepositoryBean implements CompanyReportRepository {
     public CompanyRepositoryBean(JpaCompanyReportRepository jpaCompanyReportRepository) {
         this.jpaCompanyReportRepository = jpaCompanyReportRepository;
     }
+    @Override
     public void save(CompanyReport companyReport) {
         this.jpaCompanyReportRepository.save(companyReport);
     }
 
+    @Override
     public Iterable<CompanyReport> findAll() {
         return this.jpaCompanyReportRepository.findAll();
     }
 
+    @Override
+    public Iterable<CompanyReport> findByReportUrlIn(Iterable<String> reportUrls) {
+        return this.jpaCompanyReportRepository.findByReportUrlIn(reportUrls);
+    }
+
+    @Override
+    public Iterable<CompanyReport> saveAll(Iterable<CompanyReport> companyReports) {
+        return this.jpaCompanyReportRepository.saveAll(companyReports);
+    }
 }

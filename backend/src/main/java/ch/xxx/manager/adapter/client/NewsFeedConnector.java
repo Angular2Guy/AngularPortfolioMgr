@@ -68,8 +68,8 @@ public class NewsFeedConnector implements NewsFeedClient {
         RssDto rssDto = null;		
 		try {
             rssDto = this.xmlMapper.readValue(result, RssDto.class);
-            LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
-            LOGGER.info("Xml mapping successful");
+            //LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
+            //LOGGER.info("Xml mapping successful");
         } catch (JsonProcessingException ex) {
             LOGGER.error("Failed to parse XML response", ex);
         }
