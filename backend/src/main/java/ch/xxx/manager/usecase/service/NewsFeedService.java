@@ -36,13 +36,15 @@ public class NewsFeedService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewsFeedService.class);
 	
 	private final NewsFeedClient newsFeedClient;
+	private final SecSymbolClient secSymbolClient;
 	private final SymbolRepository symbolRepository;
 	private final CompanyReportRepository companyReportRepository;
 	private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
 	private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
 	
-	public NewsFeedService(NewsFeedClient newsFeedClient, SymbolRepository symbolRepository, CompanyReportRepository companyReportRepository) {
+	public NewsFeedService(NewsFeedClient newsFeedClient, SecSymbolClient secSymbolClient, SymbolRepository symbolRepository, CompanyReportRepository companyReportRepository) {
 		this.newsFeedClient = newsFeedClient;
+		this.secSymbolClient = secSymbolClient;
 		this.symbolRepository = symbolRepository;
 		this.companyReportRepository = companyReportRepository;
 	}
@@ -87,6 +89,14 @@ public class NewsFeedService {
 		LOGGER.info("Sec Company Reports imported: {} in {}ms", companyReportsFiltered.size(), Instant.now().toEpochMilli() - start.toEpochMilli());		
 	}
 
+	@Async
+	@Transactional
+	public void updateCompanyToSymbolJson() {
+		var start = Instant.now();
+		var cikToCompanyReport = this.secSymbolClient.importSymbols();
+		
+		LOGGER.info("Sec Company to Symbol Json imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
+	}
 	public List<SyndEntry> getSeekingAlphaNewsFeed() {		
 		return this.seekingAlphaNewsFeedOptional.stream().flatMap(myFeed -> myFeed.getEntries().stream()).map(myEntry -> {
 			myEntry.getForeignMarkup().clear();

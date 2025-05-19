@@ -16,10 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.domain.model.dto.CompanyToSymbolWrapperDto;
+import ch.xxx.manager.domain.model.dto.SymbolToCikWrapperDto;
+import ch.xxx.manager.usecase.service.SecSymbolClient;
 
 @Component
-public class SecSymbolConnector {
+public class SecSymbolConnector implements SecSymbolClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecSymbolConnector.class);
 	private final ConnectorClient connectorClient;
     private static final String URL_STRING = "https://www.sec.gov/files/company_tickers.json";
@@ -28,11 +29,9 @@ public class SecSymbolConnector {
         this.connectorClient = connectorClient;
     }
 
-    public void importSymbols() {
-        this.connectorClient.restCall(URL_STRING, CompanyToSymbolWrapperDto.class)
-            .ifPresent(response -> {                
-                LOGGER.info("Successfully imported symbols: " + response.getCompanies().size());
-            });
-
+    @Override
+    public SymbolToCikWrapperDto importSymbols() {
+        return this.connectorClient.restCall(URL_STRING, SymbolToCikWrapperDto.class)
+          .stream().findFirst().orElseThrow(() -> new RuntimeException("Error while importing symbols"));        
     }
 }

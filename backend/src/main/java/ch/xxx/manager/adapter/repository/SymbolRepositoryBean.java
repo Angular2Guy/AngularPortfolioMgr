@@ -75,7 +75,7 @@ public class SymbolRepositoryBean implements SymbolRepository {
 		return this.jpaSymbolRepository.findById(id);
 	}
 	@Override
-    public List<Symbol> findByCikIn(Collection<String> ciks) {
+    public Collection<Symbol> findByCikIn(Iterable<String> ciks) {
 		return this.jpaSymbolRepository.findByCikIn(ciks);
 	}	
 
@@ -97,5 +97,10 @@ public class SymbolRepositoryBean implements SymbolRepository {
 	@Override
 	public List<Symbol> findBySymbolSingleWithQuotes(String symbol) {
 		return this.jpaSymbolRepository.findBySymbolSingleWithQuotes(symbol);
+	}
+
+	@Override
+	public Collection<Symbol> findBySymbolIn(Iterable<String> symbols) {
+		return this.jpaSymbolRepository.findBySymbolIn(symbols);
 	}
 }

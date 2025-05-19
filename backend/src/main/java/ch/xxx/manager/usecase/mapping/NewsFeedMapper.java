@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.domain.model.dto.RssDto;
 import ch.xxx.manager.domain.model.entity.CompanyReport;
 import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
+import ch.xxx.manager.domain.model.entity.dto.RssDto;
 
 @Component
 public class NewsFeedMapper {

@@ -15,7 +15,7 @@ package ch.xxx.manager.domain.model.dto;
 import java.util.Map;
 
 
-public class CompanyToSymbolWrapperDto {
+public class SymbolToCikWrapperDto {
     private Map<String, CompanySymbolDto> companies;
     
     public static class CompanySymbolDto {

@@ -24,7 +24,8 @@ public interface SymbolRepository {
 	List<Symbol> findBySymbolSingleWithQuotes(String symbol);
 	List<Symbol> findByName(String name);
 	List<Symbol> findByPortfolioId(Long portfolioId);
-	List<Symbol> findByCikIn(Collection<String> ciks);
+	Collection<Symbol> findByCikIn(Iterable<String> ciks);
+	Collection<Symbol> findBySymbolIn(Iterable<String> symbols);
 	List<Symbol> findAll();
 	Optional<Symbol> findById(Long id);
 	Symbol save(Symbol symbol);
