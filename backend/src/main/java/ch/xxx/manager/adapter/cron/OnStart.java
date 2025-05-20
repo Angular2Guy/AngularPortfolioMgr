@@ -56,7 +56,7 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();		
 		this.newsFeedService.updateSeekingAlphaNewsFeed();
-		this.newsFeedService.updateSecEdgarUsGaapNewsFeed();
+		this.newsFeedService.importCompanyReports();
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
 		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
