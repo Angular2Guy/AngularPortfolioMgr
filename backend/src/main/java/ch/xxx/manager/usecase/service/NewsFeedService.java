@@ -71,7 +71,7 @@ public class NewsFeedService {
     @Transactional
 	public void importCompanyReports() {
 		this.updateCompanyToSymbolJson();
-		this.updateSecEdgarUsGaapNewsFeed();
+		//this.updateSecEdgarUsGaapNewsFeed();
 	}
     
     private void updateSecEdgarUsGaapNewsFeed() {

@@ -49,7 +49,7 @@ public class CronJobService {
 	private final AppUserService appUserService;
 	private final PortfolioService portfolioService;
 	private final NewsFeedService newsFeedService;
-	private Environment environment;
+	private final Environment environment;
 	@Value("${api.key}")
 	private String apiKey;
 
