@@ -18,7 +18,7 @@
               #autoName="matAutocomplete"
               (optionSelected)="symbolSelected($event)"
               >
-              @for (symbol of symbolsName | async; track symbol) {
+              @for (symbol of (symbolsName | async); track symbol) {
                 <mat-option
                   [value]="symbol"
                   class="symbol-text"
@@ -46,7 +46,7 @@
               #autoSymbol="matAutocomplete"
               (optionSelected)="symbolSelected($event)"
               >
-              @for (symbol of symbolsSymbol | async; track symbol) {
+              @for (symbol of (symbolsSymbol | async); track symbol) {
                 <mat-option
                   [value]="symbol"
                   class="symbol-text"
