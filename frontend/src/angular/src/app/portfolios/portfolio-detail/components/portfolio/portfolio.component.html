@@ -1,49 +1,57 @@
 <mat-toolbar color="primary">
   <span i18n="@@portfolioPortfolio">Portfolio {{ portfolio?.name }}</span>
   <span class="example-fill-remaining-space"></span>
-  <span class="custom-spinner" *ngIf="reloadData">
-    <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
-    </mat-progress-spinner>
-  </span>
-  <span *ngIf="reloadData" class="spinner-text" i18n="@@loading"
-    >Loading...</span
-  >
-  <span
-    ><button mat-flat-button color="primary" (click)="back()" i18n="@@back">
+  @if (reloadData) {
+    <span class="custom-spinner">
+      <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </span>
+  }
+  @if (reloadData) {
+    <span class="spinner-text" i18n="@@loading"
+      >Loading...</span
+      >
+    }
+    <span
+      ><button mat-flat-button color="primary" (click)="back()" i18n="@@back">
       Back
     </button></span
-  >
-  <span
-    ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
+    >
+    <span
+      ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
       Logout
     </button></span
-  >
-</mat-toolbar>
-<mat-sidenav-container
-  class="container"
-  [ngStyle]="{ 'height.px': windowHeight }"
->
-  <mat-sidenav opened mode="side" class="symbol-list">
-    <mat-action-list *ngFor="let symbol of symbols">
-      <div class="symbol-line">
-        <button mat-list-item (click)="selectSymbol(symbol)">
-          {{ symbol.name }}
-        </button>
-      </div>
-    </mat-action-list>
-  </mat-sidenav>
-  <mat-sidenav-content opened mode="side">
-    <app-symbol
-      *ngIf="showSymbol"
-      [portfolioId]="portfolio?.id"
-      [symbol]="selSymbol"
-      [showSymbol]="showSymbol"
-      (loadingData)="updateReloadData($event)"
-    ></app-symbol>
-    <app-symbol-overview
-      *ngIf="!showSymbol"
-      [portfolio]="portfolio"
-      [symbol]="selSymbol"
-    ></app-symbol-overview>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+    >
+  </mat-toolbar>
+  <mat-sidenav-container
+    class="container"
+    [ngStyle]="{ 'height.px': windowHeight }"
+    >
+    <mat-sidenav opened mode="side" class="symbol-list">
+      @for (symbol of symbols; track symbol) {
+        <mat-action-list>
+          <div class="symbol-line">
+            <button mat-list-item (click)="selectSymbol(symbol)">
+              {{ symbol.name }}
+            </button>
+          </div>
+        </mat-action-list>
+      }
+    </mat-sidenav>
+    <mat-sidenav-content opened mode="side">
+      @if (showSymbol) {
+        <app-symbol
+          [portfolioId]="portfolio?.id"
+          [symbol]="selSymbol"
+          [showSymbol]="showSymbol"
+          (loadingData)="updateReloadData($event)"
+        ></app-symbol>
+      }
+      @if (!showSymbol) {
+        <app-symbol-overview
+          [portfolio]="portfolio"
+          [symbol]="selSymbol"
+        ></app-symbol-overview>
+      }
+    </mat-sidenav-content>
+  </mat-sidenav-container>

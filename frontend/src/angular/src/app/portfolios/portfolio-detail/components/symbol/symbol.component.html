@@ -6,115 +6,120 @@
         {{
           !symbol ? "none" : serviceUtils.replacePortfolioSymbol(symbol?.symbol)
         }}</span
-      >
-      <span class="symbol-data" i18n="@@name"
-        >Name: {{ !symbol ? "none" : symbol?.name }}</span
-      >
-    </div>
-    <div class="text-container">
-      <span class="symbol-data" i18n="@@symbolStartDate"
-        >Start Date: {{ symbolData?.start | date: "mediumDate" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolEndDate"
-        >End Date: {{ symbolData?.end | date: "mediumDate" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolOpen"
-        >Open: {{ symbolData?.open | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolHigh"
-        >High: {{ symbolData?.high | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolLow"
-        >Low: {{ symbolData?.low | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolClose"
-        >Close: {{ symbolData?.close | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolAccDividend">
+        >
+        <span class="symbol-data" i18n="@@name"
+          >Name: {{ !symbol ? "none" : symbol?.name }}</span
+          >
+        </div>
+        <div class="text-container">
+          <span class="symbol-data" i18n="@@symbolStartDate"
+            >Start Date: {{ symbolData?.start | date: "mediumDate" }}</span
+            >
+            <span class="symbol-data" i18n="@@symbolEndDate"
+              >End Date: {{ symbolData?.end | date: "mediumDate" }}</span
+              >
+              <span class="symbol-data" i18n="@@symbolOpen"
+                >Open: {{ symbolData?.open | number: "1.2-2" }}</span
+                >
+                <span class="symbol-data" i18n="@@symbolHigh"
+                  >High: {{ symbolData?.high | number: "1.2-2" }}</span
+                  >
+                  <span class="symbol-data" i18n="@@symbolLow"
+                    >Low: {{ symbolData?.low | number: "1.2-2" }}</span
+                    >
+                    <span class="symbol-data" i18n="@@symbolClose"
+                      >Close: {{ symbolData?.close | number: "1.2-2" }}</span
+                      >
+                      <span class="symbol-data" i18n="@@symbolAccDividend">
       	Acc. Dividends: {{ symbolData?.accDividend | number: "1.2-2" }}
       </span>
-    </div>
-    <div class="text-container">
-      <span class="symbol-data" i18n="@@symbolCurrency"
-        >Currency: {{ symbol?.currencyKey }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolAvgVolume"
-        >Average Volume: {{ symbolData?.avgVolume | number: "1.0-0" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolAvgClose"
-        >Average Close: {{ symbolData?.avgClose | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolMedClose"
-        >Median Close: {{ symbolData?.medianClose | number: "1.2-2" }}</span
-      >
-      <span class="symbol-data" i18n="@@symbolVolClose"
-        >Volatility Close:
+                    </div>
+                    <div class="text-container">
+                      <span class="symbol-data" i18n="@@symbolCurrency"
+                        >Currency: {{ symbol?.currencyKey }}</span
+                        >
+                        <span class="symbol-data" i18n="@@symbolAvgVolume"
+                          >Average Volume: {{ symbolData?.avgVolume | number: "1.0-0" }}</span
+                          >
+                          <span class="symbol-data" i18n="@@symbolAvgClose"
+                            >Average Close: {{ symbolData?.avgClose | number: "1.2-2" }}</span
+                            >
+                            <span class="symbol-data" i18n="@@symbolMedClose"
+                              >Median Close: {{ symbolData?.medianClose | number: "1.2-2" }}</span
+                              >
+                              <span class="symbol-data" i18n="@@symbolVolClose"
+                                >Volatility Close:
         {{
           !symbolData.volatilityClose
             ? ""
             : (symbolData.volatilityClose * 100 | number: "1.2-2")
         }}%</span
-      >
-    </div>
-  </div>
-  <div class="text-container">
-    <label id="my-radio-group-label" i18n="@@pickTimeframe"
-      >Pick your timeframe:</label
-    >
-    <mat-radio-group
-      aria-labelledby="my-radio-group-label"
-      class="my-radio-group"
-      (change)="quotePeriodChanged()"
-      [(ngModel)]="selQuotePeriod"
-    >
-      <mat-radio-button
-        class="my-radio-button"
-        *ngFor="let myQuotePeriod of quotePeriods"
-        [value]="myQuotePeriod"
-      >
-        {{ myQuotePeriod.periodText }}
-      </mat-radio-button>
-    </mat-radio-group>
-  </div>
-  <div class="text-container">
-    <label id="my-checkbox-group-label" i18n="@@pickCompIndex"
-      >Pick your comparison index:</label
-    >
-    <span>
-      <mat-checkbox
-        class="my-checkbox"
-        [(ngModel)]="showES50"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
-        (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)"
-        i18n="@@es50"
-        >EuroStoxx 50</mat-checkbox
-      >
-      <mat-checkbox
-        class="my-checkbox"
-        [(ngModel)]="showMsciCH"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
-        (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)"
-        i18n="@@msciChina"
-        >Msci China</mat-checkbox
-      >
-      <mat-checkbox
-        class="my-checkbox"
-        [(ngModel)]="showSP500"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
-        (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)"
-        i18n="@@sAndP500"
-        >S&P 500</mat-checkbox
-      >
-    </span>
-  </div>
-  <div *ngIf="!symbol" class="chart-container center-div">
-    <div i18="@@symbolSelectInstrument">Please select an instrument</div>
-  </div>
-  <div *ngIf="symbol" #chartContainer class="chart-container">
-    <sc-line-chart
-      [chartPoints]="chartPoints"
-      [replaceName]="portfolioName"
-      [replaceSymbol]="portfolioSymbol"
-    ></sc-line-chart>
-  </div>
-</div>
+                                >
+                              </div>
+                            </div>
+                            <div class="text-container">
+                              <label id="my-radio-group-label" i18n="@@pickTimeframe"
+                                >Pick your timeframe:</label
+                                >
+                                <mat-radio-group
+                                  aria-labelledby="my-radio-group-label"
+                                  class="my-radio-group"
+                                  (change)="quotePeriodChanged()"
+                                  [(ngModel)]="selQuotePeriod"
+                                  >
+                                  @for (myQuotePeriod of quotePeriods; track myQuotePeriod) {
+                                    <mat-radio-button
+                                      class="my-radio-button"
+                                      [value]="myQuotePeriod"
+                                      >
+                                      {{ myQuotePeriod.periodText }}
+                                    </mat-radio-button>
+                                  }
+                                </mat-radio-group>
+                              </div>
+                              <div class="text-container">
+                                <label id="my-checkbox-group-label" i18n="@@pickCompIndex"
+                                  >Pick your comparison index:</label
+                                  >
+                                  <span>
+                                    <mat-checkbox
+                                      class="my-checkbox"
+                                      [(ngModel)]="showES50"
+                                      [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+                                      (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)"
+                                      i18n="@@es50"
+                                      >EuroStoxx 50</mat-checkbox
+                                      >
+                                      <mat-checkbox
+                                        class="my-checkbox"
+                                        [(ngModel)]="showMsciCH"
+                                        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+                                        (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)"
+                                        i18n="@@msciChina"
+                                        >Msci China</mat-checkbox
+                                        >
+                                        <mat-checkbox
+                                          class="my-checkbox"
+                                          [(ngModel)]="showSP500"
+                                          [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+                                          (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)"
+                                          i18n="@@sAndP500"
+                                          >S&P 500</mat-checkbox
+                                          >
+                                        </span>
+                                      </div>
+                                      @if (!symbol) {
+                                        <div class="chart-container center-div">
+                                          <div i18="@@symbolSelectInstrument">Please select an instrument</div>
+                                        </div>
+                                      }
+                                      @if (symbol) {
+                                        <div #chartContainer class="chart-container">
+                                          <sc-line-chart
+                                            [chartPoints]="chartPoints"
+                                            [replaceName]="portfolioName"
+                                            [replaceSymbol]="portfolioSymbol"
+                                          ></sc-line-chart>
+                                        </div>
+                                      }
+                                    </div>

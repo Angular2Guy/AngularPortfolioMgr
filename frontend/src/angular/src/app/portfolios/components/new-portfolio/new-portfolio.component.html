@@ -9,7 +9,7 @@
             placeholder="Portfolioname"
             tabindex="1"
             formControlName="{{ FormFields.PortfolioName }}"
-          />
+            />
         </mat-form-field>
       </li>
       <li>
@@ -19,7 +19,7 @@
             matInput
             [matDatepicker]="picker1"
             formControlName="{{ FormFields.CreatedAt }}"
-          />
+            />
           <mat-datepicker-toggle
             matSuffix
             [for]="picker1"
@@ -27,13 +27,14 @@
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
       </li>
-      <li
-        *ngIf="!formValid"
-        i18n="@@newPortfolioInputInvalid"
-        class="errorText"
-      >
+      @if (!formValid) {
+        <li
+          i18n="@@newPortfolioInputInvalid"
+          class="errorText"
+          >
         Input invalid
       </li>
+      }
       <li>
         <button
           mat-button
@@ -41,7 +42,7 @@
           [disabled]="!formValid"
           tabindex="-1"
           i18n="@@ok"
-        >
+          >
           Ok
         </button>
         <button
@@ -49,7 +50,7 @@
           (click)="onCancelClick()"
           tabindex="-1"
           i18n="@@cancel"
-        >
+          >
           Cancel
         </button>
       </li>

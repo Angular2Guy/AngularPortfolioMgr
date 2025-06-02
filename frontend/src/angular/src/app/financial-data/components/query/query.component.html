@@ -1,114 +1,134 @@
 <form [formGroup]="itemFormGroup" novalidate class="myform">
   <div class="query-item base-query">
-    <div *ngIf="queryItemType === ItemType.Query && showType">
-      <div i18n="@@query">Query</div>
-    </div>
-    <div *ngIf="queryItemType === ItemType.Query && !showType">
-      <mat-form-field class="string-operator">
-        <mat-label i18n="@@operator">Operator</mat-label>
-        <mat-select
-          [formControlName]="QueryFormFields.ConceptOperator"
-          name="ConceptOperator"
-          class="operator"
-        >
-          <mat-option
-            *ngFor="let item of stringQueryItems"
-            [value]="item"
+    @if (queryItemType === ItemType.Query && showType) {
+      <div>
+        <div i18n="@@query">Query</div>
+      </div>
+    }
+    @if (queryItemType === ItemType.Query && !showType) {
+      <div>
+        <mat-form-field class="string-operator">
+          <mat-label i18n="@@operator">Operator</mat-label>
+          <mat-select
+            [formControlName]="QueryFormFields.ConceptOperator"
+            name="ConceptOperator"
             class="operator"
-            >{{ item }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="form-field">
-        <mat-label i18n="@@createQueryQueryItemConcept">Concept</mat-label>
-        <input
-          matInput
-          type="text"
-          [matAutocomplete]="autoConcept"
-          formControlName="{{ QueryFormFields.Concept }}"
-          i18n-placeholder="@@phConcept"
-          placeholder="concept"
-        />
-        <mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption>
-          <mat-option
-            *ngFor="let concept of concepts"
-            [value]="concept.concept"
-            class="symbol-text"
-          >
-            {{ concept.concept }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-    </div>
-    <div *ngIf="queryItemType === ItemType.Query && !showType">
-      <mat-form-field class="number-operator">
-        <mat-label i18n="@@operator">Operator</mat-label>
-        <mat-select
-          [formControlName]="QueryFormFields.NumberOperator"
-          name="NumberOperator"
-          class="operator"
-        >
-          <mat-option
-            *ngFor="let item of numberQueryItems"
-            [value]="item"
-            class="operator"
-            >{{ item }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="form-field">
-        <mat-label i18n="@@value">Value</mat-label>
-        <input
-          matInput
-          type="text"
-          formControlName="{{ QueryFormFields.NumberValue }}"
-          class="number-value"
-        />
-      </mat-form-field>
-    </div>
+            >
+            @for (item of stringQueryItems; track item) {
+              <mat-option
+                [value]="item"
+                class="operator"
+                >{{ item }}</mat-option
+                >
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="form-field">
+            <mat-label i18n="@@createQueryQueryItemConcept">Concept</mat-label>
+            <input
+              matInput
+              type="text"
+              [matAutocomplete]="autoConcept"
+              formControlName="{{ QueryFormFields.Concept }}"
+              i18n-placeholder="@@phConcept"
+              placeholder="concept"
+              />
+            <mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption>
+              @for (concept of concepts; track concept) {
+                <mat-option
+                  [value]="concept.concept"
+                  class="symbol-text"
+                  >
+                  {{ concept.concept }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      }
+      @if (queryItemType === ItemType.Query && !showType) {
+        <div>
+          <mat-form-field class="number-operator">
+            <mat-label i18n="@@operator">Operator</mat-label>
+            <mat-select
+              [formControlName]="QueryFormFields.NumberOperator"
+              name="NumberOperator"
+              class="operator"
+              >
+              @for (item of numberQueryItems; track item) {
+                <mat-option
+                  [value]="item"
+                  class="operator"
+                  >{{ item }}</mat-option
+                  >
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="form-field">
+              <mat-label i18n="@@value">Value</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="{{ QueryFormFields.NumberValue }}"
+                class="number-value"
+                />
+            </mat-form-field>
+          </div>
+        }
 
-    <div *ngIf="queryItemType === ItemType.TermStart && !showType">
-      <mat-form-field class="term-operator">
-        <mat-label i18n="@@operator">Operator</mat-label>
-        <mat-select
-          [formControlName]="QueryFormFields.QueryOperator"
-          name="TermOperator"
-          class="operator"
-        >
-          <mat-option
-            *ngFor="let item of termQueryItems"
-            [value]="item"
-            class="operator"
-            >{{ item }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div *ngIf="queryItemType === ItemType.TermStart">
-      <div i18n="@@queryTermStart">Term Start</div>
-    </div>
+        @if (queryItemType === ItemType.TermStart && !showType) {
+          <div>
+            <mat-form-field class="term-operator">
+              <mat-label i18n="@@operator">Operator</mat-label>
+              <mat-select
+                [formControlName]="QueryFormFields.QueryOperator"
+                name="TermOperator"
+                class="operator"
+                >
+                @for (item of termQueryItems; track item) {
+                  <mat-option
+                    [value]="item"
+                    class="operator"
+                    >{{ item }}</mat-option
+                    >
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          }
+          @if (queryItemType === ItemType.TermStart) {
+            <div>
+              <div i18n="@@queryTermStart">Term Start</div>
+            </div>
+          }
 
-    <div *ngIf="queryItemType === ItemType.TermEnd && !showType">
-      <mat-form-field class="term-operator">
-        <mat-label i18n="@@operator">Operator</mat-label>
-        <mat-select
-          [formControlName]="QueryFormFields.QueryOperator"
-          name="TermOperator"
-          class="operator"
-        >
-          <mat-option selected value="End" class="operator" i18n="@@end"
-            >End</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div *ngIf="queryItemType === ItemType.TermEnd">
-      <div i18n="@@queryTermEnd">Term End</div>
-    </div>
-    <div *ngIf="!showType">
-      <button mat-icon-button (click)="itemRemove()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-</form>
+          @if (queryItemType === ItemType.TermEnd && !showType) {
+            <div>
+              <mat-form-field class="term-operator">
+                <mat-label i18n="@@operator">Operator</mat-label>
+                <mat-select
+                  [formControlName]="QueryFormFields.QueryOperator"
+                  name="TermOperator"
+                  class="operator"
+                  >
+                  <mat-option selected value="End" class="operator" i18n="@@end"
+                    >End</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            }
+            @if (queryItemType === ItemType.TermEnd) {
+              <div>
+                <div i18n="@@queryTermEnd">Term End</div>
+              </div>
+            }
+            @if (!showType) {
+              <div>
+                <button mat-icon-button (click)="itemRemove()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        </form>

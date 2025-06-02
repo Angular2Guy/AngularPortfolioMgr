@@ -9,7 +9,7 @@
           [disabled]="!formStatus || formStatus.toLowerCase() != 'valid'"
           (click)="search()"
           i18n="@@search"
-        >
+          >
           Search
         </button>
       </div>
@@ -19,10 +19,12 @@
           <mat-select
             [formControlName]="FormFields.YearOperator"
             name="YearOperator"
-          >
-            <mat-option *ngFor="let item of yearOperators" [value]="item">{{
-              item
-            }}</mat-option>
+            >
+            @for (item of yearOperators; track item) {
+              <mat-option [value]="item">{{
+                item
+              }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
         <mat-form-field class="form-field">
@@ -40,11 +42,13 @@
             formControlName="{{ FormFields.Symbol }}"
             i18n-placeholder="@@phSymbol"
             placeholder="symbol"
-          />
+            />
           <mat-autocomplete #autoSymbol="matAutocomplete" autoActiveFirstOption>
-            <mat-option *ngFor="let symbol of symbols" [value]="symbol.symbol">
-              {{ symbol.symbol }}
-            </mat-option>
+            @for (symbol of symbols; track symbol) {
+              <mat-option [value]="symbol.symbol">
+                {{ symbol.symbol }}
+              </mat-option>
+            }
           </mat-autocomplete>
         </mat-form-field>
         <mat-form-field class="form-field">
@@ -53,10 +57,12 @@
             [formControlName]="FormFields.Quarter"
             name="Quarter"
             multiple
-          >
-            <mat-option *ngFor="let item of quarterQueryItems" [value]="item">{{
-              item
-            }}</mat-option>
+            >
+            @for (item of quarterQueryItems; track item) {
+              <mat-option [value]="item">{{
+                item
+              }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </div>
@@ -71,22 +77,25 @@
           formControlName="{{ FormFields.Name }}"
           i18n-placeholder="@@phName"
           placeholder="name"
-        />
+          />
         <mat-autocomplete #autoName="matAutocomplete" autoActiveFirstOption>
-          <mat-option
-            *ngFor="let sfSymbolName of sfSymbolNames"
-            [value]="sfSymbolName.name"
-          >
-            {{ sfSymbolName.name }}
-          </mat-option>
+          @for (sfSymbolName of sfSymbolNames; track sfSymbolName) {
+            <mat-option
+              [value]="sfSymbolName.name"
+              >
+              {{ sfSymbolName.name }}
+            </mat-option>
+          }
         </mat-autocomplete>
       </mat-form-field>
       <mat-form-field class="form-field">
         <mat-label i18n="@@country">Country</mat-label>
         <mat-select [formControlName]="FormFields.Country" name="Country">
-          <mat-option *ngFor="let item of countryQueryItems" [value]="item">{{
-            item
-          }}</mat-option>
+          @for (item of countryQueryItems; track item) {
+            <mat-option [value]="item">{{
+              item
+            }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </div>
@@ -104,15 +113,16 @@
           [cdkDropListData]="availableItems"
           class="query-list"
           (cdkDropListDropped)="drop($event)"
-        >
-          <app-query
-            *ngFor="let item of availableItems"
-            cdkDrag
-            [queryItemType]="item.queryItemType"
-            [baseFormArray]="availableItemParams.formArray"
-            [formArrayIndex]="availableItemParams.formArrayIndex"
-            [showType]="availableItemParams.showType"
-          ></app-query>
+          >
+          @for (item of availableItems; track item) {
+            <app-query
+              cdkDrag
+              [queryItemType]="item.queryItemType"
+              [baseFormArray]="availableItemParams.formArray"
+              [formArrayIndex]="availableItemParams.formArrayIndex"
+              [showType]="availableItemParams.showType"
+            ></app-query>
+          }
         </div>
       </div>
 
@@ -127,17 +137,18 @@
           [cdkDropListData]="queryItems"
           class="query-list"
           (cdkDropListDropped)="drop($event)"
-        >
-          <app-query
-            class="query-item"
-            *ngFor="let item of queryItems; let i = index"
-            cdkDrag
-            [queryItemType]="item.queryItemType"
-            [baseFormArray]="queryItemParams.formArray"
-            [formArrayIndex]="i"
-            (removeItem)="removeItem($event)"
-            [showType]="queryItemParams.showType"
-          ></app-query>
+          >
+          @for (item of queryItems; track item; let i = $index) {
+            <app-query
+              class="query-item"
+              cdkDrag
+              [queryItemType]="item.queryItemType"
+              [baseFormArray]="queryItemParams.formArray"
+              [formArrayIndex]="i"
+              (removeItem)="removeItem($event)"
+              [showType]="queryItemParams.showType"
+            ></app-query>
+          }
         </div>
       </div>
     </div>

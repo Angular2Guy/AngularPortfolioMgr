@@ -1,34 +1,42 @@
 <mat-toolbar color="primary">
   <span i18n="@@mainPortfolioManager">Portfolio Manager</span>
   <span class="example-fill-remaining-space"></span>
-  <span *ngIf="login === null"
-    ><button
+  @if (login === null) {
+    <span
+      ><button
       mat-flat-button
       color="primary"
       (click)="openLoginDialog()"
       i18n="@@login"
-    >
+      >
       Login
     </button></span
-  >
-  <span *ngIf="login !== null"
-    ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
+    >
+  }
+  @if (login !== null) {
+    <span
+      ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
       Logout
     </button></span
-  >
+    >
+  }
 </mat-toolbar>
-<div *ngIf="login !== null" class="content-container">
-  <h2 class="content-margin">Loading</h2>
-</div>
-<div *ngIf="login !== null" class="content-container">
-  <mat-progress-spinner
-    class="content-margin"
-    mode="indeterminate"
-    color="primary"
-  ></mat-progress-spinner>
-</div>
+@if (login !== null) {
+  <div class="content-container">
+    <h2 class="content-margin">Loading</h2>
+  </div>
+}
+@if (login !== null) {
+  <div class="content-container">
+    <mat-progress-spinner
+      class="content-margin"
+      mode="indeterminate"
+      color="primary"
+    ></mat-progress-spinner>
+  </div>
+}
 <div style="display: none">
   <span id="onlineAgainMsg" i18n="@@onlineAgainMsg"
     >Your token is expired. To reconnect please logout and login again.</span
-  >
-</div>
+    >
+  </div>

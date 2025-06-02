@@ -22,6 +22,7 @@ import {
   ElementRef,
   AfterViewInit,
   DestroyRef,
+  DOCUMENT
 } from "@angular/core";
 import { Symbol } from "../../../../model/symbol";
 import {
@@ -29,7 +30,7 @@ import {
   ComparisonIndex,
 } from "../../../../service/quote.service";
 import { Quote } from "../../../../model/quote";
-import { DOCUMENT, formatDate } from "@angular/common";
+import { formatDate } from "@angular/common";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { forkJoin } from "rxjs";
 import { ChartPoint, ChartPoints } from "ngx-simple-charts/line";

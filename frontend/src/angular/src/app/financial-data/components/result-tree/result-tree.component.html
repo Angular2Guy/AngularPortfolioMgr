@@ -2,109 +2,107 @@
   [dataSource]="dataSource"
   [treeControl]="treeControl"
   class="example-tree"
->
+  >
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
-    This padding value depends on the mat-icon-button width. -->
+  This padding value depends on the mat-icon-button width. -->
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-    <div *ngIf="!node?.finanicalElementExts">{{ node.name }}</div>
-    <mat-table
-      *ngIf="node.isOpen"
-      [dataSource]="node.finanicalElementExts"
-      class="mytable"
-    >
-      <ng-container matColumnDef="concept">
-        <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept"
-          >Concept</mat-header-cell
+    @if (!node?.finanicalElementExts) {
+      <div>{{ node.name }}</div>
+    }
+    @if (node.isOpen) {
+      <mat-table
+        [dataSource]="node.finanicalElementExts"
+        class="mytable"
         >
-        <mat-cell
-          *matCellDef="let element"
-          matTooltip="{{ element.label }}"
-          (click)="conceptClick(element)"
-        >
-          <span class="single-line">
-            <mat-icon
-              inline="true"
-              aria-hidden="false"
-              aria-label="info"
-              fontIcon="info_outline"
-              class="align-icon"
-            ></mat-icon>
-            {{ element.concept }}</span
-          >
-        </mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="concept">
+          <mat-header-cell *matHeaderCellDef i18n="@@queryResultsConcept"
+            >Concept</mat-header-cell
+            >
+            <mat-cell
+              *matCellDef="let element"
+              matTooltip="{{ element.label }}"
+              (click)="conceptClick(element)"
+              >
+              <span class="single-line">
+                <mat-icon
+                  inline="true"
+                  aria-hidden="false"
+                  aria-label="info"
+                  fontIcon="info_outline"
+                  class="align-icon"
+                ></mat-icon>
+                {{ element.concept }}</span
+                >
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="quarter">
+              <mat-header-cell *matHeaderCellDef i18n="@@queryResultsQuarter"
+                >Quarter</mat-header-cell
+                >
+                <mat-cell *matCellDef="let element"> {{ element.quarter }} </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="currency">
+                <mat-header-cell *matHeaderCellDef i18n="@@queryResultsCurrency"
+                  >Currency</mat-header-cell
+                  >
+                  <mat-cell *matCellDef="let element"> {{ element.currency }} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                  <mat-header-cell *matHeaderCellDef i18n="@@queryResultsValue"
+                    >Value</mat-header-cell
+                    >
+                    <mat-cell *matCellDef="let element"> {{ element.value }} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="element-type">
+                    <mat-header-cell *matHeaderCellDef i18n="@@queryResultsElementType"
+                      >Type</mat-header-cell
+                      >
+                      <mat-cell *matCellDef="let element">
+                        {{ formatFinancialType(element.financialElementType) }}
+                      </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+                  </mat-table>
+                }
+              </mat-tree-node>
+              <!-- This is the tree node template for expandable nodes -->
+              <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+                <div class="mat-tree-node">
+                  <button
+                    mat-icon-button
+                    (click)="toggleNode(node)"
+                    [attr.aria-label]="'Toggle ' + node.name"
+                    >
+                    <mat-icon class="mat-icon-rtl-mirror">
+                      {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+                    </mat-icon>
+                  </button>
+                  {{ node.name }}
+                </div>
+                <!-- There is inline padding applied to this div using styles.
+                This padding value depends on the mat-icon-button width.  -->
+                <div
+                  [class.example-tree-invisible]="!treeControl.isExpanded(node)"
+                  role="group"
+                  >
+                  <ng-container matTreeNodeOutlet></ng-container>
+                </div>
+              </mat-nested-tree-node>
+            </mat-tree>
 
-      <ng-container matColumnDef="quarter">
-        <mat-header-cell *matHeaderCellDef i18n="@@queryResultsQuarter"
-          >Quarter</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element"> {{ element.quarter }} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="currency">
-        <mat-header-cell *matHeaderCellDef i18n="@@queryResultsCurrency"
-          >Currency</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element"> {{ element.currency }} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="value">
-        <mat-header-cell *matHeaderCellDef i18n="@@queryResultsValue"
-          >Value</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element"> {{ element.value }} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="element-type">
-        <mat-header-cell *matHeaderCellDef i18n="@@queryResultsElementType"
-          >Type</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element">
-          {{ formatFinancialType(element.financialElementType) }}
-        </mat-cell>
-      </ng-container>
-
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-    </mat-table>
-  </mat-tree-node>
-  <!-- This is the tree node template for expandable nodes -->
-  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
-    <div class="mat-tree-node">
-      <button
-        mat-icon-button
-        (click)="toggleNode(node)"
-        [attr.aria-label]="'Toggle ' + node.name"
-      >
-        <mat-icon class="mat-icon-rtl-mirror">
-          {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
-        </mat-icon>
-      </button>
-      {{ node.name }}
-    </div>
-    <!-- There is inline padding applied to this div using styles.
-          This padding value depends on the mat-icon-button width.  -->
-    <div
-      [class.example-tree-invisible]="!treeControl.isExpanded(node)"
-      role="group"
-    >
-      <ng-container matTreeNodeOutlet></ng-container>
-    </div>
-  </mat-nested-tree-node>
-</mat-tree>
-
-<ng-template #bottomSheet>
-  <div class="bs-line">
-    <span i18n="@@queryResultsConcept">Concept</span>:
-    {{ financialElement.concept }}
-  </div>
-  <mat-divider></mat-divider>
-  <div class="bs-line">
-    <span i18n="@@queryResultsLabel">Label</span>: {{ financialElement.label }}
-  </div>
-  <mat-divider></mat-divider>
-  <div class="bs-line">
-    <span i18n="@@queryResultsInfo">Info</span>: {{ financialElement.info }}
-  </div>
-</ng-template>
+            <ng-template #bottomSheet>
+              <div class="bs-line">
+                <span i18n="@@queryResultsConcept">Concept</span>:
+                {{ financialElement.concept }}
+              </div>
+              <mat-divider></mat-divider>
+              <div class="bs-line">
+                <span i18n="@@queryResultsLabel">Label</span>: {{ financialElement.label }}
+              </div>
+              <mat-divider></mat-divider>
+              <div class="bs-line">
+                <span i18n="@@queryResultsInfo">Info</span>: {{ financialElement.info }}
+              </div>
+            </ng-template>

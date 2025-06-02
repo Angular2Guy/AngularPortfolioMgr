@@ -1,164 +1,175 @@
 <div mat-dialog-content>
   <mat-tab-group>
     <mat-tab i18n-label="@@loginLogin" label="Login">
-      <ng-container
-        [ngTemplateOutlet]="waitingSpinner"
-        *ngIf="waitingForResponse"
-      ></ng-container>
-      <form [formGroup]="loginForm" novalidate *ngIf="!waitingForResponse">
-        <ul>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@username"
-                placeholder="Username"
-                tabindex="1"
-                formControlName="{{ FormFields.Username }}"
-              />
-            </mat-form-field>
-          </li>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@password"
-                placeholder="Password"
-                tabindex="2"
-                formControlName="{{ FormFields.Password }}"
-                type="password"
-              />
-            </mat-form-field>
-          </li>
-          <li *ngIf="loginFailed" i18n="@@loginLoginFailed" class="errorText">
+      @if (waitingForResponse) {
+        <ng-container
+          [ngTemplateOutlet]="waitingSpinner"
+        ></ng-container>
+      }
+      @if (!waitingForResponse) {
+        <form [formGroup]="loginForm" novalidate>
+          <ul>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@username"
+                  placeholder="Username"
+                  tabindex="1"
+                  formControlName="{{ FormFields.Username }}"
+                  />
+              </mat-form-field>
+            </li>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@password"
+                  placeholder="Password"
+                  tabindex="2"
+                  formControlName="{{ FormFields.Password }}"
+                  type="password"
+                  />
+              </mat-form-field>
+            </li>
+            @if (loginFailed) {
+              <li i18n="@@loginLoginFailed" class="errorText">
             Login Failed
           </li>
-          <li>
-            <button
-              mat-button
-              (click)="onLoginClick()"
-              [disabled]="!loginForm.valid"
-              tabindex="-1"
-              i18n="@@ok"
-            >
+            }
+            <li>
+              <button
+                mat-button
+                (click)="onLoginClick()"
+                [disabled]="!loginForm.valid"
+                tabindex="-1"
+                i18n="@@ok"
+                >
               Ok
             </button>
-            <button
-              mat-button
-              (click)="onCancelClick()"
-              tabindex="-1"
-              i18n="@@cancel"
-            >
+              <button
+                mat-button
+                (click)="onCancelClick()"
+                tabindex="-1"
+                i18n="@@cancel"
+                >
               Cancel
             </button>
-          </li>
-        </ul>
-      </form>
+            </li>
+          </ul>
+        </form>
+      }
     </mat-tab>
     <mat-tab i18n-label="@@signin" label="Signin">
-      <ng-container
-        [ngTemplateOutlet]="waitingSpinner"
-        *ngIf="waitingForResponse"
-      ></ng-container>
-      <form [formGroup]="signinForm" novalidate *ngIf="!waitingForResponse">
-        <ul>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@username"
-                placeholder="Username"
-                tabindex="1"
-                formControlName="{{ FormFields.Username }}"
-              />
-            </mat-form-field>
-          </li>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@password"
-                placeholder="Password"
-                tabindex="2"
-                formControlName="{{ FormFields.Password }}"
-                type="password"
-              />
-            </mat-form-field>
-            <mat-form-field class="spacer">
-              <input
-                matInput
-                i18n-placeholder="@@password"
-                placeholder="Password"
-                tabindex="3"
-                formControlName="{{ FormFields.Password2 }}"
-                type="password"
-              />
-            </mat-form-field>
-          </li>
-          <li
-            *ngIf="!pwMatching"
-            i18n="@@loginPasswordsNoMatch"
-            class="errorText"
-          >
+      @if (waitingForResponse) {
+        <ng-container
+          [ngTemplateOutlet]="waitingSpinner"
+        ></ng-container>
+      }
+      @if (!waitingForResponse) {
+        <form [formGroup]="signinForm" novalidate>
+          <ul>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@username"
+                  placeholder="Username"
+                  tabindex="1"
+                  formControlName="{{ FormFields.Username }}"
+                  />
+              </mat-form-field>
+            </li>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@password"
+                  placeholder="Password"
+                  tabindex="2"
+                  formControlName="{{ FormFields.Password }}"
+                  type="password"
+                  />
+              </mat-form-field>
+              <mat-form-field class="spacer">
+                <input
+                  matInput
+                  i18n-placeholder="@@password"
+                  placeholder="Password"
+                  tabindex="3"
+                  formControlName="{{ FormFields.Password2 }}"
+                  type="password"
+                  />
+              </mat-form-field>
+            </li>
+            @if (!pwMatching) {
+              <li
+                i18n="@@loginPasswordsNoMatch"
+                class="errorText"
+                >
             Passwords do not match
           </li>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@loginAlphavantageKey"
-                placeholder="AlphavantageKey"
-                tabindex="4"
-                formControlName="{{ FormFields.AlphavantageKey }}"
-              />
-            </mat-form-field>
-          </li>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@loginRapidApiKey"
-                placeholder="RapidApiKey"
-                tabindex="5"
-                formControlName="{{ FormFields.RapidApiKey }}"
-              />
-            </mat-form-field>
-          </li>
-          <li>
-            <mat-form-field>
-              <input
-                matInput
-                i18n-placeholder="@@email"
-                placeholder="Email"
-                tabindex="6"
-                formControlName="{{ FormFields.Email }}"
-              />
-            </mat-form-field>
-          </li>
-          <li *ngIf="signinFailed" i18n="@@loginSigninFailed" class="errorText">
+            }
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@loginAlphavantageKey"
+                  placeholder="AlphavantageKey"
+                  tabindex="4"
+                  formControlName="{{ FormFields.AlphavantageKey }}"
+                  />
+              </mat-form-field>
+            </li>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@loginRapidApiKey"
+                  placeholder="RapidApiKey"
+                  tabindex="5"
+                  formControlName="{{ FormFields.RapidApiKey }}"
+                  />
+              </mat-form-field>
+            </li>
+            <li>
+              <mat-form-field>
+                <input
+                  matInput
+                  i18n-placeholder="@@email"
+                  placeholder="Email"
+                  tabindex="6"
+                  formControlName="{{ FormFields.Email }}"
+                  />
+              </mat-form-field>
+            </li>
+            @if (signinFailed) {
+              <li i18n="@@loginSigninFailed" class="errorText">
             Signin Failed
           </li>
-          <li>
-            <button
-              mat-button
-              (click)="onSigninClick()"
-              [disabled]="!signinForm.valid"
-              tabindex="-1"
-              i18n="@@ok"
-            >
+            }
+            <li>
+              <button
+                mat-button
+                (click)="onSigninClick()"
+                [disabled]="!signinForm.valid"
+                tabindex="-1"
+                i18n="@@ok"
+                >
               Ok
             </button>
-            <button
-              mat-button
-              (click)="onCancelClick()"
-              tabindex="-1"
-              i18n="@@cancel"
-            >
+              <button
+                mat-button
+                (click)="onCancelClick()"
+                tabindex="-1"
+                i18n="@@cancel"
+                >
               Cancel
             </button>
-          </li>
-        </ul>
-      </form>
+            </li>
+          </ul>
+        </form>
+      }
     </mat-tab>
   </mat-tab-group>
 </div>
