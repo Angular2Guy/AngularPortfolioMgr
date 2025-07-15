@@ -68,6 +68,7 @@ public class SecFileClientBean implements FileClient {
 		this.financialDataImportPath = this.appInfoService.getFinancialDataImportPath();
 	}
 
+    @Override
 	public Boolean importZipFile(String filename) {
 		if(!this.importDone) {
 			return false;
@@ -117,11 +118,15 @@ public class SecFileClientBean implements FileClient {
 				}
 			});
 			storeEntries(symbolFinancialsDtos, first, maxChildren, start);
+			LOGGER.info("Import time: {} seconds.", ChronoUnit.SECONDS.between(start.get(), LocalDateTime.now()));
+			var startCreateIndexes = LocalDateTime.now();
 			LOGGER.info("Recreate indexes.");
 			this.financialDataImportService.createFeIndexes();
-			LOGGER.info("Indexes ready.");
+			LOGGER.info("Indexes ready: {} seconds.",
+					ChronoUnit.SECONDS.between(startCreateIndexes, LocalDateTime.now()));
 			this.financialDataImportService.updateFeConcepts();
-			LOGGER.info("FeConcepts updated.");
+			LOGGER.info("FeConcepts updated: {} seconds.",
+					ChronoUnit.SECONDS.between(start.get(), LocalDateTime.now()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} 
