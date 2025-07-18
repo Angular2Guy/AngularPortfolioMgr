@@ -10,18 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NestedTreeControl } from "@angular/cdk/tree";
 import {
   Component,
-  DestroyRef,
-  inject,
   Input,
   TemplateRef,
   ViewChild,
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatTreeNestedDataSource } from "@angular/material/tree";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
 import { FeIdInfo } from "../../model/fe-id-info";
 import {
   FinancialElement,
@@ -37,8 +33,7 @@ interface ElementNode {
 }
 
 interface ByElements extends ElementNode {
-  finanicalElementExts: FinancialElementExt[];
-  isOpen: boolean;
+  finanicalElementExts: FinancialElementExt[];  
 }
 
 interface ByYearElements extends ElementNode {
@@ -59,10 +54,7 @@ interface BySymbolElements extends ElementNode {
 })
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];
-  protected treeControl = new NestedTreeControl<ElementNode>(
-    (node) => node.children,
-  );
-  protected dataSource = new MatTreeNestedDataSource<ElementNode>();
+  protected dataSource = new MatTreeNestedDataSource<ElementNode>();  
   protected displayedColumns: string[] = [
     "concept",
     "value",
@@ -81,16 +73,6 @@ export class ResultTreeComponent {
 
   protected hasChild = (_: number, node: ElementNode) =>
     !!node.children && node.children.length > 0;
-
-  toggleNode(node: ElementNode): void {
-    this.treeControl.toggle(node);
-    node?.children?.forEach((childNode) => {
-      if (!childNode || !childNode?.children?.length) {
-        const myByElements = childNode as ByElements;
-        myByElements.isOpen = this.treeControl.isExpanded(node);
-      }
-    });
-  }
 
   conceptClick(element: FinancialElement): void {
     //console.log(element);
@@ -138,8 +120,7 @@ export class ResultTreeComponent {
       const byYearElements: ByYearElements[] = [];
       byYearElementsMap.forEach((value, key) => {
         const myByElements = {
-          name: "Elements",
-          isOpen: false,
+          name: "Elements",          
           finanicalElementExts: value,
         } as ByElements;
         const myByYearElement = {
