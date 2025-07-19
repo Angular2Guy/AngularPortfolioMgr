@@ -1,15 +1,17 @@
 <mat-tree #tree
   [dataSource]="dataSource"  
+  [childrenAccessor]="childrenAccessor"
   class="example-tree"
   >
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
-  This padding value depends on the mat-icon-button width. -->
-  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-    @if (!node?.finanicalElementExts) {
+  This padding value depends on the mat-icon-button width. -->  
+  <mat-nested-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+    <!-- {{ node | json }} -->
+    @if(!node?.finanicalElementExts || node.finanicalElementExts?.length === 0) { 
       <div>{{ node.name }}</div>
     }
-    @if (tree.isExpanded(node)) {
+      @if (node.visible) {
       <mat-table
         [dataSource]="node.finanicalElementExts"
         class="mytable"
@@ -64,12 +66,13 @@
                     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
                   </mat-table>
-                }
-              </mat-tree-node>
+                 } 
+              </mat-nested-tree-node>
+
               <!-- This is the tree node template for expandable nodes -->
-              <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+              <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodeToggle>
                 <div class="mat-tree-node">
-                  <button
+                  <button (click)="toggleNode(node)"
                     mat-icon-button                    
                     [attr.aria-label]="'Toggle ' + node.name"
                     >

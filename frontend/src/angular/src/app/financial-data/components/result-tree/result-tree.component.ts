@@ -17,7 +17,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { MatTreeNestedDataSource } from "@angular/material/tree";
+import { MatTree, MatTreeNestedDataSource } from "@angular/material/tree";
 import { FeIdInfo } from "../../model/fe-id-info";
 import {
   FinancialElement,
@@ -26,14 +26,16 @@ import {
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialDataService } from "../../service/financial-data.service";
+import { CdkTree } from "@angular/cdk/tree";
 
 interface ElementNode {
   name: string;
+  visible?: boolean;
   children?: ElementNode[];
 }
 
 interface ByElements extends ElementNode {
-  finanicalElementExts: FinancialElementExt[];  
+  finanicalElementExts: FinancialElementExt[];    
 }
 
 interface ByYearElements extends ElementNode {
@@ -64,17 +66,22 @@ export class ResultTreeComponent {
   ];
   protected financialElement: FinancialElement = null;
 
-  @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;
+  @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;  
 
   constructor(
     private financialDataService: FinancialDataService,
     private bottomSheet: MatBottomSheet,
   ) {}
+  
+  protected childrenAccessor = (node: ElementNode) => {    
+    return node.children ?? [];
+  }
+  protected hasChild = (_: number, node: ElementNode) => {
+    //console.log(node);
+    return !!node.children && node.children.length > 0;
+  }      
 
-  protected hasChild = (_: number, node: ElementNode) =>
-    !!node.children && node.children.length > 0;
-
-  conceptClick(element: FinancialElement): void {
+  protected conceptClick(element: FinancialElement): void {
     //console.log(element);
     this.financialDataService.getFeInfo(element.id).subscribe((value) => {
       //console.log(value);
@@ -84,7 +91,20 @@ export class ResultTreeComponent {
     });
   }
 
-  formatFinancialType(type: string): string {
+  protected toggleNode(node: ByElements): void {          
+      node.children?.forEach((child) => {               
+        if (child.hasOwnProperty("finanicalElementExts")) {
+          if (child.hasOwnProperty("visible")) {
+            child.visible = !child.visible;
+          } else {
+            child.visible = true;
+          }
+          }        
+      });             
+    //console.log(node);
+  }
+
+  protected formatFinancialType(type: string): string {
     return type.toLocaleLowerCase() === "BalanceSheet".toLowerCase()
       ? "BS"
       : type.toLocaleLowerCase() === "Cashflow".toLowerCase()
@@ -120,7 +140,8 @@ export class ResultTreeComponent {
       const byYearElements: ByYearElements[] = [];
       byYearElementsMap.forEach((value, key) => {
         const myByElements = {
-          name: "Elements",          
+          name: "Elements",     
+          visible: false,     
           finanicalElementExts: value,
         } as ByElements;
         const myByYearElement = {
