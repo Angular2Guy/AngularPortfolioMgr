@@ -21,7 +21,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -73,6 +73,20 @@ bootJar {
 
 test {
 	useJUnitPlatform()
+}
+
+// Ensure backend tasks wait for frontend
+
+tasks.named('processResources') {
+    dependsOn(':frontend:buildAngular')
+}
+
+tasks.named('classes') {
+    dependsOn(':frontend:buildAngular')
+}
+
+tasks.named('bootJar') {
+    dependsOn(':frontend:buildAngular')
 }
 
 task buildDockerImage {
