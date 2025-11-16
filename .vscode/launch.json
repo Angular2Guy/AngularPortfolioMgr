@@ -4,19 +4,10 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "jdk",
             "request": "launch",
-            "name": "Launch Java App",
-            "mainClass": "ch.xxx.manager.ManagerApplication",
-            "vmArgs": " -Dspring.profiles.active=prod"        
-        },
-        {
-            "name": "Launch Java: Continuous Mode",
-            "type": "jdk",
-            "request": "launch",
-            "launchConfiguration": "Continuous Mode"
-        }
+            "name": "Launch Java App"
+        },       
     ]
 }
