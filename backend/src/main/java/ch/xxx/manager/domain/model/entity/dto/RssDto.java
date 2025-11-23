@@ -13,7 +13,8 @@
 package ch.xxx.manager.domain.model.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-  @JsonRootName("rss")
+
+@JsonRootName("rss")
   public record RssDto(@JacksonXmlProperty(isAttribute = true) String version, ChannelDto channel) { }

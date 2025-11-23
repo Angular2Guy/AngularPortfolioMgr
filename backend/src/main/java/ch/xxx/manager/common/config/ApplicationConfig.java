@@ -26,17 +26,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import tools.jackson.dataformat.csv.CsvMapper;
 
 @Configuration
 @EnableScheduling
@@ -61,25 +55,6 @@ public class ApplicationConfig {
 			return null;
 		});
 	}
-
-	@Bean
-	@Primary
-	public ObjectMapper createObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return objectMapper;
-	}
-
-	@Bean("csv")
-	public CsvMapper createCsvMapper() {
-		CsvMapper objectMapper = new CsvMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return objectMapper;
-	}
 	
 	@Bean
 	public LockProvider lockProvider(DataSource dataSource) {
@@ -89,14 +64,5 @@ public class ApplicationConfig {
 	@Bean
 	public RestClient restClient() {
 		return RestClient.create();
-	}
-
-	@Bean("xml")
-	public XmlMapper createXmlMapper() {
-		XmlMapper xmlMapper = new XmlMapper();
-		xmlMapper.registerModule(new JavaTimeModule());
-		xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		xmlMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return xmlMapper;
 	}
 }

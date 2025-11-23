@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
@@ -34,6 +34,7 @@ import ch.xxx.manager.domain.model.entity.dto.CompanyReportWrapper;
 import ch.xxx.manager.domain.model.entity.dto.RssDto;
 import ch.xxx.manager.usecase.mapping.NewsFeedMapper;
 import ch.xxx.manager.usecase.service.NewsFeedClient;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Component
 public class NewsFeedConnector implements NewsFeedClient {
@@ -65,18 +66,13 @@ public class NewsFeedConnector implements NewsFeedClient {
     @Override
     public List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed() {
         var result = this.loadFile(SEC_EDGAR_USGAAP, String.class);        
-        RssDto rssDto = null;		
-		try {
-            rssDto = this.xmlMapper.readValue(result, RssDto.class);
-            //LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
-            //LOGGER.info("Xml mapping successful");
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Failed to parse XML response", ex);
-        }
-		
+        RssDto rssDto = null;
+        rssDto = this.xmlMapper.readValue(result, RssDto.class);
+        //LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
+        //LOGGER.info("Xml mapping successful");
+
         return Optional.ofNullable(rssDto)
-                .map(myRssDto -> this.newsFeedMapper.convert(
-                    myRssDto))
+                .map(this.newsFeedMapper::convert)
                 .orElse(List.of());
     }
 

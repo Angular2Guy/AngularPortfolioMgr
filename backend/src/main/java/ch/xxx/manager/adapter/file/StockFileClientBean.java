@@ -32,8 +32,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.Symbol;
@@ -42,6 +40,8 @@ import ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
+import tools.jackson.dataformat.csv.CsvMapper;
+import tools.jackson.dataformat.csv.CsvSchema;
 
 @Component(value = "Stock")
 public class StockFileClientBean implements FileClient {

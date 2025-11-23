@@ -12,11 +12,11 @@
  */
 package ch.xxx.manager.common.config;
 
+import ch.xxx.manager.domain.utils.DataHelper;
+import ch.xxx.manager.usecase.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,12 +26,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue;
 
-import ch.xxx.manager.domain.utils.DataHelper;
-import ch.xxx.manager.usecase.service.JwtTokenService;
-
 @Configuration
 @EnableWebSecurity
-@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class WebSecurityConfig {
 	private static final String DEVPATH = "/rest/dev/**";
 	private static final String PRODPATH = "/rest/prod/**";

@@ -11,7 +11,7 @@
    limitations under the License.
  */
 plugins {
-	id 'org.springframework.boot' version '3.5.4'
+	id 'org.springframework.boot' version '4.0.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'java'    
 }
@@ -30,34 +30,42 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'	
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
-	implementation 'org.liquibase:liquibase-core'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.modulith:spring-modulith-starter-jpa:1.4.2'
-	implementation 'com.google.guava:guava:31.1-jre'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-	implementation 'commons-net:commons-net:3.8.0'	
+    implementation 'com.google.guava:guava:33.5.0-jre'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0-RC1'
+	implementation 'commons-net:commons-net:3.12.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+    implementation 'tools.jackson.dataformat:jackson-dataformat-xml'
+	implementation 'tools.jackson.dataformat:jackson-dataformat-csv'
 	implementation 'net.javacrumbs.shedlock:shedlock-spring:6.0.1'
 	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.1'
-	implementation 'com.google.crypto.tink:tink:1.15.0'
+	implementation 'com.google.crypto.tink:tink:1.19.0'
 	implementation 'com.rometools:rome:2.1.0'
 	implementation 'org.apache.httpcomponents.client5:httpclient5'
-	
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-liquibase-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-mail-test'
 	testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.0'
-			
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 	if(project.hasProperty('withAngular')) {
 		implementation 'org.postgresql:postgresql'
 		testImplementation 'com.h2database:h2'
