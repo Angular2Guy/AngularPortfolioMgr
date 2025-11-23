@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.common.config;
+package ch.xxx.manager.adapter.config;
 
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.core.LockProvider;

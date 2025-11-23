@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.finstat.file;
+package ch.xxx.manager.adapter.file;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -34,8 +34,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.dto.FinancialElementImportDto;

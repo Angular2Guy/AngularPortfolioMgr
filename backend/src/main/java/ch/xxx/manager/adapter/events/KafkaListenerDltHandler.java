@@ -24,10 +24,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.xxx.manager.common.config.KafkaConfig;
+import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import jakarta.transaction.Transactional;
 import tools.jackson.databind.json.JsonMapper;

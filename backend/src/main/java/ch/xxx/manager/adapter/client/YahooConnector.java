@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stock.client;
+package ch.xxx.manager.adapter.client;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.common.client.ConnectorClient;
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.usecase.mapping.YahooClientMapper;
 import ch.xxx.manager.usecase.service.YahooClient;

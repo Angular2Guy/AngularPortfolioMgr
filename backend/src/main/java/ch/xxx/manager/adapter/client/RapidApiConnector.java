@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stock.client;
+package ch.xxx.manager.adapter.client;
 
 import java.time.Duration;
 import java.util.List;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
-import ch.xxx.manager.common.client.ConnectorClient;
 import ch.xxx.manager.domain.model.dto.RapidOverviewImportDto;
 import ch.xxx.manager.usecase.service.RapidApiClient;
 import jakarta.annotation.PostConstruct;

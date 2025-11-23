@@ -30,7 +30,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.xxx.manager.common.config.KafkaConfig;
+import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.exception.AuthenticationException;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;

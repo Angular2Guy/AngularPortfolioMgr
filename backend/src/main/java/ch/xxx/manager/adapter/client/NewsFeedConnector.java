@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.xxx.manager.news.client;
+package ch.xxx.manager.adapter.client;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,11 +19,8 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;

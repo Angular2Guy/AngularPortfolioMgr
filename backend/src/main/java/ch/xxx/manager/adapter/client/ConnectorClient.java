@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.common.client;
+package ch.xxx.manager.adapter.client;
 
 import java.time.Duration;
 import java.util.Optional;

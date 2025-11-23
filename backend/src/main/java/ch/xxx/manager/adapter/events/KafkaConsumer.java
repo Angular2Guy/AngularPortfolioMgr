@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.xxx.manager.common.config.KafkaConfig;
+import ch.xxx.manager.adapter.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
