@@ -44,19 +44,20 @@ import ch.xxx.manager.domain.model.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.domain.utils.StreamHelpers;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.FinancialDataService;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component("Sec")
 public class SecFileClientBean implements FileClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecFileClientBean.class);
 	private volatile boolean importDone = true; 
 	private final AppInfoService appInfoService;
-	private final ObjectMapper objectMapper;
+	private final JsonMapper objectMapper;
 	private final FinancialDataService financialDataImportService;
 	@Value("${ssd.io:false}")
 	private boolean ssdIo;
 	String financialDataImportPath;
 
-	public SecFileClientBean(AppInfoService appInfoService, ObjectMapper objectMapper,
+	public SecFileClientBean(AppInfoService appInfoService, JsonMapper objectMapper,
 			FinancialDataService financialDataImportService) {
 		this.appInfoService = appInfoService;
 		this.objectMapper = objectMapper;

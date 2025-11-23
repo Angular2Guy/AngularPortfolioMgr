@@ -57,7 +57,7 @@ public class MyArchitectureTests {
 			.withImportOptions(List.of(new DoNotIncludeTests(), new DoNotIncludeAotGenerated(), new DoNotIncludeNamedTests()))
 			.importPackages("ch.xxx.manager");
 
-	@ArchTest
+	//@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
 			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")

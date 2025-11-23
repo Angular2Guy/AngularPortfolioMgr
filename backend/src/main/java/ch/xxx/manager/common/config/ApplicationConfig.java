@@ -12,25 +12,22 @@
  */
 package ch.xxx.manager.common.config;
 
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
+import jakarta.annotation.PostConstruct;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestClient;
-
-import jakarta.annotation.PostConstruct;
-import net.javacrumbs.shedlock.core.LockProvider;
-import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import tools.jackson.dataformat.csv.CsvMapper;
+
+import javax.sql.DataSource;
+import java.util.Optional;
 
 @Configuration
 @EnableScheduling
@@ -55,7 +52,11 @@ public class ApplicationConfig {
 			return null;
 		});
 	}
-	
+	@Bean
+    public CsvMapper createCsvMapper() {
+        return new CsvMapper();
+    }
+
 	@Bean
 	public LockProvider lockProvider(DataSource dataSource) {
 		return new JdbcTemplateLockProvider(dataSource);

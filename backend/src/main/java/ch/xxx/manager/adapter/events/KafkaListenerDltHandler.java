@@ -30,15 +30,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.common.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import jakarta.transaction.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 @Transactional
 @Service
 public class KafkaListenerDltHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaListenerDltHandler.class);
 	private final KafkaTemplate<String, String> kafkaTemplate;
-	private final ObjectMapper objectMapper;
+	private final JsonMapper objectMapper;
 
-	public KafkaListenerDltHandler(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
+	public KafkaListenerDltHandler(KafkaTemplate<String, String> kafkaTemplate, JsonMapper objectMapper) {
 		this.kafkaTemplate = kafkaTemplate;
 		this.objectMapper = objectMapper;
 	}
@@ -48,7 +49,7 @@ public class KafkaListenerDltHandler {
 			CompletableFuture<SendResult<String,String>> listenableFuture = this.kafkaTemplate
 					.send(KafkaConfig.DEFAULT_DLT_TOPIC, UUID.randomUUID().toString(), this.objectMapper.writeValueAsString(dto));
 			listenableFuture.get(3, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException | JsonProcessingException e) {
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e);
 		}
 		LOGGER.info("Message send to {}. {}", KafkaConfig.DEFAULT_DLT_TOPIC, dto.toString());

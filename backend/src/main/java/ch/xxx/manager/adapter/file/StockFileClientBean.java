@@ -12,27 +12,6 @@
  */
 package ch.xxx.manager.adapter.file;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
-
 import ch.xxx.manager.domain.file.FileClient;
 import ch.xxx.manager.domain.model.entity.Symbol;
 import ch.xxx.manager.domain.model.entity.Symbol.QuoteSource;
@@ -40,8 +19,22 @@ import ch.xxx.manager.domain.model.entity.dto.DailyQuoteImportDto;
 import ch.xxx.manager.usecase.service.AppInfoService;
 import ch.xxx.manager.usecase.service.QuoteImportService;
 import ch.xxx.manager.usecase.service.SymbolImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 import tools.jackson.dataformat.csv.CsvMapper;
 import tools.jackson.dataformat.csv.CsvSchema;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 @Component(value = "Stock")
 public class StockFileClientBean implements FileClient {
@@ -56,7 +49,7 @@ public class StockFileClientBean implements FileClient {
 	String financialDataImportPath;
 
 	public StockFileClientBean(AppInfoService appInfoService, QuoteImportService quoteImportService,
-			@Qualifier("csv") CsvMapper csvMapper, SymbolImportService symbolImportService) {
+			CsvMapper csvMapper, SymbolImportService symbolImportService) {
 		this.appInfoService = appInfoService;
 		this.csvMapper = csvMapper;
 		this.quoteImportService = quoteImportService;

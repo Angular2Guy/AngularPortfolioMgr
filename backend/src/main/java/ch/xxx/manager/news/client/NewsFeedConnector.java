@@ -47,7 +47,7 @@ public class NewsFeedConnector implements NewsFeedClient {
     private final XmlMapper xmlMapper;
     private final NewsFeedMapper newsFeedMapper;
 
-    public NewsFeedConnector(RestClient restClient, @Qualifier("xml") XmlMapper xmsMapper, NewsFeedMapper newsFeedMapper) {
+    public NewsFeedConnector(RestClient restClient, XmlMapper xmsMapper, NewsFeedMapper newsFeedMapper) {
         this.restClient = restClient;
         this.xmlMapper = xmsMapper;
         this.newsFeedMapper = newsFeedMapper;
