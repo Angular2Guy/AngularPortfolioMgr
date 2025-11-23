@@ -10,33 +10,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.config;
-
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.client.RestClient;
-
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+package ch.xxx.manager.common.config;
 
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestClient;
+import tools.jackson.dataformat.csv.CsvMapper;
+
+import javax.sql.DataSource;
+import java.util.Optional;
 
 @Configuration
 @EnableScheduling
@@ -61,26 +52,11 @@ public class ApplicationConfig {
 			return null;
 		});
 	}
-
 	@Bean
-	@Primary
-	public ObjectMapper createObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return objectMapper;
-	}
+    public CsvMapper createCsvMapper() {
+        return new CsvMapper();
+    }
 
-	@Bean("csv")
-	public CsvMapper createCsvMapper() {
-		CsvMapper objectMapper = new CsvMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return objectMapper;
-	}
-	
 	@Bean
 	public LockProvider lockProvider(DataSource dataSource) {
 		return new JdbcTemplateLockProvider(dataSource);
@@ -89,14 +65,5 @@ public class ApplicationConfig {
 	@Bean
 	public RestClient restClient() {
 		return RestClient.create();
-	}
-
-	@Bean("xml")
-	public XmlMapper createXmlMapper() {
-		XmlMapper xmlMapper = new XmlMapper();
-		xmlMapper.registerModule(new JavaTimeModule());
-		xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		xmlMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-		return xmlMapper;
 	}
 }

@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.xxx.manager.domain.model.dto.YahooChartWrapper;
 import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.domain.model.dto.YahooResultWrapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class YahooClientMapper {
@@ -51,20 +52,16 @@ public class YahooClientMapper {
 	private record DateToDto(Long timestamp, Integer index, YahooDailyQuoteImportDto dto) {
 	}
 
-	private final ObjectMapper objectMapper;
+	private final JsonMapper objectMapper;
 
-	public YahooClientMapper(ObjectMapper objectMapper) {
+	public YahooClientMapper(JsonMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
 	public YahooChartWrapper convert(String jsonStr) {
-		try {
-			var mappingIterator = this.objectMapper.readValue(jsonStr, YahooChartWrapper.class);
-			return mappingIterator;
-		} catch (IOException e) {
-			throw new RuntimeException("Json import failed.", e);
-		}
-	}
+        var mappingIterator = this.objectMapper.readValue(jsonStr, YahooChartWrapper.class);
+        return mappingIterator;
+    }
 
 	public static Stream<YahooDailyQuoteImportDto> convert(YahooChartWrapper dto) {
 		return Optional.ofNullable(dto.chart().result()).orElse(List.of()).stream().flatMap(YahooClientMapper::convert);

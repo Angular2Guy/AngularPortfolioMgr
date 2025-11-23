@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.client;
+package ch.xxx.manager.stock.client;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;

@@ -102,4 +102,34 @@
 			<column name="symbol_id" />
 		</createIndex>
 	</changeSet>
+    <changeSet id="49" author="angular2guy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="event_publication" columnName="completion_attempts" />
+            </not>
+        </preConditions>
+        <addColumn tableName="event_publication">
+            <column type="bigint" name="completion_attempts" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="50" author="angular2guy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="event_publication" columnName="last_resubmission_date" />
+            </not>
+        </preConditions>
+        <addColumn tableName="event_publication">
+            <column type="timestamp" name="last_resubmission_date" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="51" author="angular2guy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="event_publication" columnName="status" />
+            </not>
+        </preConditions>
+        <addColumn tableName="event_publication">
+            <column type="varchar(20)" name="status" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

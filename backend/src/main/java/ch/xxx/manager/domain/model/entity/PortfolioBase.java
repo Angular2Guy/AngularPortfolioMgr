@@ -14,15 +14,7 @@ package ch.xxx.manager.domain.model.entity;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.DiscriminatorType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 
 @Entity(name = "portfolio")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -38,45 +30,85 @@ public class PortfolioBase {
 	private BigDecimal year2;
 	private BigDecimal year5;
 	private BigDecimal year10;
+    @Column(name="year1correlation_sp500")
 	private Double year1CorrelationSp500;
+    @Column(name="year1correlation_msci_china")
 	private Double year1CorrelationMsciChina;
+    @Column(name="year1correlation_euro_stoxx50")
 	private Double year1CorrelationEuroStoxx50;
+    @Column(name="year1lin_reg_return_sp500")
 	private Double year1LinRegReturnSp500;
+    @Column(name="year1lin_reg_return_msci_china")
 	private Double year1LinRegReturnMsciChina;
+    @Column(name="year1lin_reg_return_euro_stoxx50")
 	private Double year1LinRegReturnEuroStoxx50;
+    @Column(name="year1sigma_sp500")
 	private Double year1SigmaSp500;
+    @Column(name="year1sigma_msci_china")
 	private Double year1SigmaMsciChina;
+    @Column(name="year1sigma_euro_stoxx50")
 	private Double year1SigmaEuroStoxx50;
+    @Column(name="year1sigma_portfolio")
 	private Double year1SigmaPortfolio;
+    @Column(name="year2correlation_sp500")
 	private Double year2CorrelationSp500;
+    @Column(name="year2correlation_msci_china")
 	private Double year2CorrelationMsciChina;
+    @Column(name="year2correlation_euro_stoxx50")
 	private Double year2CorrelationEuroStoxx50;
+    @Column(name="year2lin_reg_return_sp500")
 	private Double year2LinRegReturnSp500;
+    @Column(name="year2lin_reg_return_msci_china")
 	private Double year2LinRegReturnMsciChina;
+    @Column(name="year2lin_reg_return_euro_stoxx50")
 	private Double year2LinRegReturnEuroStoxx50;
+    @Column(name="year2sigma_sp500")
 	private Double year2SigmaSp500;
+    @Column(name="year2sigma_msci_china")
 	private Double year2SigmaMsciChina;
+    @Column(name="year2sigma_euro_stoxx50")
 	private Double year2SigmaEuroStoxx50;
+    @Column(name="year2sigma_portfolio")
 	private Double year2SigmaPortfolio;
+    @Column(name="year5correlation_sp500")
 	private Double year5CorrelationSp500;
+    @Column(name="year5correlation_msci_china")
 	private Double year5CorrelationMsciChina;
+    @Column(name="year5correlation_euro_stoxx50")
 	private Double year5CorrelationEuroStoxx50;
+    @Column(name="year5lin_reg_return_sp500")
 	private Double year5LinRegReturnSp500;
+    @Column(name="year5lin_reg_return_msci_china")
 	private Double year5LinRegReturnMsciChina;
+    @Column(name="year5lin_reg_return_euro_stoxx50")
 	private Double year5LinRegReturnEuroStoxx50;
+    @Column(name="year5sigma_sp500")
 	private Double year5SigmaSp500;
+    @Column(name="year5sigma_msci_china")
 	private Double year5SigmaMsciChina;
+    @Column(name="year5sigma_euro_stoxx50")
 	private Double year5SigmaEuroStoxx50;
+    @Column(name="year5sigma_portfolio")
 	private Double year5SigmaPortfolio;
+    @Column(name="year10correlation_sp500")
 	private Double year10CorrelationSp500;
+    @Column(name="year10correlation_msci_china")
 	private Double year10CorrelationMsciChina;
+    @Column(name = "year10correlation_euro_stoxx50")
 	private Double year10CorrelationEuroStoxx50;
+    @Column(name="year10lin_reg_return_sp500")
 	private Double year10LinRegReturnSp500;
+    @Column(name="year10lin_reg_return_msci_china")
 	private Double year10LinRegReturnMsciChina;
+    @Column(name="year10lin_reg_return_euro_stoxx50")
 	private Double year10LinRegReturnEuroStoxx50;
+    @Column(name="year10sigma_sp500")
 	private Double year10SigmaSp500;
+    @Column(name="year10sigma_msci_china")
 	private Double year10SigmaMsciChina;
+    @Column(name="year10sigma_euro_stoxx50")
 	private Double year10SigmaEuroStoxx50;
+    @Column(name="year10sigma_portfolio")
 	private Double year10SigmaPortfolio;
 
 	public Long getId() {

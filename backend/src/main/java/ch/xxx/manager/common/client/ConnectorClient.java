@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.client;
+package ch.xxx.manager.common.client;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -23,6 +23,7 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -41,7 +42,7 @@ public class ConnectorClient {
 				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(1, TimeValue.ofSeconds(1)))
 				.setDefaultRequestConfig(requestConfig).build();
 		var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-		factory.setConnectTimeout(5000);
+		factory.setReadTimeout(6000);
 		factory.setConnectionRequestTimeout(5000);
 		this.restClient = RestClient.builder().requestFactory(factory).build();
 	}
@@ -82,6 +83,6 @@ public class ConnectorClient {
 				throw new RuntimeException(e);
 			}
 		}
-		return this.restClient.get().uri(url).headers(headers -> headers.addAll(headerValues)).retrieve();
+		return this.restClient.get().uri(url).headers(headers -> headers.addAll(new HttpHeaders(headerValues))).retrieve();
 	}
 }

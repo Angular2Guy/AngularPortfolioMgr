@@ -21,12 +21,12 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.retry.annotation.Backoff;
+import org.springframework.kafka.annotation.BackOff;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.xxx.manager.adapter.config.KafkaConfig;
+import ch.xxx.manager.common.config.KafkaConfig;
 import ch.xxx.manager.domain.model.dto.AppUserDto;
 import ch.xxx.manager.domain.model.dto.KafkaEventDto;
 import ch.xxx.manager.domain.model.dto.RevokedTokenDto;
@@ -47,7 +47,7 @@ public class KafkaConsumer {
 		this.kafkaListenerDltHandler = kafkaListenerDltHandler;
 	}
 
-	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
+	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backOff = @BackOff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.NEW_USER_TOPIC)
 	public void consumerForNewUserTopic(String message) {
 		LOGGER.info("consumerForNewUserTopic [{}]", message);
@@ -65,7 +65,7 @@ public class KafkaConsumer {
 		LOGGER.info(in + " from " + topic);
 	}
 
-	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
+	@RetryableTopic(kafkaTemplate = "kafkaRetryTemplate", attempts = "3", backOff = @BackOff(delay = 1000, multiplier = 2.0), autoCreateTopics = "true", topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE)
 	@KafkaListener(topics = KafkaConfig.USER_LOGOUT_TOPIC)
 	public void consumerForUserLogoutsTopic(String message) {
 		LOGGER.info("consumerForUserLogoutsTopic [{}]", message);

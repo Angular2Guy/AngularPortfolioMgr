@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.client;
+package ch.xxx.manager.stock.client;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import ch.xxx.manager.common.client.ConnectorClient;
 import ch.xxx.manager.domain.model.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.domain.model.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.domain.utils.DataHelper.CurrencyKey;
