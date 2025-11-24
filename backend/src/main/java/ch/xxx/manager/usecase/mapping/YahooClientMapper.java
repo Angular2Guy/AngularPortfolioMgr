@@ -12,7 +12,12 @@
  */
 package ch.xxx.manager.usecase.mapping;
 
-import java.io.IOException;
+import ch.xxx.manager.domain.model.dto.YahooChartWrapper;
+import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
+import ch.xxx.manager.domain.model.dto.YahooResultWrapper;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -22,15 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.xxx.manager.domain.model.dto.YahooChartWrapper;
-import ch.xxx.manager.domain.model.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.domain.model.dto.YahooResultWrapper;
-import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class YahooClientMapper {

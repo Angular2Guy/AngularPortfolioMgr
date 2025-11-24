@@ -30,7 +30,7 @@ repositories {
 }
 
 ext {
-    set('springModulithVersion', "2.0.0-RC1")
+    set('springModulithVersion', "2.0.0")
 }
 
 dependencies {
