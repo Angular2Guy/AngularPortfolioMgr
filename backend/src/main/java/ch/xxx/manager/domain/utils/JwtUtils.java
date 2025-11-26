@@ -34,7 +34,7 @@ public class JwtUtils {
 	public static final String UUID = "uuid";
 
 	public static Optional<String> extractToken(Map<String,String> headers) {
-		String authStr = headers.get(AUTHORIZATION);
+		String authStr = Optional.ofNullable(headers.get(AUTHORIZATION)).orElse(headers.get(HttpHeaders.AUTHORIZATION));
 		return extractToken(Optional.ofNullable(authStr));
 	}
 
