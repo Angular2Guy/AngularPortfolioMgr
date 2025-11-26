@@ -12,8 +12,10 @@
  */
 package ch.xxx.manager.usecase.service;
 
-import ch.xxx.manager.domain.model.dto.SymbolToCikWrapperDto;
+import java.util.Map;
+
+import ch.xxx.manager.domain.model.dto.SymbolToCikWrapperDto.CompanySymbolDto;
 
 public interface SecSymbolClient {
-    SymbolToCikWrapperDto importSymbols();
+    Map<String, CompanySymbolDto> importSymbols();    
 }

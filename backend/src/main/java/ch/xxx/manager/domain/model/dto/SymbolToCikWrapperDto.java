@@ -14,46 +14,51 @@ package ch.xxx.manager.domain.model.dto;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SymbolToCikWrapperDto {
-    private Map<String, CompanySymbolDto> companies;
-    
-    public static class CompanySymbolDto {
-        private Long cik_str;
-        private String ticker;
-        private String title;
-        
-        // Getters and Setters
-        public Long getCik_str() {
-            return cik_str;
-        }
-        
-        public void setCik_str(Long cik_str) {
-            this.cik_str = cik_str;
-        }
-        
-        public String getTicker() {
-            return ticker;
-        }
-        
-        public void setTicker(String ticker) {
-            this.ticker = ticker;
-        }
-        
-        public String getTitle() {
-            return title;
-        }
-        
-        public void setTitle(String title) {
-            this.title = title;
-        }
-    }
-        
-    public Map<String, CompanySymbolDto> getCompanies() {
-        return companies;
-    }
-    
-    public void setCompanies(Map<String, CompanySymbolDto> companies) {
-        this.companies = companies;
-    }
+	@JsonProperty
+	private Map<String, CompanySymbolDto> companies;
+
+	public static class CompanySymbolDto {
+		@JsonProperty("cik_str")
+		private Long cik_str;
+		@JsonProperty("ticker")
+		private String ticker;
+		@JsonProperty("title")
+		private String title;
+
+		// Getters and Setters
+		public Long getCik_str() {
+			return cik_str;
+		}
+
+		public void setCik_str(Long cik_str) {
+			this.cik_str = cik_str;
+		}
+
+		public String getTicker() {
+			return ticker;
+		}
+
+		public void setTicker(String ticker) {
+			this.ticker = ticker;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public void setTitle(String title) {
+			this.title = title;
+		}
+	}
+
+	public Map<String, CompanySymbolDto> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(Map<String, CompanySymbolDto> companies) {
+		this.companies = companies;
+	}
 }

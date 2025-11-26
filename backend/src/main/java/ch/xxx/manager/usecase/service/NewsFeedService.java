@@ -100,8 +100,12 @@ public class NewsFeedService {
     
     private void updateCompanyToSymbolJson() {
         var start = Instant.now();
+        /*
+        var json = this.secSymbolClient.importSymbolJson();
+        LOGGER.info(json.substring(0, 10000));
+        */        
         final var cikToCompanyReport = this.secSymbolClient.importSymbols();
-        final var companyReportsStream = cikToCompanyReport.getCompanies().entrySet().stream().map(Map.Entry::getValue);
+        final var companyReportsStream = cikToCompanyReport.entrySet().stream().map(Map.Entry::getValue);
         final var companyReports = companyReportsStream.gather(Gatherers.windowFixed(999)).toList();
         final var symbols = companyReports.stream()
                 .flatMap(myCompanyReports -> this.symbolRepository.findBySymbolIn(myCompanyReports.stream().map(SymbolToCikWrapperDto.CompanySymbolDto::getTicker).toList()).stream())
@@ -112,7 +116,7 @@ public class NewsFeedService {
                 }).toList();
 
         var result = this.symbolRepository.saveAll(symbols);
-        LOGGER.info("Sec Company to Symbol Json: {} imported in: {}ms", result.size(), Instant.now().toEpochMilli() - start.toEpochMilli());
+        LOGGER.info("Sec Company to Symbol Json: {} imported in: {}ms", result.size(), Instant.now().toEpochMilli() - start.toEpochMilli());        
     }
 
     public List<SyndEntry> getSeekingAlphaNewsFeed() {
