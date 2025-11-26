@@ -105,12 +105,12 @@ public class NewsFeedService {
         LOGGER.info(json.substring(0, 10000));
         */        
         final var cikToCompanyReport = this.secSymbolClient.importSymbols();
-        final var companyReportsStream = cikToCompanyReport.entrySet().stream().map(Map.Entry::getValue);
-        final var companyReports = companyReportsStream.gather(Gatherers.windowFixed(999)).toList();
+        final var companyReportsList = cikToCompanyReport.entrySet().stream().map(Map.Entry::getValue).toList();
+        final var companyReports = companyReportsList.stream().gather(Gatherers.windowFixed(999)).toList();
         final var symbols = companyReports.stream()
                 .flatMap(myCompanyReports -> this.symbolRepository.findBySymbolIn(myCompanyReports.stream().map(SymbolToCikWrapperDto.CompanySymbolDto::getTicker).toList()).stream())
                 .map(mySymbol -> {
-                    mySymbol.setCik(companyReportsStream.filter(myCompanyReport -> myCompanyReport.getTicker().equals(mySymbol.getSymbol()))
+                    mySymbol.setCik(companyReportsList.stream().filter(myCompanyReport -> myCompanyReport.getTicker().equals(mySymbol.getSymbol()))
 					  .map(SymbolToCikWrapperDto.CompanySymbolDto::getCik_str).map(String::valueOf).findFirst().orElse(null));
                     return mySymbol;
                 }).toList();
