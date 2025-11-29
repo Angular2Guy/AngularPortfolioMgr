@@ -50,8 +50,8 @@ public class WebSecurityConfig {
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/rest/kedatest/**")).permitAll()
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/rest/auth/**")).permitAll()
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/rest/**")).hasAuthority(DataHelper.Role.USERS.toString())
-						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(blockedPath)).denyAll())
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/**")).permitAll())
+						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(blockedPath)).denyAll()
+						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/**")).permitAll())				
 				.csrf(myCsrf -> myCsrf.disable())
 				.sessionManagement(mySm -> mySm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.headers(myHeaders -> myHeaders.contentSecurityPolicy(myCsp -> myCsp.policyDirectives(
