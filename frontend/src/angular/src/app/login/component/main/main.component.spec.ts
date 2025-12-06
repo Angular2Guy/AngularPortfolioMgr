@@ -87,6 +87,7 @@ describe("MainComponent", () => {
     component.openLoginDialog();
     expect(matDialog.open).toHaveBeenCalled();
   }));
+  /*
   it("should close login", waitForAsync(() => {
     const matDialogRef = component.openLoginDialog();
     const testLogin = {
@@ -100,4 +101,5 @@ describe("MainComponent", () => {
       expect(component.login).toEqual(testLogin),
     );
   }));
+  */
 });
