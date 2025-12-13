@@ -148,6 +148,7 @@ public class SecFileClientBean implements FileClient {
 
 	private void storeEntries(List<SymbolFinancialsDto> symbolFinancialsDtos, final AtomicBoolean first,
 			final AtomicInteger maxChildren, AtomicReference<LocalDateTime> start) {
+		LOGGER.info("Compute time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start.get(), LocalDateTime.now()), maxChildren.get());
 		this.financialDataImportService.storeFinancialsData(symbolFinancialsDtos);
 		symbolFinancialsDtos.clear();
 		LOGGER.info("Persist time: {}, MaxChildren: {}", ChronoUnit.MILLIS.between(start.get(), LocalDateTime.now()), maxChildren.get());
