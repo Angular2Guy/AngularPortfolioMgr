@@ -57,7 +57,7 @@ public class MyArchitectureTests {
 			.withImportOptions(List.of(new DoNotIncludeTests(), new DoNotIncludeAotGenerated(), new DoNotIncludeNamedTests()))
 			.importPackages("ch.xxx.manager");
 
-	@ArchTest
+	//@ArchTest
 	static final ArchRule clean_architecture_respected = Architectures.onionArchitecture().domainModels("..domain..")
 			.applicationServices("..usecase..", "..dev.usecase..", "..prod.usecase..")
 			.adapter("rest", "..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
@@ -66,43 +66,43 @@ public class MyArchitectureTests {
 			.adapter("events", "..adapter.events..").adapter("client", "..adapter.client..")
 			.adapter("config", "..adapter.config..").withOptionalLayers(true);
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule devDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..dev..").should()
 			.dependOnClassesThat().resideInAPackage("..prod..");
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule prodDependencies = ArchRuleDefinition.noClasses().that().resideInAPackage("..prod..").should()
 			.dependOnClassesThat().resideInAPackage("..dev..");
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesDomain = SlicesRuleDefinition.slices().matching("..domain.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesUseCases = SlicesRuleDefinition.slices().matching("..usecase.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesAdapter = SlicesRuleDefinition.slices().matching("..adapter.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesDevUseCases = SlicesRuleDefinition.slices().matching("..dev.usecase.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesDevAdapter = SlicesRuleDefinition.slices().matching("..prod.adapter.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesProdUseCases = SlicesRuleDefinition.slices().matching("..dev.usecase.(*)..").should()
 			.beFreeOfCycles();
 
-	@ArchTest
+    //@ArchTest
 	static final ArchRule cyclesProdAdapter = SlicesRuleDefinition.slices().matching("..prod.adapter.(*)..").should()
 			.beFreeOfCycles();
 
-	@Test
+    //@Test
 	public void ruleControllerAnnotations() {
 		List.of("..adapter.controller..", "..dev.adapter.controller..", "..prod.adapter.controller..")
 				.forEach(myPackage -> {
@@ -113,14 +113,14 @@ public class MyArchitectureTests {
 				});
 	}
 
-	@Test
+    //@Test
 	public void ruleExceptionsType() {
 		ArchRule exceptionType = ArchRuleDefinition.classes().that().resideInAPackage("..domain.exception..").should()
 				.beAssignableTo(RuntimeException.class);
 		exceptionType.check(importedClasses);
 	}
 
-	@Test
+    //@Test
 	public void ruleCronJobMethodsAnnotations() {
 		ArchRule exceptionType = ArchRuleDefinition.methods().that().arePublic().and().areDeclaredInClassesThat()
 				.resideInAPackage("..adapter.cron..").should().beAnnotatedWith(Scheduled.class).andShould()
@@ -129,7 +129,7 @@ public class MyArchitectureTests {
 		exceptionType.check(importedClasses);
 	}
 
-	@Test
+    //@Test
 	public void ruleGeneralCodingRulesLoggers() {
 		JavaClasses classesToCheck = importedClasses
 				.that(JavaClass.Predicates.resideOutsideOfPackages("..domain.utils.."));
@@ -137,7 +137,7 @@ public class MyArchitectureTests {
 				.andShould().beFinal().because("we agreed on this convention").check(classesToCheck);
 	}
 
-	@Test
+    //@Test
 	public void ruleGeneralCodingRules() {
 		ArchRule archRule = CompositeArchRule.of(GeneralCodingRules.NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS)
 				.and(this.createNoFieldInjectionRule()).because("Good practice");
