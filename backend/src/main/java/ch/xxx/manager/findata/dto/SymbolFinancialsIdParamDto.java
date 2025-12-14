@@ -10,8 +10,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.dto;
+package ch.xxx.manager.findata.dto;
 
-public record FeIdInfoDto(Long id, String info) {
+import java.util.ArrayList;
+import java.util.List;
 
+public class SymbolFinancialsIdParamDto {
+	private List<Long> symbolFinancialsIds = new ArrayList<>();
+
+	public List<Long> getSymbolFinancialsIds() {
+		return symbolFinancialsIds;
+	}
+
+	public void setSymbolFinancialsIds(List<Long> symbolFinancialsIds) {
+		this.symbolFinancialsIds = symbolFinancialsIds;
+	}
 }

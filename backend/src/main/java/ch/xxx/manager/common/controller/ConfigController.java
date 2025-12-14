@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.stocks.dto.FilterNumberDto;
-import ch.xxx.manager.stocks.dto.FilterStringDto;
+import ch.xxx.manager.findata.dto.FilterNumberDto;
+import ch.xxx.manager.findata.dto.FilterStringDto;
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.AppInfoService;
 

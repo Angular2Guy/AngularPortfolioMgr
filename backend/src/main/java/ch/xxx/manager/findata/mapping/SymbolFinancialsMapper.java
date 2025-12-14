@@ -10,18 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.mapping;
+package ch.xxx.manager.findata.mapping;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ch.xxx.manager.findata.mapping.FinancialElementMapper;
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.stocks.dto.SymbolFinancialsDto;
+import ch.xxx.manager.findata.dto.SymbolFinancialsDto;
 import ch.xxx.manager.stocks.dto.SymbolNameDto;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
 
 @Component
 public class SymbolFinancialsMapper {

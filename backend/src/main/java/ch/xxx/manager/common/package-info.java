@@ -11,6 +11,8 @@
  limitations under the License.
  */
 @org.springframework.modulith.ApplicationModule(
-        //allowedDependencies = {"common :: common.utils", "common :: common.entity"}
+        type = ApplicationModule.Type.OPEN
 )
-package ch.xxx.manager.findata;
+package ch.xxx.manager.common;
+
+import org.springframework.modulith.ApplicationModule;

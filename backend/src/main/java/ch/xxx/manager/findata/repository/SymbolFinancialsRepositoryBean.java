@@ -31,13 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.stocks.dto.FilterNumberDto.Operation;
-import ch.xxx.manager.stocks.dto.FilterStringDto;
+import ch.xxx.manager.findata.dto.FilterNumberDto.Operation;
+import ch.xxx.manager.findata.dto.FilterStringDto;
 import ch.xxx.manager.findata.dto.FinancialElementParamDto;
-import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
-import ch.xxx.manager.stocks.entity.SymbolFinancialsRepository;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
+import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import jakarta.persistence.EntityManager;

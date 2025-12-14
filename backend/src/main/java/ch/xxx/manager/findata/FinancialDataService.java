@@ -23,16 +23,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.findata.dto.FeConceptDto;
-import ch.xxx.manager.stocks.dto.FeIdInfoDto;
+import ch.xxx.manager.findata.dto.FeIdInfoDto;
 import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
-import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.findata.entity.FinancialElementRepository;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
-import ch.xxx.manager.stocks.entity.SymbolFinancialsRepository;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
+import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.stocks.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.common.utils.StreamHelpers;
-import ch.xxx.manager.stocks.mapping.SymbolFinancialsImportMapper;
+import ch.xxx.manager.findata.mapping.SymbolFinancialsImportMapper;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 

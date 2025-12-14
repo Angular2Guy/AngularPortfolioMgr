@@ -28,8 +28,8 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto;
-import ch.xxx.manager.stocks.entity.CompanyReport;
-import ch.xxx.manager.stocks.entity.CompanyReportRepository;
+import ch.xxx.manager.findata.entity.CompanyReport;
+import ch.xxx.manager.findata.entity.CompanyReportRepository;
 import ch.xxx.manager.stocks.entity.SymbolRepository;
 import ch.xxx.manager.stocks.entity.dto.CompanyReportWrapper;
 import jakarta.transaction.Transactional;
@@ -42,15 +42,17 @@ public class NewsFeedService {
     private final NewsFeedClient newsFeedClient;
     private final SecSymbolClient secSymbolClient;
     private final SymbolRepository symbolRepository;
-    private final CompanyReportRepository companyReportRepository;
+    //private final CompanyReportRepository companyReportRepository;
     private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
     private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
 
-    public NewsFeedService(NewsFeedClient newsFeedClient, SecSymbolClient secSymbolClient, SymbolRepository symbolRepository, CompanyReportRepository companyReportRepository) {
+    public NewsFeedService(NewsFeedClient newsFeedClient, SecSymbolClient secSymbolClient, SymbolRepository symbolRepository
+    //        , CompanyReportRepository companyReportRepository
+    ) {
         this.newsFeedClient = newsFeedClient;
         this.secSymbolClient = secSymbolClient;
         this.symbolRepository = symbolRepository;
-        this.companyReportRepository = companyReportRepository;
+        //this.companyReportRepository = companyReportRepository;
     }
 
     @Async
@@ -73,7 +75,7 @@ public class NewsFeedService {
 		this.updateCompanyToSymbolJson();
 		//this.updateSecEdgarUsGaapNewsFeed();
 	}
-    
+    /*
     private void updateSecEdgarUsGaapNewsFeed() {
         var start = Instant.now();
         var cikToCompanyReport = this.newsFeedClient.importSecEdgarUsGaapNewsFeed();
@@ -97,7 +99,7 @@ public class NewsFeedService {
 
         LOGGER.info("Sec Company Reports imported: {} in {}ms", companyReportsFiltered.size(), Instant.now().toEpochMilli() - start.toEpochMilli());
     }
-    
+    */
     private void updateCompanyToSymbolJson() {
         var start = Instant.now();
         /*

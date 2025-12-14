@@ -14,7 +14,6 @@ package ch.xxx.manager.common.utils;
 
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -57,7 +56,7 @@ public class StreamHelpers {
 	}
 	
 	public static <T> Stream<T> convert(Enumeration<T> enumeration) {
-	    EnumerationSpliterator<T> spliterator 
+	    EnumerationSpliterator<T> spliterator
 	      = new EnumerationSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED, enumeration);
 
         return StreamSupport.stream(spliterator, false);

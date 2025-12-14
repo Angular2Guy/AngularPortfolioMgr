@@ -15,7 +15,6 @@ package ch.xxx.manager.findata.entity;
 import java.math.BigDecimal;
 
 import ch.xxx.manager.common.entity.EntityBase;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
 import ch.xxx.manager.common.utils.DataHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

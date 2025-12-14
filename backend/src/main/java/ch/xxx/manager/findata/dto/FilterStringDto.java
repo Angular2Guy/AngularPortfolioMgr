@@ -10,16 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.dto;
-
-import java.math.BigDecimal;
+package ch.xxx.manager.findata.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import jakarta.validation.constraints.NotNull;
 
-public class FilterNumberDto {
-	public static enum Operation {SmallerEqual("<="), LargerEqual(">="), Equal("=");
+public class FilterStringDto {
+	public static enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=*");
 		private String value;
 		
 		private Operation(String value) {
@@ -30,21 +28,20 @@ public class FilterNumberDto {
 			return this.value;
 		}
 	}
-	
 	@NotNull
 	private Operation operation;
-	private BigDecimal value;
-	
+	private String value;
+
 	public Operation getOperation() {
 		return operation;
 	}
 	public void setOperation(Operation operation) {
 		this.operation = operation;
 	}
-	public BigDecimal getValue() {
+	public String getValue() {
 		return value;
 	}
-	public void setValue(BigDecimal value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 }

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.entity;
+package ch.xxx.manager.findata.entity;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
-import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 
 public interface SymbolFinancialsRepository {
 	SymbolFinancials save(SymbolFinancials symbolfinancials);

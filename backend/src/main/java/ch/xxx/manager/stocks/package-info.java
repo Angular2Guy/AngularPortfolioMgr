@@ -10,5 +10,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-@org.springframework.modulith.NamedInterface("common.utils")
-package ch.xxx.manager.common.utils;
+@org.springframework.modulith.ApplicationModule(
+        //allowedDependencies = {"common :: common.utils", "common :: common.entity"}
+)
+package ch.xxx.manager.stocks;

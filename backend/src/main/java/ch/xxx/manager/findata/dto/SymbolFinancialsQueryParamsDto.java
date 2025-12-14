@@ -10,13 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.dto;
+package ch.xxx.manager.findata.dto;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import ch.xxx.manager.findata.dto.FinancialElementParamDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

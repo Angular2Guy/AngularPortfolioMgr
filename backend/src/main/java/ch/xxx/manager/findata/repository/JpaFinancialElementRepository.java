@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.findata.dto.FeConceptDto;
-import ch.xxx.manager.stocks.dto.FeIdInfoDto;
+import ch.xxx.manager.findata.dto.FeIdInfoDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 
 public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long> {

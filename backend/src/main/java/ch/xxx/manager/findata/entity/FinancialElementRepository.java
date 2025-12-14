@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ch.xxx.manager.findata.dto.FeConceptDto;
-import ch.xxx.manager.stocks.dto.FeIdInfoDto;
+import ch.xxx.manager.findata.dto.FeIdInfoDto;
 
 public interface FinancialElementRepository {
 	FinancialElement save(FinancialElement financialElement);

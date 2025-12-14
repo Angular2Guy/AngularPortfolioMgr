@@ -14,8 +14,8 @@ package ch.xxx.manager.findata.repository;
 
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.stocks.entity.CompanyReport;
-import ch.xxx.manager.stocks.entity.CompanyReportRepository;
+import ch.xxx.manager.findata.entity.CompanyReport;
+import ch.xxx.manager.findata.entity.CompanyReportRepository;
 
 @Repository
 public class CompanyRepositoryBean implements CompanyReportRepository {

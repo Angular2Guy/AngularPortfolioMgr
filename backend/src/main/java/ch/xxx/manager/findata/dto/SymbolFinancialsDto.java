@@ -10,43 +10,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.entity;
+package ch.xxx.manager.findata.dto;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import ch.xxx.manager.common.entity.EntityBase;
-import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.findata.entity.FinancialElement;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import ch.xxx.manager.common.utils.DataHelper.Quarter;
 
-@Entity
-public class SymbolFinancials extends EntityBase {
+public class SymbolFinancialsDto {
+	private Long id;
 	private LocalDate startDate;
-	private LocalDate endDate;	
-	private int fiscalYear;
-	@Enumerated(EnumType.STRING)
-	private DataHelper.Quarter quarter;
-	@NotBlank
-	@Size(max=20)
+	private LocalDate endDate;
+	private int year;
+	private Quarter quarter;
 	private String symbol;
-	@Size(max=150)
-	@Column(name="`name`")
-	private String name;
-	@Size(max=10)
-	private String country;
-	@Size(max=30)
+	private String name;	
+	private String country;	
 	private String city;
-	@OneToMany(mappedBy = "symbolFinancials")
-	private Set<FinancialElement> financialElements = new HashSet<FinancialElement>();
-	
+	private List<FinancialElementDto> financialElements = new ArrayList<>();
+
+	public List<FinancialElementDto> getFinancialElements() {
+		return financialElements;
+	}
+	public void setFinancialElements(List<FinancialElementDto> financialElements) {
+		this.financialElements = financialElements;
+	}
 	public LocalDate getStartDate() {
 		return startDate;
 	}
@@ -59,10 +48,16 @@ public class SymbolFinancials extends EntityBase {
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
-	public DataHelper.Quarter getQuarter() {
+	public int getYear() {
+		return year;
+	}
+	public void setYear(int year) {
+		this.year = year;
+	}
+	public Quarter getQuarter() {
 		return quarter;
 	}
-	public void setQuarter(DataHelper.Quarter quarter) {
+	public void setQuarter(Quarter quarter) {
 		this.quarter = quarter;
 	}
 	public String getSymbol() {
@@ -71,17 +66,11 @@ public class SymbolFinancials extends EntityBase {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public Set<FinancialElement> getFinancialElements() {
-		return financialElements;
+	public Long getId() {
+		return id;
 	}
-	public void setFinancialElements(Set<FinancialElement> financialElements) {
-		this.financialElements = financialElements;
-	}
-	public int getFiscalYear() {
-		return fiscalYear;
-	}
-	public void setFiscalYear(int fiscalYear) {
-		this.fiscalYear = fiscalYear;
+	public void setId(Long id) {
+		this.id = id;
 	}
 	public String getName() {
 		return name;

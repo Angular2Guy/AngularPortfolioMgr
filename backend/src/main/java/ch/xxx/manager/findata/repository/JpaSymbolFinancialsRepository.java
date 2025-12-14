@@ -22,7 +22,7 @@ import org.springframework.data.repository.query.Param;
 
 import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
 
 public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	
 	@Query(value = "select new ch.xxx.manager.domain.model.dto.SfQuarterDto(sf.quarter, count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.quarter order by quarter_count desc")	

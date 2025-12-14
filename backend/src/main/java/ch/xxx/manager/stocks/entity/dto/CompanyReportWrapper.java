@@ -12,7 +12,7 @@
  */
 package ch.xxx.manager.stocks.entity.dto;
 
-import ch.xxx.manager.stocks.entity.CompanyReport;
+import ch.xxx.manager.findata.entity.CompanyReport;
 
 public record CompanyReportWrapper(String cik, String reportZipUrl, CompanyReport companyReport) {
 }

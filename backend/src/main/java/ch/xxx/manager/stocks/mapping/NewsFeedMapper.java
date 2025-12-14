@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.stocks.entity.CompanyReport;
+import ch.xxx.manager.findata.entity.CompanyReport;
 import ch.xxx.manager.stocks.entity.dto.CompanyReportWrapper;
 import ch.xxx.manager.stocks.entity.dto.RssDto;
 

@@ -10,17 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.repository;
+package ch.xxx.manager.findata.repository;
 
 import java.util.List;
 import java.util.Optional;
 
-import ch.xxx.manager.findata.repository.JpaFinancialElementRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.findata.dto.FeConceptDto;
-import ch.xxx.manager.stocks.dto.FeIdInfoDto;
+import ch.xxx.manager.findata.dto.FeIdInfoDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 import ch.xxx.manager.findata.entity.FinancialElementRepository;
 

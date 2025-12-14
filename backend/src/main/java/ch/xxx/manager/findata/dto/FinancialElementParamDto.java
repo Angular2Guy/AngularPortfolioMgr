@@ -12,8 +12,6 @@
  */
 package ch.xxx.manager.findata.dto;
 
-import ch.xxx.manager.stocks.dto.FilterNumberDto;
-import ch.xxx.manager.stocks.dto.FilterStringDto;
 import ch.xxx.manager.common.utils.DataHelper.Operation;
 import ch.xxx.manager.common.utils.DataHelper.TermType;
 import jakarta.validation.constraints.NotNull;

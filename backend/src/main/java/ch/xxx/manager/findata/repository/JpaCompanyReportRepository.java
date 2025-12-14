@@ -14,7 +14,7 @@ package ch.xxx.manager.findata.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import ch.xxx.manager.stocks.entity.CompanyReport;
+import ch.xxx.manager.findata.entity.CompanyReport;
 
 public interface JpaCompanyReportRepository extends CrudRepository<CompanyReport, Long> {
   Iterable<CompanyReport> findByReportUrlIn(Iterable<String> reportUrls);

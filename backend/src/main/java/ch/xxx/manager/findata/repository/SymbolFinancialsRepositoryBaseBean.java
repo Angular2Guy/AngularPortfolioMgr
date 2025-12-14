@@ -25,9 +25,9 @@ import org.springframework.data.domain.Pageable;
 
 import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
-import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
-import ch.xxx.manager.stocks.entity.SymbolFinancials;
-import ch.xxx.manager.stocks.entity.SymbolFinancialsRepository;
+import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
+import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
 
 
 public abstract class SymbolFinancialsRepositoryBaseBean implements SymbolFinancialsRepository {
