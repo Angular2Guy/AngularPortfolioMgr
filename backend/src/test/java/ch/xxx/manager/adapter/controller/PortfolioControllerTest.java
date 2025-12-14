@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ch.xxx.manager.stocks.controller.PortfolioController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,14 +37,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ch.xxx.manager.ComponentScanCustomFilter;
-import ch.xxx.manager.domain.model.entity.AppUser;
-import ch.xxx.manager.domain.model.entity.Portfolio;
-import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.domain.utils.DataHelper;
-import ch.xxx.manager.domain.utils.DataHelper.Role;
-import ch.xxx.manager.domain.utils.JwtUtils;
-import ch.xxx.manager.usecase.service.JwtTokenService;
-import ch.xxx.manager.usecase.service.PortfolioService;
+import ch.xxx.manager.common.entity.AppUser;
+import ch.xxx.manager.stocks.entity.Portfolio;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.common.utils.DataHelper;
+import ch.xxx.manager.common.utils.DataHelper.Role;
+import ch.xxx.manager.common.utils.JwtUtils;
+import ch.xxx.manager.common.service.JwtTokenService;
+import ch.xxx.manager.stocks.service.PortfolioService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @DisabledInAotMode

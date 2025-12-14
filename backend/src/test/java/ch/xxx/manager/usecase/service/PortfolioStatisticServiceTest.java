@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.xxx.manager.stocks.service.CurrencyService;
+import ch.xxx.manager.stocks.service.PortfolioStatisticService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,19 +28,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
-import ch.xxx.manager.usecase.service.PortfolioStatisticService.CalcValuesDay;
-import ch.xxx.manager.usecase.service.PortfolioStatisticService.LinearRegressionResults;
+import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
+import ch.xxx.manager.stocks.service.PortfolioStatisticService.CalcValuesDay;
+import ch.xxx.manager.stocks.service.PortfolioStatisticService.LinearRegressionResults;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioStatisticServiceTest {
 	@Mock
 	DailyQuoteRepository dailyQuoteRepository;
 	@Mock
-	CurrencyService currencyService;
+    CurrencyService currencyService;
 
 	@InjectMocks
-	PortfolioStatisticService service;
+    PortfolioStatisticService service;
 
 	private List<CalcValuesDay> calcValuesDays = new ArrayList<>();
 

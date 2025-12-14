@@ -21,10 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import ch.xxx.manager.domain.model.entity.AppUser;
-import ch.xxx.manager.domain.model.entity.AppUserRepository;
+import ch.xxx.manager.common.entity.AppUser;
+import ch.xxx.manager.common.entity.AppUserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

@@ -15,6 +15,9 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Optional;
 
+import ch.xxx.manager.stocks.service.PortfolioCalculationService;
+import ch.xxx.manager.stocks.service.PortfolioService;
+import ch.xxx.manager.stocks.service.PortfolioToIndexService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +26,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ch.xxx.manager.domain.exception.ResourceNotFoundException;
-import ch.xxx.manager.domain.model.entity.AppUserRepository;
-import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
-import ch.xxx.manager.domain.model.entity.Portfolio;
-import ch.xxx.manager.domain.model.entity.PortfolioElement;
-import ch.xxx.manager.domain.model.entity.PortfolioElementRepository;
-import ch.xxx.manager.domain.model.entity.PortfolioRepository;
-import ch.xxx.manager.domain.model.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.domain.model.entity.SymbolRepository;
-import ch.xxx.manager.domain.model.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.entity.AppUserRepository;
+import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
+import ch.xxx.manager.stocks.entity.Portfolio;
+import ch.xxx.manager.stocks.entity.PortfolioElement;
+import ch.xxx.manager.stocks.entity.PortfolioElementRepository;
+import ch.xxx.manager.stocks.entity.PortfolioRepository;
+import ch.xxx.manager.stocks.entity.PortfolioToSymbolRepository;
+import ch.xxx.manager.stocks.entity.SymbolRepository;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioServiceTest {

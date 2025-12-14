@@ -14,6 +14,7 @@ package ch.xxx.manager.adapter.file;
 
 import java.net.URISyntaxException;
 
+import ch.xxx.manager.stocks.file.SecFileClientBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

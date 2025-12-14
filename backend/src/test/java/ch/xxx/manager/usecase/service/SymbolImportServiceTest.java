@@ -17,6 +17,7 @@ import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.UUID;
 
+import ch.xxx.manager.stocks.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,9 @@ import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
 import com.google.crypto.tink.daead.DeterministicAeadConfig;
 
-import ch.xxx.manager.domain.model.entity.AppUserRepository;
-import ch.xxx.manager.domain.model.entity.DailyQuoteRepository;
-import ch.xxx.manager.domain.model.entity.SymbolRepository;
+import ch.xxx.manager.common.entity.AppUserRepository;
+import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
+import ch.xxx.manager.stocks.entity.SymbolRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SymbolImportServiceTest {
