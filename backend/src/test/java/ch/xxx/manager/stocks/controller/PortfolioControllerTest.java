@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.controller;
+package ch.xxx.manager.stocks.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import ch.xxx.manager.stocks.controller.PortfolioController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

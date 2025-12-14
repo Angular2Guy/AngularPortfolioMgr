@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.controller;
+package ch.xxx.manager.stocks.controller;
 
 import javax.sql.DataSource;
 

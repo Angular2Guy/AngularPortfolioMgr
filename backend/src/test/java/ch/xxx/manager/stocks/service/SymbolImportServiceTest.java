@@ -10,14 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.stocks.service;
 
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.UUID;
 
-import ch.xxx.manager.stocks.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

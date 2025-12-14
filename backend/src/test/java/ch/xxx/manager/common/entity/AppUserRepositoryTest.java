@@ -10,35 +10,37 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.file;
+package ch.xxx.manager.common.entity;
 
-import java.net.URISyntaxException;
+import java.util.Optional;
 
-import ch.xxx.manager.stocks.file.SecFileClientBean;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-public class SecFileClientTest {
+public class AppUserRepositoryTest {
+
 	@Autowired
-	private SecFileClientBean fileClient;
-	@Value("${path.financial-data}")
-	private String filePath;
+	private AppUserRepository appUserRepository;
 	
 	@Test
-	public void importFile() throws URISyntaxException {
-		String fullFilePath = this.getClass().getClassLoader().getResource(filePath).toURI().toASCIIString();
-		fullFilePath = fullFilePath.replace("file:", "");
-		System.out.println(fullFilePath);
-		this.fileClient.financialDataImportPath = "";
-		this.fileClient.importZipFile(fullFilePath);
+	public void findByUsernameFound() {
+		String userName = "sven";
+		Optional<AppUser> findByUsernameOpt = this.appUserRepository.findByUsername(userName);
+		Assertions.assertTrue(findByUsernameOpt.isPresent());
+		Assertions.assertEquals(userName, findByUsernameOpt.get().getUserName());
+	}
+	
+	@Test
+	public void findByUsernameNotFound() {
+		String userName = "XXX";
+		Optional<AppUser> findByUsernameOpt = this.appUserRepository.findByUsername(userName);
+		Assertions.assertTrue(findByUsernameOpt.isEmpty());
 	}
 }

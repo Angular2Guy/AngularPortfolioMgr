@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.stocks.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,8 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.xxx.manager.stocks.service.CurrencyService;
-import ch.xxx.manager.stocks.service.PortfolioStatisticService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

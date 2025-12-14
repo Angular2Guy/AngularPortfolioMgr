@@ -10,40 +10,34 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.adapter.repository;
+package ch.xxx.manager.stocks.file;
 
-import java.util.Optional;
+import java.net.URISyntaxException;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import ch.xxx.manager.common.entity.AppUser;
-import ch.xxx.manager.common.entity.AppUserRepository;
-
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class AppUserRepositoryTest {
-
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
+public class SecFileClientTest {
 	@Autowired
-	private AppUserRepository appUserRepository;
+	private SecFileClientBean fileClient;
+	@Value("${path.financial-data}")
+	private String filePath;
 	
 	@Test
-	public void findByUsernameFound() {
-		String userName = "sven";
-		Optional<AppUser> findByUsernameOpt = this.appUserRepository.findByUsername(userName);
-		Assertions.assertTrue(findByUsernameOpt.isPresent());
-		Assertions.assertEquals(userName, findByUsernameOpt.get().getUserName());
-	}
-	
-	@Test
-	public void findByUsernameNotFound() {
-		String userName = "XXX";
-		Optional<AppUser> findByUsernameOpt = this.appUserRepository.findByUsername(userName);
-		Assertions.assertTrue(findByUsernameOpt.isEmpty());
+	public void importFile() throws URISyntaxException {
+		String fullFilePath = this.getClass().getClassLoader().getResource(filePath).toURI().toASCIIString();
+		fullFilePath = fullFilePath.replace("file:", "");
+		System.out.println(fullFilePath);
+		this.fileClient.financialDataImportPath = "";
+		this.fileClient.importZipFile(fullFilePath);
 	}
 }

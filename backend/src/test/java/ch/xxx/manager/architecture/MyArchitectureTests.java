@@ -47,7 +47,7 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import ch.xxx.manager.architecture.MyArchitectureTests.DoNotIncludeAotGenerated;
-import ch.xxx.manager.adapter.file.SecFileClientTest;
+import ch.xxx.manager.stocks.file.SecFileClientTest;
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 

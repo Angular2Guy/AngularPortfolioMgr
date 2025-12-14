@@ -10,14 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.usecase.service;
+package ch.xxx.manager.stocks.service;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Optional;
 
-import ch.xxx.manager.stocks.service.PortfolioCalculationService;
-import ch.xxx.manager.stocks.service.PortfolioService;
-import ch.xxx.manager.stocks.service.PortfolioToIndexService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
