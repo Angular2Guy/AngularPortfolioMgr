@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.entity.dto;
+package ch.xxx.manager.findata.dto;
 
 import ch.xxx.manager.findata.entity.CompanyReport;
 

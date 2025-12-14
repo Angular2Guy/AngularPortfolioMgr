@@ -10,8 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.file;
+package ch.xxx.manager.findata;
 
-public interface FileClient {
-	Boolean importZipFile(String filename);
+import java.util.List;
+
+import com.rometools.rome.feed.synd.SyndFeed;
+
+import ch.xxx.manager.findata.dto.CompanyReportWrapper;
+
+public interface NewsFeedClient {
+	SyndFeed importSeekingAlphaFeed();
+	SyndFeed importCnbcFinanceNewsFeed();  
+  List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed();
+  byte[] loadCompanyReportZip(String url);
 }

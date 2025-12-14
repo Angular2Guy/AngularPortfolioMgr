@@ -24,7 +24,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.stocks.file.FileClient;
+import ch.xxx.manager.common.file.FileClient;
 import ch.xxx.manager.stocks.dto.ImportDataDto;
 import ch.xxx.manager.stocks.dto.SymbolDto;
 import ch.xxx.manager.stocks.entity.SymbolRepository;

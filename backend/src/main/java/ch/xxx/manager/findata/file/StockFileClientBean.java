@@ -10,8 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.file;
+package ch.xxx.manager.findata.file;
 
+import ch.xxx.manager.common.file.FileClient;
 import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 import ch.xxx.manager.stocks.entity.dto.DailyQuoteImportDto;

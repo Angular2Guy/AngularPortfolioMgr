@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.xxx.manager.stocks;
+package ch.xxx.manager.findata;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Gatherers;
-import java.util.stream.StreamSupport;
 
+import ch.xxx.manager.stocks.SecSymbolClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -28,10 +28,7 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto;
-import ch.xxx.manager.findata.entity.CompanyReport;
-import ch.xxx.manager.findata.entity.CompanyReportRepository;
 import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.CompanyReportWrapper;
 import jakarta.transaction.Transactional;
 
 @Service

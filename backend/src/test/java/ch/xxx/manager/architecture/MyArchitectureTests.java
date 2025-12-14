@@ -21,7 +21,6 @@ import static com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWit
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -37,7 +36,6 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.importer.ImportOption.DoNotIncludeTests;
 import com.tngtech.archunit.core.importer.Location;
 import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.CompositeArchRule;
@@ -47,7 +45,7 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import ch.xxx.manager.architecture.MyArchitectureTests.DoNotIncludeAotGenerated;
-import ch.xxx.manager.stocks.file.SecFileClientTest;
+import ch.xxx.manager.findata.file.SecFileClientTest;
 import jakarta.annotation.PostConstruct;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 

@@ -10,10 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.file;
+package ch.xxx.manager.findata.file;
 
 import java.net.URISyntaxException;
 
+import ch.xxx.manager.findata.file.SecFileClientBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

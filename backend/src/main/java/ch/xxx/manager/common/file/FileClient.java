@@ -10,17 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks;
+package ch.xxx.manager.common.file;
 
-import java.util.List;
-
-import com.rometools.rome.feed.synd.SyndFeed;
-
-import ch.xxx.manager.stocks.entity.dto.CompanyReportWrapper;
-
-public interface NewsFeedClient {
-	SyndFeed importSeekingAlphaFeed();
-	SyndFeed importCnbcFinanceNewsFeed();  
-  List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed();
-  byte[] loadCompanyReportZip(String url);
+public interface FileClient {
+	Boolean importZipFile(String filename);
 }

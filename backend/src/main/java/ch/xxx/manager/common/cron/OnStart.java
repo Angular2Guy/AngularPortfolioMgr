@@ -26,7 +26,7 @@ import ch.xxx.manager.findata.dto.FeConceptDto;
 import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.findata.FinancialDataService;
-import ch.xxx.manager.stocks.NewsFeedService;
+import ch.xxx.manager.findata.NewsFeedService;
 import ch.xxx.manager.stocks.PortfolioService;
 import ch.xxx.manager.stocks.SymbolImportService;
 import jakarta.annotation.PostConstruct;
