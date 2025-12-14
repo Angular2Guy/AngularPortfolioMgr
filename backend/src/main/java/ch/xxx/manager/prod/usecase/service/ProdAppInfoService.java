@@ -15,7 +15,7 @@ package ch.xxx.manager.prod.usecase.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ch.xxx.manager.common.service.AppInfoService;
+import ch.xxx.manager.common.AppInfoService;
 
 @Service
 public class ProdAppInfoService implements AppInfoService {

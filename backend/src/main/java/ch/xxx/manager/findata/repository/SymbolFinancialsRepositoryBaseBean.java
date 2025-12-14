@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
-import ch.xxx.manager.stocks.dto.SfCountryDto;
-import ch.xxx.manager.stocks.dto.SfQuarterDto;
+import ch.xxx.manager.findata.dto.SfCountryDto;
+import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.stocks.entity.SymbolFinancials;
 import ch.xxx.manager.stocks.entity.SymbolFinancialsRepository;

@@ -39,8 +39,8 @@ import ch.xxx.manager.stocks.entity.dto.FinancialElementImportDto;
 import ch.xxx.manager.stocks.entity.dto.FinancialsDataDto;
 import ch.xxx.manager.stocks.entity.dto.SymbolFinancialsDto;
 import ch.xxx.manager.common.utils.StreamHelpers;
-import ch.xxx.manager.common.service.AppInfoService;
-import ch.xxx.manager.findata.service.FinancialDataService;
+import ch.xxx.manager.common.AppInfoService;
+import ch.xxx.manager.findata.FinancialDataService;
 import tools.jackson.databind.json.JsonMapper;
 
 @Component("Sec")

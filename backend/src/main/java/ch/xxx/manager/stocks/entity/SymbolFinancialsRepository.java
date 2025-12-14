@@ -16,8 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import ch.xxx.manager.stocks.dto.SfCountryDto;
-import ch.xxx.manager.stocks.dto.SfQuarterDto;
+import ch.xxx.manager.findata.dto.SfCountryDto;
+import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
 
 public interface SymbolFinancialsRepository {

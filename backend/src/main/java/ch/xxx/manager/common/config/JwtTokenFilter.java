@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
-import ch.xxx.manager.common.service.JwtTokenService;
+import ch.xxx.manager.common.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

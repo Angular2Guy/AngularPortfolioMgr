@@ -29,14 +29,14 @@ import org.springframework.stereotype.Service;
 
 import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.common.service.AppUserService;
-import ch.xxx.manager.stocks.service.ComparisonIndex;
-import ch.xxx.manager.stocks.service.CurrencyService;
-import ch.xxx.manager.stocks.service.NewsFeedService;
-import ch.xxx.manager.stocks.service.PortfolioService;
-import ch.xxx.manager.stocks.service.QuoteImportService;
-import ch.xxx.manager.stocks.service.QuoteImportService.UserKeys;
-import ch.xxx.manager.stocks.service.SymbolImportService;
+import ch.xxx.manager.common.AppUserService;
+import ch.xxx.manager.stocks.ComparisonIndex;
+import ch.xxx.manager.stocks.CurrencyService;
+import ch.xxx.manager.stocks.NewsFeedService;
+import ch.xxx.manager.stocks.PortfolioService;
+import ch.xxx.manager.stocks.QuoteImportService;
+import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
+import ch.xxx.manager.stocks.SymbolImportService;
 import jakarta.transaction.Transactional;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
 import ch.xxx.manager.stocks.dto.RapidOverviewImportDto;
-import ch.xxx.manager.stocks.service.RapidApiClient;
+import ch.xxx.manager.stocks.RapidApiClient;
 import jakarta.annotation.PostConstruct;
 
 @Component

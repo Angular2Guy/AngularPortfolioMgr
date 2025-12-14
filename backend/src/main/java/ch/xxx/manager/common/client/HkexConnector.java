@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
 import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
-import ch.xxx.manager.stocks.service.HkexClient;
+import ch.xxx.manager.stocks.HkexClient;
 
 @Component
 public class HkexConnector implements HkexClient {

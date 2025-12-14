@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
-import ch.xxx.manager.stocks.service.NewsFeedService;
+import ch.xxx.manager.stocks.NewsFeedService;
 
 @RestController
 @RequestMapping("rest/newsfeed")

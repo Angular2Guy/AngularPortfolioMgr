@@ -25,7 +25,7 @@ import org.springframework.util.MultiValueMapAdapter;
 
 import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto;
 import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto.CompanySymbolDto;
-import ch.xxx.manager.stocks.service.SecSymbolClient;
+import ch.xxx.manager.stocks.SecSymbolClient;
 
 @Component
 public class SecSymbolConnector implements SecSymbolClient {

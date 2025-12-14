@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import ch.xxx.manager.stocks.dto.AlphaOverviewImportDto;
 import ch.xxx.manager.stocks.dto.DailyFxWrapperImportDto;
 import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.stocks.service.AlphavatageClient;
+import ch.xxx.manager.stocks.AlphavatageClient;
 import jakarta.annotation.PostConstruct;
 
 @Component

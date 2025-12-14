@@ -13,7 +13,7 @@
 package ch.xxx.manager.common.config;
 
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.common.service.JwtTokenService;
+import ch.xxx.manager.common.JwtTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

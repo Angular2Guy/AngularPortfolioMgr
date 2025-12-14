@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.stocks.service.XetraClient;
+import ch.xxx.manager.stocks.XetraClient;
 
 @Component
 public class XetraConnector implements XetraClient {

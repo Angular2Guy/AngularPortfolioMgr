@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
 import ch.xxx.manager.stocks.mapping.YahooClientMapper;
-import ch.xxx.manager.stocks.service.YahooClient;
+import ch.xxx.manager.stocks.YahooClient;
 
 @Component
 public class YahooConnector implements YahooClient {

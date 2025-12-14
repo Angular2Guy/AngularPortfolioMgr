@@ -26,18 +26,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.stocks.dto.FeConceptDto;
+import ch.xxx.manager.findata.dto.FeConceptDto;
 import ch.xxx.manager.stocks.dto.FeIdInfoDto;
 import ch.xxx.manager.stocks.dto.ImportDataDto;
-import ch.xxx.manager.stocks.dto.SfCountryDto;
-import ch.xxx.manager.stocks.dto.SfQuarterDto;
+import ch.xxx.manager.findata.dto.SfCountryDto;
+import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.stocks.dto.SymbolFinancialsDto;
 import ch.xxx.manager.stocks.dto.SymbolFinancialsIdParamDto;
 import ch.xxx.manager.stocks.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.stocks.dto.SymbolNameDto;
 import ch.xxx.manager.stocks.mapping.SymbolFinancialsMapper;
-import ch.xxx.manager.findata.service.FinancialDataService;
-import ch.xxx.manager.stocks.service.SymbolService;
+import ch.xxx.manager.findata.FinancialDataService;
+import ch.xxx.manager.stocks.SymbolService;
 
 @RestController
 @RequestMapping("rest/financialdata")

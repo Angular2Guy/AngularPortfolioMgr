@@ -19,7 +19,7 @@ import ch.xxx.manager.findata.repository.JpaFinancialElementRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.stocks.dto.FeConceptDto;
+import ch.xxx.manager.findata.dto.FeConceptDto;
 import ch.xxx.manager.stocks.dto.FeIdInfoDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 import ch.xxx.manager.findata.entity.FinancialElementRepository;

@@ -22,13 +22,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.stocks.dto.FeConceptDto;
-import ch.xxx.manager.stocks.dto.SfCountryDto;
-import ch.xxx.manager.stocks.dto.SfQuarterDto;
-import ch.xxx.manager.findata.service.FinancialDataService;
-import ch.xxx.manager.stocks.service.NewsFeedService;
-import ch.xxx.manager.stocks.service.PortfolioService;
-import ch.xxx.manager.stocks.service.SymbolImportService;
+import ch.xxx.manager.findata.dto.FeConceptDto;
+import ch.xxx.manager.findata.dto.SfCountryDto;
+import ch.xxx.manager.findata.dto.SfQuarterDto;
+import ch.xxx.manager.findata.FinancialDataService;
+import ch.xxx.manager.stocks.NewsFeedService;
+import ch.xxx.manager.stocks.PortfolioService;
+import ch.xxx.manager.stocks.SymbolImportService;
 import jakarta.annotation.PostConstruct;
 
 @Component

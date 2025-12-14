@@ -42,8 +42,8 @@ import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.DataHelper.Role;
 import ch.xxx.manager.common.utils.JwtUtils;
-import ch.xxx.manager.common.service.JwtTokenService;
-import ch.xxx.manager.stocks.service.PortfolioService;
+import ch.xxx.manager.common.JwtTokenService;
+import ch.xxx.manager.stocks.PortfolioService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @DisabledInAotMode

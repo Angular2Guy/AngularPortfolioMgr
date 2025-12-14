@@ -35,7 +35,7 @@ import ch.xxx.manager.common.dto.AuthCheckDto;
 import ch.xxx.manager.common.dto.KafkaEventDto;
 import ch.xxx.manager.common.dto.RefreshTokenDto;
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.common.service.AppUserService;
+import ch.xxx.manager.common.AppUserService;
 
 @RestController
 @RequestMapping("/rest/auth")

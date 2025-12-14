@@ -33,15 +33,15 @@ import ch.xxx.manager.stocks.dto.ImportDataDto;
 import ch.xxx.manager.stocks.dto.QuoteDto;
 import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.stocks.entity.dto.DailyQuoteEntityDto;
-import ch.xxx.manager.common.service.AppUserService;
-import ch.xxx.manager.stocks.service.ComparisonIndex;
-import ch.xxx.manager.stocks.service.CurrencyService;
-import ch.xxx.manager.common.service.JwtTokenService;
-import ch.xxx.manager.stocks.service.PortfolioToIndexService;
-import ch.xxx.manager.stocks.service.QuoteImportService;
-import ch.xxx.manager.stocks.service.QuoteImportService.UserKeys;
-import ch.xxx.manager.stocks.service.QuoteService;
-import ch.xxx.manager.stocks.service.SymbolImportService;
+import ch.xxx.manager.common.AppUserService;
+import ch.xxx.manager.stocks.ComparisonIndex;
+import ch.xxx.manager.stocks.CurrencyService;
+import ch.xxx.manager.common.JwtTokenService;
+import ch.xxx.manager.stocks.PortfolioToIndexService;
+import ch.xxx.manager.stocks.QuoteImportService;
+import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
+import ch.xxx.manager.stocks.QuoteService;
+import ch.xxx.manager.stocks.SymbolImportService;
 
 @RestController
 @RequestMapping("rest/quote")

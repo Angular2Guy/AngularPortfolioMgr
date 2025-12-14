@@ -20,8 +20,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import ch.xxx.manager.stocks.dto.SfCountryDto;
-import ch.xxx.manager.stocks.dto.SfQuarterDto;
+import ch.xxx.manager.findata.dto.SfCountryDto;
+import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.stocks.entity.SymbolFinancials;
 
 public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	

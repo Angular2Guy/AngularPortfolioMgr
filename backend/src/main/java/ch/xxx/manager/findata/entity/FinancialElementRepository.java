@@ -15,7 +15,7 @@ package ch.xxx.manager.findata.entity;
 import java.util.List;
 import java.util.Optional;
 
-import ch.xxx.manager.stocks.dto.FeConceptDto;
+import ch.xxx.manager.findata.dto.FeConceptDto;
 import ch.xxx.manager.stocks.dto.FeIdInfoDto;
 
 public interface FinancialElementRepository {

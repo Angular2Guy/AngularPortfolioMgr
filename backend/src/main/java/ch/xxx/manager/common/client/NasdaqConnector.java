@@ -32,7 +32,7 @@ import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.common.utils.MyLogPrintWriter;
-import ch.xxx.manager.stocks.service.NasdaqClient;
+import ch.xxx.manager.stocks.NasdaqClient;
 
 @Component
 public class NasdaqConnector implements NasdaqClient {

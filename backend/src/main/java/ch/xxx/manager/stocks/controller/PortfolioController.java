@@ -38,8 +38,8 @@ import ch.xxx.manager.stocks.dto.PortfolioDto;
 import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import ch.xxx.manager.stocks.mapping.PortfolioMapper;
-import ch.xxx.manager.stocks.service.ComparisonIndex;
-import ch.xxx.manager.stocks.service.PortfolioService;
+import ch.xxx.manager.stocks.ComparisonIndex;
+import ch.xxx.manager.stocks.PortfolioService;
 
 @RestController
 @RequestMapping("rest/portfolio")

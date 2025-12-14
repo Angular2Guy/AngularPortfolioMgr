@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.xxx.manager.stocks.dto.SymbolDto;
-import ch.xxx.manager.stocks.service.ComparisonIndex;
-import ch.xxx.manager.stocks.service.QuoteImportService;
-import ch.xxx.manager.stocks.service.QuoteImportService.UserKeys;
-import ch.xxx.manager.stocks.service.SymbolImportService;
-import ch.xxx.manager.stocks.service.SymbolService;
+import ch.xxx.manager.stocks.ComparisonIndex;
+import ch.xxx.manager.stocks.QuoteImportService;
+import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
+import ch.xxx.manager.stocks.SymbolImportService;
+import ch.xxx.manager.stocks.SymbolService;
 
 @RestController
 @RequestMapping("rest/symbol")

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.xxx.manager.common.service.AppInfoService;
+import ch.xxx.manager.common.AppInfoService;
 
 @RestController
 @RequestMapping("/rest/prod/app-info")

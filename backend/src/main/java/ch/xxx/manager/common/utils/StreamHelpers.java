@@ -32,11 +32,11 @@ public class StreamHelpers {
 	}
 
 	public static <T> Stream<T> toStream(Collection<T> collection) {
-		return Optional.ofNullable(collection).stream().flatMap(myList -> myList.stream());
+		return Optional.ofNullable(collection).stream().flatMap(Collection::stream);
 	}
 
 	public static <T> Stream<T> toStream(T[] array) {
-		return Optional.ofNullable(array).stream().flatMap(myArray -> List.of(array).stream());
+		return Optional.ofNullable(array).stream().flatMap(myArray -> Stream.of(array));
 	}
 
 	public static <T> Stream<T> toStream(Iterable<T> iterable) {
@@ -59,8 +59,7 @@ public class StreamHelpers {
 	public static <T> Stream<T> convert(Enumeration<T> enumeration) {
 	    EnumerationSpliterator<T> spliterator 
 	      = new EnumerationSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED, enumeration);
-	    Stream<T> stream = StreamSupport.stream(spliterator, false);
 
-	    return stream;
+        return StreamSupport.stream(spliterator, false);
 	}
 }

@@ -30,7 +30,7 @@ import ch.xxx.manager.common.config.KafkaConfig;
 import ch.xxx.manager.common.dto.AppUserDto;
 import ch.xxx.manager.common.dto.KafkaEventDto;
 import ch.xxx.manager.common.dto.RevokedTokenDto;
-import ch.xxx.manager.common.service.AppUserServiceEvents;
+import ch.xxx.manager.common.AppUserServiceEvents;
 
 @Service
 @Profile("kafka | prod-kafka")

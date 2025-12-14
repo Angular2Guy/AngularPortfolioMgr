@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.xxx.manager.stocks.dto.FilterNumberDto;
 import ch.xxx.manager.stocks.dto.FilterStringDto;
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.common.service.AppInfoService;
+import ch.xxx.manager.common.AppInfoService;
 
 @RestController
 @RequestMapping("rest/config")

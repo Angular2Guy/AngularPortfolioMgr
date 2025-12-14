@@ -30,14 +30,14 @@ import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import ch.xxx.manager.stocks.repository.JpaSectorRepository;
 import ch.xxx.manager.findata.repository.JpaSymbolFinancialsRepository;
 import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
-import ch.xxx.manager.common.service.AppUserServiceDb;
-import ch.xxx.manager.stocks.service.CurrencyService;
-import ch.xxx.manager.findata.service.FinancialDataService;
-import ch.xxx.manager.stocks.service.PortfolioToIndexService;
-import ch.xxx.manager.stocks.service.QuoteImportService;
-import ch.xxx.manager.stocks.service.QuoteService;
-import ch.xxx.manager.stocks.service.SymbolImportService;
-import ch.xxx.manager.stocks.service.SymbolService;
+import ch.xxx.manager.common.AppUserServiceDb;
+import ch.xxx.manager.stocks.CurrencyService;
+import ch.xxx.manager.findata.FinancialDataService;
+import ch.xxx.manager.stocks.PortfolioToIndexService;
+import ch.xxx.manager.stocks.QuoteImportService;
+import ch.xxx.manager.stocks.QuoteService;
+import ch.xxx.manager.stocks.SymbolImportService;
+import ch.xxx.manager.stocks.SymbolService;
 import jakarta.persistence.EntityManager;
 
 public class BaseControllerTest {

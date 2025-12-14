@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.TokenSubjectRole;
-import ch.xxx.manager.common.service.JwtTokenService;
+import ch.xxx.manager.common.JwtTokenService;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
