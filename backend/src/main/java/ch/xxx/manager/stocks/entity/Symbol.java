@@ -18,7 +18,6 @@ import java.util.Set;
 
 import ch.xxx.manager.common.entity.EntityBase;
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.findata.entity.CompanyReport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

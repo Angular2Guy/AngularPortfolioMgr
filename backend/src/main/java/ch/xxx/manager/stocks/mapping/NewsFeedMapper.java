@@ -10,15 +10,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.findata.mapping;
+package ch.xxx.manager.stocks.mapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import ch.xxx.manager.findata.entity.CompanyReport;
-import ch.xxx.manager.findata.dto.CompanyReportWrapper;
+import ch.xxx.manager.stocks.entity.CompanyReport;
+import ch.xxx.manager.stocks.dto.CompanyReportWrapper;
 import ch.xxx.manager.stocks.entity.dto.RssDto;
 
 @Component

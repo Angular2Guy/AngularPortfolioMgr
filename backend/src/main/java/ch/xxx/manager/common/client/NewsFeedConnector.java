@@ -27,10 +27,10 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
-import ch.xxx.manager.findata.dto.CompanyReportWrapper;
+import ch.xxx.manager.stocks.dto.CompanyReportWrapper;
 import ch.xxx.manager.stocks.entity.dto.RssDto;
-import ch.xxx.manager.findata.mapping.NewsFeedMapper;
-import ch.xxx.manager.findata.NewsFeedClient;
+import ch.xxx.manager.stocks.mapping.NewsFeedMapper;
+import ch.xxx.manager.stocks.NewsFeedClient;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 @Component

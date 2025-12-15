@@ -10,12 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.findata.entity;
+package ch.xxx.manager.stocks.entity;
 
 import java.time.LocalDateTime;
 
 import ch.xxx.manager.common.entity.EntityBase;
-import ch.xxx.manager.stocks.entity.Symbol;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

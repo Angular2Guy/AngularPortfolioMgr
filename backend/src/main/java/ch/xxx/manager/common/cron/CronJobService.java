@@ -32,7 +32,7 @@ import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.AppUserService;
 import ch.xxx.manager.stocks.ComparisonIndex;
 import ch.xxx.manager.stocks.CurrencyService;
-import ch.xxx.manager.findata.NewsFeedService;
+import ch.xxx.manager.stocks.NewsFeedService;
 import ch.xxx.manager.stocks.PortfolioService;
 import ch.xxx.manager.stocks.QuoteImportService;
 import ch.xxx.manager.stocks.QuoteImportService.UserKeys;

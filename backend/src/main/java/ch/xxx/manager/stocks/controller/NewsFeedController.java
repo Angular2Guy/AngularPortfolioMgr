@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.findata.controller;
+package ch.xxx.manager.stocks.controller;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
-import ch.xxx.manager.findata.NewsFeedService;
+import ch.xxx.manager.stocks.NewsFeedService;
 
 @RestController
 @RequestMapping("rest/newsfeed")

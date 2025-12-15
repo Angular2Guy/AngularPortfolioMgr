@@ -10,9 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.findata.dto;
+package ch.xxx.manager.stocks.dto;
 
-import ch.xxx.manager.findata.entity.CompanyReport;
+import ch.xxx.manager.stocks.entity.CompanyReport;
 
 public record CompanyReportWrapper(String cik, String reportZipUrl, CompanyReport companyReport) {
 }

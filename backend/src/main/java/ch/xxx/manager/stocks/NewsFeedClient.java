@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.findata;
+package ch.xxx.manager.stocks;
 
 import java.util.List;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 
-import ch.xxx.manager.findata.dto.CompanyReportWrapper;
+import ch.xxx.manager.stocks.dto.CompanyReportWrapper;
 
 public interface NewsFeedClient {
 	SyndFeed importSeekingAlphaFeed();
