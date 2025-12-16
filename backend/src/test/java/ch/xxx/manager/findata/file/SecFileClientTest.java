@@ -12,9 +12,6 @@
  */
 package ch.xxx.manager.findata.file;
 
-import java.net.URISyntaxException;
-
-import ch.xxx.manager.findata.file.SecFileClientBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.net.URISyntaxException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
@@ -38,7 +37,7 @@ public class SecFileClientTest {
 		String fullFilePath = this.getClass().getClassLoader().getResource(filePath).toURI().toASCIIString();
 		fullFilePath = fullFilePath.replace("file:", "");
 		System.out.println(fullFilePath);
-		this.fileClient.financialDataImportPath = "";
+		this.fileClient.setFinancialDataImportPath("");
 		this.fileClient.importZipFile(fullFilePath);
 	}
 }

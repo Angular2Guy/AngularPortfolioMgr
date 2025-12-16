@@ -64,8 +64,12 @@ public class SecFileClientBean implements FileClient {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void doOnStartup() {
-		this.financialDataImportPath = this.appInfoService.getFinancialDataImportPath();
+        this.financialDataImportPath = this.appInfoService.getFinancialDataImportPath();
 	}
+
+    public void setFinancialDataImportPath(String financialDataImportPath) {
+        this.financialDataImportPath = financialDataImportPath;
+    }
 
     @Override
 	public Boolean importZipFile(String filename) {
