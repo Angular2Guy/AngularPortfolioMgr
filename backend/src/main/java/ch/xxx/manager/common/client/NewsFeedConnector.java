@@ -29,7 +29,7 @@ import com.rometools.rome.io.XmlReader;
 
 import ch.xxx.manager.stocks.dto.CompanyReportWrapper;
 import ch.xxx.manager.stocks.entity.dto.RssDto;
-import ch.xxx.manager.stocks.mapping.NewsFeedMapper;
+import ch.xxx.manager.stocks.mapping.open.NewsFeedMapper;
 import ch.xxx.manager.stocks.NewsFeedClient;
 import tools.jackson.dataformat.xml.XmlMapper;
 

@@ -12,7 +12,6 @@
  */
 package ch.xxx.manager.stocks.mapping;
 
-import ch.xxx.manager.common.mapping.MappingUtils;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.stocks.dto.SymbolDto;

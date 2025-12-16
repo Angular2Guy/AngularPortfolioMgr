@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.stocks.mapping;
+package ch.xxx.manager.stocks.mapping.open;
 
 import ch.xxx.manager.stocks.dto.YahooChartWrapper;
 import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;

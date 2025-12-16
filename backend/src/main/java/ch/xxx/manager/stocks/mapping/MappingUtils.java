@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package ch.xxx.manager.common.mapping;
+package ch.xxx.manager.stocks.mapping;
 
 import java.util.Optional;
 import java.util.function.Predicate;

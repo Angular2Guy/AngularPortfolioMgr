@@ -11,7 +11,9 @@
  limitations under the License.
  */
 @org.springframework.modulith.ApplicationModule(
-        type = ApplicationModule.Type.OPEN
+        type = ApplicationModule.Type.OPEN,
+        allowedDependencies = {"stocks", "stocks :: stocks.dto", "stocks :: stocks.mapping.open",
+                "stocks :: stocks.entity.dto", "stocks :: stocks.entity", "findata", "findata :: findata.dto" }
 )
 package ch.xxx.manager.common;
 

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.stocks.mapping.YahooClientMapper;
+import ch.xxx.manager.stocks.mapping.open.YahooClientMapper;
 import ch.xxx.manager.stocks.YahooClient;
 
 @Component
