@@ -24,7 +24,7 @@ import ch.xxx.manager.stocks.entity.dto.PortfolioAndSymbolDto;
 public interface JpaPortfolioRepository extends JpaRepository<Portfolio, Long> {
 	@Query("select p from Portfolio p inner join fetch p.portfolioToSymbols where p.appUser.id = :userId")
 	List<Portfolio> findByUserId(@Param(value = "userId") Long userId);
-	@Query("select new ch.xxx.manager.domain.model.entity.dto.PortfolioAndSymbolDto(p.id, au.id, p.name, p.createdAt, pts.weight, pts.changedAt, "
+	@Query("select new ch.xxx.manager.stocks.entity.dto.PortfolioAndSymbolDto(p.id, au.id, p.name, p.createdAt, pts.weight, pts.changedAt, "
 			+ "pts.removedAt, s.id, s.symbol, s.name, s.currencyKey) "
 			+ "from Portfolio p inner join p.appUser au inner join p.portfolioToSymbols pts inner join pts.symbol s "
 			+ "where p.id = :portfolioId and (pts.removedAt is null or pts.removedAt > CURRENT_TIMESTAMP)")
