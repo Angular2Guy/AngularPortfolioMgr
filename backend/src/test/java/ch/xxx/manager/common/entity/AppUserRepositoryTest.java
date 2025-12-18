@@ -14,6 +14,7 @@ package ch.xxx.manager.common.entity;
 
 import java.util.Optional;
 
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 public class AppUserRepositoryTest {
 
 	@Autowired
-	private AppUserRepository appUserRepository;
+	private JpaAppUserRepository appUserRepository;
 	
 	@Test
 	public void findByUsernameFound() {

@@ -11,10 +11,11 @@
    limitations under the License.
  */
 package ch.xxx.manager.stocks;
-import static org.mockito.ArgumentMatchers.any;
 
-import java.util.Optional;
-
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +24,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Portfolio;
-import ch.xxx.manager.stocks.entity.PortfolioElement;
-import ch.xxx.manager.stocks.entity.PortfolioElementRepository;
-import ch.xxx.manager.stocks.entity.PortfolioRepository;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioServiceTest {
@@ -45,7 +39,7 @@ public class PortfolioServiceTest {
 	@Mock
 	private SymbolRepository symbolRepository;
 	@Mock
-	private AppUserRepository appUserRepository;
+	private JpaAppUserRepository appUserRepository;
 	@Mock
 	private PortfolioCalculationService portfolioCalculationService;
 	@Mock

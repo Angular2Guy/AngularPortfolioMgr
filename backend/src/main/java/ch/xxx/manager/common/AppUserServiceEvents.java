@@ -14,12 +14,12 @@ package ch.xxx.manager.common;
 
 import ch.xxx.manager.common.dto.*;
 import ch.xxx.manager.common.entity.AppUser;
-import ch.xxx.manager.common.entity.AppUserRepository;
 import ch.xxx.manager.common.entity.RevokedToken;
 import ch.xxx.manager.common.mapping.AppUserMapper;
 import ch.xxx.manager.common.mapping.RevokedTokenMapper;
 import ch.xxx.manager.common.producer.EventProducer;
 import ch.xxx.manager.common.producer.EventPublications;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
 import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
@@ -39,7 +39,7 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 	private final ApplicationEventPublisher applicationEventPublisher;
 	private final EventPublications eventPublications;
 
-	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper,
+	public AppUserServiceEvents(JpaAppUserRepository repository, AppUserMapper appUserMapper,
                                 RevokedTokenMapper revokedTokenMapper, JavaMailSender javaMailSender,
                                 JpaRevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
                                 PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService,

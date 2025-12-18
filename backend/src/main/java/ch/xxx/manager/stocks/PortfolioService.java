@@ -12,38 +12,28 @@
  */
 package ch.xxx.manager.stocks;
 
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.dto.PortfolioDto;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
+import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
+import ch.xxx.manager.stocks.entity.dto.PortfolioBarsWrapper;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import ch.xxx.manager.common.utils.ServiceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.stocks.dto.PortfolioDto;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Portfolio;
-import ch.xxx.manager.stocks.entity.PortfolioElement;
-import ch.xxx.manager.stocks.entity.PortfolioElementRepository;
-import ch.xxx.manager.stocks.entity.PortfolioRepository;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
-import ch.xxx.manager.stocks.entity.dto.PortfolioBarsWrapper;
-import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.common.utils.StreamHelpers;
 
 @Service
 @Transactional
@@ -53,12 +43,12 @@ public class PortfolioService {
 	private final PortfolioElementRepository portfolioElementRepository;
 	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
 	private final SymbolRepository symbolRepository;
-	private final AppUserRepository appUserRepository;
+	private final JpaAppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
 	private final PortfolioToIndexService portfolioToIndexService;
 	private final DailyQuoteRepository dailyQuoteRepository;
 
-	public PortfolioService(PortfolioRepository portfolioRepository, AppUserRepository appUserRepository,
+	public PortfolioService(PortfolioRepository portfolioRepository, JpaAppUserRepository appUserRepository,
 			PortfolioElementRepository portfolioElementRepository, DailyQuoteRepository dailyQuoteRepository,
 			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
 			PortfolioCalculationService portfolioCalculationService, PortfolioToIndexService portfolioToIndexService) {

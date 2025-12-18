@@ -12,17 +12,12 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.stocks.dto.RapidOverviewImportDto;
+import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 import ch.xxx.manager.stocks.entity.dto.DailyQuoteImportDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,18 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.stocks.dto.RapidOverviewImportDto;
-import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Sector;
-import ch.xxx.manager.stocks.entity.SectorRepository;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -59,7 +48,7 @@ public class QuoteImportService {
 
 	public QuoteImportService(YahooClient yahooConnector, DailyQuoteRepository dailyQuoteRepository,
 			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
-			SectorRepository sectorRepository, AppUserRepository appUserRepository) {
+			SectorRepository sectorRepository) {
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.symbolRepository = symbolRepository;

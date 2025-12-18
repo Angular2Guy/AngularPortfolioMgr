@@ -12,11 +12,14 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.util.Base64;
-import java.util.UUID;
-
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
+import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
+import ch.xxx.manager.stocks.entity.SymbolRepository;
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,15 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.google.crypto.tink.DeterministicAead;
-import com.google.crypto.tink.InsecureSecretKeyAccess;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
-import com.google.crypto.tink.daead.DeterministicAeadConfig;
-
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.util.Base64;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class SymbolImportServiceTest {
@@ -55,7 +53,7 @@ public class SymbolImportServiceTest {
 	@Mock
 	private QuoteImportService quoteImportService;
 	@Mock
-	private AppUserRepository appUserRepository;
+	private JpaAppUserRepository appUserRepository;
 
 	@InjectMocks
 	private SymbolImportService symbolImportService;

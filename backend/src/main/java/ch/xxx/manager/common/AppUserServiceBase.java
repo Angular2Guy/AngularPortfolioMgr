@@ -17,12 +17,12 @@ import ch.xxx.manager.common.dto.KafkaEventDto;
 import ch.xxx.manager.common.dto.RefreshTokenDto;
 import ch.xxx.manager.common.dto.RevokedTokenDto;
 import ch.xxx.manager.common.entity.AppUser;
-import ch.xxx.manager.common.entity.AppUserRepository;
 import ch.xxx.manager.common.entity.RevokedToken;
 import ch.xxx.manager.common.exception.AuthenticationException;
 import ch.xxx.manager.common.exception.ResourceNotFoundException;
 import ch.xxx.manager.common.mapping.AppUserMapper;
 import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
 import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import ch.xxx.manager.common.utils.DataHelper.Role;
 import ch.xxx.manager.common.utils.StreamHelpers;
@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 public class AppUserServiceBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceBase.class);
 	private static final long LOGOUT_TIMEOUT = 185L;
-	private final AppUserRepository repository;
+	private final JpaAppUserRepository repository;
 	protected final AppUserMapper appUserMapper;
 	private final JavaMailSender javaMailSender;
 	private final PasswordEncoder passwordEncoder;
@@ -72,7 +72,7 @@ public class AppUserServiceBase {
 	@Value("${tink.json.key}")
 	private String tinkJsonKey;
 
-	public AppUserServiceBase(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
+	public AppUserServiceBase(JpaAppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
 			JpaRevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
 			JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
 		this.repository = repository;

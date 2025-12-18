@@ -12,9 +12,9 @@
  */
 package ch.xxx.manager.common;
 
-import ch.xxx.manager.common.entity.AppUserRepository;
 import ch.xxx.manager.common.mapping.AppUserMapper;
 import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
 import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppUserServiceDb extends AppUserServiceBase implements AppUserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceDb.class);
 	
-	public AppUserServiceDb(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
+	public AppUserServiceDb(JpaAppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
                             JpaRevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
                             JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);

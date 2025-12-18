@@ -12,26 +12,22 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
+import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
+import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
+import ch.xxx.manager.stocks.entity.Symbol;
+import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
+import ch.xxx.manager.stocks.entity.SymbolRepository;
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,22 +36,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.crypto.tink.DeterministicAead;
-import com.google.crypto.tink.InsecureSecretKeyAccess;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
-import com.google.crypto.tink.daead.DeterministicAeadConfig;
-
-import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.common.utils.StreamHelpers;
-import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
-import jakarta.annotation.PostConstruct;
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -70,13 +61,13 @@ public class SymbolImportService {
 	private final XetraClient xetraClient;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
 	private final QuoteImportService quoteImportService;
-	private final AppUserRepository appUserRepository;
+	private final JpaAppUserRepository appUserRepository;
 	private DeterministicAead daead;
 	@Value("${tink.json.key}")
 	String tinkJsonKey;
 
 	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository, DailyQuoteRepository dailyQuoteRepository,
-			XetraClient xetraClient, QuoteImportService quoteImportService, AppUserRepository appUserRepository) {
+			XetraClient xetraClient, QuoteImportService quoteImportService, JpaAppUserRepository appUserRepository) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;
 		this.repository = repository;
