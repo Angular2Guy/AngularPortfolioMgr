@@ -12,43 +12,40 @@
  */
 package ch.xxx.manager.findata;
 
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.findata.dto.*;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
+import ch.xxx.manager.findata.mapping.SymbolFinancialsImportMapper;
+import ch.xxx.manager.findata.repository.JpaFinancialElementRepository;
+import ch.xxx.manager.findata.repository.JpaSymbolFinancialsRepository;
+import ch.xxx.manager.findata.repository.SymbolFinancialsRepository;
+import ch.xxx.manager.stocks.entity.dto.SymbolFinancialsDto;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import ch.xxx.manager.findata.dto.FeConceptDto;
-import ch.xxx.manager.findata.dto.FeIdInfoDto;
-import ch.xxx.manager.findata.dto.SfCountryDto;
-import ch.xxx.manager.findata.dto.SfQuarterDto;
-import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
-import ch.xxx.manager.findata.entity.FinancialElementRepository;
-import ch.xxx.manager.findata.entity.SymbolFinancials;
-import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
-import ch.xxx.manager.stocks.entity.dto.SymbolFinancialsDto;
-import ch.xxx.manager.common.utils.StreamHelpers;
-import ch.xxx.manager.findata.mapping.SymbolFinancialsImportMapper;
-import jakarta.transaction.Transactional;
-import jakarta.transaction.Transactional.TxType;
-
 @Service
 public class FinancialDataService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FinancialDataService.class);
 	private final SymbolFinancialsImportMapper symbolFinancialsMapper;
 	private final SymbolFinancialsRepository symbolFinancialsRepository;
-	private final FinancialElementRepository financialElementRepository;
+	private final JpaFinancialElementRepository financialElementRepository;
 	private final List<FeConceptDto> feConcepts = new CopyOnWriteArrayList<>();
 	private final List<SfQuarterDto> sfQuarters = new CopyOnWriteArrayList<>();
 	private final List<SfCountryDto> sfCountries = new CopyOnWriteArrayList<>();
 
 	public FinancialDataService(SymbolFinancialsImportMapper symbolFinancialsMapper,
 			SymbolFinancialsRepository symbolFinancialsRepository,
-			FinancialElementRepository financialElementRepository) {
+			JpaFinancialElementRepository financialElementRepository) {
 		this.symbolFinancialsMapper = symbolFinancialsMapper;
 		this.symbolFinancialsRepository = symbolFinancialsRepository;
 		this.financialElementRepository = financialElementRepository;
@@ -56,7 +53,7 @@ public class FinancialDataService {
 
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public void clearFinancialsData() {
-		this.financialElementRepository.deleteAllBatch();
+		this.financialElementRepository.deleteAllInBatch();
 		this.symbolFinancialsRepository.deleteAllBatch();
 	}
 
@@ -126,7 +123,7 @@ public class FinancialDataService {
 	@Transactional
 	public void updateFeConcepts() {
 		this.feConcepts.clear();
-		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts());
+		this.feConcepts.addAll(this.financialElementRepository.findCommonFeConcepts(Pageable.ofSize(200)));
 	}
 
 	@Transactional

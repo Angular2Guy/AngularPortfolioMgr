@@ -37,7 +37,6 @@ import ch.xxx.manager.findata.dto.FinancialElementParamDto;
 import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 import ch.xxx.manager.findata.entity.SymbolFinancials;
-import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import jakarta.persistence.EntityManager;
@@ -48,9 +47,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 @Repository
-public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBaseBean
-		implements SymbolFinancialsRepository {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBean.class);
+public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBean {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepository.class);
 	private static final String SYMBOL = "symbol";
 	private static final String FINANCIAL_ELEMENTS = "financialElements";
 	private static final String QUARTER = "quarter";
@@ -62,13 +60,12 @@ public class SymbolFinancialsRepositoryBean extends SymbolFinancialsRepositoryBa
 	private static final String COUNTRY = "country";
 	private final EntityManager entityManager;
 
-	public SymbolFinancialsRepositoryBean(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
+	public SymbolFinancialsRepository(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
 			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
 		super(jpaSymbolFinancialsRepository);
 		this.entityManager = entityManager;
 	}
 
-	@Override
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		List<SymbolFinancials> result = List.of();
 		record SfAndFe(SymbolFinancials symbolFinancials, List<FinancialElement> financialElements) {

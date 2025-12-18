@@ -27,10 +27,9 @@ import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.findata.entity.SymbolFinancials;
-import ch.xxx.manager.findata.entity.SymbolFinancialsRepository;
 
 
-public abstract class SymbolFinancialsRepositoryBaseBean implements SymbolFinancialsRepository {
+public abstract class SymbolFinancialsRepositoryBaseBean {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolFinancialsRepositoryBaseBean.class);
 	protected final JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository;
 
@@ -38,51 +37,41 @@ public abstract class SymbolFinancialsRepositoryBaseBean implements SymbolFinanc
 		this.jpaSymbolFinancialsRepository = jpaSymbolFinancialsRepository;
 	}
 
-	@Override
 	public SymbolFinancials save(SymbolFinancials symbolfinancials) {
 		return this.jpaSymbolFinancialsRepository.save(symbolfinancials);
 	}
 
-	@Override
 	public List<SymbolFinancials> saveAll(Iterable<SymbolFinancials> symbolfinancials) {
 		return this.jpaSymbolFinancialsRepository.saveAll(symbolfinancials);
 	}
 
-	@Override
 	public Optional<SymbolFinancials> findById(Long id) {
 		return this.jpaSymbolFinancialsRepository.findById(id);
 	}
 
-	@Override
 	public void deleteAllBatch() {
 		this.jpaSymbolFinancialsRepository.deleteAllInBatch();
 	}
 
-	@Override
 	public List<SfQuarterDto> findCommonSfQuarters() {
 		return this.jpaSymbolFinancialsRepository.findCommonSfQuarters(Pageable.ofSize(20)).stream()
 				.filter(myDto -> myDto.getTimesFound() >= 10).collect(Collectors.toList());
 	}
 	
-	@Override
 	public List<SfCountryDto> findCommonSfCountries() {
 		return this.jpaSymbolFinancialsRepository.findCommonSfCountries(Pageable.unpaged());
 	}
 	
-	@Override
 	public abstract List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams);
 
-	@Override
-	public List<SymbolFinancials> findByName(String companyName) {	
+	public List<SymbolFinancials> findByName(String companyName) {
 		return this.jpaSymbolFinancialsRepository.findByName(companyName.trim().toLowerCase(), Pageable.ofSize(20));
 	}
 
-	@Override
-	public List<SymbolFinancials> findBySymbol(String symbol) {	
+	public List<SymbolFinancials> findBySymbol(String symbol) {
 		return this.jpaSymbolFinancialsRepository.findBySymbol(symbol.trim().toLowerCase(), Pageable.ofSize(20));
 	}
 	
-	@Override
 	public List<SymbolFinancials> findAllByIdFetchEager(Collection<Long> ids) {
 		LocalTime start = LocalTime.now();
 		List<SymbolFinancials> results = this.jpaSymbolFinancialsRepository.findAllByIdFetchEager(ids);
