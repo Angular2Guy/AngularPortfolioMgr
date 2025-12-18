@@ -12,8 +12,15 @@
  */
 package ch.xxx.manager.common;
 
-import java.util.Optional;
-
+import ch.xxx.manager.common.dto.*;
+import ch.xxx.manager.common.entity.AppUser;
+import ch.xxx.manager.common.entity.AppUserRepository;
+import ch.xxx.manager.common.entity.RevokedToken;
+import ch.xxx.manager.common.mapping.AppUserMapper;
+import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import ch.xxx.manager.common.producer.EventProducer;
+import ch.xxx.manager.common.producer.EventPublications;
+import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,19 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.common.dto.AppUserDto;
-import ch.xxx.manager.common.dto.KafkaEventDto;
-import ch.xxx.manager.common.dto.LogoutEvent;
-import ch.xxx.manager.common.dto.RevokedTokenDto;
-import ch.xxx.manager.common.dto.SigninEvent;
-import ch.xxx.manager.common.entity.AppUser;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.common.entity.RevokedToken;
-import ch.xxx.manager.common.entity.RevokedTokenRepository;
-import ch.xxx.manager.common.producer.EventProducer;
-import ch.xxx.manager.common.producer.EventPublications;
-import ch.xxx.manager.common.mapping.AppUserMapper;
-import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import java.util.Optional;
 
 @Profile("kafka | prod-kafka")
 @Transactional
@@ -45,10 +40,10 @@ public class AppUserServiceEvents extends AppUserServiceBase implements AppUserS
 	private final EventPublications eventPublications;
 
 	public AppUserServiceEvents(AppUserRepository repository, AppUserMapper appUserMapper,
-			RevokedTokenMapper revokedTokenMapper, JavaMailSender javaMailSender,
-			RevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
-			PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService,
-			ApplicationEventPublisher applicationEventPublisher, EventPublications eventPublications) {
+                                RevokedTokenMapper revokedTokenMapper, JavaMailSender javaMailSender,
+                                JpaRevokedTokenRepository revokedTokenRepository, EventProducer messageProducer,
+                                PasswordEncoder passwordEncoder, JwtTokenService jwtTokenProvider, AppInfoService myService,
+                                ApplicationEventPublisher applicationEventPublisher, EventPublications eventPublications) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider,
 				myService, revokedTokenMapper);
 		this.eventProducer = messageProducer;

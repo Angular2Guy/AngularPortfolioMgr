@@ -12,24 +12,27 @@
  */
 package ch.xxx.manager.common;
 
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.dto.AppUserDto;
+import ch.xxx.manager.common.dto.KafkaEventDto;
+import ch.xxx.manager.common.dto.RefreshTokenDto;
+import ch.xxx.manager.common.dto.RevokedTokenDto;
+import ch.xxx.manager.common.entity.AppUser;
+import ch.xxx.manager.common.entity.AppUserRepository;
+import ch.xxx.manager.common.entity.RevokedToken;
+import ch.xxx.manager.common.exception.AuthenticationException;
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.mapping.AppUserMapper;
+import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
+import ch.xxx.manager.common.utils.DataHelper.Role;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.common.utils.TokenSubjectRole;
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,27 +41,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.google.crypto.tink.DeterministicAead;
-import com.google.crypto.tink.InsecureSecretKeyAccess;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
-import com.google.crypto.tink.daead.DeterministicAeadConfig;
-
-import ch.xxx.manager.common.exception.AuthenticationException;
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.common.dto.AppUserDto;
-import ch.xxx.manager.common.dto.KafkaEventDto;
-import ch.xxx.manager.common.dto.RefreshTokenDto;
-import ch.xxx.manager.common.dto.RevokedTokenDto;
-import ch.xxx.manager.common.entity.AppUser;
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.common.entity.RevokedToken;
-import ch.xxx.manager.common.entity.RevokedTokenRepository;
-import ch.xxx.manager.common.utils.DataHelper.Role;
-import ch.xxx.manager.common.utils.TokenSubjectRole;
-import ch.xxx.manager.common.mapping.AppUserMapper;
-import ch.xxx.manager.common.mapping.RevokedTokenMapper;
-import jakarta.annotation.PostConstruct;
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AppUserServiceBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceBase.class);
@@ -69,7 +58,7 @@ public class AppUserServiceBase {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenService jwtTokenService;
 	private final AppInfoService myService;
-	private final RevokedTokenRepository revokedTokenRepository;
+	private final JpaRevokedTokenRepository revokedTokenRepository;
 	protected final RevokedTokenMapper revokedTokenMapper;
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
 	private DeterministicAead daead;
@@ -84,7 +73,7 @@ public class AppUserServiceBase {
 	private String tinkJsonKey;
 
 	public AppUserServiceBase(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
-			RevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
+			JpaRevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
 			JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
 		this.repository = repository;
 		this.javaMailSender = javaMailSender;
@@ -117,7 +106,7 @@ public class AppUserServiceBase {
 	}
 
 	protected void updateLoggedOutUsers(Long timeout) {
-		final List<RevokedToken> revokedTokens = new ArrayList<RevokedToken>(this.revokedTokenRepository.findAll());
+		final List<RevokedToken> revokedTokens = StreamHelpers.toStream(this.revokedTokenRepository.findAll()).toList();
 		this.jwtTokenService.updateLoggedOutUsers(revokedTokens.stream()
 				.filter(myRevokedToken -> myRevokedToken.getLastLogout() == null
 						|| !myRevokedToken.getLastLogout().isBefore(LocalDateTime.now().minusSeconds(timeout)))
@@ -264,7 +253,7 @@ public class AppUserServiceBase {
 				.orElseThrow(() -> new AuthenticationException("Invalid bearer string.")));
 		this.repository.findByUsername(username)
 				.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username));
-		long revokedTokensForUuid = this.revokedTokenRepository.findAll().stream()
+		long revokedTokensForUuid = StreamHelpers.toStream(this.revokedTokenRepository.findAll())
 				.filter(myRevokedToken -> myRevokedToken.getUuid().equals(uuid)
 						&& myRevokedToken.getName().equalsIgnoreCase(username))
 				.count();

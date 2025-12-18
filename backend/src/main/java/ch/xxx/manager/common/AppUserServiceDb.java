@@ -12,6 +12,10 @@
  */
 package ch.xxx.manager.common;
 
+import ch.xxx.manager.common.entity.AppUserRepository;
+import ch.xxx.manager.common.mapping.AppUserMapper;
+import ch.xxx.manager.common.mapping.RevokedTokenMapper;
+import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -20,11 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.common.entity.AppUserRepository;
-import ch.xxx.manager.common.entity.RevokedTokenRepository;
-import ch.xxx.manager.common.mapping.AppUserMapper;
-import ch.xxx.manager.common.mapping.RevokedTokenMapper;
-
 @Profile("!kafka & !prod-kafka")
 @Transactional
 @Service
@@ -32,8 +31,8 @@ public class AppUserServiceDb extends AppUserServiceBase implements AppUserServi
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceDb.class);
 	
 	public AppUserServiceDb(AppUserRepository repository, AppUserMapper appUserMapper, JavaMailSender javaMailSender,
-			RevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
-			JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
+                            JpaRevokedTokenRepository revokedTokenRepository, PasswordEncoder passwordEncoder,
+                            JwtTokenService jwtTokenProvider, AppInfoService myService, RevokedTokenMapper revokedTokenMapper) {
 		super(repository, appUserMapper, javaMailSender, revokedTokenRepository, passwordEncoder, jwtTokenProvider, myService, revokedTokenMapper);
 	}
 
