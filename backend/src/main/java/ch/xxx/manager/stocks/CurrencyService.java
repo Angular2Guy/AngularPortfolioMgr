@@ -12,6 +12,21 @@
  */
 package ch.xxx.manager.stocks;
 
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.stocks.dto.DailyFxQuoteImportDto;
+import ch.xxx.manager.stocks.dto.DailyFxWrapperImportDto;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.DailyQuote;
+import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
+import ch.xxx.manager.stocks.repository.JpaCurrencyRepository;
+import com.google.common.collect.ImmutableSortedMap;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -25,32 +40,15 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.ImmutableSortedMap;
-
-import ch.xxx.manager.stocks.dto.DailyFxQuoteImportDto;
-import ch.xxx.manager.stocks.dto.DailyFxWrapperImportDto;
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.CurrencyRepository;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import jakarta.annotation.PostConstruct;
-
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class CurrencyService {
 	private static final Logger LOG = LoggerFactory.getLogger(CurrencyService.class);
-	private final CurrencyRepository currencyRepository;
+	private final JpaCurrencyRepository currencyRepository;
 	private final AlphavatageClient alphavatageClient;
 	private ImmutableSortedMap<LocalDate, Collection<Currency>> currencyMap = ImmutableSortedMap.of();
 
-	public CurrencyService(CurrencyRepository currencyRepository, AlphavatageClient alphavatageClient) {
+	public CurrencyService(JpaCurrencyRepository currencyRepository, AlphavatageClient alphavatageClient) {
 		this.currencyRepository = currencyRepository;
 		this.alphavatageClient = alphavatageClient;
 	}
