@@ -12,12 +12,9 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+import ch.xxx.manager.stocks.PortfolioStatisticService.CalcValuesDay;
+import ch.xxx.manager.stocks.PortfolioStatisticService.LinearRegressionResults;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,14 +23,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.PortfolioStatisticService.CalcValuesDay;
-import ch.xxx.manager.stocks.PortfolioStatisticService.LinearRegressionResults;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class PortfolioStatisticServiceTest {
 	@Mock
-	DailyQuoteRepository dailyQuoteRepository;
+    JpaDailyQuoteRepository dailyQuoteRepository;
 	@Mock
     CurrencyService currencyService;
 

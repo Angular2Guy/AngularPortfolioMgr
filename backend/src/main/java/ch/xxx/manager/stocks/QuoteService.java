@@ -12,11 +12,11 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.file.FileClient;
+import ch.xxx.manager.stocks.dto.ImportDataDto;
+import ch.xxx.manager.stocks.dto.QuoteDto;
+import ch.xxx.manager.stocks.mapping.QuoteMapper;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,21 +24,20 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.common.file.FileClient;
-import ch.xxx.manager.stocks.dto.ImportDataDto;
-import ch.xxx.manager.stocks.dto.QuoteDto;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.mapping.QuoteMapper;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 public class QuoteService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteService.class);
-	private final DailyQuoteRepository dailyQuoteRepository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
 	private final QuoteMapper quoteMapper;
 	private final FileClient fileClient;
 
-	public QuoteService(DailyQuoteRepository dailyQuoteRepository, 
+	public QuoteService(JpaDailyQuoteRepository dailyQuoteRepository,
 			QuoteMapper quoteMapper, @Qualifier("Stock") FileClient fileClient) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.quoteMapper = quoteMapper;

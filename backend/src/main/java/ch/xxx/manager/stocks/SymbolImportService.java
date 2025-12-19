@@ -18,10 +18,10 @@ import ch.xxx.manager.common.utils.ServiceUtils;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import ch.xxx.manager.stocks.QuoteImportService.UserKeys;
 import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
 import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import com.google.crypto.tink.DeterministicAead;
 import com.google.crypto.tink.InsecureSecretKeyAccess;
 import com.google.crypto.tink.KeysetHandle;
@@ -56,8 +56,8 @@ public class SymbolImportService {
 
 	private final NasdaqClient nasdaqClient;
 	private final HkexClient hkexClient;
-	private final SymbolRepository repository;
-	private final DailyQuoteRepository dailyQuoteRepository;
+	private final JpaSymbolRepository repository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
 	private final XetraClient xetraClient;
 	private final AtomicReference<List<Symbol>> allSymbolEntities = new AtomicReference<>(new ArrayList<>());
 	private final QuoteImportService quoteImportService;
@@ -66,7 +66,7 @@ public class SymbolImportService {
 	@Value("${tink.json.key}")
 	String tinkJsonKey;
 
-	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, SymbolRepository repository, DailyQuoteRepository dailyQuoteRepository,
+	public SymbolImportService(NasdaqClient nasdaqClient, HkexClient hkexClient, JpaSymbolRepository repository, JpaDailyQuoteRepository dailyQuoteRepository,
 			XetraClient xetraClient, QuoteImportService quoteImportService, JpaAppUserRepository appUserRepository) {
 		this.nasdaqClient = nasdaqClient;
 		this.hkexClient = hkexClient;

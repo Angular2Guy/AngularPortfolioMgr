@@ -14,8 +14,10 @@ package ch.xxx.manager.stocks;
 
 import ch.xxx.manager.common.exception.ResourceNotFoundException;
 import ch.xxx.manager.common.repository.JpaAppUserRepository;
-import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Portfolio;
+import ch.xxx.manager.stocks.entity.PortfolioElement;
 import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.stocks.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +33,13 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 public class PortfolioServiceTest {
 	@Mock
-	private PortfolioRepository portfolioRepository;
+	private JpaPortfolioRepository portfolioRepository;
 	@Mock
-	private PortfolioElementRepository portfolioElementRepository;
+	private JpaPortfolioElementRepository portfolioElementRepository;
 	@Mock
-	private PortfolioToSymbolRepository portfolioToSymbolRepository;
+	private JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
 	@Mock
-	private SymbolRepository symbolRepository;
+	private JpaSymbolRepository symbolRepository;
 	@Mock
 	private JpaAppUserRepository appUserRepository;
 	@Mock
@@ -45,7 +47,7 @@ public class PortfolioServiceTest {
 	@Mock
 	private PortfolioToIndexService portfolioToIndexService;
 	@Mock
-	private DailyQuoteRepository dailyQuoteRepository;
+	private JpaDailyQuoteRepository dailyQuoteRepository;
 	@InjectMocks
 	private PortfolioService portfolioService;
 

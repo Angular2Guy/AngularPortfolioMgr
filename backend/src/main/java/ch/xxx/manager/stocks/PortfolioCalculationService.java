@@ -12,6 +12,26 @@
  */
 package ch.xxx.manager.stocks;
 
+import ch.xxx.manager.common.exception.ResourceForbiddenException;
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.dto.PortfolioDto;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
+import ch.xxx.manager.stocks.entity.dto.DailyQuoteEntityDto;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioToSymbolRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -19,49 +39,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import ch.xxx.manager.common.utils.ServiceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import ch.xxx.manager.common.exception.ResourceForbiddenException;
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.stocks.dto.PortfolioDto;
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Portfolio;
-import ch.xxx.manager.stocks.entity.PortfolioRepository;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
-import ch.xxx.manager.stocks.entity.dto.DailyQuoteEntityDto;
-import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.common.utils.StreamHelpers;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PortfolioCalculationService extends PortfolioCalculcationBase {
 	private static final Logger LOG = LoggerFactory.getLogger(PortfolioCalculationService.class);
 	private final PortfolioStatisticService portfolioStatisticService;
-	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final PortfolioRepository portfolioRepository;
+	private final JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final JpaPortfolioRepository portfolioRepository;
 
 	private record PortfolioSymbolWithDailyQuotes(Symbol symbol, List<DailyQuote> dailyQuotes) {
 	};
@@ -78,9 +67,9 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 			List<DailyQuoteEntityDto> dailyQuoteEntityDtos) {
 	};
 
-	public PortfolioCalculationService(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
-			PortfolioRepository portfolioRepository, PortfolioStatisticService portfolioStatisticService,
-			SymbolRepository symbolRepository, PortfolioToSymbolRepository portfolioToSymbolRepository) {
+	public PortfolioCalculationService(JpaDailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
+                                       JpaPortfolioRepository portfolioRepository, PortfolioStatisticService portfolioStatisticService,
+                                       JpaSymbolRepository symbolRepository, JpaPortfolioToSymbolRepository portfolioToSymbolRepository) {
 		super(dailyQuoteRepository, currencyService, symbolRepository);
 		this.portfolioStatisticService = portfolioStatisticService;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;

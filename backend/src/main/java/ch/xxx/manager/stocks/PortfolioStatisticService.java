@@ -12,49 +12,36 @@
  */
 package ch.xxx.manager.stocks;
 
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioElementRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherer;
 import java.util.stream.IntStream;
 
-import ch.xxx.manager.common.utils.ServiceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Portfolio;
-import ch.xxx.manager.stocks.entity.PortfolioBase;
-import ch.xxx.manager.stocks.entity.PortfolioElement;
-import ch.xxx.manager.stocks.entity.PortfolioElementRepository;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.common.utils.StreamHelpers;
-import jakarta.transaction.Transactional;
-
 @Service
 @Transactional
 public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioStatisticService.class);
-	private final PortfolioElementRepository portfolioElementRepository;
+	private final JpaPortfolioElementRepository portfolioElementRepository;
 
 	private record BigDecimalValues(BigDecimal daily, BigDecimal comp) {
 	}
@@ -75,8 +62,8 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 	record DateToCloseAdjPercent(LocalDate localDate, BigDecimal closeAdjPercent) {
 	}
 
-	public PortfolioStatisticService(SymbolRepository symbolRepository, CurrencyService currencyService,
-			DailyQuoteRepository dailyQuoteRepository, PortfolioElementRepository portfolioElementRepository) {
+	public PortfolioStatisticService(JpaSymbolRepository symbolRepository, CurrencyService currencyService,
+                                     JpaDailyQuoteRepository dailyQuoteRepository, JpaPortfolioElementRepository portfolioElementRepository) {
 		super(dailyQuoteRepository, currencyService, symbolRepository);
 		this.portfolioElementRepository = portfolioElementRepository;
 	}

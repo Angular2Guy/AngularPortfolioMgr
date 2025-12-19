@@ -12,23 +12,21 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Gatherers;
-
+import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-
-import ch.xxx.manager.stocks.dto.SymbolToCikWrapperDto;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import jakarta.transaction.Transactional;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Gatherers;
 
 @Service
 public class NewsFeedService {
@@ -37,18 +35,14 @@ public class NewsFeedService {
 
     private final NewsFeedClient newsFeedClient;
     private final SecSymbolClient secSymbolClient;
-    private final SymbolRepository symbolRepository;
-    //private final CompanyReportRepository companyReportRepository;
+    private final JpaSymbolRepository symbolRepository;
     private volatile Optional<SyndFeed> seekingAlphaNewsFeedOptional = Optional.empty();
     private volatile Optional<SyndFeed> cnbcFinanceNewsFeedOptional = Optional.empty();
 
-    public NewsFeedService(NewsFeedClient newsFeedClient, SecSymbolClient secSymbolClient, SymbolRepository symbolRepository
-    //        , CompanyReportRepository companyReportRepository
-    ) {
+    public NewsFeedService(NewsFeedClient newsFeedClient, SecSymbolClient secSymbolClient, JpaSymbolRepository symbolRepository) {
         this.newsFeedClient = newsFeedClient;
         this.secSymbolClient = secSymbolClient;
         this.symbolRepository = symbolRepository;
-        //this.companyReportRepository = companyReportRepository;
     }
 
     @Async

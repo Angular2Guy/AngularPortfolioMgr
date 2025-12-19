@@ -23,6 +23,7 @@ import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
 import ch.xxx.manager.stocks.entity.dto.PortfolioBarsWrapper;
 import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.stocks.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,18 +40,18 @@ import java.util.stream.Stream;
 @Transactional
 public class PortfolioService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioService.class);
-	private final PortfolioRepository portfolioRepository;
-	private final PortfolioElementRepository portfolioElementRepository;
-	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final SymbolRepository symbolRepository;
+	private final JpaPortfolioRepository portfolioRepository;
+	private final JpaPortfolioElementRepository portfolioElementRepository;
+	private final JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final JpaSymbolRepository symbolRepository;
 	private final JpaAppUserRepository appUserRepository;
 	private final PortfolioCalculationService portfolioCalculationService;
 	private final PortfolioToIndexService portfolioToIndexService;
-	private final DailyQuoteRepository dailyQuoteRepository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
 
-	public PortfolioService(PortfolioRepository portfolioRepository, JpaAppUserRepository appUserRepository,
-			PortfolioElementRepository portfolioElementRepository, DailyQuoteRepository dailyQuoteRepository,
-			PortfolioToSymbolRepository portfolioToSymbolRepository, SymbolRepository symbolRepository,
+	public PortfolioService(JpaPortfolioRepository portfolioRepository, JpaAppUserRepository appUserRepository,
+			JpaPortfolioElementRepository portfolioElementRepository, JpaDailyQuoteRepository dailyQuoteRepository,
+			JpaPortfolioToSymbolRepository portfolioToSymbolRepository, JpaSymbolRepository symbolRepository,
 			PortfolioCalculationService portfolioCalculationService, PortfolioToIndexService portfolioToIndexService) {
 		this.portfolioRepository = portfolioRepository;
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;

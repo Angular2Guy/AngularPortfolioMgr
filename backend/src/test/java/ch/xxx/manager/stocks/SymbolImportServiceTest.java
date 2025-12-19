@@ -13,8 +13,8 @@
 package ch.xxx.manager.stocks;
 
 import ch.xxx.manager.common.repository.JpaAppUserRepository;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import com.google.crypto.tink.DeterministicAead;
 import com.google.crypto.tink.InsecureSecretKeyAccess;
 import com.google.crypto.tink.KeysetHandle;
@@ -45,9 +45,9 @@ public class SymbolImportServiceTest {
 	@Mock
 	private HkexClient hkexClient;
 	@Mock
-	private SymbolRepository repository;
+	private JpaSymbolRepository repository;
 	@Mock
-	private DailyQuoteRepository dailyQuoteRepository;
+	private JpaDailyQuoteRepository dailyQuoteRepository;
 	@Mock
 	private XetraClient xetraClient;
 	@Mock

@@ -15,10 +15,15 @@ package ch.xxx.manager.stocks;
 import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
 import ch.xxx.manager.stocks.dto.RapidOverviewImportDto;
 import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.stocks.entity.*;
 import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.DailyQuote;
+import ch.xxx.manager.stocks.entity.Sector;
+import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 import ch.xxx.manager.stocks.entity.dto.DailyQuoteImportDto;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaSectorRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,14 +46,14 @@ public class QuoteImportService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuoteImportService.class);
 	private final YahooClient yahooClient;
 	private final RapidApiClient rapidApiClient;
-	private final DailyQuoteRepository dailyQuoteRepository;
-	private final SymbolRepository symbolRepository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
+	private final JpaSymbolRepository symbolRepository;
 	private final CurrencyService currencyService;
-	private final SectorRepository sectorRepository;
+	private final JpaSectorRepository sectorRepository;
 
-	public QuoteImportService(YahooClient yahooConnector, DailyQuoteRepository dailyQuoteRepository,
-			SymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
-			SectorRepository sectorRepository) {
+	public QuoteImportService(YahooClient yahooConnector, JpaDailyQuoteRepository dailyQuoteRepository,
+			JpaSymbolRepository symbolRepository, CurrencyService currencyService, RapidApiClient rapidApiClient,
+			JpaSectorRepository sectorRepository) {
 		this.yahooClient = yahooConnector;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.symbolRepository = symbolRepository;

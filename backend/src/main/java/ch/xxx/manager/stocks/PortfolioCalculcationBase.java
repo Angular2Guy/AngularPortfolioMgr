@@ -12,38 +12,30 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.entity.*;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.Portfolio;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.stocks.entity.Symbol;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.common.utils.StreamHelpers;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class PortfolioCalculcationBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioCalculcationBase.class);
-	protected final DailyQuoteRepository dailyQuoteRepository;
-	protected final SymbolRepository symbolRepository;
+	protected final JpaDailyQuoteRepository dailyQuoteRepository;
+	protected final JpaSymbolRepository symbolRepository;
 	protected final CurrencyService currencyService;
 
-	public PortfolioCalculcationBase(DailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
-			SymbolRepository symbolRepository) {
+	public PortfolioCalculcationBase(JpaDailyQuoteRepository dailyQuoteRepository, CurrencyService currencyService,
+			JpaSymbolRepository symbolRepository) {
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;
 		this.symbolRepository = symbolRepository;
@@ -64,7 +56,7 @@ public abstract class PortfolioCalculcationBase {
 				.filter(StreamHelpers.distinctByKey(DailyQuote::getSymbolKey))
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay))
 				.collect(Collectors.groupingBy(DailyQuote::getSymbolKey));
-		final record MyKeyValue(String key, List<DailyQuote> quotes) {
+		record MyKeyValue(String key, List<DailyQuote> quotes) {
 		}
 		final Map<String, List<DailyQuote>> filteredDailyQuotesMap = dailyQuotesMap.keySet().stream()
 				.map(myKey -> new MyKeyValue(myKey,
@@ -97,7 +89,7 @@ public abstract class PortfolioCalculcationBase {
 	}
 
 	protected List<LocalDate> filteredCommonQuoteDates(Map<String, List<DailyQuote>> dailyQuotesKeyMap) {
-		final Set<LocalDate> quoteDates = dailyQuotesKeyMap.keySet().stream().map(myId -> dailyQuotesKeyMap.get(myId))
+		final Set<LocalDate> quoteDates = dailyQuotesKeyMap.keySet().stream().map(dailyQuotesKeyMap::get)
 				.flatMap(List::stream).map(DailyQuote::getLocalDay).collect(Collectors.toSet());
 		final List<LocalDate> commonQuoteDates = quoteDates.stream()
 				.filter(myLocalDate -> dailyQuotesKeyMap.keySet().stream()

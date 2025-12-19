@@ -12,39 +12,30 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.SortedMap;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
 import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.stocks.dto.QuoteDto;
+import ch.xxx.manager.stocks.entity.Currency;
+import ch.xxx.manager.stocks.entity.DailyQuote;
+import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
+import ch.xxx.manager.stocks.entity.dto.DailyQuoteEntityDto;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioToSymbolRepository;
+import com.google.common.collect.ImmutableSortedMap;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.ImmutableSortedMap;
-
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.stocks.dto.QuoteDto;
-import ch.xxx.manager.stocks.entity.Currency;
-import ch.xxx.manager.stocks.entity.DailyQuote;
-import ch.xxx.manager.stocks.entity.DailyQuoteRepository;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
-import ch.xxx.manager.stocks.entity.PortfolioToSymbolRepository;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.entity.dto.DailyQuoteEntityDto;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -56,13 +47,12 @@ public class PortfolioToIndexService {
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioToIndexService.class);
-	private final PortfolioToSymbolRepository portfolioToSymbolRepository;
-	private final DailyQuoteRepository dailyQuoteRepository;
+	private final JpaPortfolioToSymbolRepository portfolioToSymbolRepository;
+	private final JpaDailyQuoteRepository dailyQuoteRepository;
 	private final CurrencyService currencyService;
 
-	public PortfolioToIndexService(PortfolioToSymbolRepository portfolioToSymbolRepository,
-			SymbolRepository symbolRepository, DailyQuoteRepository dailyQuoteRepository,
-			CurrencyService currencyService) {
+	public PortfolioToIndexService(JpaPortfolioToSymbolRepository portfolioToSymbolRepository, JpaDailyQuoteRepository dailyQuoteRepository,
+                                   CurrencyService currencyService) {
 		this.portfolioToSymbolRepository = portfolioToSymbolRepository;
 		this.dailyQuoteRepository = dailyQuoteRepository;
 		this.currencyService = currencyService;

@@ -12,11 +12,11 @@
  */
 package ch.xxx.manager.stocks;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.xxx.manager.common.file.FileClient;
+import ch.xxx.manager.stocks.dto.ImportDataDto;
+import ch.xxx.manager.stocks.dto.SymbolDto;
+import ch.xxx.manager.stocks.mapping.SymbolMapper;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,21 +24,20 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.xxx.manager.common.file.FileClient;
-import ch.xxx.manager.stocks.dto.ImportDataDto;
-import ch.xxx.manager.stocks.dto.SymbolDto;
-import ch.xxx.manager.stocks.entity.SymbolRepository;
-import ch.xxx.manager.stocks.mapping.SymbolMapper;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 public class SymbolService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SymbolService.class);
-	private final SymbolRepository repository;
+	private final JpaSymbolRepository repository;
 	private final SymbolMapper symbolMapper;
 	private final FileClient fileClient;
 
-	public SymbolService(SymbolRepository repository, SymbolMapper symbolMapper, @Qualifier("Sec") FileClient fileClient) {
+	public SymbolService(JpaSymbolRepository repository, SymbolMapper symbolMapper, @Qualifier("Sec") FileClient fileClient) {
 		this.repository = repository;
 		this.symbolMapper = symbolMapper;
 		this.fileClient = fileClient;
