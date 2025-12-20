@@ -14,17 +14,19 @@ package ch.xxx.manager.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Optional;
+
 public class AuthCheckDto {
 	private final String path;
-	private final boolean authorized;	
+	private final Boolean authorized;
 	
-	public AuthCheckDto(@JsonProperty("path") String path, @JsonProperty("authorized") boolean authorized) {
+	public AuthCheckDto(@JsonProperty("path") String path, @JsonProperty("authorized") Boolean authorized) {
 		this.path = path;
 		this.authorized = authorized;
 	}
 
 	public boolean isAuthorized() {
-		return authorized;
+		return Optional.ofNullable(authorized).orElse(Boolean.FALSE);
 	}
 
 	public String getPath() {

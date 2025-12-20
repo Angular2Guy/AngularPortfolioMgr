@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,8 +36,8 @@ public class AppUserDto implements UserDetails {
 	private String password;
 	private String emailAddress;
 	private String userRole;
-	private boolean locked;
-	private boolean enabled;
+	private Boolean locked;
+	private Boolean enabled;
 	private String uuid;
 	private String token;
 	//500 calls a day and 5 a min
@@ -46,7 +47,7 @@ public class AppUserDto implements UserDetails {
 	private Long secUntilNexLogin;
 
 	public AppUserDto(Long id, String userName, LocalDate birthdate, String password, String token, String emailAddress,
-			String userRole, boolean locked, boolean enabled, String uuid, String alphavantageKey, String rapidApiKey,Long secUntilNexLogin) {
+			String userRole, Boolean locked, Boolean enabled, String uuid, String alphavantageKey, String rapidApiKey,Long secUntilNexLogin) {
 		super();
 		this.id = id;
 		this.username = userName;
@@ -140,7 +141,7 @@ public class AppUserDto implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return this.enabled;
+		return Optional.ofNullable(this.enabled).orElse(Boolean.FALSE);
 	}
 
 	public LocalDateTime getUpdatedAt() {
@@ -160,10 +161,10 @@ public class AppUserDto implements UserDetails {
 	}
 
 	public boolean isLocked() {
-		return locked;
+		return Optional.ofNullable(locked).orElse(Boolean.FALSE);
 	}
 
-	public void setLocked(boolean locked) {
+	public void setLocked(Boolean locked) {
 		this.locked = locked;
 	}
 
@@ -171,7 +172,7 @@ public class AppUserDto implements UserDetails {
 		this.password = password;
 	}
 
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
 
