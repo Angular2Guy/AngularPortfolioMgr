@@ -30,7 +30,7 @@ repositories {
 }
 
 ext {
-    set('springModulithVersion', "2.0.0")
+    set('springModulithVersion', "2.0.1")
 }
 
 dependencies {
@@ -64,7 +64,7 @@ dependencies {
 	implementation 'org.apache.httpcomponents.client5:httpclient5'
     runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
     runtimeOnly 'org.springframework.modulith:spring-modulith-events-kafka'
-    //runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
+    runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
     testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'

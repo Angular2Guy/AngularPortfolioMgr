@@ -8,6 +8,7 @@ Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, J
 [![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
 
 ## Articles
+* [Java Microservices(SCS) vs. Spring Modulith](https://angular2guy.wordpress.com/2025/12/22/java-microservicesscs-vs-spring-modulith/)
 * [Using Java Stream Gatherers to improve Stateful Operations](https://angular2guy.wordpress.com/2025/05/03/using-java-stream-gatherers-to-improve-stateful-operations/)
 * [Spring RestClient with Delays on Virtual Threads](https://angular2guy.wordpress.com/2024/08/30/restclient-with-delays-on-virtual-threads/)
 * [Using KRaft Kafka for development and Kubernetes deployment](https://angular2guy.wordpress.com/2024/08/17/using-kraft-kafka-for-development-and-kubernetes-deployment/)
