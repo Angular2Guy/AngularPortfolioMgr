@@ -77,7 +77,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
 		Map<String, List<DailyQuote>> dailyQuotesMap = this.createDailyQuotesKeyMap(portfolioToSymbolsNoPort);
 		List<Symbol> comparisionSymbols = StreamHelpers.toStream(ComparisonIndex.values())
 				.map(ComparisonIndex::getSymbol)
-				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr).stream())
+				.flatMap(mySymbolStr -> this.symbolRepository.findBySymbolSingle(mySymbolStr.toLowerCase()).stream())
 //				.filter(StreamHelpers.distinctByKey(mySymbol -> mySymbol.getSymbol()))
 				.toList();
 		var ptsToDelete = portfolioToSymbols.stream().filter(pts -> Optional.ofNullable(pts.getRemovedAt()).isPresent())
