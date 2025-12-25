@@ -38,8 +38,8 @@ public class XetraConnector implements XetraClient {
 	@Override
 	public Optional<List<String>> importXetraSymbols() {
 		return this.connectorClient
-				.restCall(XETRA_URL, String.class, Duration.ofMillis(100)).stream().map(str -> this.findCsvUrl(str)).findFirst()
-				.flatMap(myUrlStr -> this.loadSymbolsCsv(myUrlStr));
+				.restCall(XETRA_URL, String.class, Duration.ofMillis(100)).stream().map(this::findCsvUrl).findFirst()
+				.flatMap(this::loadSymbolsCsv);
 	}
 
 
@@ -57,7 +57,7 @@ public class XetraConnector implements XetraClient {
 		}
 		// create csv url for the xetra stocks
 		String csvUrl = hrefs.stream().filter(href -> href.contains("t7-xetr-allTradableInstruments.csv"))
-				.map(href -> this.createCsvUrl(href)).findFirst()
+				.map(this::createCsvUrl).findFirst()
 				.orElseThrow(() -> new RuntimeException("t7-xetr-allTradableInstruments.csv not found."));
 		LOGGER.info(csvUrl);
 		return csvUrl;

@@ -156,7 +156,7 @@ public class CronJobService {
 	@SchedulerLock(name = "CronJob_portfolios", lockAtLeastFor = "PT10M", lockAtMostFor = "PT2H")
 	public void scheduledUpdatePortfolios() {
 		Instant start = Instant.now();
-		this.portfolioService.findAllPortfolios().forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
+		this.portfolioService.findAllPortfolios().forEach(this.portfolioService::updatePortfolioValues);
 		LOGGER.info("scheduledUpdatePortfolios: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
 	}
 }

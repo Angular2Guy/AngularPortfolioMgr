@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,12 +54,12 @@ public class WebSecurityConfig {
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/rest/**")).hasAuthority(DataHelper.Role.USERS.toString())
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(blockedPath)).denyAll()
 						.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/**")).permitAll())				
-				.csrf(myCsrf -> myCsrf.disable())
+				.csrf(AbstractHttpConfigurer::disable)
 				.sessionManagement(mySm -> mySm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.headers(myHeaders -> myHeaders.contentSecurityPolicy(myCsp -> myCsp.policyDirectives(
 						"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';")))
 				.headers(myHeaders -> myHeaders.xssProtection(myXss -> myXss.headerValue(HeaderValue.ENABLED)))
-				.headers(myHeaders -> myHeaders.frameOptions(myFo -> myFo.sameOrigin()))
+				.headers(myHeaders -> myHeaders.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
 				.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}

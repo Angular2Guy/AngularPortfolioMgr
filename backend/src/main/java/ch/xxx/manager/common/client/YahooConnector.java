@@ -47,7 +47,7 @@ public class YahooConnector implements YahooClient {
 				symbol, fromTime.toEpochSecond(OffsetDateTime.now().getOffset()),
 				toTime.toEpochSecond(OffsetDateTime.now().getOffset()), symbol);
 		LOGGER.info(myUrl);
-		return this.connectorClient.restCall(myUrl, String.class).stream().map(response -> this.yahooDtoMapper.convert(response))
+		return this.connectorClient.restCall(myUrl, String.class).stream().map(this.yahooDtoMapper::convert)
 				.flatMap(YahooClientMapper::convert).toList();
 	}
 }
