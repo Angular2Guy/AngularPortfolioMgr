@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -146,12 +147,12 @@ public class PortfolioService {
 //		filteredDailyQuotes.stream().filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
 //				.peek(dq -> LOGGER.info("Porfolio: {} {}", dq.getId(), dq.getLocalDay().toString())).count();
 		filteredDailyQuotes = this.dailyQuoteRepository
-				.saveAll(filteredDailyQuotes.stream().collect(Collectors.toList()));
+				.saveAll(new ArrayList<>(filteredDailyQuotes));
 //		portfolioWithElements.dailyQuotesToRemove().stream()
 //				.filter(dq -> dq.getLocalDay().isAfter(LocalDate.of(2022, 9, 1)))
 //				.peek(dq -> LOGGER.info("Porfolio remove: {} {}", dq.getId(), dq.getLocalDay().toString())).count();
 		this.dailyQuoteRepository
-				.deleteAll(portfolioWithElements.dailyQuotesToRemove().stream().collect(Collectors.toList()));
+				.deleteAll(new ArrayList<>(portfolioWithElements.dailyQuotesToRemove()));
 		return new PortfolioWithElements(portfolio, portfolioElements, List.of(), List.of());
 	}
 

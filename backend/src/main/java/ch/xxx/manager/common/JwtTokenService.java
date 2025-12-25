@@ -14,15 +14,7 @@ package ch.xxx.manager.common;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -112,7 +104,7 @@ public class JwtTokenService {
 	}
 
 	public Authentication getAuthentication(String token) {
-		if (this.getAuthorities(token).stream().filter(role -> role.equals(DataHelper.Role.GUEST)).count() > 0) {
+		if (this.getAuthorities(token).stream().anyMatch(role -> role.equals(DataHelper.Role.GUEST))) {
 			return new UsernamePasswordAuthenticationToken(this.getUsername(token), null);
 		}
 		return new UsernamePasswordAuthenticationToken(this.getUsername(token), "", this.getAuthorities(token));
@@ -132,9 +124,7 @@ public class JwtTokenService {
 	@SuppressWarnings("unchecked")
 	public Collection<DataHelper.Role> getAuthorities(String token) {
 		Collection<DataHelper.Role> roles = new LinkedList<>();
-		for (DataHelper.Role role : DataHelper.Role.values()) {
-			roles.add(role);
-		}
+        Collections.addAll(roles, DataHelper.Role.values());
 		Collection<Map<String, String>> rolestrs = (Collection<Map<String, String>>) Jwts.parserBuilder()
 				.setSigningKey(this.jwtTokenKey).build().parseClaimsJws(token).getBody().get(JwtUtils.TOKENAUTHKEY);
 		return rolestrs.stream()

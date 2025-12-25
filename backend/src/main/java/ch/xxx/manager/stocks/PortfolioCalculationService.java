@@ -117,7 +117,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 							? BigDecimal.ZERO
 							: pe.value()
 									.divide(cutOffPEs.stream().filter(myPe -> myPe.symbolId().equals(pe.symbolId()))
-											.map(CalcPortfolioElement::value).findFirst().get(), 8,
+											.map(CalcPortfolioElement::value).findFirst().orElseThrow(), 8,
 											RoundingMode.HALF_EVEN)
 									.subtract(BigDecimal.ONE).multiply(BigDecimal.valueOf(100));
 			return new CalcPortfolioElement(pe.symbolId(), pe.localDate(), value, pe.symbolName(), pe.weight());
@@ -213,7 +213,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 								.flatMap(Collection::stream)
 								.filter(myDailyQuote -> commonQuoteDates.stream()
 										.anyMatch(myLocalDate -> myLocalDate.isEqual(myDailyQuote.getLocalDay())))
-								.map(myDailyQuote -> this.resetPortfolioQuote(myDailyQuote))
+								.map(this::resetPortfolioQuote)
 								.collect(Collectors.toList())))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Portfolio Symbol not found."));
 		List<CalcPortfolioElement> portfolioElements = portfolioToSymbols.stream()

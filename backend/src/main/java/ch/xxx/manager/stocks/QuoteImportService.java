@@ -116,7 +116,7 @@ public class QuoteImportService {
 
 	public void storeDailyQuoteData(
 			List<DailyQuoteImportDto> dailyQuoteImportDtos) {
-		final Map<String, Symbol> symbolMap = dailyQuoteImportDtos.stream().map(myDto -> myDto.getSymbol()).distinct()
+		final Map<String, Symbol> symbolMap = dailyQuoteImportDtos.stream().map(DailyQuoteImportDto::getSymbol).distinct()
 				.map(mySym -> this.symbolRepository.findBySymbol(mySym).stream().findFirst().orElse(
 						this.symbolRepository.save(new Symbol(null, mySym, mySym, CurrencyKey.USD, QuoteSource.DATA))))
 				.filter(mySymbol -> mySymbol.getQuoteSource().equals(QuoteSource.DATA))
@@ -199,8 +199,8 @@ public class QuoteImportService {
 
 	private List<DailyQuote> saveAllDailyQuotes(List<DailyQuote> entities, boolean clearOldQuotes) {
 		LOGGER.info("importDailyQuotes() {} to import", entities.size());
-		if (clearOldQuotes && entities != null && !entities.isEmpty()) {
-			this.dailyQuoteRepository.deleteAll(this.dailyQuoteRepository.findBySymbol(entities.get(0).getSymbolKey()));
+		if (clearOldQuotes && !entities.isEmpty()) {
+			this.dailyQuoteRepository.deleteAll(this.dailyQuoteRepository.findBySymbol(entities.getFirst().getSymbolKey()));
 		}
 		return this.dailyQuoteRepository.saveAll(entities);
 	}

@@ -75,7 +75,7 @@ public class PortfolioToIndexService {
 				.collect(Collectors.toList());
 		Map<String, List<PortfolioToSymbol>> symbolToPtsMap = myPortfolioChanges.stream()
 				.collect(Collectors.groupingBy(pts -> pts.getSymbol().getSymbol(),
-						Collectors.flatMapping((PortfolioToSymbol pts) -> Stream.of(pts), Collectors.toList())));
+						Collectors.flatMapping(Stream::of, Collectors.toList())));
 		symbolToPtsMap.entrySet().stream().map(entry -> {
 			entry.setValue(entry.getValue().stream()
 					.sorted((a, b) -> Optional.ofNullable(a.getChangedAt()).orElse(a.getRemovedAt())
@@ -111,15 +111,15 @@ public class PortfolioToIndexService {
 				.sorted(Comparator.comparing(DailyQuote::getLocalDay)).collect(Collectors.toList());
 		final Optional<DailyQuote> firstDailyQuotePortfolioOpt = this.dailyQuoteRepository
 				.findBySymbolAndDayBetween(portfolioPts.getSymbol().getSymbol(),
-						myDailyQuotesPortfolio.get(0).getLocalDay(),
-						myDailyQuotesPortfolio.get(myDailyQuotesPortfolio.size() - 1).getLocalDay())
+						myDailyQuotesPortfolio.getFirst().getLocalDay(),
+						myDailyQuotesPortfolio.getLast().getLocalDay())
 				.stream().findFirst();
 		final Optional<DailyQuote> indexQuoteOpt = dailyQuotes.stream().filter(
-				myDailyQuotes -> myDailyQuotesPortfolio.get(0).getLocalDay().isEqual(myDailyQuotes.getLocalDay()))
+				myDailyQuotes -> myDailyQuotesPortfolio.getFirst().getLocalDay().isEqual(myDailyQuotes.getLocalDay()))
 				.findFirst();
-		final Currency currencyChange = indexQuoteOpt
-				.map(indexQuote -> this.currencyService.getCurrencyQuote(portfolioPts, indexQuote))
-				.orElse(Optional.of(new Currency(null, null, null, null, null, null, BigDecimal.ONE))).get();
+		final Currency currencyChange = indexQuoteOpt.stream()
+				.map(indexQuote -> this.currencyService.getCurrencyQuote(portfolioPts, indexQuote)).flatMap(Optional::stream).findFirst()
+				.orElse(new Currency(null, null, null, null, null, null, BigDecimal.ONE));
 		final BigDecimal iqAdjClose = indexQuoteOpt.stream().map(DailyQuote::getAdjClose).findFirst()
 				.orElse(BigDecimal.ONE);
 		final AtomicReference<BigDecimal> currentWeight = new AtomicReference<>(firstDailyQuotePortfolioOpt
