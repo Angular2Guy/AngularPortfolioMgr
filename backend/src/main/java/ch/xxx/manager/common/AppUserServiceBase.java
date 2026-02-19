@@ -12,6 +12,38 @@
  */
 package ch.xxx.manager.common;
 
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.google.crypto.tink.DeterministicAead;
+import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
+
 import ch.xxx.manager.common.dto.AppUserDto;
 import ch.xxx.manager.common.dto.KafkaEventDto;
 import ch.xxx.manager.common.dto.RefreshTokenDto;
@@ -27,27 +59,7 @@ import ch.xxx.manager.common.repository.JpaRevokedTokenRepository;
 import ch.xxx.manager.common.utils.DataHelper.Role;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import ch.xxx.manager.common.utils.TokenSubjectRole;
-import com.google.crypto.tink.DeterministicAead;
-import com.google.crypto.tink.InsecureSecretKeyAccess;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
-import com.google.crypto.tink.daead.DeterministicAeadConfig;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.access.AuthorizationServiceException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AppUserServiceBase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppUserServiceBase.class);
@@ -135,13 +147,14 @@ public class AppUserServiceBase {
 	}
 
 	private AppUser mapEncryptDto(AppUserDto appUserDto, Optional<AppUser> appUserOpt) {
-		AppUser appUser = this.appUserMapper.convert(appUserDto, appUserOpt);
-		UUID userUuid = appUserOpt.map(myAppUser -> UUID.fromString(myAppUser.getUuid())).orElse(UUID.randomUUID());
+		AppUser appUser = this.appUserMapper.convert(appUserDto, appUserOpt);		
+		UUID userUuid = appUserOpt.filter(myAppUser -> Optional.ofNullable(myAppUser.getUuid()).stream().anyMatch(Predicate.not(String::isBlank)))
+		  .map(myAppUser -> UUID.fromString(myAppUser.getUuid())).orElse(UUID.randomUUID());
 		appUser.setUuid(userUuid.toString());
-		Optional.ofNullable(appUserDto.getAlphavantageKey()).stream().filter(alphaKey -> !alphaKey.trim().isBlank())
+		Optional.ofNullable(appUserDto.getAlphavantageKey()).stream().filter(alphaKey -> Optional.ofNullable(alphaKey).stream().anyMatch(Predicate.not(String::isBlank)))
 				.findFirst().ifPresent(alphaKey -> appUser.setAlphavantageKey(this.encrypt(alphaKey, userUuid)));
-		Optional.ofNullable(appUserDto.getRapidApiKey()).stream().filter(rapidKey -> !rapidKey.trim().isBlank()).findFirst()
-				.ifPresent(rapidKey -> appUser.setRapidApiKey(this.encrypt(rapidKey, userUuid)));		
+		Optional.ofNullable(appUserDto.getRapidApiKey()).stream().filter(rapidKey -> Optional.ofNullable(rapidKey).stream().anyMatch(Predicate.not(String::isBlank)))
+				.findFirst().ifPresent(rapidKey -> appUser.setRapidApiKey(this.encrypt(rapidKey, userUuid)));		
 		return appUser;
 	}
 
