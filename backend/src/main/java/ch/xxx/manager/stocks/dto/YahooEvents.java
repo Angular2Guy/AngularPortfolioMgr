@@ -14,8 +14,6 @@ package ch.xxx.manager.stocks.dto;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public record YahooEvents(@JsonProperty Map<Long, YahooEventsDividend> dividends, @JsonProperty Map<Long, YahooEventsSplit> splits) {
+public record YahooEvents(Map<Long, YahooEventsDividend> dividends, Map<Long, YahooEventsSplit> splits) {
 
 }

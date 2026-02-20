@@ -12,12 +12,36 @@
  */
 package ch.xxx.manager.stocks.dto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
-public record YahooMetaData(String currency, String symbol, String exchangeName, String fullExchangeName, String instrumentType, Long firstTradeDate, Long regularMarketTime,
-		Boolean hasPrePostMarketData, Long gmtoffset, String timezone, String exchangeTimezoneName, BigDecimal regularMarketPrice, BigDecimal fiftyTwoWeekHigh,
-		BigDecimal fiftyTwoWeekLow, BigDecimal regularMarketDayHigh, BigDecimal regularMarketDayLow, Long regularMarketVolume, String longName, String shortName,
-		BigDecimal chartPreviousClose, Long priceHint, YahooTradingPeriods currentTradingPeriod, String dataGranularity, String range, List<String> validRanges) {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record YahooMetaData(String currency,
+        String symbol,
+        String exchangeName,
+        String fullExchangeName,
+        String instrumentType,
+        Long firstTradeDate,
+        Long regularMarketTime,
+        Boolean hasPrePostMarketData,
+        Integer gmtoffset,
+        String timezone,
+        String exchangeTimezoneName,
+        Double regularMarketPrice,
+        Double fiftyTwoWeekHigh,
+        Double fiftyTwoWeekLow,
+        Double regularMarketDayHigh,
+        Double regularMarketDayLow,
+        Long regularMarketVolume,
+        String longName,
+        String shortName,
+        Double chartPreviousClose,
+        Integer priceHint,
+        YahooCurrentTradingPeriod currentTradingPeriod,
+        String dataGranularity,
+        String range,
+        List<String> validRanges) {
 
 }

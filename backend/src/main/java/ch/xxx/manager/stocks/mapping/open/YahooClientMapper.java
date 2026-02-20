@@ -12,21 +12,21 @@
  */
 package ch.xxx.manager.stocks.mapping.open;
 
-import ch.xxx.manager.stocks.dto.YahooChartWrapper;
-import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
-import ch.xxx.manager.stocks.dto.YahooResultWrapper;
-import org.springframework.stereotype.Component;
-import tools.jackson.databind.json.JsonMapper;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+
+import org.springframework.stereotype.Component;
+
+import ch.xxx.manager.stocks.dto.YahooChartWrapper;
+import ch.xxx.manager.stocks.dto.YahooDailyQuoteImportDto;
+import ch.xxx.manager.stocks.dto.YahooResultWrapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class YahooClientMapper {
@@ -96,50 +96,18 @@ public class YahooClientMapper {
 
 	private static DateToDto addQuoteProperties(final YahooResultWrapper dto, DateToDto myDto) {
 		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
-			myDto.dto()
-					.setOpen(
-							Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-									.map(myMap -> myMap.getOrDefault(JsonKey.Open.toString(),
-											new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
-									.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
-									.orElse(BigDecimal.ZERO));
-			myDto.dto()
-					.setHigh(
-							Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-									.map(myMap -> myMap.getOrDefault(JsonKey.High.toString(),
-											new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
-									.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
-									.orElse(BigDecimal.ZERO));
-			myDto.dto()
-					.setVolume(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.getOrDefault(JsonKey.Volume.toString(),
-									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
-							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO))
-							.map(myValue -> myValue.longValue()).findFirst().orElse(0L));
-			myDto.dto().setLow(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-					.map(myMap -> myMap
-							.getOrDefault(JsonKey.Low.toString(), new ArrayList<BigDecimal>(myDto.index() + 1))
-							.get(myDto.index()))
-					.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
-					.orElse(BigDecimal.ZERO));
-			myDto.dto()
-					.setClose(Optional.ofNullable(myIndicators.quote()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.getOrDefault(JsonKey.Close.toString(),
-									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
-							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
-							.orElse(BigDecimal.ZERO));
+			myDto.dto().setOpen(myIndicators.quote().stream().map(myQuote -> myQuote.close().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
+			myDto.dto().setHigh(myIndicators.quote().stream().map(myQuote -> myQuote.high().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
+			myDto.dto().setVolume(myIndicators.quote().stream().map(myQuote -> myQuote.volume().get(myDto.index())).findFirst().orElse(0L));
+			myDto.dto().setLow(myIndicators.quote().stream().map(myQuote -> myQuote.low().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
+			myDto.dto().setClose(myIndicators.quote().stream().map(myQuote -> myQuote.close().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
 		});
 		return myDto;
 	}
 
 	private static DateToDto addAdjClose(final YahooResultWrapper dto, DateToDto myDto) {
 		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
-			myDto.dto()
-					.setAdjClose(Optional.ofNullable(myIndicators.adjclose()).orElse(List.of(Map.of())).stream()
-							.map(myMap -> myMap.getOrDefault(JsonKey.AdjClose.toString(),
-									new ArrayList<BigDecimal>(myDto.index() + 1)).get(myDto.index()))
-							.map(myValue -> Optional.ofNullable(myValue).orElse(BigDecimal.ZERO)).findFirst()
-							.orElse(BigDecimal.ZERO));
+			myDto.dto().setAdjClose(Optional.ofNullable(myIndicators.adjclose()).stream().flatMap(List::stream).map(myQuote -> myQuote.adjclose().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));			
 		});
 		return myDto;
 	}

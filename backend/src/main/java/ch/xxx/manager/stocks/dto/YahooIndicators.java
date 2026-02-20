@@ -12,10 +12,8 @@
  */
 package ch.xxx.manager.stocks.dto;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
-public record YahooIndicators(List<Map<String, List<BigDecimal>>> quote, List<Map<String, List<BigDecimal>>> adjclose) {
+public record YahooIndicators(List<YahooQuote> quote, List<YahooAdjClose> adjclose) {
 
 }

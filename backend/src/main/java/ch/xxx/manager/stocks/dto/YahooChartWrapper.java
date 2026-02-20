@@ -12,6 +12,11 @@
  */
 package ch.xxx.manager.stocks.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record YahooChartWrapper(YahooResult chart) {
+
 
 }
