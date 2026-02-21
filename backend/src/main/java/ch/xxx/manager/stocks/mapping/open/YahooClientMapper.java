@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.stocks.dto.YahooChartWrapper;
@@ -49,6 +51,7 @@ public class YahooClientMapper {
 	}
 
 	private final JsonMapper objectMapper;
+	private static final Logger LOG = LoggerFactory.getLogger(YahooClientMapper.class);
 
 	public YahooClientMapper(JsonMapper objectMapper) {
 		this.objectMapper = objectMapper;
@@ -70,7 +73,15 @@ public class YahooClientMapper {
 						.of(new DateToDto(myTimestamp, atomicInt.addAndGet(1), new YahooDailyQuoteImportDto())))
 				.map(myDto -> addLocalDate(myDto)).map(myDto -> addAdjClose(dto, myDto))
 				.map(myDto -> addQuoteProperties(dto, myDto)).map(myDto -> addEventProperties(dto, myDto))
+				.filter(myDto -> filterEmptyQuotes(myDto))
 				.map(myDto -> myDto.dto());
+	}
+
+	private static boolean filterEmptyQuotes(final DateToDto dto) {
+		return Optional.ofNullable(dto.dto()).stream()
+		.filter(myDto -> !BigDecimal.ZERO.equals(myDto.getOpen()) && !BigDecimal.ZERO.equals(myDto.getHigh()) && !BigDecimal.ZERO.equals(myDto.getLow())
+		   && !BigDecimal.ZERO.equals(myDto.getClose()) && !Long.valueOf(0L).equals(myDto.getVolume()))
+		   .findFirst().isPresent();
 	}
 
 	private static DateToDto addLocalDate(DateToDto myDto) {
