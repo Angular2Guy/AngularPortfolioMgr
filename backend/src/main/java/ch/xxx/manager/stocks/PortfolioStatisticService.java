@@ -195,9 +195,9 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
     private BigDecimal calcStandardDiviation(Map<LocalDate, BigDecimal> adjClosePercents) {
         final var adjCloseMean = adjClosePercents.entrySet().stream().map(Entry::getValue)
                 .reduce(BigDecimal.ZERO, (acc, value) -> value.add(acc))
-                .divide(BigDecimal.valueOf(adjClosePercents.entrySet().size()), 25, RoundingMode.HALF_EVEN);
+                .divide(BigDecimal.valueOf(Math.max(adjClosePercents.entrySet().size(), 1)), 25, RoundingMode.HALF_EVEN);
         final var divisor = BigDecimal.ONE.divide(
-                BigDecimal.valueOf(adjClosePercents.entrySet().size() < 2 ? 2 : adjClosePercents.entrySet().size())
+                BigDecimal.valueOf(Math.max(adjClosePercents.entrySet().size(), 2))
                         .subtract(BigDecimal.ONE),
                 25, RoundingMode.HALF_EVEN);
         final var standardDeviation = adjClosePercents.entrySet().stream().map(Entry::getValue)
@@ -225,9 +225,13 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
                 (state, element, downstream) -> {
                     var result = true;
                     if (state.get().longValue() > -900L) {
-                        var resultPercetage = element.getAdjClose().divide(state.get(), 25, RoundingMode.HALF_EVEN)
-                                .multiply(new BigDecimal(100L));
-                        result = downstream.push(new DateToCloseAdjPercent(element.getLocalDay(), resultPercetage));
+                        try {
+                            var resultPercetage = element.getAdjClose().divide(state.get(), 25, RoundingMode.HALF_EVEN)
+                                    .multiply(new BigDecimal(100L));
+                            result = downstream.push(new DateToCloseAdjPercent(element.getLocalDay(), resultPercetage));
+                        }catch (ArithmeticException e) {
+                            LOGGER.info("calcClosePercentage failed: ",e);
+                        }
                     }
                     state.set(element.getAdjClose());
                     return result;
@@ -354,15 +358,19 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
         CalcValuesDay prevValues = null;
         for (int i = 0; i < calcValuesDays.size(); i++) {
             if (prevValues != null) {
-                BigDecimal quoteReturn = calcValuesDays.get(i).quote()
-                        .divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
-                        .multiply(BigDecimal.valueOf(100L));
-                BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote()
-                        .divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
-                        .multiply(BigDecimal.valueOf(100L));
-                CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
-                        compQuoteReturn);
-                divValuesDays.add(myCalcValuesDay);
+                try {
+                    BigDecimal quoteReturn = calcValuesDays.get(i).quote()
+                            .divide(calcValuesDays.get(i - 1).quote(), 25, RoundingMode.HALF_EVEN)
+                            .multiply(BigDecimal.valueOf(100L));
+                    BigDecimal compQuoteReturn = calcValuesDays.get(i).compQuote()
+                            .divide(calcValuesDays.get(i - 1).compQuote(), 25, RoundingMode.HALF_EVEN)
+                            .multiply(BigDecimal.valueOf(100L));
+                    CalcValuesDay myCalcValuesDay = new CalcValuesDay(calcValuesDays.get(i).day(), quoteReturn,
+                            compQuoteReturn);
+                    divValuesDays.add(myCalcValuesDay);
+                }catch (ArithmeticException e) {
+                    LOGGER.info("calcLinRegReturn had an error: ",e);
+                }
             }
             prevValues = calcValuesDays.get(i);
         }
@@ -373,7 +381,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
     LinearRegressionResults calcLinRegReturn(List<CalcValuesDay> calcValuesDays) {
         BigDecimalValues meanValues = this.calculateMeans(calcValuesDays);
         BigDecimal yMean = BigDecimal.valueOf(IntStream.range(0, calcValuesDays.size()).sum()).divide(
-                BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25, RoundingMode.HALF_EVEN);
+                BigDecimal.valueOf(Math.max(calcValuesDays.size(), 1)), 25, RoundingMode.HALF_EVEN);
         final int[] yValue = new int[1];
         yValue[0] = 0;
         BigDecimal crossDiviationDailyQuotes = calcValuesDays.stream()
@@ -443,11 +451,11 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
     private BigDecimalValues calculateMeans(List<CalcValuesDay> calcValuesDays) {
         BigDecimal meanDailyQuotes = calcValuesDays.stream().map(CalcValuesDay::quote)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25,
+                .divide(BigDecimal.valueOf(Math.max(calcValuesDays.size(), 1)), 25,
                         RoundingMode.HALF_EVEN);
         BigDecimal meanCompQuotes = calcValuesDays.stream().map(CalcValuesDay::compQuote)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(calcValuesDays.size() < 1 ? 1 : calcValuesDays.size()), 25,
+                .divide(BigDecimal.valueOf(Math.max(calcValuesDays.size(), 1)), 25,
                         RoundingMode.HALF_EVEN);
         return new BigDecimalValues(meanDailyQuotes, meanCompQuotes);
     }
