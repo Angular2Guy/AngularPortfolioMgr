@@ -107,7 +107,7 @@ public class YahooClientMapper {
 
 	private static DateToDto addQuoteProperties(final YahooResultWrapper dto, DateToDto myDto) {
 		Optional.ofNullable(dto.indicators()).ifPresent(myIndicators -> {
-			myDto.dto().setOpen(myIndicators.quote().stream().map(myQuote -> myQuote.close().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
+			myDto.dto().setOpen(myIndicators.quote().stream().map(myQuote -> myQuote.open().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
 			myDto.dto().setHigh(myIndicators.quote().stream().map(myQuote -> myQuote.high().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
 			myDto.dto().setVolume(myIndicators.quote().stream().map(myQuote -> myQuote.volume().get(myDto.index())).findFirst().orElse(0L));
 			myDto.dto().setLow(myIndicators.quote().stream().map(myQuote -> myQuote.low().get(myDto.index())).findFirst().orElse(BigDecimal.ZERO));
