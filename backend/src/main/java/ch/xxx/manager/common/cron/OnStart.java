@@ -66,7 +66,7 @@ public class OnStart {
 		List<SfCountryDto> sfCountries = this.financialDataService.findSfCountries();
 		LOGGER.info("Country count {}", sfCountries.size());
 		var portfolioList = this.portfolioService.findAllPortfolios();
-		portfolioList.forEach(myPortfolio -> this.portfolioService.updatePortfolioValues(myPortfolio));
+		portfolioList.forEach(this.portfolioService::updatePortfolioValues);
 		LOGGER.info("Portfolios updated {}", portfolioList.size());
 	}
 }
