@@ -369,7 +369,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
                             compQuoteReturn);
                     divValuesDays.add(myCalcValuesDay);
                 }catch (ArithmeticException e) {
-                    LOGGER.info("calcLinRegReturn had an error: ",e);
+                    LOGGER.trace("calcLinRegReturn had an error: ",e);
                 }
             }
             prevValues = calcValuesDays.get(i);
