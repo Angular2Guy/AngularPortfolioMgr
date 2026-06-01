@@ -48,7 +48,7 @@ public class ConnectorClient {
 	}
 
 	public <T> Optional<T> restCall(String url, Class<T> typeClass, Duration delay) {
-		return restCall(url, new LinkedMultiValueMap<String, String>(), typeClass, delay);
+		return restCall(url, new LinkedMultiValueMap<>(), typeClass, delay);
 	}
 	
 	public <T> Optional<T> restCall(String url, Class<T> typeClass) {
@@ -56,7 +56,7 @@ public class ConnectorClient {
 	}
 
 	public <T> Optional<T> restCall(String url, ParameterizedTypeReference<T> valueTypeRef) {
-		return restCall(url, new LinkedMultiValueMap<String, String>(), valueTypeRef);
+		return restCall(url, new LinkedMultiValueMap<>(), valueTypeRef);
 	}
 
 	public <T> Optional<T> restCall(String url, MultiValueMap<String, String> headerValues, Class<T> typeClass, Duration delay) {

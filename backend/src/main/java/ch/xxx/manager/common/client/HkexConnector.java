@@ -22,8 +22,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
-import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
 import ch.xxx.manager.stocks.HkexClient;
+import ch.xxx.manager.stocks.dto.HkSymbolImportDto;
 
 @Component
 public class HkexConnector implements HkexClient {
@@ -37,7 +37,7 @@ public class HkexConnector implements HkexClient {
 	public Optional<List<HkSymbolImportDto>> importSymbols() {
 		final String myUrl = "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json";
 		LOGGER.info(myUrl);
-		var result = this.connectorClient.restCall(myUrl, new LinkedMultiValueMap<String, String>(),
+		var result = this.connectorClient.restCall(myUrl, new LinkedMultiValueMap<>(),
 				new ParameterizedTypeReference<List<HkSymbolImportDto>>() {
 				}, Duration.ofMillis(100));
 		return result;

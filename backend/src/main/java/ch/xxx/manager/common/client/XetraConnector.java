@@ -28,7 +28,7 @@ import ch.xxx.manager.stocks.XetraClient;
 @Component
 public class XetraConnector implements XetraClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XetraConnector.class);
-	private static final String XETRA_URL = "https://www.xetra.com/xetra-de/instrumente/alle-handelbaren-instrumente";
+	private static final String XETRA_URL = "https://www.cashmarket.deutsche-boerse.com/cash-de/Handel/Handelbare-Werte-Xetra";
 	private final ConnectorClient connectorClient;
 	
 	public XetraConnector(ConnectorClient connectorClient) {
@@ -51,7 +51,7 @@ public class XetraConnector implements XetraClient {
 		// find 'href="..."' in html page
 		Pattern pattern = Pattern.compile("(href=\\\"(.*?)\\\")");
 		Matcher matcher = pattern.matcher(htmlPage);
-		List<String> hrefs = new ArrayList<String>();
+		List<String> hrefs = new ArrayList<>();
 		while (matcher.find()) {
 			hrefs.add(matcher.group(1));
 		}
@@ -64,7 +64,7 @@ public class XetraConnector implements XetraClient {
 	}
 
 	private String createCsvUrl(String href) {
-		String url = (href.contains("https://www.xetra.com") ? "" : "https://www.xetra.com")
+		String url = (href.contains("https://www.cashmarket.deutsche-boerse.com") ? "" : "https://www.cashmarket.deutsche-boerse.com")
 				+ href.replaceAll("href=\"", "").replaceAll("\"", "");
 		return url;
 	}

@@ -11,19 +11,19 @@
    limitations under the License.
  */
 package ch.xxx.manager.stocks;
-import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
 
 public enum ComparisonIndex {
 	SP500("IVV", "S&P 500 ETF", DataHelper.CurrencyKey.USD, QuoteSource.YAHOO),
 	EUROSTOXX50("SXRT.DE", "EuroStoxx 50 ETF", DataHelper.CurrencyKey.EUR, QuoteSource.YAHOO),
 	MSCI_CHINA("ICGA.DE", "Msci China ETF", DataHelper.CurrencyKey.USD, QuoteSource.YAHOO);
 
-	private String symbol;
-	private String name;
-	private CurrencyKey currencyKey;
-	private QuoteSource source;
+	private final String symbol;
+	private final String name;
+	private final CurrencyKey currencyKey;
+	private final QuoteSource source;
 
 	private ComparisonIndex(String symbol, String name, DataHelper.CurrencyKey currency, QuoteSource source) {
 		this.symbol = symbol;
