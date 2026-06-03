@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.validation.constraints.NotNull;
 
 public class FilterNumberDto {
-	public static enum Operation {SmallerEqual("<="), LargerEqual(">="), Equal("=");
-		private String value;
+	public enum Operation {SmallerEqual("<="), LargerEqual(">="), Equal("=");
+		private final String value;
 		
 		private Operation(String value) {
 			this.value = value;

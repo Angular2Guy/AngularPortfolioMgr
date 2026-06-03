@@ -105,7 +105,7 @@ public class QuoteImportService {
 						.flatMap(mySymbol -> Stream.of(this.customImport(mySymbol.getSymbol().toLowerCase(),
 								this.currencyService.getCurrencyMap(), mySymbol, delay, userKeys)))
 						.map(values -> this.saveAllDailyQuotes(values, false)).count()))
-				.reduce(0L, (a, b) -> a + b);
+				.reduce(0L, Long::sum);
 	}
 
 	private List<Symbol> findSymbolsFor(String symbol) {

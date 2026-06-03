@@ -83,27 +83,27 @@ public class FinancialDataController {
 	@GetMapping("/symbolfinancials/companyname/{companyname}")
 	public List<SymbolNameDto> findSymbolNameByName(@PathVariable("companyname") String companyName) {
 		return this.financialDataService.findSymbolFinancialsByName(companyName).stream()
-				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
+				.map(this.symbolFinancialsMapper::toRc).toList();
 	}
 
 	@GetMapping("/symbolfinancials/symbol/{symbol}")
 	public List<SymbolNameDto> findSymbolNameBySymbol(@PathVariable("symbol") String symbol) {
 		return this.financialDataService.findSymbolFinancialsBySymbol(symbol).stream()
-				.map(mySymbolFinancials -> this.symbolFinancialsMapper.toRc(mySymbolFinancials)).toList();
+				.map(this.symbolFinancialsMapper::toRc).toList();
 	}		
 	
 	@PostMapping("/search/params")
 	public List<SymbolFinancialsDto> findSymbolFinancials(
 			@RequestBody SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
 		return this.financialDataService.findSymbolFinancials(symbolFinancialsQueryParams).stream()
-				.map(mySymbolFe -> this.symbolFinancialsMapper.toDto(mySymbolFe)).collect(Collectors.toList());
+				.map(this.symbolFinancialsMapper::toDto).collect(Collectors.toList());
 	}
 
 	@PostMapping("/search/symbolfinancials/ids")
 	public List<SymbolFinancialsDto> findSymbolFinancialsByIds(
 			@RequestBody SymbolFinancialsIdParamDto symbolFinancialsIdParamDto) {
 		return this.financialDataService.findSymbolFinancialsByIds(symbolFinancialsIdParamDto.getSymbolFinancialsIds())
-				.stream().map(mySymbolFinancials -> this.symbolFinancialsMapper.toDto(mySymbolFinancials))
+				.stream().map(this.symbolFinancialsMapper::toDto)
 				.collect(Collectors.toList());
 	}
 

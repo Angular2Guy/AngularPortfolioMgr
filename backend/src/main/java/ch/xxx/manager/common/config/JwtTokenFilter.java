@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class JwtTokenFilter extends GenericFilterBean {
 
-	private JwtTokenService jwtTokenProvider;
+	private final JwtTokenService jwtTokenProvider;
 
 	public JwtTokenFilter(JwtTokenService jwtTokenProvider) {
 		this.jwtTokenProvider = jwtTokenProvider;
@@ -36,7 +36,7 @@ public class JwtTokenFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
 			throws IOException, ServletException {
 		jwtTokenProvider.resolveToken((HttpServletRequest) request).stream()
-				.filter(myToken -> this.jwtTokenProvider.validateToken(myToken)).findFirst().ifPresentOrElse(
+				.filter(this.jwtTokenProvider::validateToken).findFirst().ifPresentOrElse(
 						myToken -> SecurityContextHolder.getContext()
 								.setAuthentication(this.jwtTokenProvider.getAuthentication(myToken)),
 						() -> SecurityContextHolder.getContext().setAuthentication(null));

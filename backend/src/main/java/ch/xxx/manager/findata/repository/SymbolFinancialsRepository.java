@@ -125,7 +125,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 		}
 		LocalTime start1 = LocalTime.now();
 		result = this.entityManager.createQuery(createQuery).getResultStream()
-				.map(mySymbolFinancials -> removeDublicates(mySymbolFinancials)).limit(100)
+				.map(this::removeDublicates).limit(100)
 				.collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		return result;
@@ -148,13 +148,13 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	private SymbolFinancials removeDublicates(SymbolFinancials mySymbolFinancials) {
 		this.entityManager.detach(mySymbolFinancials);
 		List<FinancialElement> myfilteredFinancialElements = mySymbolFinancials.getFinancialElements().stream()
-				.peek(myFinancialElement -> this.entityManager.detach(myFinancialElement))
+				.peek(this.entityManager::detach)
 				.filter(StreamHelpers.distinctByKey(myFinancialElement -> ""
 						+ Optional.ofNullable(myFinancialElement.getConcept()).orElse("").trim()
 						+ myFinancialElement.getCurrency() + myFinancialElement.getValue() != null
 								? myFinancialElement.getValue().toString().trim()
 								: ""))
-				.collect(Collectors.toList());
+				.toList();
 		mySymbolFinancials.getFinancialElements().clear();
 		mySymbolFinancials.getFinancialElements().addAll(myfilteredFinancialElements);
 		return mySymbolFinancials;
@@ -217,7 +217,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 					try {
 						subTermQueue.put(new SubTerm(myDto.getOperation(), new ArrayList<>()));
 					} catch (InterruptedException e) {
-						new RuntimeException(e);
+                        throw new RuntimeException(e);
 					}
 				}
 				case Query -> {

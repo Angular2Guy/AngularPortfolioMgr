@@ -3,7 +3,7 @@
 
 Author: Sven Loesekann
 
-Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka, Tink
+Technologies: Angular, Angular-Cli, Angular-Material, Typescript, Spring Boot, Java, Spring Data Jpa, Spring Modulith, ArchUnit, Liquibase, Gradle, Docker, H2, Postgresql, Apache Kafka, Tink
 
 [![CodeQL](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/AngularPortfolioMgr/actions/workflows/codeql-analysis.yml)
 
@@ -32,7 +32,7 @@ The goal is to provide a Portfolio Management Application to compare different p
 The project can now serve as an example of howto integrate Angular and Spring Boot with Gradle as a build tool.
 * The Gradle build is done. 
 * The security setup is done. It uses Jwt Tokens and has an auto refresh feature in the frontend and a rest endpoint in the backend. Apache Kafka can be used for Jwt Token revocation. The error handling for problems with Kafka events is implemented with transaction rollback.
-* The Angular fronted displays several D3 charts and statistics. Comparison indexes have been added to the to the charts and statistics.
+* The Angular fronted displays several D3 charts and statistics. Comparison indexes have been added to the charts and statistics.
 * The import of the Kaggle SEC Filings dataset is implemented and optimized. 
 * The UI for the search in the SEC Filings data set uses Drag and Drop and displays the results in a Angular Components table or in an Angular Components tree of Angular Components tables.
 * The search of the SEC Filings uses the Jpa Criteria Api to dynamicaly generate the query requested by the frontend.
@@ -42,6 +42,7 @@ The project can now serve as an example of howto integrate Angular and Spring Bo
 * The scrolling Dateline chart is added to show how a portfolio evolves over time.
 * Support for a separate Api Key pair for each user is implemented to support the import/update for the quotes.
 * The User Api Keys are encrypted with Tink. 
+* Architecture support with Spring Modulith and 2 modules
 
 The current state of the project is that a multi user portfolio management is implemented and is ready for use. 
 

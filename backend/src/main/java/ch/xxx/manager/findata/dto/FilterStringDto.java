@@ -17,8 +17,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.validation.constraints.NotNull;
 
 public class FilterStringDto {
-	public static enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=*");
-		private String value;
+	public enum Operation {StartsWith("=*"), EndsWith("*="), Equal("="), Contains("*=*");
+		private final String value;
 		
 		private Operation(String value) {
 			this.value = value;

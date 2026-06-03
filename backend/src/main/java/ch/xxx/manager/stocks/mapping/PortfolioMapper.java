@@ -60,7 +60,7 @@ public class PortfolioMapper {
 			}
 		});
 		List<SymbolDto> symbolDtos = mapRef.get().entrySet().stream()
-				.filter(myEntry -> myEntry.getValue().getRemovedAt() == null).map(myEntry -> myEntry.getValue())
+				.filter(myEntry -> myEntry.getValue().getRemovedAt() == null).map(Map.Entry::getValue)
 				.toList();
 		result.getSymbols().clear();
 		result.getSymbols().addAll(symbolDtos);
@@ -93,7 +93,7 @@ public class PortfolioMapper {
 
 		dto.setCurrencyKey(portfolio.getCurrencyKey());
 		dto.getSymbols()
-				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(() -> Set.of()).stream()
+				.addAll(Optional.ofNullable(portfolio.getPortfolioToSymbols()).orElseGet(Set::of).stream()
 						.flatMap(pts -> Stream.of(this.symbolMapper.convert(pts.getSymbol(), pts)))
 						.collect(Collectors.toList()));
 		List<PortfolioElementDto> myPortfolioElements = Optional.ofNullable(portfolioElements).orElse(List.of())

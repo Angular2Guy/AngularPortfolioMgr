@@ -45,19 +45,19 @@ public class SymbolFinancialsImportMapper {
 		financialsDataDto.setBalanceSheet(Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.BalanceSheet
 						.equals(myElment.getFinancialElementType()))
-				.map(myElement -> this.financialElementMapper.toDto(myElement))
+				.map(this.financialElementMapper::toDto)
 				.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setCashFlow(
 				Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.CashFlow
 						.equals(myElment.getFinancialElementType()))
-				.map(myElement -> this.financialElementMapper.toDto(myElement))
+				.map(this.financialElementMapper::toDto)
 						.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		financialsDataDto.setIncome(
 				Optional.ofNullable(symbolFinancials.getFinancialElements()).stream().flatMap(Set::stream)
 				.filter(myElment -> DataHelper.FinancialElementType.Income
 						.equals(myElment.getFinancialElementType()))
-				.map(myElement -> this.financialElementMapper.toDto(myElement))
+				.map(this.financialElementMapper::toDto)
 						.map(myElement -> addSymbolFinancialsDto(dto, myElement)).collect(Collectors.toSet()));
 		dto.setData(financialsDataDto);
 		return dto;

@@ -99,9 +99,9 @@ public class SymbolImportService {
 						this.decrypt(myAppUser.getAlphavantageKey(), UUID.fromString(myAppUser.getUuid())),
 						this.decrypt(myAppUser.getRapidApiKey(), UUID.fromString(myAppUser.getUuid()))))
 				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.alphavantageKey()).stream()
-						.filter(Predicate.not(String::isBlank)).findFirst().isPresent())
+						.anyMatch(Predicate.not(String::isBlank)))
 				.filter(myUserKeys -> Optional.ofNullable(myUserKeys.RapidApiKey()).stream()
-						.filter(Predicate.not(String::isBlank)).findFirst().isPresent())
+						.anyMatch(Predicate.not(String::isBlank)))
 				.toList();
 		LOGGER.info("UserKeys size: {}", allUserKeys.size());
 		final AtomicLong indexDaily = new AtomicLong(-1L);
@@ -110,7 +110,7 @@ public class SymbolImportService {
 			long userKeyIndex = Math.floorDiv(myIndex, PORTFOLIO_SYMBOL_LIMIT);
 			return Stream.of(this.quoteImportService.importUpdateDailyQuotes(mySymbol.getSymbol(),
 					Duration.ofMillis(100), allUserKeys.get((Long.valueOf(userKeyIndex).intValue()))));
-		}).reduce(0L, (acc, value) -> acc + value);
+		}).reduce(0L, Long::sum);
 		LOGGER.info("Daily Quote import done for: {}", quoteCount);
 		LOGGER.info("updateSymbolQuotes done.");
 		return CompletableFuture.completedFuture(quoteCount);
@@ -169,7 +169,7 @@ public class SymbolImportService {
 		List<Symbol> result = this.repository.saveAll(xetra.stream().filter(this::filter).filter(this::filterXetra)
 				.flatMap(SymbolImportService::convertXetra).collect(Collectors.groupingBy(Symbol::getSymbol)).entrySet()
 				.stream()
-				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().get(0)))
+				.flatMap(group -> group.getValue().isEmpty() ? Stream.empty() : Stream.of(group.getValue().getFirst()))
 				.flatMap(this::replaceEntity).collect(Collectors.toList()));
 		return Long.valueOf(result.size());
 	}
@@ -222,7 +222,7 @@ public class SymbolImportService {
 
 	private Stream<Symbol> replaceEntity(Symbol entity) {
 		return this.updateEntity(this.allSymbolEntities.get().stream()
-				.filter(mySymbol -> mySymbol.getSymbol().toLowerCase().equals(entity.getSymbol().toLowerCase()))
+				.filter(mySymbol -> mySymbol.getSymbol().equalsIgnoreCase(entity.getSymbol()))
 				.findFirst().orElse(entity), entity);
 	}
 

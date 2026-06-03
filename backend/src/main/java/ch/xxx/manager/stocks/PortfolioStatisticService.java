@@ -202,7 +202,7 @@ public class PortfolioStatisticService extends PortfolioCalculcationBase {
                 25, RoundingMode.HALF_EVEN);
         final var standardDeviation = adjClosePercents.entrySet().stream().map(Entry::getValue)
                 .map(myValue -> myValue.subtract(adjCloseMean)).map(myValue -> myValue.multiply(myValue))
-                .reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value)).multiply(divisor, MathContext.DECIMAL128)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).multiply(divisor, MathContext.DECIMAL128)
                 .sqrt(MathContext.DECIMAL128);
         return standardDeviation;
     }

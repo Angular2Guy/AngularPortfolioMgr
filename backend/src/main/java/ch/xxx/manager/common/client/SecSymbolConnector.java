@@ -39,7 +39,7 @@ public class SecSymbolConnector implements SecSymbolClient {
 
     @Override
     public Map<String, CompanySymbolDto> importSymbols() {
-    	MultiValueMap<String, String> headerValues = new MultiValueMapAdapter<String, String>(new HashMap<>());
+    	var headerValues = new MultiValueMapAdapter<String, String>(new HashMap<>());
     	headerValues.add("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
     	headerValues.add("accept-encoding", "gzip");
     	headerValues.add("accept-language", "en-US,en;q=0.9");

@@ -262,7 +262,7 @@ public class PortfolioCalculationService extends PortfolioCalculcationBase {
 				.flatMap(StreamHelpers::optionalStream)
 //				.peek(pe -> LOG.info("value: {}, weight: {}", pe.value(), pe.weight()))
 				.map(pe -> pe.value().multiply(BigDecimal.valueOf(pe.weight()), MathContext.DECIMAL128))
-				.reduce(BigDecimal.ZERO, (acc, value) -> acc.add(value));
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		return result;
 	}
 

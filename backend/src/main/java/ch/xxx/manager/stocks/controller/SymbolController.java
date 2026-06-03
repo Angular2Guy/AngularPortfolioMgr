@@ -72,7 +72,7 @@ public class SymbolController {
 		List<String> symbols = this.importService.importReferenceIndexes(List.of(ComparisonIndex.SP500.getSymbol(),
 				ComparisonIndex.EUROSTOXX50.getSymbol(), ComparisonIndex.MSCI_CHINA.getSymbol()));
 		Long symbolCount = symbols.stream().map(mySymbol -> this.quoteImportService.importUpdateDailyQuotes(mySymbol,
-				new UserKeys(this.apiKey, this.rapidApiKey))).reduce(0L, (acc, value) -> acc + value);
+				new UserKeys(this.apiKey, this.rapidApiKey))).reduce(0L, Long::sum);
 		LOGGER.info("Indexquotes import done for: {}", symbolCount);
 		return String.format("Indexquotes import done for: %d", symbolCount);
 	}
