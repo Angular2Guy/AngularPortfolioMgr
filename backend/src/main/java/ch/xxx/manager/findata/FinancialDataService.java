@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -140,9 +141,14 @@ public class FinancialDataService {
 	
 	@Transactional
 	public Collection<SymbolFinancials> findSymbolFinancialsBySymbol(String symbol) {
+        return Optional.ofNullable(symbol).stream().filter(mySymbol -> mySymbol.trim().isBlank()).flatMap(mySymbol ->
+                this.symbolFinancialsRepository.findBySymbol(mySymbol).stream()
+                        .filter(StreamHelpers.distinctByKey(SymbolFinancials::getSymbol))).toList();
+        /*
 		return symbol == null || symbol.trim().isBlank() ? List.of()
 				: this.symbolFinancialsRepository.findBySymbol(symbol).stream()
 				.filter(StreamHelpers.distinctByKey(SymbolFinancials::getSymbol)).toList();
+         */
 	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
