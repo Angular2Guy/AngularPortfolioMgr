@@ -22,11 +22,12 @@ export enum ItemType {
 export class FinancialsDataUtils {
   public static groupByKey<A, B>(array: A[], key: string): Map<B, A[]> {
     const resultObj = array.reduce((hash, obj) => {
-      if (obj[key] === undefined || obj[key] === null) return hash;
+      const objAny = obj as any;
+      if (objAny[key] === undefined || objAny[key] === null) return hash;
       return Object.assign(hash, {
-        [obj[key]]: (hash[obj[key]] || []).concat(obj),
+        [objAny[key]]: (hash[objAny[key]] || []).concat(obj),
       });
-    }, {});
+    }, {} as any);
     return new Map(Object.entries(resultObj)) as Map<B, A[]>;
   }
 
@@ -42,7 +43,7 @@ export class FinancialsDataUtils {
         return financialElementExt;
       }),
     );
-    return [].concat.apply([], myResult);
+    return myResult.flat();
   }
 
   public static compareNumbers(

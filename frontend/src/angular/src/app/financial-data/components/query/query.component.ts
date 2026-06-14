@@ -51,15 +51,15 @@ export enum QueryFormFields {
 export class QueryComponent implements OnInit {
   protected readonly containsOperator = "*=*";
   @Input()
-  public baseFormArray: FormArray;
+  public baseFormArray!: FormArray;
   @Input()
-  public formArrayIndex: number;
+  public formArrayIndex!: number;
   @Input()
-  public queryItemType: ItemType;
+  public queryItemType!: ItemType;
   @Output()
   public removeItem = new EventEmitter<number>();
-  private _showType: boolean;
-  private timeoutRef = null;
+  private _showType!: boolean;
+  private timeoutRef = null as any;
   protected termQueryItems: string[] = [];
   protected stringQueryItems: string[] = [];
   protected numberQueryItems: string[] = [];
@@ -95,11 +95,11 @@ export class QueryComponent implements OnInit {
   ngOnInit(): void {
     this.itemFormGroup.controls[QueryFormFields.Concept].valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200))
-      .subscribe((myValue) =>
+      .subscribe((myValue: string) =>
         this.financialDataService
           .getConcepts()
           .subscribe(
-            (myConceptList) =>
+            (myConceptList: FeConcept[]) =>
               (this.concepts = myConceptList.filter((myConcept) =>
                 FinancialsDataUtils.compareStrings(
                   myConcept.concept,
@@ -148,7 +148,7 @@ export class QueryComponent implements OnInit {
       this.configService
         .getNumberOperators()
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((values) => {
+        .subscribe((values: string[]) => {
           this.numberQueryItems = values;
           this.itemFormGroup.controls[
             QueryFormFields.NumberOperator
@@ -157,7 +157,7 @@ export class QueryComponent implements OnInit {
       this.configService
         .getStringOperators()
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((values) => {
+        .subscribe((values: string[]) => {
           this.stringQueryItems = values;
           this.itemFormGroup.controls[
             QueryFormFields.ConceptOperator
@@ -174,7 +174,7 @@ export class QueryComponent implements OnInit {
         this.configService
           .getQueryOperators()
           .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe((values) => {
+          .subscribe((values: string[]) => {
             this.termQueryItems = values;
             this.itemFormGroup.controls[
               QueryFormFields.QueryOperator

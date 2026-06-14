@@ -43,8 +43,8 @@ enum FormFields {
 export class ImportFinancialsComponent implements OnInit {
   protected financialsForm: FormGroup;
   protected FormFields = FormFields;
-  protected filepath: string = null;
-  protected filename: string = null;
+  protected filepath: string = '';
+  protected filename: string = '';
   protected ImportDataType = ImportDataType;
 
   constructor(

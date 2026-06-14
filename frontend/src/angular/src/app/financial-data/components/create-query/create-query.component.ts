@@ -45,13 +45,15 @@ import {
   FilterNumber,
 } from "../../model/symbol-financials-query-params";
 import { switchMap, debounceTime, delay, filter } from "rxjs/operators";
-import { SymbolService } from "src/app/service/symbol.service";
-import { ConfigService } from "src/app/service/config.service";
+import { SymbolService } from "../../../service/symbol.service";
+import { ConfigService } from "../../../service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { QueryFormFields } from "../query/query.component";
-import { Symbol } from "src/app/model/symbol";
+import { Symbol } from "../../../model/symbol";
 import { SfSymbolName } from "../../model/sf-symbol-name";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { QuarterData } from "../../model/quarter-data";
+import { FeCountry } from "../../model/fe-country";
 
 export interface MyItem {
   queryItemType: ItemType;
@@ -95,12 +97,12 @@ export class CreateQueryComponent implements OnInit {
   ];
   protected readonly availableItemParams = {
     showType: true,
-    formArray: null,
+    formArray: new FormArray([] as any[]),
     formArrayIndex: -1,
   } as ItemParams;
   protected readonly queryItemParams = {
     showType: false,
-    formArray: {},
+    formArray: new FormArray([] as any[]),
     formArrayIndex: -1,
   } as ItemParams;
   protected queryForm: FormGroup;
@@ -145,7 +147,7 @@ export class CreateQueryComponent implements OnInit {
     //delay(0) fixes "NG0100: Expression has changed after it was checked" exception
     this.queryForm.statusChanges
       .pipe(delay(0))
-      .subscribe((result) => (this.formStatus = result));
+      .subscribe((result: string) => (this.formStatus = result));
   }
 
   ngOnInit(): void {
@@ -156,40 +158,40 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
-        filter((myValue) => !!myValue),
-        switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue)),
+        filter((myValue: string) => !!myValue),
+        switchMap((myValue: string) => this.symbolService.getSymbolBySymbol(myValue)),
       )
-      .subscribe((myValue) => (this.symbols = myValue));
+      .subscribe((myValue: Symbol[]) => (this.symbols = myValue));
     this.queryForm.controls[FormFields.Name].valueChanges
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
-        filter((myValue) => !!myValue),
-        switchMap((myValue) =>
+        filter((myValue: string) => !!myValue),
+        switchMap((myValue: string) =>
           this.financialDataService.getSymbolNamesByCompanyName(myValue),
         ),
       )
-      .subscribe((myValue) => (this.sfSymbolNames = myValue));
+      .subscribe((myValue: SfSymbolName[]) => (this.sfSymbolNames = myValue));
 
-    this.configService.getNumberOperators().subscribe((values) => {
+    this.configService.getNumberOperators().subscribe((values: string[]) => {
       this.yearOperators = values;
       this.queryForm.controls[FormFields.YearOperator].patchValue(
-        values.filter((myValue) => myValue === "=")[0],
+        values.filter((myValue: string) => myValue === "=")[0],
       );
     });
     this.financialDataService
       .getQuarters()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
-        (values) =>
-          (this.quarterQueryItems = values.map((myValue) => myValue.quarter)),
+        (values: QuarterData[]) =>
+          (this.quarterQueryItems = values.map((myValue: QuarterData) => myValue.quarter)),
       );
     this.financialDataService
       .getCountries()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
-        (values) =>
-          (this.countryQueryItems = values.map((myValue) => myValue.country)),
+        (values: FeCountry[]) =>
+          (this.countryQueryItems = values.map((myValue: FeCountry) => myValue.country)),
       );
   }
 
@@ -200,10 +202,9 @@ export class CreateQueryComponent implements OnInit {
         event.previousIndex,
         event.currentIndex,
       );
-      const myFormArrayItem = this.queryForm[
-        FormFields.QueryItems
-      ].value.splice(event.previousIndex, 1)[0];
-      this.queryForm[FormFields.QueryItems].value.splice(
+      const queryItemsArray = this.queryForm.controls[FormFields.QueryItems] as FormArray;
+      const myFormArrayItem = queryItemsArray.value.splice(event.previousIndex, 1)[0];
+      queryItemsArray.value.splice(
         event.currentIndex,
         0,
         myFormArrayItem,
@@ -246,7 +247,7 @@ export class CreateQueryComponent implements OnInit {
       financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]
         ?.value?.length
         ? this.queryForm.controls[FormFields.QueryItems].value.map(
-            (myFormGroup) => this.createFinancialElementParam(myFormGroup),
+            (myFormGroup: FormGroup) => this.createFinancialElementParam(myFormGroup),
           )
         : [],
     } as SymbolFinancialsQueryParams;
@@ -255,7 +256,7 @@ export class CreateQueryComponent implements OnInit {
     this.financialDataService
       .postSymbolFinancialsParam(symbolFinancialsParams)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result) => {
+      .subscribe((result: SymbolFinancials[]) => {
         this.processQueryResult(result, symbolFinancialsParams);
         this.showSpinner.emit(false);
       });
@@ -301,15 +302,15 @@ export class CreateQueryComponent implements OnInit {
     //console.log(formGroup);
     return {
       conceptFilter: {
-        operation: formGroup[QueryFormFields.ConceptOperator],
-        value: formGroup[QueryFormFields.Concept],
+        operation: formGroup.get(QueryFormFields.ConceptOperator)?.value,
+        value: formGroup.get(QueryFormFields.Concept)?.value,
       },
       valueFilter: {
-        operation: formGroup[QueryFormFields.NumberOperator],
-        value: formGroup[QueryFormFields.NumberValue],
+        operation: formGroup.get(QueryFormFields.NumberOperator)?.value,
+        value: formGroup.get(QueryFormFields.NumberValue)?.value,
       },
-      operation: formGroup[QueryFormFields.QueryOperator],
-      termType: formGroup[QueryFormFields.ItemType],
+      operation: formGroup.get(QueryFormFields.QueryOperator)?.value,
+      termType: formGroup.get(QueryFormFields.ItemType)?.value,
     } as FinancialElementParams;
   }
 

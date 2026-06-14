@@ -42,10 +42,10 @@ import { QuoteImportService } from "src/app/service/quote-import.service";
   standalone: false,
 })
 export class OverviewComponent implements OnInit {
-  protected windowHeight: number = null;
+  protected windowHeight: number = 0;
   protected symbolFinancials: SymbolFinancials[] = [];
   protected financialElements: FinancialElementExt[] = [];
-  private spinnerDialogRef: MatDialogRef<DialogSpinnerComponent, any> = null;
+  private spinnerDialogRef!: MatDialogRef<DialogSpinnerComponent, any> | null;
 
   constructor(
     private financialDataService: FinancialDataService,

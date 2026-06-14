@@ -27,7 +27,6 @@ import {
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialDataService } from "../../service/financial-data.service";
-import { CdkTree } from "@angular/cdk/tree";
 
 interface ElementNode {
   name: string;
@@ -66,9 +65,9 @@ export class ResultTreeComponent {
     "element-type",
     "quarter",
   ];
-  protected financialElement: FinancialElement = null;
+  protected financialElement!: FinancialElement;
 
-  @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;
+  @ViewChild("bottomSheet") bsTemplate!: TemplateRef<HTMLElement>;
 
   constructor(
     private financialDataService: FinancialDataService,
@@ -85,10 +84,10 @@ export class ResultTreeComponent {
 
   protected conceptClick(element: FinancialElement): void {
     //console.log(element);
-    this.financialDataService.getFeInfo(element.id).subscribe((value) => {
+    this.financialDataService.getFeInfo(element.id).subscribe((value: FeIdInfo) => {
       //console.log(value);
       this.financialElement = element;
-      this.financialElement.info = (value as FeIdInfo).info;
+      this.financialElement.info = value.info;
       this.bottomSheet.open(this.bsTemplate);
     });
   }
