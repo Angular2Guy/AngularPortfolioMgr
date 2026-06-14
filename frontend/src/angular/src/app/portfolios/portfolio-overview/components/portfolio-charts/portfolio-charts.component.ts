@@ -21,7 +21,6 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { ReplaySubject, Subject } from "rxjs";
 import { NewsItem } from "../../model/news-item";
 import { NewsService } from "../../service/news.service";
 
@@ -35,7 +34,7 @@ import { NewsService } from "../../service/news.service";
 export class PortfolioChartsComponent implements OnInit {
   protected cnbcFinanceNews: NewsItem[] = [];
   protected seekingAlphaNews: NewsItem[] = [];
-  selPortfolio: Portfolio;
+  selPortfolio: Portfolio = {} as Portfolio;
   reloadData = false;
 
   constructor(
@@ -48,22 +47,22 @@ export class PortfolioChartsComponent implements OnInit {
   ngOnInit(): void {
     this.newsService
       .getCnbcFinanceNews()
-      .subscribe((result) => (this.cnbcFinanceNews = result));
+      .subscribe((result: NewsItem[]) => (this.cnbcFinanceNews = result));
     this.newsService
       .getSeekingAlphaNews()
-      .subscribe((result) => (this.seekingAlphaNews = result));
+      .subscribe((result: NewsItem[]) => (this.seekingAlphaNews = result));
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        filter((params: ParamMap) => parseInt(params.get("portfolioId")) >= 0),
+        filter((params: ParamMap) => parseInt(params.get("portfolioId") ?? "-1") >= 0),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId")),
+            parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
         tap(() => (this.reloadData = false)),
       )
-      .subscribe((myData) => (this.selPortfolio = myData));
+      .subscribe((myData: Portfolio) => (this.selPortfolio = myData));
   }
 }

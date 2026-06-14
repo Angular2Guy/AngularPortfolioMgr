@@ -13,12 +13,12 @@
 import { EventEmitter } from "@angular/core";
 
 export class Item<T extends Event> {
-  id: number;
-  lineId: string;
-  name: string;
-  details: string;
-  start: Date;
-  end: Date;
+  id: number = -1;
+  lineId: string = "";
+  name: string = "";
+  details: string = "";
+  start: Date = new Date();
+  end: Date = new Date();
   eventEmitter = new EventEmitter<T>();
   cssClass = "";
   headerAnchorId = "";

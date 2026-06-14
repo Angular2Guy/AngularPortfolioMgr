@@ -39,8 +39,8 @@ export class PortfolioComponent implements OnInit {
   symbols: Symbol[] = [];
   reloadData = false;
   windowHeight = 0;
-  portfolio: Portfolio;
-  selSymbol: Symbol = null;
+  portfolio!: Portfolio;
+  selSymbol!: Symbol;
   showSymbol = true;
 
   constructor(
@@ -60,13 +60,13 @@ export class PortfolioComponent implements OnInit {
         //tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId")),
+            parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
         tap(() => (this.reloadData = false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((myPortfolio) => {
+      .subscribe((myPortfolio: Portfolio) => {
         this.symbols = myPortfolio.symbols;
         this.selSymbol =
           myPortfolio?.symbols.length > 0

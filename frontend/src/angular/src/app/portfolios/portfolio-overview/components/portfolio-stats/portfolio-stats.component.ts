@@ -23,5 +23,5 @@ import { Portfolio } from "src/app/model/portfolio";
 export class PortfolioStatsComponent {
   protected readonly years = [1, 2, 5, 10];
   @Input()
-  selPortfolio: Portfolio;
+  selPortfolio: Portfolio = {} as Portfolio;
 }

@@ -48,7 +48,7 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
   standalone: false,
 })
 export class OverviewComponent implements OnInit {
-  protected windowHeight: number = null;
+  protected windowHeight: number = 0;
   portfolios: Portfolio[] = [];
   myPortfolio!: Portfolio;
   displayedColumns = [
@@ -65,7 +65,7 @@ export class OverviewComponent implements OnInit {
   //limit 250
   countPortfolioSymbolsByUserId = 1000000;
   private timeoutId = -1;
-  protected profiles: string = null;
+  protected profiles: string = '';
   private showPortfolioTable = true;
 
   constructor(
@@ -85,7 +85,7 @@ export class OverviewComponent implements OnInit {
     this.configService
       .getProfiles()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((value) => {
+      .subscribe((value: string) => {
         this.profiles = !value ? "dev" : value.trim().toLowerCase();
         //this.profiles = "dev " + this.profiles;
         console.log(this.profiles);
@@ -112,7 +112,7 @@ export class OverviewComponent implements OnInit {
       year10: null,
       year2: null,
       year5: null,
-    };
+    } as unknown as Portfolio;
     const newPortfolioData: PortfolioData = { portfolio: portfolio };
     const dialogRef = this.dialog.open(NewPortfolioComponent, {
       width: "500px",
@@ -217,10 +217,10 @@ export class OverviewComponent implements OnInit {
               portfolio,
               symbol.id,
               symbol.weight,
-              symbol.changedAt,
+              symbol.changedAt ?? '',
             )
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((result) => {
+            .subscribe((result: Portfolio) => {
               if (result) {
                 const filteredPortfolios = this.portfolios.filter(
                   (port) => port.id !== result.id,
@@ -248,7 +248,7 @@ export class OverviewComponent implements OnInit {
       this.quoteImportService.importFxDailyQuotes("HKD"),
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]) => {
+      .subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]: [string, string, string, string, string]) => {
         console.log(
           `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`,
         );
@@ -257,7 +257,7 @@ export class OverviewComponent implements OnInit {
             this.symbolImportService
               .getIndexSymbols()
               .pipe(takeUntilDestroyed(this.destroyRef))
-              .subscribe((resultIndex) => {
+              .subscribe((resultIndex: string) => {
                 console.log(`Index Symbols: ${resultIndex}`);
                 this.importingSymbols = false;
               }),
@@ -279,7 +279,7 @@ export class OverviewComponent implements OnInit {
       dialogRef
         .afterClosed()
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => (dialogRef = null));
+        .subscribe();
     }
   }
 }

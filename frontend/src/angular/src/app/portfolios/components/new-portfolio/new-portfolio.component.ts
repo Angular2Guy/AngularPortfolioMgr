@@ -57,23 +57,22 @@ export class NewPortfolioComponent {
   }
 
   onAddClick(): void {
-    const createdAt = this.portfolioForm.get(FormFields.CreatedAt)
-      .value as DateTime;
+    const createdAt = this.portfolioForm.get(FormFields.CreatedAt)?.value as DateTime;
     //createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
     const portfolio: Portfolio = {
-      id: null,
+      id: -1,
       createdAt: new Date(createdAt.toMillis()).toISOString(),
-      month1: null,
-      month6: null,
-      name: this.portfolioForm.get(FormFields.PortfolioName).value,
-      currencyKey: null,
+      month1: 0,
+      month6: 0,
+      name: this.portfolioForm.get(FormFields.PortfolioName)?.value,
+      currencyKey: '',
       symbols: [],
       portfolioElements: [],
       userId: this.tokenService.userId as number,
-      year1: null,
-      year10: null,
-      year2: null,
-      year5: null,
+      year1: 0,
+      year10: 0,
+      year2: 0,
+      year5: 0,
     };
     this.dialogRef.close(portfolio);
     /*
@@ -94,15 +93,14 @@ export class NewPortfolioComponent {
   }
 
   validate(formGroup: FormGroup) {
-    if (formGroup.get(FormFields.PortfolioName).touched) {
-      const myValue: string = formGroup.get(FormFields.PortfolioName).value;
+    if (formGroup.get(FormFields.PortfolioName)?.touched) {
+      const myValue: string = formGroup.get(FormFields.PortfolioName)?.value;
       if (myValue && myValue.trim().length > 4) {
-        formGroup.get(FormFields.PortfolioName).setErrors(null);
+        formGroup.get(FormFields.PortfolioName)?.setErrors(null);
         this.formValid = true;
       } else {
         formGroup
-          .get(FormFields.PortfolioName)
-          .setErrors({ MatchPassword: true });
+          .get(FormFields.PortfolioName)?.setErrors({ MatchPassword: true });
         this.formValid = false;
       }
     }

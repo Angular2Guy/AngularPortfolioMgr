@@ -29,8 +29,8 @@ import { Portfolio, CommonValues } from "../../../../model/portfolio";
 })
 export class SymbolOverviewComponent {
   @Input()
-  portfolio: Portfolio;
-  private localSymbol: Symbol;
+  portfolio!: Portfolio;
+  private localSymbol!: Symbol;
   serviceUtils = ServiceUtils;
 
   constructor() {}

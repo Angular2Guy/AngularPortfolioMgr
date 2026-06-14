@@ -56,7 +56,7 @@ interface CalcPortfolioElement {
   standalone: false,
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
-  localSelPortfolio: Portfolio;
+  localSelPortfolio: Portfolio = {} as Portfolio;
   chartSlices: ChartSlices = {
     title: "",
     from: "",
@@ -66,7 +66,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   };
   chartsLoading = true;
   @ViewChild("hideMe")
-  divHideMe: ElementRef;
+  divHideMe!: ElementRef;
   afterViewInitCalled = false;
   chartState: "ready" | "not-ready" = "not-ready";
   slicesSum = 1;
@@ -121,7 +121,7 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
         myMap.set(cpe.sector, myValue + cpe.value);
         return myMap;
       }, new Map<string, number>());
-    let calcColors = [];
+    let calcColors = [] as string[];
     while (calcColors.length < valueMap.size) {
       calcColors = calcColors.concat(sliceColors);
     }

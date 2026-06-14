@@ -49,15 +49,15 @@ interface ChartPeriod {
   standalone: false,
 })
 export class PortfolioComparisonComponent implements OnInit {
-  localSelPortfolio: Portfolio;
-  startDate: Date;
+  localSelPortfolio: Portfolio = {} as Portfolio;
+  startDate!: Date;
   chartPeriods: ChartPeriod[] = [];
   chartsLoading = true;
   readonly ComparisonIndex = ComparisonIndex;
   showSP500 = false;
   showMsciCH = false;
   showES50 = false;
-  selChartPeriod: ChartPeriod = null;
+  selChartPeriod: ChartPeriod = {} as ChartPeriod;
   chartBars!: ChartBars;
   selCompIndexes: ComparisonIndex[] = [];
 
@@ -134,7 +134,7 @@ export class PortfolioComparisonComponent implements OnInit {
           this.selCompIndexes,
         )
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((result) => this.updateChartData(result));
+        .subscribe((result: PortfolioBars) => this.updateChartData(result));
     }
   }
 

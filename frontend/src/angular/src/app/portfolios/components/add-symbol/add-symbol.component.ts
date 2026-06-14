@@ -58,9 +58,9 @@ enum FormFields {
   standalone: false,
 })
 export class AddSymbolComponent implements OnInit {
-  private portfolio: Portfolio = null;
+  private portfolio!: Portfolio;
   symbolForm: FormGroup;
-  selSymbol: Symbol = null;
+  selSymbol!: Symbol;
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
   loading = false;
@@ -91,9 +91,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.symbolsName = this.symbolForm
-      .get(FormFields.SymbolName)
-      .valueChanges.pipe(
+    this.symbolsName = this.symbolForm.get(FormFields.SymbolName)?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
         tap(() => (this.loading = true)),
@@ -110,18 +108,16 @@ export class AddSymbolComponent implements OnInit {
         ),
         tap(() => (this.loading = false)),
       );
-    this.symbolsSymbol = this.symbolForm
-      .get(FormFields.SymbolSymbol)
-      .valueChanges.pipe(
+    this.symbolsSymbol = this.symbolForm.get(FormFields.SymbolSymbol)?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
         tap(() => (this.loading = true)),
-        switchMap((name) =>
+        switchMap((name: string) =>
           name && name.length >= 2
             ? this.symbolService
                 .getSymbolBySymbol(name)
                 .pipe(
-                  map((localSymbols) =>
+                  map((localSymbols: Symbol[]) =>
                     this.filterPortfolioSymbols(localSymbols),
                   ),
                 )
@@ -140,7 +136,7 @@ export class AddSymbolComponent implements OnInit {
   }
 
   private clearSymbol(): Observable<Symbol[]> {
-    this.selSymbol = null;
+    this.selSymbol = {} as Symbol;
     return of([]) as Observable<Symbol[]>;
   }
 
@@ -177,7 +173,7 @@ export class AddSymbolComponent implements OnInit {
         this.quoteImportService.importIntraDayQuotes(this.selSymbol.symbol),
       )
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(([resultDaily, resultIntraDay]) => {
+        .subscribe(([resultDaily, resultIntraDay]: [string, string]) => {
           console.log(
             `Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`,
           );

@@ -13,15 +13,12 @@
 import {
   Component,
   OnInit,
-  Input,
-  OnDestroy,
   DestroyRef,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { MatTableDataSource } from "@angular/material/table";
 import { Portfolio, CommonValues } from "../../../model/portfolio";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
-import { Subscription } from "rxjs";
 import { switchMap, tap, filter, mergeMap } from "rxjs/operators";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -37,7 +34,7 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
   standalone: false,
 })
 export class PortfolioTableComponent implements OnInit {
-  private myLocalPortfolio: Portfolio = null;
+  private myLocalPortfolio!: Portfolio;
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = [
     "name",
@@ -62,17 +59,17 @@ export class PortfolioTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
-        filter((params: ParamMap) => parseInt(params.get("portfolioId")) >= 0),
+        filter((params: ParamMap) => parseInt(params.get("portfolioId") ?? "-1") >= 0),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
-            parseInt(params.get("portfolioId")),
+            parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
         tap(() => (this.reloadData = false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((myData) => (this.localPortfolio = myData));
+      .subscribe((myData: Portfolio) => (this.localPortfolio = myData));
   }
 
   updateStock(event: MouseEvent, element: CommonValues) {
@@ -90,14 +87,14 @@ export class PortfolioTableComponent implements OnInit {
       .subscribe((result: PortfolioElement) => {
         //console.log(result);
         const myPortfolio = {
-          createdAt: this.localPortfolio?.createdAt,
-          currencyKey: this.localPortfolio?.currencyKey,
-          id: this.localPortfolio?.id,
-          name: this.localPortfolio.name,
+          createdAt: this.localPortfolio?.createdAt ?? '',
+          currencyKey: this.localPortfolio?.currencyKey ?? '',
+          id: this.localPortfolio?.id ?? -1,
+          name: this.localPortfolio?.name ?? '',
           portfolioElements: [],
           symbols: [],
-          userId: this.localPortfolio.userId,
-        } as Portfolio;
+          userId: this.localPortfolio?.userId ?? '',
+        } as unknown as Portfolio;
         if (!!result && result.weight > 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
             (mySymbol) => mySymbol.symbol === result.symbol,
@@ -107,10 +104,10 @@ export class PortfolioTableComponent implements OnInit {
               myPortfolio,
               mySymbol.id,
               result.weight,
-              result.changedAt,
+              result.changedAt ?? '',
             )
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((myResult) => (this.localPortfolio = myResult));
+            .subscribe((myResult: Portfolio) => (this.localPortfolio = myResult));
         } else if (!!result && result.weight <= 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
             (mySymbol) => mySymbol.symbol === result.symbol,
@@ -119,15 +116,15 @@ export class PortfolioTableComponent implements OnInit {
             .deleteSymbolFromPortfolio(
               myPortfolio,
               mySymbol.id,
-              result.changedAt,
+              result.changedAt ?? '',
             )
             .pipe(
-              mergeMap((xyz) =>
+              mergeMap(() =>
                 this.portfolioService.getPortfolioById(myPortfolio.id),
               ),
               takeUntilDestroyed(this.destroyRef),
             )
-            .subscribe((myResult) => (this.localPortfolio = myResult));
+            .subscribe((myResult: Portfolio) => (this.localPortfolio = myResult));
         }
       });
   }

@@ -35,7 +35,7 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 })
 export class PortfolioTimechartComponent implements OnInit {
   @Input({ required: true })
-  public selPortfolio: Portfolio;
+  public selPortfolio: Portfolio = {} as Portfolio;
   protected start = new Date();
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
@@ -117,7 +117,7 @@ export class PortfolioTimechartComponent implements OnInit {
     myItem.name = "MyName2";
     myItem.details = "MyDetails2";
     myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();
-    myItem.end = null;
+    myItem.end = new Date();
     this.items.push(myItem);
   }
 }

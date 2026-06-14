@@ -83,19 +83,19 @@ export class LoginComponent implements OnInit {
 
   validate(group: FormGroup) {
     if (
-      group.get(FormFields.Password).touched ||
-      group.get(FormFields.Password2).touched
+      group.get(FormFields.Password)?.touched ||
+      group.get(FormFields.Password2)?.touched
     ) {
       this.pwMatching =
-        group.get(FormFields.Password).value ===
-          group.get(FormFields.Password2).value &&
-        group.get(FormFields.Password).value !== "";
+        group.get(FormFields.Password)?.value ===
+          group.get(FormFields.Password2)?.value &&
+        group.get(FormFields.Password)?.value !== "";
       if (!this.pwMatching) {
-        group.get(FormFields.Password).setErrors({ MatchPassword: true });
-        group.get(FormFields.Password2).setErrors({ MatchPassword: true });
+        group.get(FormFields.Password)?.setErrors({ MatchPassword: true });
+        group.get(FormFields.Password2)?.setErrors({ MatchPassword: true });
       } else {
-        group.get(FormFields.Password).setErrors(null);
-        group.get(FormFields.Password2).setErrors(null);
+        group.get(FormFields.Password)?.setErrors(null);
+        group.get(FormFields.Password2)?.setErrors(null);
       }
     }
     return this.pwMatching;
@@ -103,46 +103,46 @@ export class LoginComponent implements OnInit {
 
   onSigninClick(): void {
     const login: Login = {
-      emailAddress: null,
-      token: null,
-      password: null,
-      username: null,
-      alphavantageKey: null,
-      rapidApiKey: null,
+      emailAddress: '',
+      token: '',
+      password: '',
+      username: '',
+      alphavantageKey: '',
+      rapidApiKey: '',
     };
-    login.username = this.signinForm.get(FormFields.Username).value;
-    login.password = this.signinForm.get(FormFields.Password).value;
-    login.emailAddress = this.signinForm.get(FormFields.Email).value;
+    login.username = this.signinForm.get(FormFields.Username)?.value;
+    login.password = this.signinForm.get(FormFields.Password)?.value;
+    login.emailAddress = this.signinForm.get(FormFields.Email)?.value;
     login.alphavantageKey = this.signinForm.get(
       FormFields.AlphavantageKey,
-    ).value;
-    login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey).value;
+    )?.value;
+    login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey)?.value;
     this.waitingForResponse = true;
     this.loginService
       .postSignin(login)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => this.signin(res),
-        error: (err) => console.log(err),
+        next: (res: boolean) => this.signin(res),
+        error: (err: Error) => console.log(err),
       });
   }
 
   onLoginClick(): void {
     const login: Login = {
-      emailAddress: null,
-      token: null,
-      password: null,
-      username: null,
+      emailAddress: '',
+      token: '',
+      password: '',
+      username: '',
     };
-    login.username = this.loginForm.get(FormFields.Username).value;
-    login.password = this.loginForm.get(FormFields.Password).value;
+    login.username = this.loginForm.get(FormFields.Username)?.value;
+    login.password = this.loginForm.get(FormFields.Password)?.value;
     this.waitingForResponse = true;
     this.loginService
       .postLogin(login)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => this.login(res),
-        error: (err) => console.log(err),
+        next: (res: Login) => this.login(res),
+        error: (err: Error) => console.log(err),
       });
   }
 

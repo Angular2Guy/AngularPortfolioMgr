@@ -20,8 +20,8 @@ import { tap } from "rxjs/operators";
   providedIn: "root",
 })
 export class ConfigService {
-  private profiles: string = null;
-  private importPath: string = null;
+  private profiles: string = '';
+  private importPath: string = '';
   private stringOperators: string[] = [];
   private numberOperators: string[] = [];
   private queryOperators: string[] = [];
@@ -32,8 +32,8 @@ export class ConfigService {
   getProfiles(): Observable<string> {
     if (!this.profiles) {
       return this.http
-        .get(`/rest/config/profiles`, { responseType: "text" })
-        .pipe(tap((value) => (this.profiles = value)));
+        .get<string>(`/rest/config/profiles`)
+        .pipe(tap((value: string) => (this.profiles = value)));
     } else {
       return of(this.profiles);
     }
@@ -42,8 +42,8 @@ export class ConfigService {
   getImportPath(): Observable<string> {
     if (!this.importPath) {
       return this.http
-        .get(`/rest/config/importpath`, { responseType: "text" })
-        .pipe(tap((value) => (this.importPath = value)));
+        .get<string>(`/rest/config/importpath`)
+        .pipe(tap((value: string) => (this.importPath = value)));
     } else {
       return of(this.importPath);
     }
@@ -55,7 +55,7 @@ export class ConfigService {
     } else {
       return this.http
         .get<string[]>("/rest/config/operators/string")
-        .pipe(tap((value) => (this.stringOperators = value)));
+        .pipe(tap((value: string[]) => (this.stringOperators = value)));
     }
   }
 
@@ -65,7 +65,7 @@ export class ConfigService {
     } else {
       return this.http
         .get<string[]>("/rest/config/operators/number")
-        .pipe(tap((value) => (this.numberOperators = value)));
+        .pipe(tap((value: string[]) => (this.numberOperators = value)));
     }
   }
 
@@ -75,7 +75,7 @@ export class ConfigService {
     } else {
       return this.http
         .get<string[]>("/rest/config/operators/query")
-        .pipe(tap((value) => (this.queryOperators = value)));
+        .pipe(tap((value: string[]) => (this.queryOperators = value)));
     }
   }
 }
