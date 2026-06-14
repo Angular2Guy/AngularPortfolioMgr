@@ -18,13 +18,13 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { DateTime } from "luxon";
-import { Portfolio } from "src/app/model/portfolio";
-import { Symbol } from "src/app/model/symbol";
-import { ServiceUtils } from "src/app/model/service-utils";
-import { PortfolioService } from "src/app/service/portfolio.service";
+import { Portfolio } from "../../../../model/portfolio";
+import { Symbol } from "../../../../model/symbol";
+import { ServiceUtils } from "../../../../model/service-utils";
+import { PortfolioService } from "../../../../service/portfolio.service";
 import { ChartItem } from "ngx-simple-charts/date-time";
 import { Item } from "../../model/item";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 
 @Component({
   selector: "app-portfolio-timechart",
@@ -35,7 +35,7 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 })
 export class PortfolioTimechartComponent implements OnInit {
   @Input({ required: true })
-  public selPortfolio: Portfolio = {} as Portfolio;
+  public selPortfolio!: Portfolio;
   protected start = new Date();
   protected items: ChartItem<Event>[] = [];
   protected showDays = false;
@@ -49,7 +49,7 @@ export class PortfolioTimechartComponent implements OnInit {
     this.portfolioService
       .getPortfolioByIdWithHistory(this.selPortfolio.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result) => {
+      .subscribe((result: Portfolio) => {
         //console.log(result);
         const myMap = result.symbols
           .filter(
@@ -57,7 +57,7 @@ export class PortfolioTimechartComponent implements OnInit {
               !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER),
           )
           .reduce((acc, mySymbol) => {
-            const myValue = !acc[mySymbol.symbol] ? [] : acc[mySymbol.symbol];
+            const myValue = !acc.get(mySymbol.symbol) ? [] : acc.get(mySymbol.symbol) as Symbol[];
             myValue.push(mySymbol);
             acc.set(mySymbol.symbol, myValue);
             return acc;
@@ -79,7 +79,7 @@ export class PortfolioTimechartComponent implements OnInit {
           let myItem = new ChartItem<Event>();
           myItem.id = myIndex;
           myItem.lineId = myKey;
-          myItem.details = myValue[0].description;
+          myItem.details = myValue[0].description ?? '';
           myItem.name = myValue[0].name;
           myItem.start = myStart;
           myItem.end = myEnd;
