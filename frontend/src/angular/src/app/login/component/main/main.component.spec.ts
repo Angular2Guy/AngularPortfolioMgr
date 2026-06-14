@@ -26,7 +26,7 @@ import { Login } from "../../model/login";
 import { LoginService } from "../../service/login.service";
 
 import { MainComponent } from "./main.component";
-import { BaseModule } from "src/app/base/base.module";
+import { BaseModule } from "../../../base/base.module";
 import { LoginComponent } from "../login/login.component";
 import { MatInputModule } from "@angular/material/input";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
@@ -36,8 +36,8 @@ import { MatButtonModule } from "@angular/material/button";
 describe("MainComponent", () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
-  let tokenService: TokenService;
-  let loginService: LoginService;
+  let tokenService!: TokenService;
+  let loginService!: LoginService;
   let matDialog: MatDialog;
   let router: ActivatedRoute;
 

@@ -25,7 +25,7 @@ describe("LoginService", () => {
     username: "username",
     token: "token",
   } as Login;
-  let service: LoginService = null;
+  let service!: LoginService;
   let obsSpy;
   beforeEach(() => {
     const httpSpy = jasmine.createSpyObj("http", ["post"]);
