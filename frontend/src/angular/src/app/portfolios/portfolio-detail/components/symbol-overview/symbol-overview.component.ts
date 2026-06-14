@@ -10,16 +10,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { Symbol } from "../../../../model/symbol";
 import { Portfolio, CommonValues } from "../../../../model/portfolio";
 
 @Component({
-    selector: "app-symbol-overview",
-    templateUrl: "./symbol-overview.component.html",
-    styleUrls: ["./symbol-overview.component.scss"],
-    standalone: false
+  selector: "app-symbol-overview",
+  templateUrl: "./symbol-overview.component.html",
+  styleUrls: ["./symbol-overview.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SymbolOverviewComponent {
   @Input()

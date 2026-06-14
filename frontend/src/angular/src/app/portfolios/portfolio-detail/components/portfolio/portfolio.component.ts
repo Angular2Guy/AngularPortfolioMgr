@@ -17,6 +17,7 @@ import {
   EventEmitter,
   ChangeDetectorRef,
   DestroyRef,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { switchMap, tap } from "rxjs/operators";
@@ -28,10 +29,11 @@ import { Subscription, Subject } from "rxjs";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-    selector: "app-portfolio",
-    templateUrl: "./portfolio.component.html",
-    styleUrls: ["./portfolio.component.scss"],
-    standalone: false
+  selector: "app-portfolio",
+  templateUrl: "./portfolio.component.html",
+  styleUrls: ["./portfolio.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class PortfolioComponent implements OnInit {
   symbols: Symbol[] = [];

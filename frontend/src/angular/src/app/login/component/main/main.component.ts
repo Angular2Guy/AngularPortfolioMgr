@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, OnDestroy, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { Login } from "../../model/login";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginComponent } from "../login/login.component";
@@ -19,10 +25,11 @@ import { Router } from "@angular/router";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-    selector: "app-main",
-    templateUrl: "./main.component.html",
-    styleUrls: ["./main.component.scss"],
-    standalone: false
+  selector: "app-main",
+  templateUrl: "./main.component.html",
+  styleUrls: ["./main.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class MainComponent {
   login: Login = null;

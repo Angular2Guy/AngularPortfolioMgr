@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Inject,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   FormGroup,
   FormBuilder,
@@ -28,10 +34,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-import-financials",
-    templateUrl: "./import-financials.component.html",
-    styleUrls: ["./import-financials.component.scss"],
-    standalone: false
+  selector: "app-import-financials",
+  templateUrl: "./import-financials.component.html",
+  styleUrls: ["./import-financials.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ImportFinancialsComponent implements OnInit {
   protected financialsForm: FormGroup;

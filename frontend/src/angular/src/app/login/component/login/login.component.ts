@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Inject,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MainComponent } from "../main/main.component";
@@ -29,10 +35,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-login",
-    templateUrl: "./login.component.html",
-    styleUrls: ["./login.component.scss"],
-    standalone: false
+  selector: "app-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class LoginComponent implements OnInit {
   signinForm: FormGroup;

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, Validators, FormBuilder } from "@angular/forms";
 import { OverviewComponent } from "../overview/overview.component";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
@@ -25,10 +25,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-new-portfolio",
-    templateUrl: "./new-portfolio.component.html",
-    styleUrls: ["./new-portfolio.component.scss"],
-    standalone: false
+  selector: "app-new-portfolio",
+  templateUrl: "./new-portfolio.component.html",
+  styleUrls: ["./new-portfolio.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class NewPortfolioComponent {
   portfolioForm: FormGroup;

@@ -22,7 +22,8 @@ import {
   ElementRef,
   AfterViewInit,
   DestroyRef,
-  DOCUMENT
+  DOCUMENT,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { Symbol } from "../../../../model/symbol";
 import {
@@ -66,10 +67,11 @@ interface SymbolData {
 }
 
 @Component({
-    selector: "app-symbol",
-    templateUrl: "./symbol.component.html",
-    styleUrls: ["./symbol.component.scss"],
-    standalone: false
+  selector: "app-symbol",
+  templateUrl: "./symbol.component.html",
+  styleUrls: ["./symbol.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SymbolComponent implements OnInit {
   private readonly dayInMs = 24 * 60 * 60 * 1000;
@@ -94,7 +96,7 @@ export class SymbolComponent implements OnInit {
     high: null,
     low: null,
     open: null,
-	accDividend: null,
+    accDividend: null,
     start: null,
     avgClose: null,
     medianClose: null,
@@ -240,8 +242,12 @@ export class SymbolComponent implements OnInit {
             .map((quote) => quote.volume)
             .reduce((result, volume) => result + volume, 0) / localQuotes.length
         : null;
-	this.symbolData.accDividend = localQuotes && localQuotes.length > 0 ? 
-	localQuotes.map((quote) => quote.dividend).reduce((result, dividend) => result + dividend, 0) : 0;
+    this.symbolData.accDividend =
+      localQuotes && localQuotes.length > 0
+        ? localQuotes
+            .map((quote) => quote.dividend)
+            .reduce((result, dividend) => result + dividend, 0)
+        : 0;
     this.symbolData.avgClose =
       localQuotes && localQuotes.length > 0
         ? localQuotes

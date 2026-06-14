@@ -10,7 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   MatDialog,
   MatDialogRef,
@@ -22,10 +27,11 @@ export interface SpinnerData {
 }
 
 @Component({
-    selector: "app-dialog-spinner",
-    templateUrl: "./dialog-spinner.component.html",
-    styleUrls: ["./dialog-spinner.component.scss"],
-    standalone: false
+  selector: "app-dialog-spinner",
+  templateUrl: "./dialog-spinner.component.html",
+  styleUrls: ["./dialog-spinner.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class DialogSpinnerComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) {}

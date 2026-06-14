@@ -1,14 +1,15 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { DevAppInfoService } from "../../service/dev-app-info.service";
 import { OverviewComponent } from "../overview/overview.component";
 
 @Component({
-    selector: "app-dev-config",
-    templateUrl: "./dev-config.component.html",
-    styleUrls: ["./dev-config.component.scss"],
-    standalone: false
+  selector: "app-dev-config",
+  templateUrl: "./dev-config.component.html",
+  styleUrls: ["./dev-config.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class DevConfigComponent implements OnInit {
   classNameObs: Observable<string>;

@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Inject, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Inject,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   FormGroup,
   FormBuilder,
@@ -45,10 +51,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-add-symbol",
-    templateUrl: "./add-symbol.component.html",
-    styleUrls: ["./add-symbol.component.scss"],
-    standalone: false
+  selector: "app-add-symbol",
+  templateUrl: "./add-symbol.component.html",
+  styleUrls: ["./add-symbol.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class AddSymbolComponent implements OnInit {
   private portfolio: Portfolio = null;

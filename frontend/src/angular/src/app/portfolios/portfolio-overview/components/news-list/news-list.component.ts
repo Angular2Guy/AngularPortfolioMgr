@@ -10,7 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, OnInit } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { NewsService } from "../../service/news.service";
 import {
   Observable,
@@ -25,10 +30,11 @@ import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 import { NewsItem } from "../../model/news-item";
 
 @Component({
-    selector: "app-news-list",
-    templateUrl: "./news-list.component.html",
-    styleUrl: "./news-list.component.scss",
-    standalone: false
+  selector: "app-news-list",
+  templateUrl: "./news-list.component.html",
+  styleUrl: "./news-list.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class NewsListComponent {
   @Input()

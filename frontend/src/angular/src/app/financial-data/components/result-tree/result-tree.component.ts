@@ -15,6 +15,7 @@ import {
   Input,
   TemplateRef,
   ViewChild,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatTree, MatTreeNestedDataSource } from "@angular/material/tree";
@@ -35,7 +36,7 @@ interface ElementNode {
 }
 
 interface ByElements extends ElementNode {
-  finanicalElementExts: FinancialElementExt[];    
+  finanicalElementExts: FinancialElementExt[];
 }
 
 interface ByYearElements extends ElementNode {
@@ -49,14 +50,15 @@ interface BySymbolElements extends ElementNode {
 }
 
 @Component({
-    selector: "app-result-tree",
-    templateUrl: "./result-tree.component.html",
-    styleUrls: ["./result-tree.component.scss"],
-    standalone: false
+  selector: "app-result-tree",
+  templateUrl: "./result-tree.component.html",
+  styleUrls: ["./result-tree.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];
-  protected dataSource = new MatTreeNestedDataSource<ElementNode>();  
+  protected dataSource = new MatTreeNestedDataSource<ElementNode>();
   protected displayedColumns: string[] = [
     "concept",
     "value",
@@ -66,20 +68,20 @@ export class ResultTreeComponent {
   ];
   protected financialElement: FinancialElement = null;
 
-  @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;  
+  @ViewChild("bottomSheet") bsTemplate: TemplateRef<HTMLElement>;
 
   constructor(
     private financialDataService: FinancialDataService,
     private bottomSheet: MatBottomSheet,
   ) {}
-  
-  protected childrenAccessor = (node: ElementNode) => {    
+
+  protected childrenAccessor = (node: ElementNode) => {
     return node.children ?? [];
-  }
+  };
   protected hasChild = (_: number, node: ElementNode) => {
     //console.log(node);
     return !!node.children && node.children.length > 0;
-  }      
+  };
 
   protected conceptClick(element: FinancialElement): void {
     //console.log(element);
@@ -91,16 +93,16 @@ export class ResultTreeComponent {
     });
   }
 
-  protected toggleNode(node: ByElements): void {          
-      node.children?.forEach((child) => {               
-        if (child.hasOwnProperty("finanicalElementExts")) {
-          if (child.hasOwnProperty("visible")) {
-            child.visible = !child.visible;
-          } else {
-            child.visible = true;
-          }
-          }        
-      });             
+  protected toggleNode(node: ByElements): void {
+    node.children?.forEach((child) => {
+      if (child.hasOwnProperty("finanicalElementExts")) {
+        if (child.hasOwnProperty("visible")) {
+          child.visible = !child.visible;
+        } else {
+          child.visible = true;
+        }
+      }
+    });
     //console.log(node);
   }
 
@@ -140,8 +142,8 @@ export class ResultTreeComponent {
       const byYearElements: ByYearElements[] = [];
       byYearElementsMap.forEach((value, key) => {
         const myByElements = {
-          name: "Elements",     
-          visible: false,     
+          name: "Elements",
+          visible: false,
           finanicalElementExts: value,
         } as ByElements;
         const myByYearElement = {

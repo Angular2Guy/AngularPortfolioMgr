@@ -8,50 +8,48 @@
     </span>
   }
   @if (reloadData) {
-    <span class="spinner-text" i18n="@@loading"
-      >Loading...</span
-      >
-    }
-    <span
-      ><button mat-flat-button color="primary" (click)="back()" i18n="@@back">
+    <span class="spinner-text" i18n="@@loading">Loading...</span>
+  }
+  <span
+    ><button mat-flat-button color="primary" (click)="back()" i18n="@@back">
       Back
     </button></span
-    >
-    <span
-      ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
+  >
+  <span
+    ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
       Logout
     </button></span
-    >
-  </mat-toolbar>
-  <mat-sidenav-container
-    class="container"
-    [ngStyle]="{ 'height.px': windowHeight }"
-    >
-    <mat-sidenav opened mode="side" class="symbol-list">
-      @for (symbol of symbols; track symbol) {
-        <mat-action-list>
-          <div class="symbol-line">
-            <button mat-list-item (click)="selectSymbol(symbol)">
-              {{ symbol.name }}
-            </button>
-          </div>
-        </mat-action-list>
-      }
-    </mat-sidenav>
-    <mat-sidenav-content opened mode="side">
-      @if (showSymbol) {
-        <app-symbol
-          [portfolioId]="portfolio?.id"
-          [symbol]="selSymbol"
-          [showSymbol]="showSymbol"
-          (loadingData)="updateReloadData($event)"
-        ></app-symbol>
-      }
-      @if (!showSymbol) {
-        <app-symbol-overview
-          [portfolio]="portfolio"
-          [symbol]="selSymbol"
-        ></app-symbol-overview>
-      }
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+  >
+</mat-toolbar>
+<mat-sidenav-container
+  class="container"
+  [ngStyle]="{ 'height.px': windowHeight }"
+>
+  <mat-sidenav opened mode="side" class="symbol-list">
+    @for (symbol of symbols; track symbol) {
+      <mat-action-list>
+        <div class="symbol-line">
+          <button mat-list-item (click)="selectSymbol(symbol)">
+            {{ symbol.name }}
+          </button>
+        </div>
+      </mat-action-list>
+    }
+  </mat-sidenav>
+  <mat-sidenav-content opened mode="side">
+    @if (showSymbol) {
+      <app-symbol
+        [portfolioId]="$safeNavigationMigration(portfolio?.id)"
+        [symbol]="selSymbol"
+        [showSymbol]="showSymbol"
+        (loadingData)="updateReloadData($event)"
+      ></app-symbol>
+    }
+    @if (!showSymbol) {
+      <app-symbol-overview
+        [portfolio]="portfolio"
+        [symbol]="selSymbol"
+      ></app-symbol-overview>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, HostListener, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  HostListener,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
@@ -29,10 +35,11 @@ import { ImportData, ImportDataType } from "src/app/model/import-data";
 import { QuoteImportService } from "src/app/service/quote-import.service";
 
 @Component({
-    selector: "app-overview",
-    templateUrl: "./overview.component.html",
-    styleUrls: ["./overview.component.scss"],
-    standalone: false
+  selector: "app-overview",
+  templateUrl: "./overview.component.html",
+  styleUrls: ["./overview.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;

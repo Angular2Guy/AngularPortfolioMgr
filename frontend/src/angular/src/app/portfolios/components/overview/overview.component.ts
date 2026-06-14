@@ -17,6 +17,7 @@ import {
   OnDestroy,
   DestroyRef,
   inject,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
@@ -40,10 +41,11 @@ import {
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-    selector: "app-overview",
-    templateUrl: "./overview.component.html",
-    styleUrls: ["./overview.component.scss"],
-    standalone: false
+  selector: "app-overview",
+  templateUrl: "./overview.component.html",
+  styleUrls: ["./overview.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = null;

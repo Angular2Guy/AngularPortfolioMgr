@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, DestroyRef, Inject, OnInit } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  Inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -31,10 +37,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-change-symbol",
-    templateUrl: "./change-symbol.component.html",
-    styleUrls: ["./change-symbol.component.scss"],
-    standalone: false
+  selector: "app-change-symbol",
+  templateUrl: "./change-symbol.component.html",
+  styleUrls: ["./change-symbol.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ChangeSymbolComponent implements OnInit {
   protected FormFields = FormFields;

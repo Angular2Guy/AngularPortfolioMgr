@@ -19,6 +19,7 @@ import {
   EventEmitter,
   DestroyRef,
   inject,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import {
   FinancialsDataUtils,
@@ -41,10 +42,11 @@ export enum QueryFormFields {
 }
 
 @Component({
-    selector: "app-query",
-    templateUrl: "./query.component.html",
-    styleUrls: ["./query.component.scss"],
-    standalone: false
+  selector: "app-query",
+  templateUrl: "./query.component.html",
+  styleUrls: ["./query.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class QueryComponent implements OnInit {
   protected readonly containsOperator = "*=*";

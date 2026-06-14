@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, DestroyRef, Input, OnInit } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { DateTime, Duration } from "luxon";
 import { ChartBars, ChartBar } from "ngx-simple-charts/bar";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
@@ -36,10 +42,11 @@ interface ChartPeriod {
 }
 
 @Component({
-    selector: "app-portfolio-comparison",
-    templateUrl: "./portfolio-comparison.component.html",
-    styleUrls: ["./portfolio-comparison.component.scss"],
-    standalone: false
+  selector: "app-portfolio-comparison",
+  templateUrl: "./portfolio-comparison.component.html",
+  styleUrls: ["./portfolio-comparison.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class PortfolioComparisonComponent implements OnInit {
   localSelPortfolio: Portfolio;

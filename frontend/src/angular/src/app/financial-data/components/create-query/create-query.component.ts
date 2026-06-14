@@ -18,6 +18,7 @@ import {
   EventEmitter,
   DestroyRef,
   inject,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import {
   CdkDragDrop,
@@ -76,10 +77,11 @@ enum FormFields {
 }
 
 @Component({
-    selector: "app-create-query",
-    templateUrl: "./create-query.component.html",
-    styleUrls: ["./create-query.component.scss"],
-    standalone: false
+  selector: "app-create-query",
+  templateUrl: "./create-query.component.html",
+  styleUrls: ["./create-query.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [
@@ -154,7 +156,7 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
-		filter(myValue => !!myValue),
+        filter((myValue) => !!myValue),
         switchMap((myValue) => this.symbolService.getSymbolBySymbol(myValue)),
       )
       .subscribe((myValue) => (this.symbols = myValue));
@@ -162,7 +164,7 @@ export class CreateQueryComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
-		filter(myValue => !!myValue),
+        filter((myValue) => !!myValue),
         switchMap((myValue) =>
           this.financialDataService.getSymbolNamesByCompanyName(myValue),
         ),

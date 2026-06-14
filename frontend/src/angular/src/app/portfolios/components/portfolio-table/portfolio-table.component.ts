@@ -10,7 +10,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, OnInit, Input, OnDestroy, DestroyRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Input,
+  OnDestroy,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { MatTableDataSource } from "@angular/material/table";
 import { Portfolio, CommonValues } from "../../../model/portfolio";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
@@ -23,10 +30,11 @@ import { PortfolioElement } from "src/app/model/portfolio-element";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-    selector: "app-portfolio-table",
-    templateUrl: "./portfolio-table.component.html",
-    styleUrls: ["./portfolio-table.component.scss"],
-    standalone: false
+  selector: "app-portfolio-table",
+  templateUrl: "./portfolio-table.component.html",
+  styleUrls: ["./portfolio-table.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class PortfolioTableComponent implements OnInit {
   private myLocalPortfolio: Portfolio = null;

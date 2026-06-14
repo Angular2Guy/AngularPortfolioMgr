@@ -17,6 +17,7 @@ import {
   HttpClientModule,
   provideHttpClient,
   withInterceptorsFromDi,
+  withXhr,
 } from "@angular/common/http";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { DialogSpinnerComponent } from "./components/dialog-spinner/dialog-spinner.component";
@@ -36,6 +37,6 @@ import { DialogSpinnerComponent } from "./components/dialog-spinner/dialog-spinn
     ReactiveFormsModule,
     MatProgressSpinnerModule,
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
+  providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())],
 })
 export class BaseModule {}

@@ -10,7 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, DestroyRef, Input, OnInit } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { DateTime } from "luxon";
 import { Portfolio } from "src/app/model/portfolio";
 import { Symbol } from "src/app/model/symbol";
@@ -21,10 +27,11 @@ import { Item } from "../../model/item";
 import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 
 @Component({
-    selector: "app-portfolio-timechart",
-    templateUrl: "./portfolio-timechart.component.html",
-    styleUrls: ["./portfolio-timechart.component.scss"],
-    standalone: false
+  selector: "app-portfolio-timechart",
+  templateUrl: "./portfolio-timechart.component.html",
+  styleUrls: ["./portfolio-timechart.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class PortfolioTimechartComponent implements OnInit {
   @Input({ required: true })
