@@ -21,7 +21,7 @@ import { SymbolFinancials } from "../model/symbol-financials";
 import { FeCountry } from "../model/fe-country";
 import { SfSymbolName } from "../model/sf-symbol-name";
 import { FeIdInfo } from "../model/fe-id-info";
-import { ImportData } from "src/app/model/import-data";
+import { ImportData } from "../../model/import-data";
 
 @Injectable()
 export class FinancialDataService {

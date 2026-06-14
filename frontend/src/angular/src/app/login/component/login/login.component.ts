@@ -23,7 +23,7 @@ import { MainComponent } from "../main/main.component";
 import { LoginService } from "../../service/login.service";
 import { Login } from "../../model/login";
 import { TokenService } from "ngx-simple-charts/base-service";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 enum FormFields {
   Username = "username",

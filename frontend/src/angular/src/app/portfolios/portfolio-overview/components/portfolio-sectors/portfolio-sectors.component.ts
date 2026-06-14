@@ -29,7 +29,7 @@ import {
   group,
 } from "@angular/animations";
 import { ChartSlices, ChartSlice } from "ngx-simple-charts/donut";
-import { Portfolio } from "src/app/model/portfolio";
+import { Portfolio } from "../../../../model/portfolio";
 
 interface CalcPortfolioElement {
   name: string;

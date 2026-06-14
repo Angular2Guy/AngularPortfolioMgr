@@ -26,7 +26,7 @@ import { Portfolio } from "../../../../model/portfolio";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { Subscription, Subject } from "rxjs";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 
 @Component({
   selector: "app-portfolio",

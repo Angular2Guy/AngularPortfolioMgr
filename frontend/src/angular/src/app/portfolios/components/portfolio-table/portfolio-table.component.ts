@@ -23,8 +23,8 @@ import { switchMap, tap, filter, mergeMap } from "rxjs/operators";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
-import { PortfolioElement } from "src/app/model/portfolio-element";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { PortfolioElement } from "../../../model/portfolio-element";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 @Component({
   selector: "app-portfolio-table",

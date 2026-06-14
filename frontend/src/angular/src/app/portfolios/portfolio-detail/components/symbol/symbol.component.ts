@@ -31,7 +31,7 @@ import { Quote } from "../../../../model/quote";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { forkJoin } from "rxjs";
 import { ChartPoint, ChartPoints } from "ngx-simple-charts/line";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 
 const enum QuotePeriodKey {
   Month,

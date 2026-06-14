@@ -16,11 +16,11 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from "@angular/core";
-import { Portfolio } from "src/app/model/portfolio";
+import { Portfolio } from "../../../../model/portfolio";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../../service/portfolio.service";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 import { NewsItem } from "../../model/news-item";
 import { NewsService } from "../../service/news.service";
 

@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
-import { Portfolio } from "src/app/model/portfolio";
+import { Portfolio } from "../../../../model/portfolio";
 
 @Component({
   selector: "app-portfolio-stats",
@@ -23,5 +23,5 @@ import { Portfolio } from "src/app/model/portfolio";
 export class PortfolioStatsComponent {
   protected readonly years = [1, 2, 5, 10];
   @Input()
-  selPortfolio: Portfolio = {} as Portfolio;
+  selPortfolio!: Portfolio;
 }

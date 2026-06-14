@@ -22,7 +22,7 @@ import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginComponent } from "../login/login.component";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 @Component({
   selector: "app-main",

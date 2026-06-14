@@ -19,11 +19,11 @@ import {
 } from "@angular/core";
 import { DateTime, Duration } from "luxon";
 import { ChartBars, ChartBar } from "ngx-simple-charts/bar";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { Portfolio } from "src/app/model/portfolio";
-import { PortfolioBars } from "src/app/model/portfolio-bars";
-import { PortfolioService } from "src/app/service/portfolio.service";
-import { ComparisonIndex } from "src/app/service/quote.service";
+import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { Portfolio } from "../../../../model/portfolio";
+import { PortfolioBars } from "../../../../model/portfolio-bars";
+import { PortfolioService } from "../../../../service/portfolio.service";
+import { ComparisonIndex } from "../../../../service/quote.service";
 
 const enum ChartPeriodKey {
   Month,

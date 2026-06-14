@@ -25,14 +25,14 @@ import { FinancialDataService } from "../../service/financial-data.service";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
 import { TokenService } from "ngx-simple-charts/base-service";
-import { ConfigService } from "src/app/service/config.service";
+import { ConfigService } from "../../../service/config.service";
 import {
   DialogSpinnerComponent,
   SpinnerData,
-} from "src/app/base/components/dialog-spinner/dialog-spinner.component";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { ImportData, ImportDataType } from "src/app/model/import-data";
-import { QuoteImportService } from "src/app/service/quote-import.service";
+} from "../../../base/components/dialog-spinner/dialog-spinner.component";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { ImportData, ImportDataType } from "../../../model/import-data";
+import { QuoteImportService } from "../../../service/quote-import.service";
 
 @Component({
   selector: "app-overview",

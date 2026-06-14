@@ -315,7 +315,7 @@ export class CreateQueryComponent implements OnInit {
   }
 
   private validateItemTypes(): ValidatorFn {
-    return (form: FormGroup): ValidationErrors | null => {
+    const validateItemTypesFn = (form: FormGroup): ValidationErrors | null => {
       let termStartCount = this.queryItems.filter(
         (myTerm) => myTerm.queryItemType === ItemType.TermStart,
       ).length;
@@ -324,5 +324,6 @@ export class CreateQueryComponent implements OnInit {
       ).length;
       return termStartCount != termEndCount ? { termItemsValid: false } : null;
     };
+    return validateItemTypesFn as ValidatorFn;
   }
 }

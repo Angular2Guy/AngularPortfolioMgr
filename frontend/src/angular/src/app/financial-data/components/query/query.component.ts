@@ -27,10 +27,10 @@ import {
 } from "../../model/financials-data-utils";
 import { FormArray, FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { debounceTime } from "rxjs/operators";
-import { ConfigService } from "src/app/service/config.service";
+import { ConfigService } from "../../../service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { FeConcept } from "../../model/fe-concept";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 export enum QueryFormFields {
   QueryOperator = "queryOperator",

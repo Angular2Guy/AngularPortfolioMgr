@@ -25,9 +25,9 @@ import {
 } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
-import { ConfigService } from "src/app/service/config.service";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
-import { ImportData, ImportDataType } from "src/app/model/import-data";
+import { ConfigService } from "../../../service/config.service";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { ImportData, ImportDataType } from "../../../model/import-data";
 
 enum FormFields {
   Filename = "filename",

@@ -27,9 +27,9 @@ import {
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { DateTime, Duration } from "luxon";
 import { filter } from "rxjs";
-import { PortfolioElement } from "src/app/model/portfolio-element";
+import { PortfolioElement } from "../../../model/portfolio-element";
 import { PortfolioTableComponent } from "../portfolio-table/portfolio-table.component";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 enum FormFields {
   SymbolWeight = "symbolWeight",

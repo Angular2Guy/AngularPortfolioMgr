@@ -12,21 +12,9 @@
  */
 import {
   Component,
-  Input,
-  OnInit,
+  Input,  
   ChangeDetectionStrategy,
 } from "@angular/core";
-import { NewsService } from "../../service/news.service";
-import {
-  Observable,
-  ReplaySubject,
-  Subject,
-  interval,
-  mergeMap,
-  of,
-  repeat,
-} from "rxjs";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
 import { NewsItem } from "../../model/news-item";
 
 @Component({

@@ -41,7 +41,7 @@ import {
 import { QuoteImportService } from "../../../service/quote-import.service";
 import { DateTime } from "luxon";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { takeUntilDestroyed } from "src/app/base/utils/funtions";
+import { takeUntilDestroyed } from "../../../base/utils/funtions";
 
 enum FormFields {
   SymbolSymbol = "symbolSymbol",
@@ -95,12 +95,12 @@ export class AddSymbolComponent implements OnInit {
         debounceTime(400),
         distinctUntilChanged(),
         tap(() => (this.loading = true)),
-        switchMap((name) =>
+        switchMap((name: string) =>
           name && name.length > 2
             ? this.symbolService
                 .getSymbolByName(name)
                 .pipe(
-                  map((localSymbols) =>
+                  map((localSymbols: Symbol[]) =>
                     this.filterPortfolioSymbols(localSymbols),
                   ),
                 )
