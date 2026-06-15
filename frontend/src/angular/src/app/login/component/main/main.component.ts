@@ -32,7 +32,7 @@ import { takeUntilDestroyed } from "../../../base/utils/funtions";
   standalone: false,
 })
 export class MainComponent {
-  login: Login = {} as Login;
+  login: Login | null = null;
 
   constructor(
     private dialog: MatDialog,
@@ -52,7 +52,7 @@ export class MainComponent {
       .beforeClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: Login) => {
-        this.login = typeof result == "undefined" ? {} as Login : result;
+        this.login = typeof result == "undefined" ? null : result;
         if (this.login) {
           this.router.navigate(["/portfolios/overview"]);
         }

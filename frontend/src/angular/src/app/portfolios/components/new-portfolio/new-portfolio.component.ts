@@ -65,7 +65,7 @@ export class NewPortfolioComponent {
       month1: 0,
       month6: 0,
       name: this.portfolioForm.get(FormFields.PortfolioName)?.value,
-      currencyKey: '',
+      currencyKey: "EUR",
       symbols: [],
       portfolioElements: [],
       userId: this.tokenService.userId as number,

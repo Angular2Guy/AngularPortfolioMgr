@@ -12,23 +12,6 @@
  */
 package ch.xxx.manager.stocks;
 
-import ch.xxx.manager.common.exception.ResourceNotFoundException;
-import ch.xxx.manager.common.repository.JpaAppUserRepository;
-import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
-import ch.xxx.manager.common.utils.ServiceUtils;
-import ch.xxx.manager.common.utils.StreamHelpers;
-import ch.xxx.manager.stocks.dto.PortfolioDto;
-import ch.xxx.manager.stocks.entity.*;
-import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
-import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
-import ch.xxx.manager.stocks.entity.dto.PortfolioBarsWrapper;
-import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.stocks.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -36,6 +19,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ch.xxx.manager.common.exception.ResourceNotFoundException;
+import ch.xxx.manager.common.repository.JpaAppUserRepository;
+import ch.xxx.manager.common.utils.DataHelper.CurrencyKey;
+import ch.xxx.manager.common.utils.ServiceUtils;
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.dto.PortfolioDto;
+import ch.xxx.manager.stocks.entity.DailyQuote;
+import ch.xxx.manager.stocks.entity.Portfolio;
+import ch.xxx.manager.stocks.entity.PortfolioElement;
+import ch.xxx.manager.stocks.entity.PortfolioToSymbol;
+import ch.xxx.manager.stocks.entity.Symbol;
+import ch.xxx.manager.stocks.entity.Symbol.QuoteSource;
+import ch.xxx.manager.stocks.entity.dto.CalcPortfolioElement;
+import ch.xxx.manager.stocks.entity.dto.PortfolioBarsWrapper;
+import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
+import ch.xxx.manager.stocks.repository.JpaDailyQuoteRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioElementRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioRepository;
+import ch.xxx.manager.stocks.repository.JpaPortfolioToSymbolRepository;
+import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 
 @Service
 @Transactional
@@ -99,6 +108,9 @@ public class PortfolioService {
 	}
 
 	public Portfolio addPortfolio(Portfolio entity, Long userId) {
+		if(entity.getId() != null && entity.getId() <= 0) {
+			entity.setId(null);
+		}
 		entity.setAppUser(this.appUserRepository.findById(userId).orElse(null));
 		Portfolio portfolio = this.portfolioRepository.save(entity);
 		portfolio.getPortfolioToSymbols().add(createPortfolioPtSAndSymbol(portfolio));
