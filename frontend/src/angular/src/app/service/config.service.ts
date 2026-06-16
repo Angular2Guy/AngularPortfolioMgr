@@ -32,7 +32,7 @@ export class ConfigService {
   getProfiles(): Observable<string> {
     if (!this.profiles) {
       return this.http
-        .get<string>(`/rest/config/profiles`)
+        .get(`/rest/config/profiles`, { responseType: 'text' })
         .pipe(tap((value: string) => (this.profiles = value)));
     } else {
       return of(this.profiles);
@@ -42,7 +42,7 @@ export class ConfigService {
   getImportPath(): Observable<string> {
     if (!this.importPath) {
       return this.http
-        .get<string>(`/rest/config/importpath`)
+        .get(`/rest/config/importpath`, { responseType: 'text' })
         .pipe(tap((value: string) => (this.importPath = value)));
     } else {
       return of(this.importPath);
