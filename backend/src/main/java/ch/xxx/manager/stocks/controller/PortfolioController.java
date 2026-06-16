@@ -33,13 +33,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.stocks.ComparisonIndex;
+import ch.xxx.manager.stocks.PortfolioService;
 import ch.xxx.manager.stocks.dto.PortfolioBarsDto;
 import ch.xxx.manager.stocks.dto.PortfolioDto;
 import ch.xxx.manager.stocks.entity.dto.PortfolioWithElements;
-import ch.xxx.manager.common.utils.StreamHelpers;
 import ch.xxx.manager.stocks.mapping.PortfolioMapper;
-import ch.xxx.manager.stocks.ComparisonIndex;
-import ch.xxx.manager.stocks.PortfolioService;
 
 @RestController
 @RequestMapping("rest/portfolio")
@@ -100,6 +100,9 @@ public class PortfolioController {
 	@PostMapping("/symbol/{symbolId}/weight/{weight}")
 	public PortfolioDto addSymbolToPortfolio(@RequestBody PortfolioDto dto, @PathVariable("symbolId") Long symbolId,
 			@PathVariable("weight") Long weight, @RequestParam(name = "changedAt") String changedAt) {
+		if(dto.getId() != null && dto.getId() <= 0) {
+			dto.setId(null);
+		}
 		PortfolioWithElements portfolioWithElements = this.portfolioService
 		.addSymbolToPortfolio(dto, symbolId, weight, this.isoDateTimeToLocalDateTime(changedAt));
 		return this.portfolioMapper.toDtoFiltered(portfolioWithElements.portfolio(), portfolioWithElements.portfolioElements());
