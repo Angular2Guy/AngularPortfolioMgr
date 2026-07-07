@@ -13,6 +13,7 @@
 package ch.xxx.manager.stocks.entity.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -22,10 +23,10 @@ import ch.xxx.manager.common.utils.DataHelper;
 //@JsonIgnoreProperties(ignoreUnknown = true) 
 public class SymbolFinancialsDto {
 	private Long id;
-	@JsonFormat(pattern="yyyy-MM-dd")
-	private LocalDate startDate;
-	@JsonFormat(pattern="yyyy-MM-dd")
-	private LocalDate endDate;
+	//@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDateTime startDate;
+	//@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDateTime endDate;
 	private int year;	
 	private DataHelper.Quarter quarter;
 	private String symbol;	
@@ -40,16 +41,16 @@ public class SymbolFinancialsDto {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public LocalDate getStartDate() {
+	public LocalDateTime getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(LocalDateTime startDate) {
 		this.startDate = startDate;
 	}
-	public LocalDate getEndDate() {
+	public LocalDateTime getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
 	}
 	public int getYear() {

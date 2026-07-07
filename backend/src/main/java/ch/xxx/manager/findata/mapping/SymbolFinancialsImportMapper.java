@@ -12,6 +12,8 @@
  */
 package ch.xxx.manager.findata.mapping;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,10 +37,10 @@ public class SymbolFinancialsImportMapper {
 	
 	public SymbolFinancialsDto toDto(SymbolFinancials symbolFinancials) {
 		SymbolFinancialsDto dto = new SymbolFinancialsDto();
-		dto.setEndDate(symbolFinancials.getEndDate());
+		dto.setEndDate(Optional.ofNullable(symbolFinancials.getEndDate()).stream().map(LocalDate::atStartOfDay).findFirst().orElse(null));
 		dto.setId(symbolFinancials.getId());
 		dto.setQuarter(symbolFinancials.getQuarter());
-		dto.setStartDate(symbolFinancials.getStartDate());
+		dto.setStartDate(Optional.ofNullable(symbolFinancials.getStartDate()).stream().map(LocalDate::atStartOfDay).findFirst().orElse(null));
 		dto.setSymbol(symbolFinancials.getSymbol());
 		dto.setYear(symbolFinancials.getFiscalYear());
 		FinancialsDataDto financialsDataDto = new FinancialsDataDto();
@@ -71,10 +73,10 @@ public class SymbolFinancialsImportMapper {
 
 	public SymbolFinancials toEntity(SymbolFinancialsDto symbolFinancialsDto) {
 		SymbolFinancials entity = new SymbolFinancials();
-		entity.setEndDate(symbolFinancialsDto.getEndDate());
+		entity.setEndDate(Optional.ofNullable(symbolFinancialsDto.getEndDate()).stream().map(LocalDateTime::toLocalDate).findFirst().orElse(null));
 		entity.setId(symbolFinancialsDto.getId());
 		entity.setQuarter(symbolFinancialsDto.getQuarter());
-		entity.setStartDate(symbolFinancialsDto.getStartDate());
+		entity.setStartDate(Optional.ofNullable(symbolFinancialsDto.getStartDate()).stream().map(LocalDateTime::toLocalDate).findFirst().orElse(null));
 		entity.setSymbol(symbolFinancialsDto.getSymbol());
 		entity.setCity(symbolFinancialsDto.getCity());
 		entity.setCountry(symbolFinancialsDto.getCountry());

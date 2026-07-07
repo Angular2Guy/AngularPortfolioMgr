@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.findata.mapping;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,9 +33,9 @@ public class SymbolFinancialsMapper {
 
 	public SymbolFinancialsDto toDto(SymbolFinancials symbolFinancials) {
 		SymbolFinancialsDto dto = new SymbolFinancialsDto();
-		dto.setEndDate(symbolFinancials.getEndDate());
+		dto.setEndDate(Optional.ofNullable(symbolFinancials.getEndDate()).stream().map(LocalDate::atStartOfDay).findFirst().orElse(null));
 		dto.setQuarter(symbolFinancials.getQuarter());
-		dto.setStartDate(symbolFinancials.getStartDate());
+		dto.setStartDate(Optional.ofNullable(symbolFinancials.getStartDate()).stream().map(LocalDate::atStartOfDay).findFirst().orElse(null));
 		dto.setSymbol(symbolFinancials.getSymbol());
 		dto.setYear(symbolFinancials.getFiscalYear());
 		dto.setId(symbolFinancials.getId());

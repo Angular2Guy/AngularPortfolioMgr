@@ -12,7 +12,7 @@
  */
 package ch.xxx.manager.findata.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +20,8 @@ import ch.xxx.manager.common.utils.DataHelper.Quarter;
 
 public class SymbolFinancialsDto {
 	private Long id;
-	private LocalDate startDate;
-	private LocalDate endDate;
+	private LocalDateTime startDate;
+	private LocalDateTime endDate;
 	private int year;
 	private Quarter quarter;
 	private String symbol;
@@ -36,16 +36,16 @@ public class SymbolFinancialsDto {
 	public void setFinancialElements(List<FinancialElementDto> financialElements) {
 		this.financialElements = financialElements;
 	}
-	public LocalDate getStartDate() {
+	public LocalDateTime getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(LocalDateTime startDate) {
 		this.startDate = startDate;
 	}
-	public LocalDate getEndDate() {
+	public LocalDateTime getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
 	}
 	public int getYear() {
