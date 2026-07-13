@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +46,18 @@ public class NewsFeedConnector implements NewsFeedClient {
     private final RestClient restClient;
     private final XmlMapper xmlMapper;
     private final NewsFeedMapper newsFeedMapper;
+    private final Semaphore secRateLimiter = new Semaphore(5, true);
 
     public NewsFeedConnector(RestClient restClient, XmlMapper xmsMapper, NewsFeedMapper newsFeedMapper) {
         this.restClient = restClient;
         this.xmlMapper = xmsMapper;
         this.newsFeedMapper = newsFeedMapper;
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            int releaseCount = 5 - secRateLimiter.availablePermits();
+            if (releaseCount > 0) {
+                secRateLimiter.release(releaseCount);
+            }
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -62,6 +72,7 @@ public class NewsFeedConnector implements NewsFeedClient {
 
     @Override
     public List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed() {
+        this.acquireToken();
         var result = this.loadFile(SEC_EDGAR_USGAAP, String.class);        
         RssDto rssDto = null;
         rssDto = this.xmlMapper.readValue(result, RssDto.class);
@@ -82,7 +93,7 @@ public class NewsFeedConnector implements NewsFeedClient {
         var result = this.restClient.get().uri(url)                
                 .header("Accept-Encoding", "gzip, deflate")    
                 .header("Host", "www.sec.gov")
-                .header("User-Agent","Sven Loesekann support@svenloesekann.de")              
+                .header("User-Agent","Sven Smith Privat (sven@gmx.de)")
                 .retrieve().body(classType);
         return result;
     }
@@ -95,5 +106,14 @@ public class NewsFeedConnector implements NewsFeedClient {
             LOGGER.error(String.format("Feed import failed. url: %s", url), e);
         }
         return feed;
+    }
+
+    private void acquireToken() {
+        try {
+            secRateLimiter.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Das Rate-Limiting wurde unerwartet unterbrochen", e);
+        }
     }
 }
