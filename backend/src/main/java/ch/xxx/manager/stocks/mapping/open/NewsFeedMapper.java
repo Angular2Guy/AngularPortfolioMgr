@@ -14,6 +14,7 @@ package ch.xxx.manager.stocks.mapping.open;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,9 @@ import ch.xxx.manager.stocks.entity.dto.RssDto;
 public class NewsFeedMapper {
 
     public List<CompanyReportWrapper> convert(RssDto rssDto) {  
-      var result =  rssDto.channel().item().stream().filter(myItem -> 
-         CompanyReport.ReportType.ANNUAL.toString().equalsIgnoreCase(myItem.xbrlFiling().formType().trim()) 
-         || CompanyReport.ReportType.QUARTERLY.toString().equalsIgnoreCase(myItem.xbrlFiling().formType().trim())
+      var result =  rssDto.channel().item().stream().filter(myItem ->
+                      Optional.ofNullable(myItem.xbrlFiling().formType()).stream().anyMatch(value -> value.trim().toUpperCase().contains(CompanyReport.ReportType.ANNUAL.getReportType()))
+              || Optional.ofNullable(myItem.xbrlFiling().formType()).stream().anyMatch(value -> value.trim().toUpperCase().contains(CompanyReport.ReportType.QUARTERLY.getReportType()))
       ) .map(myItem -> {
           var period = myItem.xbrlFiling().period();
           var year = Long.getLong(period.substring(0, 3));
