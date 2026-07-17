@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import ch.xxx.manager.findata.SecNewsFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,11 +50,12 @@ public class CronJobService {
 	private final AppUserService appUserService;
 	private final PortfolioService portfolioService;
 	private final NewsFeedService newsFeedService;
+	private final SecNewsFeedService secNewsFeedService;
 	private final Environment environment;
 	@Value("${api.key}")
 	private String apiKey;
 
-	public CronJobService(SymbolImportService symbolImportService, PortfolioService portfolioService, 
+	public CronJobService(SymbolImportService symbolImportService, PortfolioService portfolioService, SecNewsFeedService secNewsFeedService,
 			QuoteImportService quoteImportService, CurrencyService currencyService, AppUserService appUserService,
 			Environment environment, NewsFeedService newsFeedService) {
 		this.symbolImportService = symbolImportService;
@@ -63,6 +65,7 @@ public class CronJobService {
 		this.portfolioService = portfolioService;
 		this.environment = environment;
 		this.newsFeedService = newsFeedService;
+		this.secNewsFeedService = secNewsFeedService;
 	}
 
 	@Scheduled(fixedRate = 90000)
@@ -79,6 +82,12 @@ public class CronJobService {
 	public void updateNewsFeeds() {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();
 		this.newsFeedService.updateSeekingAlphaNewsFeed();
+	}
+
+	@Scheduled(cron = "0 2 * * * ?")
+	@Order(2)
+	public void updateSecNewsFeeds() {
+		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeed();
 	}
 	
 	@Scheduled(cron = "5 0 1 * * ?")

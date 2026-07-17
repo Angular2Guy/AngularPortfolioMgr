@@ -15,6 +15,7 @@ package ch.xxx.manager.stocks;
 import ch.xxx.manager.common.file.FileClient;
 import ch.xxx.manager.stocks.dto.ImportDataDto;
 import ch.xxx.manager.stocks.dto.SymbolDto;
+import ch.xxx.manager.stocks.entity.Symbol;
 import ch.xxx.manager.stocks.mapping.SymbolMapper;
 import ch.xxx.manager.stocks.repository.JpaSymbolRepository;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,6 +62,10 @@ public class SymbolService {
 				.map(myName -> this.repository.findByName(myName.trim().toLowerCase()).stream()
 						.flatMap(entity -> Stream.of(this.symbolMapper.convert(entity))).collect(Collectors.toList()))
 				.orElse(List.of());
+	}
+
+	public Collection<Symbol> findByCikIn(Iterable<String> ciks) {
+		return this.repository.findByCikIn(ciks);
 	}
 	
 	@Async

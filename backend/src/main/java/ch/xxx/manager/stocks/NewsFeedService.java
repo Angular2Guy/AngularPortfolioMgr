@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Gatherers;
 
@@ -63,33 +62,8 @@ public class NewsFeedService {
     @Transactional
 	public void importCompanyReports() {
 		this.updateCompanyToSymbolJson();
-		//this.updateSecEdgarUsGaapNewsFeed();
 	}
-    /*
-    private void updateSecEdgarUsGaapNewsFeed() {
-        var start = Instant.now();
-        var cikToCompanyReport = this.newsFeedClient.importSecEdgarUsGaapNewsFeed();
-        var ciks = cikToCompanyReport.stream().map(CompanyReportWrapper::cik).toList();
-        var symbols = this.symbolRepository.findByCikIn(ciks);
 
-        final var companyReports = cikToCompanyReport.stream().filter(item -> CompanyReport.ReportType.ANNUAL.equals(item.companyReport().getReportType())
-                || CompanyReport.ReportType.QUARTERLY.equals(item.companyReport().getReportType())).map(entry -> {
-            var symbol = symbols.stream().filter(mySymbol -> mySymbol.getCik().equals(entry.cik())).findFirst().orElse(null);
-            var companyReport = entry.companyReport();
-            companyReport.setSymbol(symbol);
-            companyReport.setReportBlob(this.newsFeedClient.loadCompanyReportZip(entry.reportZipUrl()));
-            return companyReport;
-        }).filter(myCompanyReport -> myCompanyReport.getSymbol() != null).toList();
-
-        var companyReportsFiltered = companyReports.stream().filter(myCompanyReport
-                -> StreamSupport.stream(this.companyReportRepository.findByReportUrlIn(companyReports.stream().map(CompanyReport::getReportUrl).toList()).spliterator(), false)
-                        .map(CompanyReport::getReportUrl).noneMatch(myCompanyReport.getReportUrl()::equals)).toList();
-
-        companyReportsFiltered = StreamSupport.stream(this.companyReportRepository.saveAll(companyReportsFiltered).spliterator(), false).toList();
-
-        LOGGER.info("Sec Company Reports imported: {} in {}ms", companyReportsFiltered.size(), Instant.now().toEpochMilli() - start.toEpochMilli());
-    }
-    */
     private void updateCompanyToSymbolJson() {
         var start = Instant.now();
         /*

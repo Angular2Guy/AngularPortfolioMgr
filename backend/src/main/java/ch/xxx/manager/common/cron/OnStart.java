@@ -15,6 +15,7 @@ package ch.xxx.manager.common.cron;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ch.xxx.manager.findata.SecNewsFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -38,12 +39,15 @@ public class OnStart {
 	private final FinancialDataService financialDataService;
 	private final PortfolioService portfolioService;
 	private final NewsFeedService newsFeedService;
+	private final SecNewsFeedService secNewsFeedService;
 
-	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService, PortfolioService portfolioService, NewsFeedService newsFeedService) {
+	public OnStart(SymbolImportService symbolImportService, FinancialDataService financialDataImportService,
+				   PortfolioService portfolioService, NewsFeedService newsFeedService, SecNewsFeedService secNewsFeedService) {
 		this.symbolImportService = symbolImportService;
 		this.financialDataService = financialDataImportService;
 		this.portfolioService = portfolioService;
 		this.newsFeedService = newsFeedService;
+		this.secNewsFeedService = secNewsFeedService;
 	}
 
 	@PostConstruct
@@ -57,6 +61,8 @@ public class OnStart {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();		
 		this.newsFeedService.updateSeekingAlphaNewsFeed();
 		this.newsFeedService.importCompanyReports();
+		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeed();
+
 		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
 		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
