@@ -58,11 +58,10 @@ public class NewsFeedService {
         LOGGER.info("Cnbc news imported in: {}ms", Instant.now().toEpochMilli() - start.toEpochMilli());
     }
 
-	@Async
     @Transactional
-	public void importCompanyReports() {
-		this.updateCompanyToSymbolJson();
-	}
+    public void importCompanyReportsSync() {
+        this.updateCompanyToSymbolJson();
+    }
 
     private void updateCompanyToSymbolJson() {
         var start = Instant.now();

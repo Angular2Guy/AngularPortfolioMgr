@@ -22,7 +22,6 @@ import jakarta.transaction.Transactional;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -44,9 +43,12 @@ public class SecNewsFeedService {
         this.symbolService = symbolService;
     }
 
-    @Async
     @Transactional
-    public void updateSecEdgarUsGaapNewsFeed() {
+    public void updateSecEdgarUsGaapNewsFeedSync() {
+        this.updateSecEdgarUsGaapNewsFeed();
+    }
+
+    private void updateSecEdgarUsGaapNewsFeed() {
         var start = Instant.now();
         var cikToCompanyReport = this.newsFeedClient.importSecEdgarUsGaapNewsFeed();
         var ciks = cikToCompanyReport.stream().map(CompanyReportWrapper::cik).toList();

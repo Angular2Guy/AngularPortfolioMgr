@@ -60,10 +60,8 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();		
 		this.newsFeedService.updateSeekingAlphaNewsFeed();
-		this.newsFeedService.importCompanyReports();
-		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeed();
+		this.importSecData();
 
-		this.symbolImportService.refreshSymbolEntities();
 		LOGGER.info("Symbols refreshed");
 		List<FeConceptDto> feConcepts = this.financialDataService.findFeConcepts();
 		LOGGER.info("Concept count {}", feConcepts.size());
@@ -74,5 +72,11 @@ public class OnStart {
 		var portfolioList = this.portfolioService.findAllPortfolios();
 		portfolioList.forEach(this.portfolioService::updatePortfolioValues);
 		LOGGER.info("Portfolios updated {}", portfolioList.size());
+	}
+
+	private void importSecData() {
+		this.newsFeedService.importCompanyReportsSync();
+		this.symbolImportService.refreshSymbolEntities();
+		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeedSync();
 	}
 }

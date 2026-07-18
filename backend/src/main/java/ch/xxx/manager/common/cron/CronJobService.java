@@ -85,9 +85,15 @@ public class CronJobService {
 	}
 
 	@Scheduled(cron = "0 2 * * * ?")
-	@Order(2)
+	@SchedulerLock(name = "UpdateCompanyReports", lockAtLeastFor = "PT10M", lockAtMostFor = "PT20M")
+	public void updateCompanyReports() {
+		this.newsFeedService.importCompanyReportsSync();
+	}
+
+	@Scheduled(cron = "0 4 * * * ?")
+	@SchedulerLock(name = "UpdateSecNewsFeeds", lockAtLeastFor = "PT10M", lockAtMostFor = "PT20M")
 	public void updateSecNewsFeeds() {
-		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeed();
+		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeedSync();
 	}
 	
 	@Scheduled(cron = "5 0 1 * * ?")
