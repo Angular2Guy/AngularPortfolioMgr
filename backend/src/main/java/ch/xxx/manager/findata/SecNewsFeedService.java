@@ -22,6 +22,8 @@ import jakarta.transaction.Transactional;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -48,6 +50,11 @@ public class SecNewsFeedService {
         this.updateSecEdgarUsGaapNewsFeed();
     }
 
+    public Collection<CompanyReport> findNewestCompanyReports() {
+        var companyReports = this.companyReportRepository.findBy(Sort.by(Sort.Direction.DESC, CompanyReport::getReportDate).descending(), Limit.of(100));
+        return companyReports;
+    }
+
     private void updateSecEdgarUsGaapNewsFeed() {
         var start = Instant.now();
         var cikToCompanyReport = this.newsFeedClient.importSecEdgarUsGaapNewsFeed();
@@ -57,6 +64,7 @@ public class SecNewsFeedService {
         final var companyReports = cikToCompanyReport.stream().filter(item -> CompanyReport.ReportType.ANNUAL.equals(item.companyReport().getReportType())
                         || CompanyReport.ReportType.QUARTERLY.equals(item.companyReport().getReportType())).map(entry -> this.getCompanyReport(entry, symbols))
                 .filter(myCompanyReport -> Optional.ofNullable(myCompanyReport.getSymbol()).stream().anyMatch(Objects::nonNull)).toList();
+        //var companyReportsFiltered = companyReports;
 
         var companyReportsFiltered = companyReports.stream().filter(myCompanyReport
                 -> StreamSupport.stream(this.companyReportRepository.findByReportUrlIn(companyReports.stream().map(CompanyReport::getReportUrl).toList()).spliterator(), false)

@@ -12,10 +12,16 @@
  */
 package ch.xxx.manager.findata.repository;
 
-import org.springframework.data.repository.CrudRepository;
 
 import ch.xxx.manager.stocks.entity.CompanyReport;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface JpaCompanyReportRepository extends CrudRepository<CompanyReport, Long> {
-  Iterable<CompanyReport> findByReportUrlIn(Iterable<String> reportUrls);
+import java.util.Collection;
+
+public interface JpaCompanyReportRepository extends PagingAndSortingRepository<CompanyReport, Long>, CrudRepository<CompanyReport, Long> {
+  Iterable<CompanyReport> findByReportUrlIn(Collection<String> reportUrl);
+  Collection<CompanyReport> findBy(Sort sort, Limit limit);
 }
