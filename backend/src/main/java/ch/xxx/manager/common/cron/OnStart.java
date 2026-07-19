@@ -60,6 +60,7 @@ public class OnStart {
 	public void startupDone() throws InterruptedException, ExecutionException {
 		this.newsFeedService.updateCnbcFinanceNewsFeed();		
 		this.newsFeedService.updateSeekingAlphaNewsFeed();
+		this.symbolImportService.refreshSymbolEntities();
 		this.importSecData();
 
 		LOGGER.info("Symbols refreshed");
@@ -75,8 +76,15 @@ public class OnStart {
 	}
 
 	private void importSecData() {
-		this.newsFeedService.importCompanyReportsSync();
-		this.symbolImportService.refreshSymbolEntities();
-		this.secNewsFeedService.updateSecEdgarUsGaapNewsFeedSync();
+		try {
+			this.newsFeedService.importCompanyReportsSync();
+		}catch (Exception e) {
+			LOGGER.info("importCompanyReportsSync() failed: ",e);
+		}
+		try {
+			this.secNewsFeedService.updateSecEdgarUsGaapNewsFeedSync();
+		}catch (Exception e) {
+			LOGGER.info("updateSecEdgarUsGaapNewsFeedSync() failed: ",e);
+		}
 	}
 }
