@@ -185,11 +185,11 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: "786M"
-            cpu: "1.0"
+            memory: "2G"
+            cpu: "2.0"
           requests:
-            memory: "512M"
-            cpu: "0.1"
+            memory: "2G"
+            cpu: "2.0"
         env:
           {{- include "helpers.list-envApp-variables" . | indent 10 }}
         ports:
