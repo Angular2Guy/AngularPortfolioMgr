@@ -561,6 +561,31 @@ public class SymbolFinancialsRepositoryTest {
 	}
 
 	@Test
+	public void findWithAllCriteriaCombined() {
+		seedBaseData();
+		List<FinancialElementParamDto> params = new ArrayList<>();
+		params.add(termStartParam(Operation.And));
+		params.add(queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"),
+				numberFilter(FilterNumberDto.Operation.LargerEqual, BigDecimal.valueOf(200))));
+		params.add(termEndParam());
+		SymbolFinancialsQueryParamsDto dto = feParams(params.toArray(new FinancialElementParamDto[0]));
+		dto.setSymbol("aapl");
+		dto.setName("Apple Inc.");
+		dto.setCity("Cupertino");
+		dto.setCountry("US");
+		dto.setQuarters(List.of(Quarter.Q4));
+		dto.setYearFilter(numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.valueOf(2020)));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("aapl"), symbolList(result));
+		SymbolFinancials aapl = result.get(0);
+		Assertions.assertEquals(Quarter.Q4, aapl.getQuarter());
+		Assertions.assertEquals(2020, aapl.getFiscalYear());
+		Assertions.assertTrue(aapl.getFinancialElements().stream()
+				.anyMatch(fe -> "Revenues".equals(fe.getConcept())
+						&& BigDecimal.valueOf(200).compareTo(fe.getValue()) == 0));
+	}
+
+	@Test
 	public void findWithFinancialElementParamsAndNonMatchingSymbolReturnsEmpty() {
 		seedBaseData();
 		SymbolFinancialsQueryParamsDto dto = feParams(
