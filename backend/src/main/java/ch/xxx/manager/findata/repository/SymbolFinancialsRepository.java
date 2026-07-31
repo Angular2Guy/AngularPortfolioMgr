@@ -15,8 +15,10 @@ package ch.xxx.manager.findata.repository;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -138,7 +139,16 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				|| symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
 				&& (symbolFinancialsQueryParams.getSymbol() == null
 						|| symbolFinancialsQueryParams.getSymbol().isBlank())
-				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isBlank())) {
+				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isBlank())
+				&& (symbolFinancialsQueryParams.getQuarters() == null
+						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
+				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
+				&& (symbolFinancialsQueryParams.getCountry() == null
+						|| symbolFinancialsQueryParams.getCountry().isEmpty())
+				&& (symbolFinancialsQueryParams.getYearFilter() == null
+						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
+						|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
+						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
 			symbolFinancialsQueryParams.setSymbol("A");
 			results = List.of(this.createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, true, SYMBOL));
 		}
@@ -151,9 +161,9 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				.peek(this.entityManager::detach)
 				.filter(StreamHelpers.distinctByKey(myFinancialElement -> ""
 						+ Optional.ofNullable(myFinancialElement.getConcept()).orElse("").trim()
-						+ myFinancialElement.getCurrency() + myFinancialElement.getValue() != null
-								? myFinancialElement.getValue().toString().trim()
-								: ""))
+						+ myFinancialElement.getCurrency()
+						+ (myFinancialElement.getValue() != null ? myFinancialElement.getValue().toString().trim()
+								: "")))
 				.toList();
 		mySymbolFinancials.getFinancialElements().clear();
 		mySymbolFinancials.getFinancialElements().addAll(myfilteredFinancialElements);
@@ -208,21 +218,15 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
 		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {
 		}
-		final LinkedBlockingQueue<SubTerm> subTermQueue = new LinkedBlockingQueue<>();
+		final Deque<SubTerm> subTermStack = new ArrayDeque<>();
 		final Collection<Predicate> result = new LinkedList<>();
 		if (financialElementParamDtos != null) {
 			financialElementParamDtos.forEach(myDto -> {
 				switch (myDto.getTermType()) {
-				case TermStart -> {
-					try {
-						subTermQueue.put(new SubTerm(myDto.getOperation(), new ArrayList<>()));
-					} catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-					}
-				}
+				case TermStart -> subTermStack.push(new SubTerm(myDto.getOperation(), new ArrayList<>()));
 				case Query -> {
-					Collection<Predicate> localResult = subTermQueue.isEmpty() ? result
-							: subTermQueue.peek().subTerms();
+					Collection<Predicate> localResult = subTermStack.isEmpty() ? result
+							: subTermStack.peek().subTerms();
 					Optional<Predicate> conceptClauseOpt = financialElementConceptClause(fePath, myDto);
 					Optional<Predicate> valueClauseOpt = financialElementValueClause(fePath, myDto);
 					List<Predicate> myPredicates = List.of(conceptClauseOpt, valueClauseOpt).stream()
@@ -235,13 +239,13 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 					}
 				}
 				case TermEnd -> {
-					if (subTermQueue.isEmpty()) {
-						throw new RuntimeException(String.format("subPredicates: %d", subTermQueue.size()));
+					if (subTermStack.isEmpty()) {
+						throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
 					}
-					SubTerm subTermColl = subTermQueue.poll();
+					SubTerm subTermColl = subTermStack.pop();
 					Collection<Predicate> myPredicates = subTermColl.subTerms();
-					Collection<Predicate> baseTermCollection = subTermQueue.peek() == null ? result
-							: subTermQueue.peek().subTerms();
+					Collection<Predicate> baseTermCollection = subTermStack.isEmpty() ? result
+							: subTermStack.peek().subTerms();
 					DataHelper.Operation operation = subTermColl.operation();
 					Collection<Predicate> resultPredicates = operation == null ? myPredicates : switch (operation) {
 					case And ->
@@ -259,8 +263,8 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 			});
 		}
 		// validate terms
-		if (!subTermQueue.isEmpty()) {
-			throw new RuntimeException(String.format("subPredicates: %d", subTermQueue.size()));
+		if (!subTermStack.isEmpty()) {
+			throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
 		}
 		predicates.addAll(result);
 	}
