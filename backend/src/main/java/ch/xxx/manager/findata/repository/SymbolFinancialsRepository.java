@@ -16,8 +16,6 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +51,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	private static final String NAME = "name";
 	private static final String CITY = "city";
 	private static final String COUNTRY = "country";
-	private static final int MAX_FINANCIAL_ELEMENT_RESULTS = 1000;
+	private static final int MAX_RESULTS = 1000;
 	private final JpaFinancialElementRepository jpaFinancialElementRepository;
 	private final EntityManager entityManager;
 
@@ -65,31 +63,9 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	}
 
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		record SfAndFe(SymbolFinancials symbolFinancials, List<FinancialElement> financialElements) {
-		}
 		if (this.isFinancialElementOnlyQuery(symbolFinancialsQueryParams)) {
-			LocalTime start1 = LocalTime.now();
-			Set<FinancialElement> financialElements = this
-					.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
-			final Map<Long, SfAndFe> sfToFeMap = new HashMap<>();
-			financialElements.forEach(myFe -> {
-				this.entityManager.detach(myFe);
-				this.entityManager.detach(myFe.getSymbolFinancials());
-				if (!sfToFeMap.containsKey(myFe.getSymbolFinancials().getId())) {
-					sfToFeMap.put(myFe.getSymbolFinancials().getId(),
-							new SfAndFe(myFe.getSymbolFinancials(), new ArrayList<>(List.of(myFe))));
-				}
-				sfToFeMap.get(myFe.getSymbolFinancials().getId()).financialElements().add(myFe);
-			});
-			List<SymbolFinancials> result = sfToFeMap.entrySet().stream().map(myEntry -> {
-				myEntry.getValue().symbolFinancials()
-						.setFinancialElements(new HashSet<>(myEntry.getValue().financialElements()));
-				return myEntry.getValue().symbolFinancials();
-			}).collect(Collectors.toList());
-			LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
-			return result;
+			return this.findSymbolFinancialsByFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
 		}
-
 		final Specification<SymbolFinancials> specification = this
 				.createSymbolFinancialsSpecification(symbolFinancialsQueryParams);
 		LocalTime start1 = LocalTime.now();
@@ -97,6 +73,24 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				.map(this::removeDublicates).limit(100).collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		return result;
+	}
+
+	private List<SymbolFinancials> findSymbolFinancialsByFinancialElements(
+			List<FinancialElementParamDto> financialElementParams) {
+		LocalTime start1 = LocalTime.now();
+		final List<FinancialElement> financialElements = this.jpaFinancialElementRepository
+				.findAll(FinancialElementSpecifications.findByParams(financialElementParams),
+						PageRequest.of(0, MAX_RESULTS))
+				.getContent();
+		financialElements.forEach(myFe -> {
+			this.entityManager.detach(myFe);
+			this.entityManager.detach(myFe.getSymbolFinancials());
+		});
+		final Map<SymbolFinancials, Set<FinancialElement>> sfToFeMap = financialElements.stream()
+				.collect(Collectors.groupingBy(FinancialElement::getSymbolFinancials, Collectors.toSet()));
+		sfToFeMap.forEach(SymbolFinancials::setFinancialElements);
+		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
+		return new ArrayList<>(sfToFeMap.keySet());
 	}
 
 	private boolean isFinancialElementOnlyQuery(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
@@ -110,11 +104,14 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				&& (symbolFinancialsQueryParams.getCountry() == null
 						|| symbolFinancialsQueryParams.getCountry().isEmpty())
 				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isEmpty())
-				&& (symbolFinancialsQueryParams.getYearFilter() == null
-						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
-						|| 0 < BigDecimal.valueOf(1800)
-								.compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
-						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null);
+				&& this.isYearFilterInvalidOrAbsent(symbolFinancialsQueryParams);
+	}
+
+	private boolean isYearFilterInvalidOrAbsent(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		return symbolFinancialsQueryParams.getYearFilter() == null
+				|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
+				|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
+				|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null;
 	}
 
 	private Specification<SymbolFinancials> createSymbolFinancialsSpecification(
@@ -149,10 +146,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
 				&& (symbolFinancialsQueryParams.getCountry() == null
 						|| symbolFinancialsQueryParams.getCountry().isEmpty())
-				&& (symbolFinancialsQueryParams.getYearFilter() == null
-						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
-						|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
-						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
+				&& this.isYearFilterInvalidOrAbsent(symbolFinancialsQueryParams)) {
 			results = List.of(this.createColumnCriteria("A", root, true, SYMBOL, cb));
 		}
 		return results;
@@ -212,12 +206,5 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 		String lowerStr = queryParamStr.trim().toLowerCase();
 		return uselike ? cb.like(lowerExpr, String.format("%s%%", lowerStr))
 				: cb.equal(lowerExpr, lowerStr);
-	}
-
-	private Set<FinancialElement> findFinancialElements(List<FinancialElementParamDto> financialElementParams) {
-		return new HashSet<>(this.jpaFinancialElementRepository
-				.findAll(FinancialElementSpecifications.findByParams(financialElementParams),
-						PageRequest.of(0, MAX_FINANCIAL_ELEMENT_RESULTS))
-				.getContent());
 	}
 }
