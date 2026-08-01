@@ -12,34 +12,24 @@
   */
 package ch.xxx.manager.findata.repository;
 
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import ch.xxx.manager.common.utils.StreamHelpers;
+import ch.xxx.manager.findata.dto.FinancialElementParamDto;
+import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
+import ch.xxx.manager.findata.entity.FinancialElement;
+import ch.xxx.manager.findata.entity.SymbolFinancials;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import ch.xxx.manager.findata.dto.FilterNumberDto.Operation;
-import ch.xxx.manager.findata.dto.FinancialElementParamDto;
-import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
-import ch.xxx.manager.findata.entity.FinancialElement;
-import ch.xxx.manager.findata.entity.SymbolFinancials;
-import ch.xxx.manager.common.utils.StreamHelpers;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBean {
@@ -185,23 +175,20 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream().map(String::trim)
 				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
 						.add(createColumnCriteria(symbolFinancialsQueryParams.getCountry(), root, false, COUNTRY, cb)));
-		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
-			predicates.add(cb.in(root.get(QUARTER)).value(symbolFinancialsQueryParams.getQuarters()));
-		}
-		if (symbolFinancialsQueryParams.getYearFilter() != null
-				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
-				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
-				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
-			switch (symbolFinancialsQueryParams.getYearFilter().getOperation()) {
-			case SmallerEqual -> predicates.add(cb.lessThanOrEqualTo(root.get(FISCAL_YEAR),
-					symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case LargerEqual ->
-				predicates.add(cb.greaterThanOrEqualTo(root.get(FISCAL_YEAR),
-						symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case Equal -> predicates.add(
-					cb.equal(root.get(FISCAL_YEAR), symbolFinancialsQueryParams.getYearFilter().getValue()));
-			}
-		}
+		Optional.ofNullable(symbolFinancialsQueryParams.getQuarters()).filter(myQuarters -> !myQuarters.isEmpty())
+				.ifPresent(myQuarters -> predicates
+						.add(cb.in(root.get(QUARTER)).value(myQuarters)));
+		Optional.ofNullable(symbolFinancialsQueryParams.getYearFilter()).filter(myFilter -> myFilter.getValue() != null)
+				.filter(myFilter -> 0 >= BigDecimal.valueOf(1800).compareTo(myFilter.getValue()))
+				.filter(myFilter -> myFilter.getOperation() != null).ifPresent(myFilter -> {
+					switch (myFilter.getOperation()) {
+					case SmallerEqual -> predicates
+							.add(cb.lessThanOrEqualTo(root.get(FISCAL_YEAR), myFilter.getValue()));
+					case LargerEqual -> predicates
+							.add(cb.greaterThanOrEqualTo(root.get(FISCAL_YEAR), myFilter.getValue()));
+					case Equal -> predicates.add(cb.equal(root.get(FISCAL_YEAR), myFilter.getValue()));
+					}
+				});
 	}
 
 	private Predicate createColumnCriteria(String queryParamStr, final Root<SymbolFinancials> root, boolean uselike,
