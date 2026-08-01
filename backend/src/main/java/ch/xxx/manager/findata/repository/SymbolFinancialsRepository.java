@@ -94,24 +94,26 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	}
 
 	private boolean isFinancialElementOnlyQuery(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		return symbolFinancialsQueryParams.getFinancialElementParams() != null
-				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()
-				&& (symbolFinancialsQueryParams.getSymbol() == null
-						|| symbolFinancialsQueryParams.getSymbol().isBlank())
-				&& (symbolFinancialsQueryParams.getQuarters() == null
-						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
-				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
-				&& (symbolFinancialsQueryParams.getCountry() == null
-						|| symbolFinancialsQueryParams.getCountry().isEmpty())
-				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isEmpty())
+		return Optional.ofNullable(symbolFinancialsQueryParams.getFinancialElementParams())
+				.filter(myParams -> !myParams.isEmpty()).isPresent()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getSymbol())
+						.filter(mySymbol -> !mySymbol.isBlank()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getQuarters())
+						.filter(myQuarters -> !myQuarters.isEmpty()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getCity())
+						.filter(myCity -> !myCity.isEmpty()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getCountry())
+						.filter(myCountry -> !myCountry.isEmpty()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getName())
+						.filter(myName -> !myName.isEmpty()).isEmpty()
 				&& this.isYearFilterInvalidOrAbsent(symbolFinancialsQueryParams);
 	}
 
 	private boolean isYearFilterInvalidOrAbsent(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		return symbolFinancialsQueryParams.getYearFilter() == null
-				|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
-				|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
-				|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null;
+		return Optional.ofNullable(symbolFinancialsQueryParams.getYearFilter())
+				.filter(myFilter -> myFilter.getValue() != null)
+				.filter(myFilter -> 0 >= BigDecimal.valueOf(1800).compareTo(myFilter.getValue()))
+				.filter(myFilter -> myFilter.getOperation() != null).isEmpty();
 	}
 
 	private Specification<SymbolFinancials> createSymbolFinancialsSpecification(
@@ -136,16 +138,18 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	private List<Predicate> limitYearQuarterResults(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
 			final Root<SymbolFinancials> root, final CriteriaBuilder cb) {
 		List<Predicate> results = List.of();
-		if ((symbolFinancialsQueryParams.getFinancialElementParams() == null
-				|| symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
-				&& (symbolFinancialsQueryParams.getSymbol() == null
-						|| symbolFinancialsQueryParams.getSymbol().isBlank())
-				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isBlank())
-				&& (symbolFinancialsQueryParams.getQuarters() == null
-						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
-				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
-				&& (symbolFinancialsQueryParams.getCountry() == null
-						|| symbolFinancialsQueryParams.getCountry().isEmpty())
+		if (Optional.ofNullable(symbolFinancialsQueryParams.getFinancialElementParams())
+				.filter(myParams -> !myParams.isEmpty()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getSymbol())
+						.filter(java.util.function.Predicate.not(String::isBlank)).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getName())
+						.filter(java.util.function.Predicate.not(String::isBlank)).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getQuarters())
+						.filter(myQuarters -> !myQuarters.isEmpty()).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getCity())
+						.filter(java.util.function.Predicate.not(String::isBlank)).isEmpty()
+				&& Optional.ofNullable(symbolFinancialsQueryParams.getCountry())
+						.filter(java.util.function.Predicate.not(String::isBlank)).isEmpty()
 				&& this.isYearFilterInvalidOrAbsent(symbolFinancialsQueryParams)) {
 			results = List.of(this.createColumnCriteria("A", root, true, SYMBOL, cb));
 		}
