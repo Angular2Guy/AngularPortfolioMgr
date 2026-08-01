@@ -164,6 +164,14 @@ public class SymbolFinancialsRepositoryTest {
 		return dto;
 	}
 
+	private FinancialElementParamDto termStartNoOpParam() {
+		FinancialElementParamDto dto = new FinancialElementParamDto();
+		dto.setConceptFilter(conceptFilter(FilterStringDto.Operation.Contains, "xxx"));
+		dto.setValueFilter(numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.ONE));
+		dto.setTermType(TermType.TermStart);
+		return dto;
+	}
+
 	private FinancialElementParamDto termEndParam() {
 		FinancialElementParamDto dto = new FinancialElementParamDto();
 		dto.setConceptFilter(conceptFilter(FilterStringDto.Operation.Contains, "xxx"));
@@ -273,10 +281,46 @@ public class SymbolFinancialsRepositoryTest {
 	}
 
 	@Test
+	public void nullValueFilterIsIgnored() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
+				"Revenu"), numberFilter(FilterNumberDto.Operation.LargerEqual, null)));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(Set.of("aapl", "abb", "baba"), symbolSet(result));
+	}
+
+	@Test
+	public void nullOperationValueFilterIsIgnored() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
+				"Revenu"), numberFilter(null, BigDecimal.valueOf(200))));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(Set.of("aapl", "abb", "baba"), symbolSet(result));
+	}
+
+	@Test
 	public void conceptShorterThanThreeCharsReturnsEmpty() {
 		seedBaseData();
 		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
 				"Re"), numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.valueOf(50))));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertTrue(result.isEmpty());
+	}
+
+	@Test
+	public void findByConceptWithWhitespaceIsTrimmed() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "  Ass  "), null));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(Set.of("aapl", "abb", "baba"), symbolSet(result));
+	}
+
+	@Test
+	public void findByNullConceptValueReturnsEmpty() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, null), null));
 		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
 		Assertions.assertTrue(result.isEmpty());
 	}
@@ -322,6 +366,29 @@ public class SymbolFinancialsRepositoryTest {
 		params.add(termEndParam());
 		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(feParams(params.toArray(new FinancialElementParamDto[0])));
 		Assertions.assertEquals(Set.of("tor", "tnot"), symbolSet(result));
+	}
+
+	@Test
+	public void findWithOrNotTerm() {
+		seedTermData();
+		List<FinancialElementParamDto> params = new ArrayList<>();
+		params.add(termStartParam(Operation.OrNot));
+		params.add(queryParam(conceptFilter(FilterStringDto.Operation.Equal, "Debts"), null));
+		params.add(queryParam(conceptFilter(FilterStringDto.Operation.Equal, "Equities"), null));
+		params.add(termEndParam());
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(feParams(params.toArray(new FinancialElementParamDto[0])));
+		Assertions.assertEquals(Set.of("tand1", "tand2", "revonly"), symbolSet(result));
+	}
+
+	@Test
+	public void findWithNullOperationTerm() {
+		seedTermData();
+		List<FinancialElementParamDto> params = new ArrayList<>();
+		params.add(termStartNoOpParam());
+		params.add(queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
+		params.add(termEndParam());
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(feParams(params.toArray(new FinancialElementParamDto[0])));
+		Assertions.assertEquals(Set.of("tand1", "tand2", "revonly"), symbolSet(result));
 	}
 
 	@Test
@@ -521,6 +588,24 @@ public class SymbolFinancialsRepositoryTest {
 	}
 
 	@Test
+	public void yearFilterWithNullOperationFallsBackToASymbol() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = new SymbolFinancialsQueryParamsDto();
+		dto.setYearFilter(numberFilter(null, BigDecimal.valueOf(2020)));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("aapl", "abb"), symbolList(result));
+	}
+
+	@Test
+	public void yearFilterWithNullValueFallsBackToASymbol() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = new SymbolFinancialsQueryParamsDto();
+		dto.setYearFilter(numberFilter(FilterNumberDto.Operation.LargerEqual, null));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("aapl", "abb"), symbolList(result));
+	}
+
+	@Test
 	public void findWithSymbolAndYearCombined() {
 		seedBaseData();
 		SymbolFinancialsQueryParamsDto dto = new SymbolFinancialsQueryParamsDto();
@@ -556,6 +641,46 @@ public class SymbolFinancialsRepositoryTest {
 		SymbolFinancialsQueryParamsDto dto = feParams(
 				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
 		dto.setSymbol("baba");
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("baba"), symbolList(result));
+	}
+
+	@Test
+	public void findWithFinancialElementParamsAndQuarters() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
+		dto.setQuarters(List.of(Quarter.Q1));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("abb"), symbolList(result));
+	}
+
+	@Test
+	public void findWithFinancialElementParamsAndCity() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
+		dto.setCity("Cupertino");
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("aapl"), symbolList(result));
+	}
+
+	@Test
+	public void findWithFinancialElementParamsAndCountry() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
+		dto.setCountry("DE");
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(List.of("baba"), symbolList(result));
+	}
+
+	@Test
+	public void findWithFinancialElementParamsAndName() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Revenu"), null));
+		dto.setName("Bayer AG");
 		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
 		Assertions.assertEquals(List.of("baba"), symbolList(result));
 	}
@@ -605,6 +730,24 @@ public class SymbolFinancialsRepositoryTest {
 		Set<String> conceptValuePairs = result.get(0).getFinancialElements().stream()
 				.map(myFe -> myFe.getConcept() + myFe.getValue()).collect(Collectors.toSet());
 		Assertions.assertEquals(Set.of("Assets100", "Assets200", "Revenues50", "Debts30"), conceptValuePairs);
+	}
+
+	@Test
+	public void deduplicationHandlesNullConceptAndValue() {
+		SymbolFinancials nulls = createSf("nulls", "Null AG", "Berlin", "DE", Quarter.Q1, 2020);
+		List<FinancialElement> fes = new ArrayList<>();
+		fes.add(createFe(nulls, null, CurrencyKey.USD, null));
+		fes.add(createFe(nulls, null, CurrencyKey.USD, null));
+		fes.add(createFe(nulls, "Assets", CurrencyKey.USD, null));
+		fes.add(createFe(nulls, null, CurrencyKey.USD, BigDecimal.valueOf(100)));
+		persist(List.of(nulls), fes);
+		SymbolFinancialsQueryParamsDto dto = new SymbolFinancialsQueryParamsDto();
+		dto.setSymbol("nulls");
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(1, result.size());
+		Set<String> conceptValuePairs = result.get(0).getFinancialElements().stream()
+				.map(myFe -> myFe.getConcept() + "-" + myFe.getValue()).collect(Collectors.toSet());
+		Assertions.assertEquals(Set.of("null-null", "Assets-null", "null-100"), conceptValuePairs);
 	}
 
 	@Test
