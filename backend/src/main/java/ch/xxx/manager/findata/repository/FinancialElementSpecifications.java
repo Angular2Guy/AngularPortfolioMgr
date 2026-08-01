@@ -108,19 +108,17 @@ public final class FinancialElementSpecifications {
 
 	private static Optional<Predicate> financialElementValueClause(Path<FinancialElement> fePath,
 			FinancialElementParamDto myDto, CriteriaBuilder cb) {
-		Optional<Predicate> result = Optional.empty();
-		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
-				&& myDto.getValueFilter().getValue() != null
-				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
-						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
-			Expression<BigDecimal> joinPath = fePath.get(VALUE);
-			result = Optional.of(switch (myDto.getValueFilter().getOperation()) {
-			case Equal -> cb.equal(joinPath, myDto.getValueFilter().getValue());
-			case SmallerEqual -> cb.lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
-			case LargerEqual -> cb.greaterThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
-			});
-		}
-		return result;
+		return Optional.ofNullable(myDto.getValueFilter()).filter(myFilter -> myFilter.getOperation() != null)
+				.filter(myFilter -> myFilter.getValue() != null)
+				.filter(myFilter -> !BigDecimal.ZERO.equals(myFilter.getValue()))
+				.filter(myFilter -> !Operation.Equal.equals(myFilter.getOperation())).map(myFilter -> {
+					Expression<BigDecimal> joinPath = fePath.get(VALUE);
+					return switch (myFilter.getOperation()) {
+					case Equal -> cb.equal(joinPath, myFilter.getValue());
+					case SmallerEqual -> cb.lessThanOrEqualTo(joinPath, myFilter.getValue());
+					case LargerEqual -> cb.greaterThanOrEqualTo(joinPath, myFilter.getValue());
+					};
+				});
 	}
 
 	private static Optional<Predicate> financialElementConceptClause(Path<FinancialElement> fePath,
