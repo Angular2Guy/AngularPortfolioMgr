@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,7 +25,8 @@ import ch.xxx.manager.findata.dto.FeConceptDto;
 import ch.xxx.manager.findata.dto.FeIdInfoDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 
-public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long> {
+public interface JpaFinancialElementRepository extends JpaRepository<FinancialElement, Long>,
+		JpaSpecificationExecutor<FinancialElement> {
 	@Modifying
 	@Query(nativeQuery = true, value = "drop index if exists ix_financial_element_symbol_financials_id")
 	void dropSymbolFinancialsIdIndex();

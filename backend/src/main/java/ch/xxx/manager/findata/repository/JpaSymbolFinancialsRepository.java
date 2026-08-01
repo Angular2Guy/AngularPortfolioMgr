@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,7 +25,8 @@ import ch.xxx.manager.findata.dto.SfCountryDto;
 import ch.xxx.manager.findata.dto.SfQuarterDto;
 import ch.xxx.manager.findata.entity.SymbolFinancials;
 
-public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long> {	
+public interface JpaSymbolFinancialsRepository extends JpaRepository<SymbolFinancials, Long>,
+		JpaSpecificationExecutor<SymbolFinancials> {	
 	@Query(value = "select new ch.xxx.manager.findata.dto.SfQuarterDto(sf.quarter, count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.quarter order by quarter_count desc")
 	List<SfQuarterDto> findCommonSfQuarters(Pageable pageable);
 	@Query(value = "select new ch.xxx.manager.findata.dto.SfCountryDto(upper(sf.country), count(sf.id) as quarter_count) from SymbolFinancials sf group by sf.country order by quarter_count desc")

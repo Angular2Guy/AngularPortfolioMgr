@@ -9,19 +9,15 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
+  */
 package ch.xxx.manager.findata.repository;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,18 +26,18 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import ch.xxx.manager.findata.dto.FilterNumberDto.Operation;
-import ch.xxx.manager.findata.dto.FilterStringDto;
 import ch.xxx.manager.findata.dto.FinancialElementParamDto;
 import ch.xxx.manager.findata.dto.SymbolFinancialsQueryParamsDto;
 import ch.xxx.manager.findata.entity.FinancialElement;
 import ch.xxx.manager.findata.entity.SymbolFinancials;
-import ch.xxx.manager.common.utils.DataHelper;
 import ch.xxx.manager.common.utils.StreamHelpers;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -54,38 +50,24 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 	private static final String FINANCIAL_ELEMENTS = "financialElements";
 	private static final String QUARTER = "quarter";
 	private static final String FISCAL_YEAR = "fiscalYear";
-	private static final String VALUE = "value";
-	private static final String CONCEPT = "concept";
 	private static final String NAME = "name";
 	private static final String CITY = "city";
 	private static final String COUNTRY = "country";
+	private static final int MAX_FINANCIAL_ELEMENT_RESULTS = 1000;
+	private final JpaFinancialElementRepository jpaFinancialElementRepository;
 	private final EntityManager entityManager;
 
 	public SymbolFinancialsRepository(JpaSymbolFinancialsRepository jpaSymbolFinancialsRepository,
 			JpaFinancialElementRepository jpaFinancialElementRepository, EntityManager entityManager) {
 		super(jpaSymbolFinancialsRepository);
+		this.jpaFinancialElementRepository = jpaFinancialElementRepository;
 		this.entityManager = entityManager;
 	}
 
 	public List<SymbolFinancials> findSymbolFinancials(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
-		List<SymbolFinancials> result = List.of();
 		record SfAndFe(SymbolFinancials symbolFinancials, List<FinancialElement> financialElements) {
 		}
-		if (symbolFinancialsQueryParams.getFinancialElementParams() != null
-				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()
-				&& (symbolFinancialsQueryParams.getSymbol() == null
-						|| symbolFinancialsQueryParams.getSymbol().isBlank())
-				&& (symbolFinancialsQueryParams.getQuarters() == null
-						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
-				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
-				&& (symbolFinancialsQueryParams.getCountry() == null
-						|| symbolFinancialsQueryParams.getCountry().isEmpty())
-				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isEmpty())
-				&& (symbolFinancialsQueryParams.getYearFilter() == null
-						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
-						|| 0 < BigDecimal.valueOf(1800)
-								.compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
-						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
+		if (this.isFinancialElementOnlyQuery(symbolFinancialsQueryParams)) {
 			LocalTime start1 = LocalTime.now();
 			Set<FinancialElement> financialElements = this
 					.findFinancialElements(symbolFinancialsQueryParams.getFinancialElementParams());
@@ -99,7 +81,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 				}
 				sfToFeMap.get(myFe.getSymbolFinancials().getId()).financialElements().add(myFe);
 			});
-			result = sfToFeMap.entrySet().stream().map(myEntry -> {
+			List<SymbolFinancials> result = sfToFeMap.entrySet().stream().map(myEntry -> {
 				myEntry.getValue().symbolFinancials()
 						.setFinancialElements(new HashSet<>(myEntry.getValue().financialElements()));
 				return myEntry.getValue().symbolFinancials();
@@ -108,32 +90,54 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 			return result;
 		}
 
-		final CriteriaQuery<SymbolFinancials> createQuery = this.entityManager.getCriteriaBuilder()
-				.createQuery(SymbolFinancials.class);
-		final Root<SymbolFinancials> root = createQuery.from(SymbolFinancials.class);
-
-		final List<Predicate> predicates = createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root);
-
-		predicates.addAll(this.limitYearQuarterResults(symbolFinancialsQueryParams, root));
-		root.fetch(FINANCIAL_ELEMENTS);
-		Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
-		this.createFinancialElementClauses(symbolFinancialsQueryParams.getFinancialElementParams(), fePath, predicates);
-		if (!predicates.isEmpty()) {
-			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true)
-					.orderBy(this.entityManager.getCriteriaBuilder().asc(root.get(SYMBOL)));
-		} else {
-			return new LinkedList<>();
-		}
+		final Specification<SymbolFinancials> specification = this
+				.createSymbolFinancialsSpecification(symbolFinancialsQueryParams);
 		LocalTime start1 = LocalTime.now();
-		result = this.entityManager.createQuery(createQuery).getResultStream()
-				.map(this::removeDublicates).limit(100)
-				.collect(Collectors.toList());
+		final List<SymbolFinancials> result = this.jpaSymbolFinancialsRepository.findAll(specification).stream()
+				.map(this::removeDublicates).limit(100).collect(Collectors.toList());
 		LOGGER.info("Query1: {} ms", Duration.between(start1, LocalTime.now()).toMillis());
 		return result;
 	}
 
+	private boolean isFinancialElementOnlyQuery(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		return symbolFinancialsQueryParams.getFinancialElementParams() != null
+				&& !symbolFinancialsQueryParams.getFinancialElementParams().isEmpty()
+				&& (symbolFinancialsQueryParams.getSymbol() == null
+						|| symbolFinancialsQueryParams.getSymbol().isBlank())
+				&& (symbolFinancialsQueryParams.getQuarters() == null
+						|| symbolFinancialsQueryParams.getQuarters().isEmpty())
+				&& (symbolFinancialsQueryParams.getCity() == null || symbolFinancialsQueryParams.getCity().isEmpty())
+				&& (symbolFinancialsQueryParams.getCountry() == null
+						|| symbolFinancialsQueryParams.getCountry().isEmpty())
+				&& (symbolFinancialsQueryParams.getName() == null || symbolFinancialsQueryParams.getName().isEmpty())
+				&& (symbolFinancialsQueryParams.getYearFilter() == null
+						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
+						|| 0 < BigDecimal.valueOf(1800)
+								.compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
+						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null);
+	}
+
+	private Specification<SymbolFinancials> createSymbolFinancialsSpecification(
+			SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams) {
+		return (root, query, cb) -> {
+			final List<Predicate> predicates = new ArrayList<>();
+			this.createSymbolFinancialsPredicates(symbolFinancialsQueryParams, root, cb, predicates);
+			predicates.addAll(this.limitYearQuarterResults(symbolFinancialsQueryParams, root, cb));
+			root.fetch(FINANCIAL_ELEMENTS);
+			Path<FinancialElement> fePath = root.get(FINANCIAL_ELEMENTS);
+			FinancialElementSpecifications.createFinancialElementClauses(
+					symbolFinancialsQueryParams.getFinancialElementParams(), fePath, cb, predicates);
+			if (predicates.isEmpty()) {
+				return cb.disjunction();
+			}
+			query.distinct(true);
+			query.orderBy(cb.asc(root.get(SYMBOL)));
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+	}
+
 	private List<Predicate> limitYearQuarterResults(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
-			final Root<SymbolFinancials> root) {
+			final Root<SymbolFinancials> root, final CriteriaBuilder cb) {
 		List<Predicate> results = List.of();
 		if ((symbolFinancialsQueryParams.getFinancialElementParams() == null
 				|| symbolFinancialsQueryParams.getFinancialElementParams().isEmpty())
@@ -149,8 +153,7 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 						|| symbolFinancialsQueryParams.getYearFilter().getValue() == null
 						|| 0 < BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 						|| symbolFinancialsQueryParams.getYearFilter().getOperation() == null)) {
-			symbolFinancialsQueryParams.setSymbol("A");
-			results = List.of(this.createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, true, SYMBOL));
+			results = List.of(this.createColumnCriteria("A", root, true, SYMBOL, cb));
 		}
 		return results;
 	}
@@ -170,159 +173,51 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 		return mySymbolFinancials;
 	}
 
-	private List<Predicate> createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
-			final Root<SymbolFinancials> root) {
-		final List<Predicate> predicates = new ArrayList<>();
+	private void createSymbolFinancialsPredicates(SymbolFinancialsQueryParamsDto symbolFinancialsQueryParams,
+			final Root<SymbolFinancials> root, final CriteriaBuilder cb, final List<Predicate> predicates) {
 		Optional.ofNullable(symbolFinancialsQueryParams.getSymbol()).stream()
 				.filter(myValue -> !myValue.trim().isBlank()).forEach(myValue -> predicates
-						.add(createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, false, SYMBOL)));
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getSymbol(), root, false, SYMBOL, cb)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getName()).stream().map(String::trim)
 				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
-						.add(createColumnCriteria(symbolFinancialsQueryParams.getName(), root, false, NAME)));
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getName(), root, false, NAME, cb)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getCity()).stream().map(String::trim)
 				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
-						.add(createColumnCriteria(symbolFinancialsQueryParams.getCity(), root, false, CITY)));
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getCity(), root, false, CITY, cb)));
 		Optional.ofNullable(symbolFinancialsQueryParams.getCountry()).stream().map(String::trim)
 				.filter(java.util.function.Predicate.not(String::isBlank)).forEach(myValue -> predicates
-						.add(createColumnCriteria(symbolFinancialsQueryParams.getCountry(), root, false, COUNTRY)));
+						.add(createColumnCriteria(symbolFinancialsQueryParams.getCountry(), root, false, COUNTRY, cb)));
 		if (symbolFinancialsQueryParams.getQuarters() != null && !symbolFinancialsQueryParams.getQuarters().isEmpty()) {
-			predicates.add(this.entityManager.getCriteriaBuilder().in(root.get(QUARTER))
-					.value(symbolFinancialsQueryParams.getQuarters()));
+			predicates.add(cb.in(root.get(QUARTER)).value(symbolFinancialsQueryParams.getQuarters()));
 		}
 		if (symbolFinancialsQueryParams.getYearFilter() != null
 				&& symbolFinancialsQueryParams.getYearFilter().getValue() != null
 				&& 0 >= BigDecimal.valueOf(1800).compareTo(symbolFinancialsQueryParams.getYearFilter().getValue())
 				&& symbolFinancialsQueryParams.getYearFilter().getOperation() != null) {
 			switch (symbolFinancialsQueryParams.getYearFilter().getOperation()) {
-			case SmallerEqual -> predicates.add(this.entityManager.getCriteriaBuilder()
-					.lessThanOrEqualTo(root.get(FISCAL_YEAR), symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case LargerEqual ->
-				predicates.add(this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(root.get(FISCAL_YEAR),
-						symbolFinancialsQueryParams.getYearFilter().getValue()));
-			case Equal -> predicates.add(this.entityManager.getCriteriaBuilder().equal(root.get(FISCAL_YEAR),
+			case SmallerEqual -> predicates.add(cb.lessThanOrEqualTo(root.get(FISCAL_YEAR),
 					symbolFinancialsQueryParams.getYearFilter().getValue()));
+			case LargerEqual ->
+				predicates.add(cb.greaterThanOrEqualTo(root.get(FISCAL_YEAR),
+						symbolFinancialsQueryParams.getYearFilter().getValue()));
+			case Equal -> predicates.add(
+					cb.equal(root.get(FISCAL_YEAR), symbolFinancialsQueryParams.getYearFilter().getValue()));
 			}
 		}
-		return predicates;
 	}
 
 	private Predicate createColumnCriteria(String queryParamStr, final Root<SymbolFinancials> root, boolean uselike,
-			String columnName) {
-		Expression<String> lowerExpr = this.entityManager.getCriteriaBuilder().lower(root.get(columnName));
+			String columnName, CriteriaBuilder cb) {
+		Expression<String> lowerExpr = cb.lower(root.get(columnName));
 		String lowerStr = queryParamStr.trim().toLowerCase();
-		return uselike ? this.entityManager.getCriteriaBuilder().like(lowerExpr, String.format("%s%%", lowerStr))
-				: this.entityManager.getCriteriaBuilder().equal(lowerExpr, lowerStr);
-	}
-
-	private <T> void createFinancialElementClauses(List<FinancialElementParamDto> financialElementParamDtos,
-			final Path<FinancialElement> fePath, final List<Predicate> predicates) {
-		record SubTerm(DataHelper.Operation operation, Collection<Predicate> subTerms) {
-		}
-		final Deque<SubTerm> subTermStack = new ArrayDeque<>();
-		final Collection<Predicate> result = new LinkedList<>();
-		if (financialElementParamDtos != null) {
-			financialElementParamDtos.forEach(myDto -> {
-				switch (myDto.getTermType()) {
-				case TermStart -> subTermStack.push(new SubTerm(myDto.getOperation(), new ArrayList<>()));
-				case Query -> {
-					Collection<Predicate> localResult = subTermStack.isEmpty() ? result
-							: subTermStack.peek().subTerms();
-					Optional<Predicate> conceptClauseOpt = financialElementConceptClause(fePath, myDto);
-					Optional<Predicate> valueClauseOpt = financialElementValueClause(fePath, myDto);
-					List<Predicate> myPredicates = List.of(conceptClauseOpt, valueClauseOpt).stream()
-							.flatMap(Optional::stream).toList();
-					if (myPredicates.size() > 1) {
-						localResult.add(
-								this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0])));
-					} else {
-						localResult.addAll(myPredicates);
-					}
-				}
-				case TermEnd -> {
-					if (subTermStack.isEmpty()) {
-						throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
-					}
-					SubTerm subTermColl = subTermStack.pop();
-					Collection<Predicate> myPredicates = subTermColl.subTerms();
-					Collection<Predicate> baseTermCollection = subTermStack.isEmpty() ? result
-							: subTermStack.peek().subTerms();
-					DataHelper.Operation operation = subTermColl.operation();
-					Collection<Predicate> resultPredicates = operation == null ? myPredicates : switch (operation) {
-					case And ->
-						List.of(this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0])));
-					case AndNot -> List.of(this.entityManager.getCriteriaBuilder()
-							.not(this.entityManager.getCriteriaBuilder().and(myPredicates.toArray(new Predicate[0]))));
-					case Or ->
-						List.of(this.entityManager.getCriteriaBuilder().or(myPredicates.toArray(new Predicate[0])));
-					case OrNot -> List.of(this.entityManager.getCriteriaBuilder()
-							.not(this.entityManager.getCriteriaBuilder().or(myPredicates.toArray(new Predicate[0]))));
-					};
-					baseTermCollection.addAll(resultPredicates);
-				}
-				}
-			});
-		}
-		// validate terms
-		if (!subTermStack.isEmpty()) {
-			throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
-		}
-		predicates.addAll(result);
+		return uselike ? cb.like(lowerExpr, String.format("%s%%", lowerStr))
+				: cb.equal(lowerExpr, lowerStr);
 	}
 
 	private Set<FinancialElement> findFinancialElements(List<FinancialElementParamDto> financialElementParams) {
-		final CriteriaQuery<FinancialElement> createQuery = this.entityManager.getCriteriaBuilder()
-				.createQuery(FinancialElement.class);
-		final Root<FinancialElement> root = createQuery.from(FinancialElement.class);
-		root.fetch("symbolFinancials");
-		final List<Predicate> predicates = new ArrayList<>();
-		this.createFinancialElementClauses(financialElementParams, root, predicates);
-		if (!predicates.isEmpty()) {
-			createQuery.where(predicates.toArray(new Predicate[0])).distinct(true);
-		} else {
-			return new HashSet<>();
-		}
-		return new HashSet<>(this.entityManager.createQuery(createQuery).setMaxResults(1000).getResultList());
-	}
-
-	private Optional<Predicate> financialElementValueClause(Path<FinancialElement> fePath,
-			FinancialElementParamDto myDto) {
-		Optional<Predicate> result = Optional.empty();
-		if (myDto.getValueFilter() != null && myDto.getValueFilter().getOperation() != null
-				&& myDto.getValueFilter().getValue() != null
-				&& (!BigDecimal.ZERO.equals(myDto.getValueFilter().getValue())
-						&& !Operation.Equal.equals(myDto.getValueFilter().getOperation()))) {
-			Expression<BigDecimal> joinPath = fePath.get(VALUE);
-			result = Optional.of(switch (myDto.getValueFilter().getOperation()) {
-			case Equal -> this.entityManager.getCriteriaBuilder().equal(joinPath, myDto.getValueFilter().getValue());
-			case SmallerEqual ->
-				this.entityManager.getCriteriaBuilder().lessThanOrEqualTo(joinPath, myDto.getValueFilter().getValue());
-			case LargerEqual -> this.entityManager.getCriteriaBuilder().greaterThanOrEqualTo(joinPath,
-					myDto.getValueFilter().getValue());
-			});
-		}
-		return result;
-	}
-
-	private Optional<Predicate> financialElementConceptClause(Path<FinancialElement> fePath,
-			FinancialElementParamDto myDto) {
-		Optional<Predicate> result = Optional.empty();
-		if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
-				&& myDto.getConceptFilter().getValue().trim().length() > 2) {
-			Expression<String> lowerExp = this.entityManager.getCriteriaBuilder().lower(fePath.get(CONCEPT));
-			if (!myDto.getConceptFilter().getOperation().equals(FilterStringDto.Operation.Equal)) {
-				String filterStr = switch (myDto.getConceptFilter().getOperation()) {
-				case Contains -> String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
-				case StartsWith -> String.format("%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
-				case EndsWith -> String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
-				default ->
-					throw new IllegalArgumentException("Unexpected value: " + myDto.getConceptFilter().getOperation());
-				};
-				result = Optional.of(this.entityManager.getCriteriaBuilder().like(lowerExp, filterStr));
-			} else {
-				result = Optional.of(this.entityManager.getCriteriaBuilder().equal(lowerExp,
-						myDto.getConceptFilter().getValue().trim().toLowerCase()));
-			}
-		}
-		return result;
+		return new HashSet<>(this.jpaFinancialElementRepository
+				.findAll(FinancialElementSpecifications.findByParams(financialElementParams),
+						PageRequest.of(0, MAX_FINANCIAL_ELEMENT_RESULTS))
+				.getContent());
 	}
 }
