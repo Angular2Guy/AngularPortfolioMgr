@@ -51,8 +51,10 @@ public class NewsFeedMapper {
           .filter(xbrlFile -> xbrlFile.type().trim().equalsIgnoreCase(myItem.xbrlFiling().formType().trim()))
           .findFirst().ifPresent(xbrlFile -> {
               companyReport.setReportUrl(xbrlFile.url());
-          });          
-          return new CompanyReportWrapper(myItem.xbrlFiling().cikNumber().trim(), myItem.enclosure().url(), companyReport);
+          });
+          var cik = Optional.ofNullable(myItem.xbrlFiling().cikNumber()).stream()
+                  .map(String::trim).filter(value -> value.matches("^\\d+$")).map(Long::parseLong).map(Object::toString).findFirst().orElse("");
+          return new CompanyReportWrapper(cik, myItem.enclosure().url(), companyReport);
         }).toList();
         return result;
     }
