@@ -58,7 +58,9 @@ public class SecNewsFeedService {
     private void updateSecEdgarUsGaapNewsFeed() {
         var start = Instant.now();
         var cikToCompanyReport = this.newsFeedClient.importSecEdgarUsGaapNewsFeed();
-        var ciks = cikToCompanyReport.stream().map(CompanyReportWrapper::cik).toList();
+        var ciks = cikToCompanyReport.stream().map(CompanyReportWrapper::cik)
+                .flatMap(value -> Optional.ofNullable(value).stream())
+                .map(String::trim).filter(value -> value.matches("^\\d+$")).map(Long::parseLong).map(Object::toString).toList();
         var symbols = this.symbolService.findByCikIn(ciks);
 
         final var companyReports = cikToCompanyReport.stream().filter(item -> CompanyReport.ReportType.ANNUAL.equals(item.companyReport().getReportType())
