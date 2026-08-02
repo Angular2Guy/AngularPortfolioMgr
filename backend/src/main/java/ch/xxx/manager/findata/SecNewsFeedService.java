@@ -81,7 +81,7 @@ public class SecNewsFeedService {
         var symbol = symbols.stream().filter(mySymbol -> mySymbol.getCik().equals(entry.cik())).findFirst().orElse(null);
         var companyReport = entry.companyReport();
         companyReport.setSymbol(symbol);
-        companyReport.setReportBlob(this.newsFeedClient.loadCompanyReportZip(entry.reportZipUrl()));
+        companyReport.setReportBlob(symbol == null ? null : this.newsFeedClient.loadCompanyReportZip(entry.reportZipUrl()));
         return companyReport;
     }
 }
