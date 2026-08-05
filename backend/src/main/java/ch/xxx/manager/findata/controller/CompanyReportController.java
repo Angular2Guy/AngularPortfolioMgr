@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("rest/companyreport")
@@ -33,7 +33,7 @@ public class CompanyReportController {
     }
 
     @GetMapping
-    public Collection<CompanyReportDto> getNewestCompanyReports() {
+    public List<CompanyReportDto> getNewestCompanyReports() {
         return this.secNewsFeedService.findNewestCompanyReports().stream().map(this.companyReportMapper::toDto).toList();
     }
 }

@@ -12,21 +12,16 @@
  */
 package ch.xxx.manager.findata.mapping;
 
-import ch.xxx.manager.findata.dto.CompanyReportDto;
-import ch.xxx.manager.stocks.entity.CompanyReport;
+import ch.xxx.manager.findata.dto.CrSymbolDto;
+import ch.xxx.manager.stocks.entity.Symbol;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CompanyReportMapper {
-    private final CrSymbolMapper crSymbolMapper;
+public class CrSymbolMapper {
 
-    public CompanyReportMapper(CrSymbolMapper crSymbolMapper) {
-        this.crSymbolMapper = crSymbolMapper;
-    }
-
-    public CompanyReportDto toDto(CompanyReport companyReport) {
-        var dto = new CompanyReportDto(companyReport.getReportType(), companyReport.getReportDate(),
-                companyReport.getReportUrl(), companyReport.getReportBlob(), this.crSymbolMapper.toDto(companyReport.getSymbol()));
-        return dto;
+    public CrSymbolDto toDto(Symbol symbol) {
+        return new CrSymbolDto(symbol.getSymbol(), symbol.getName(), symbol.getCurrencyKey(),
+                symbol.getSectorStr(), symbol.getIndustry(), symbol.getDescription(),
+                symbol.getAddress(), symbol.getCountry());
     }
 }

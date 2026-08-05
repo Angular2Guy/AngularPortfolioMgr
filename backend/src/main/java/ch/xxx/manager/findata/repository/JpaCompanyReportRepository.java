@@ -16,12 +16,15 @@ package ch.xxx.manager.findata.repository;
 import ch.xxx.manager.stocks.entity.CompanyReport;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface JpaCompanyReportRepository extends PagingAndSortingRepository<CompanyReport, Long>, CrudRepository<CompanyReport, Long> {
   Iterable<CompanyReport> findByReportUrlIn(Collection<String> reportUrl);
-  Collection<CompanyReport> findBy(Sort sort, Limit limit);
+  @Query("select cr from CompanyReport cr join fetch cr.symbol")
+  List<CompanyReport> findBy(Sort sort, Limit limit);
 }

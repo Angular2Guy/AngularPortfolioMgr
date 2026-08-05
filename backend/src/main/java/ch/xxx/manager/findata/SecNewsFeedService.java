@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -51,7 +52,7 @@ public class SecNewsFeedService {
         this.updateSecEdgarUsGaapNewsFeed();
     }
 
-    public Collection<CompanyReport> findNewestCompanyReports() {
+    public List<CompanyReport> findNewestCompanyReports() {
         var companyReports = this.companyReportRepository.findBy(Sort.by(Sort.Direction.DESC, CompanyReport::getReportDate).descending(), Limit.of(100));
         return companyReports;
     }
