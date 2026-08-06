@@ -21,16 +21,13 @@ public class MappingUtils {
 	public static final String SECTOR_PORTFOLIO = "Portfolio";
 	
 	public static String findSectorName(Symbol entity) {
-		return Optional.ofNullable(entity.getSector()).stream().map(myEntity -> {
-			String result = myEntity.getYahooName() != null && !myEntity.getYahooName().isBlank()
-					? myEntity.getYahooName()
-					: switch (entity.getQuoteSource()) {
+		return Optional.ofNullable(entity.getSector()).map(myEntity ->
+			Optional.ofNullable(myEntity.getYahooName()).filter(Predicate.not(String::isBlank)).orElseGet(() ->
+				switch (entity.getQuoteSource()) {
 					case ALPHAVANTAGE -> Optional.ofNullable(myEntity.getAlphavantageName()).filter(Predicate.not(String::isBlank)).orElse(SECTOR_PORTFOLIO);
 					case YAHOO -> Optional.ofNullable(myEntity.getYahooName()).filter(Predicate.not(String::isBlank)).orElse(SECTOR_PORTFOLIO);
 					default -> SECTOR_PORTFOLIO;
-					};
-			return result;
-		}).findFirst().orElse(SECTOR_PORTFOLIO);
+				})).orElse(SECTOR_PORTFOLIO);
 	}
 
 	public static String findSectorName(Optional<Symbol> entityOpt) {
