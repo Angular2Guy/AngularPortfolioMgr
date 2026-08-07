@@ -69,7 +69,7 @@ import { ResultTreeComponent } from "./components/result-tree/result-tree.compon
     FinancialDataRoutingModule,
   ],
   providers: [
-    FinancialDataService,
+    FinancialDataService,    
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
   ],
 })

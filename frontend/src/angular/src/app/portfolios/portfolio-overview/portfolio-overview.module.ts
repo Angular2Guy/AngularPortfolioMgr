@@ -26,11 +26,11 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
 import { PortfolioTimechartComponent } from "./components/portfolio-timechart/portfolio-timechart.component";
-
 import { CalendarService } from "./service/calendar.service";
 import { NewsListComponent } from "./components/news-list/news-list.component";
 import { NewsService } from "./service/news.service";
 import { PortfolioStatsComponent } from "./components/portfolio-stats/portfolio-stats.component";
+import { CompanyReportService } from "./service/company-report.service";
 
 @NgModule({
   declarations: [
@@ -54,6 +54,6 @@ import { PortfolioStatsComponent } from "./components/portfolio-stats/portfolio-
     MatTooltipModule,
     PortfoliosOverviewRoutingModule,
   ],
-  providers: [CalendarService, NewsService],
+  providers: [CalendarService, NewsService, CompanyReportService],
 })
 export class PortfolioOverviewModule {}

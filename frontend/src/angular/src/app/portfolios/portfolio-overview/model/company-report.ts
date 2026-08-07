@@ -10,12 +10,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-package ch.xxx.manager.findata.dto;
+export interface CompanyReport {
+    reportType: string, 
+    reportDate: string, 
+    reportUrl: string,
+    reportBlob: Blob, 
+    crSymbol: CrSymbol
+}
 
-import java.time.LocalDateTime;
-
-import ch.xxx.manager.stocks.entity.CompanyReport;
-
-public record CompanyReportDto(CompanyReport.ReportType reportType, LocalDateTime reportDate, String reportUrl,
-                               byte[] reportBlob, CrSymbolDto crSymbol) {
+export interface CrSymbol {
+    symbol: string, 
+    name: string, 
+    currencyKey: string,
+    sector: string,
+    industry: string, 
+    description: string, 
+    address: string, 
+    country: string
 }
