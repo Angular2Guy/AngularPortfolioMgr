@@ -12,7 +12,7 @@
  */
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { CompanyReportsComponentComponent } from "./company-reports.component";
+import { CompanyReportsComponent } from "./company-reports.component";
 /*
 describe("CompanyReportsComponentComponent", () => {
   let component: CompanyReportsComponentComponent;
