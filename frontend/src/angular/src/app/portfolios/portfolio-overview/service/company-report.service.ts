@@ -19,7 +19,7 @@ import { Observable } from "rxjs";
 export class CompanyReportService {
     private httpClient = inject(HttpClient);
 
-    public getCompanyReports(): Observable<CompanyReport> {
-        return this.httpClient.get<CompanyReport>('rest/companyreport');
+    public getCompanyReports(): Observable<CompanyReport[]> {
+        return this.httpClient.get<CompanyReport[]>('rest/companyreport');
     }
 }

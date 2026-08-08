@@ -10,12 +10,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
+import { CompanyReportService } from "../../service/company-report.service";
+import { CompanyReport } from "../../model/company-report";
+import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: "app-company-reports",
-  imports: [],
+  imports: [JsonPipe],
   templateUrl: "./company-reports.component.html",
   styleUrl: "./company-reports.component.scss",
 })
-export class CompanyReportsComponentComponent {}
+export class CompanyReportsComponentComponent implements OnInit {
+  private companyReportService = inject(CompanyReportService);
+  private companyReports = signal<CompanyReport[]>([]);
+
+  ngOnInit(): void {
+    this.companyReportService.getCompanyReports().subscribe((reports: CompanyReport[]) => {
+      this.companyReports.set(reports);
+    });
+  }
+}
