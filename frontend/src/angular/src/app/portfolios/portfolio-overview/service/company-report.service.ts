@@ -20,6 +20,6 @@ export class CompanyReportService {
     private httpClient = inject(HttpClient);
 
     public getCompanyReports(): Observable<CompanyReport[]> {
-        return this.httpClient.get<CompanyReport[]>('rest/companyreport');
+        return this.httpClient.get<CompanyReport[]>('/rest/companyreport');
     }
 }
