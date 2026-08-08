@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from "@angular/core";
 import { CompanyReportService } from "../../service/company-report.service";
 import { CompanyReport } from "../../model/company-report";
 import { JsonPipe } from "@angular/common";
@@ -20,8 +20,10 @@ import { JsonPipe } from "@angular/common";
   imports: [JsonPipe],
   templateUrl: "./company-reports.component.html",
   styleUrl: "./company-reports.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
-export class CompanyReportsComponentComponent implements OnInit {
+export class CompanyReportsComponent implements OnInit {
   private companyReportService = inject(CompanyReportService);
   private companyReports = signal<CompanyReport[]>([]);
 
