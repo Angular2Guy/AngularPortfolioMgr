@@ -31,6 +31,8 @@ import { NewsListComponent } from "./components/news-list/news-list.component";
 import { NewsService } from "./service/news.service";
 import { PortfolioStatsComponent } from "./components/portfolio-stats/portfolio-stats.component";
 import { CompanyReportService } from "./service/company-report.service";
+import { CompanyReportsComponent } from "./components/company-reports/company-reports.component";
+import { JsonPipe } from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -39,7 +41,8 @@ import { CompanyReportService } from "./service/company-report.service";
     PortfolioSectorsComponent,
     PortfolioTimechartComponent,
     NewsListComponent,
-	PortfolioStatsComponent
+	PortfolioStatsComponent,
+  CompanyReportsComponent
   ],
   imports: [
     BaseModule,
@@ -52,6 +55,7 @@ import { CompanyReportService } from "./service/company-report.service";
     MatRadioModule,
     MatCheckboxModule,
     MatTooltipModule,
+    JsonPipe,
     PortfoliosOverviewRoutingModule,
   ],
   providers: [CalendarService, NewsService, CompanyReportService],

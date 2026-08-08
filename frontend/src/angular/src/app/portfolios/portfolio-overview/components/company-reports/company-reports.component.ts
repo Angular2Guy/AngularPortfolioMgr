@@ -17,7 +17,6 @@ import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: "app-company-reports",
-  imports: [JsonPipe],
   templateUrl: "./company-reports.component.html",
   styleUrl: "./company-reports.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -25,7 +24,7 @@ import { JsonPipe } from "@angular/common";
 })
 export class CompanyReportsComponent implements OnInit {
   private companyReportService = inject(CompanyReportService);
-  private companyReports = signal<CompanyReport[]>([]);
+  protected companyReports = signal<CompanyReport[]>([]);
 
   ngOnInit(): void {
     this.companyReportService.getCompanyReports().subscribe((reports: CompanyReport[]) => {
