@@ -16,6 +16,7 @@ import ch.xxx.manager.findata.SecNewsFeedService;
 import ch.xxx.manager.findata.dto.CompanyReportDto;
 import ch.xxx.manager.findata.mapping.CompanyReportMapper;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +36,10 @@ public class CompanyReportController {
     @GetMapping
     public List<CompanyReportDto> getNewestCompanyReports() {
         return this.secNewsFeedService.findNewestCompanyReports().stream().map(this.companyReportMapper::toDto).toList();
+    }
+
+    @GetMapping("/id/{:id}")
+    public List<CompanyReportDto> getCompanyReports(@PathVariable Long id) {
+        return this.secNewsFeedService.findCompanyReport(id).stream().map(this.companyReportMapper::toDtoWithBlob).toList();
     }
 }

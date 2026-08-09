@@ -16,6 +16,6 @@ import java.time.LocalDateTime;
 
 import ch.xxx.manager.stocks.entity.CompanyReport;
 
-public record CompanyReportDto(CompanyReport.ReportType reportType, LocalDateTime reportDate, String reportUrl,
+public record CompanyReportDto(Long id, CompanyReport.ReportType reportType, LocalDateTime reportDate, String reportUrl,
                                byte[] reportBlob, CrSymbolDto crSymbol) {
 }

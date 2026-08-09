@@ -11,20 +11,20 @@
  limitations under the License.
  */
 export interface CompanyReport {
-    reportType: string, 
-    reportDate: string, 
+    reportType: string,
+    reportDate: string,
     reportUrl: string,
-    reportBlob: Blob, 
+    reportBlob: Blob | null,
     crSymbol: CrSymbol
 }
 
 export interface CrSymbol {
-    symbol: string, 
-    name: string, 
+    symbol: string,
+    name: string,
     currencyKey: string,
     sector: string,
-    industry: string, 
-    description: string, 
-    address: string, 
+    industry: string,
+    description: string,
+    address: string,
     country: string
 }

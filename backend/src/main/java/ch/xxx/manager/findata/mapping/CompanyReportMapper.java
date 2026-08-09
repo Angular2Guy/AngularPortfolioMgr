@@ -24,9 +24,15 @@ public class CompanyReportMapper {
         this.crSymbolMapper = crSymbolMapper;
     }
 
-    public CompanyReportDto toDto(CompanyReport companyReport) {
-        var dto = new CompanyReportDto(companyReport.getReportType(), companyReport.getReportDate(),
+    public CompanyReportDto toDtoWithBlob(CompanyReport companyReport) {
+        var dto = new CompanyReportDto(companyReport.getId(),companyReport.getReportType(), companyReport.getReportDate(),
                 companyReport.getReportUrl(), companyReport.getReportBlob(), this.crSymbolMapper.toDto(companyReport.getSymbol()));
+        return dto;
+    }
+
+    public CompanyReportDto toDto(CompanyReport companyReport) {
+        var dto = new CompanyReportDto(companyReport.getId(),companyReport.getReportType(), companyReport.getReportDate(),
+                companyReport.getReportUrl(), null, this.crSymbolMapper.toDto(companyReport.getSymbol()));
         return dto;
     }
 }

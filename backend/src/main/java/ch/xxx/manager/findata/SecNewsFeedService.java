@@ -12,6 +12,7 @@
  */
 package ch.xxx.manager.findata;
 
+import ch.xxx.manager.findata.dto.CompanyReportDto;
 import ch.xxx.manager.findata.repository.JpaCompanyReportRepository;
 import ch.xxx.manager.stocks.NewsFeedClient;
 import ch.xxx.manager.stocks.SymbolService;
@@ -53,8 +54,13 @@ public class SecNewsFeedService {
     }
 
     public List<CompanyReport> findNewestCompanyReports() {
-        var companyReports = this.companyReportRepository.findBy(Sort.by(Sort.Direction.DESC, CompanyReport::getReportDate).descending(), Limit.of(100));
+        var companyReports = this.companyReportRepository.findBy(Sort.by(Sort.Direction.DESC, CompanyReport::getReportDate).descending(), Limit.of(50));
         return companyReports;
+    }
+
+    public Optional<CompanyReport> findCompanyReport(Long id) {
+        var companyReport = this.companyReportRepository.findById(id);
+        return companyReport;
     }
 
     private void updateSecEdgarUsGaapNewsFeed() {
