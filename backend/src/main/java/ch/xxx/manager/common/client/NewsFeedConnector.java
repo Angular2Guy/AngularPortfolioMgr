@@ -89,10 +89,9 @@ public class NewsFeedConnector implements NewsFeedClient {
 
     private <T> T loadFile(String sourceUrl, Class<T> classType) {
         var url = Optional.ofNullable(sourceUrl).orElseThrow();
-        var isSecRequest = url.toLowerCase().contains("sec.gov");
         var client = this.restClient.get().uri(url)
                 .header("Accept-Encoding", "gzip, deflate");
-        if (isSecRequest) {
+        if (url.toLowerCase().contains("sec.gov")) {
             this.acquireToken();
             client.header("Host", Optional.ofNullable(URI.create(url).getHost()).orElseThrow())
                     .header("User-Agent", this.userAgent);
