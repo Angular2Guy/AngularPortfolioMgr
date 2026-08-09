@@ -1,5 +1,5 @@
 /**
- *    Copyright 2019 Sven Loesekann
+ * Copyright 2019 Sven Loesekann
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,11 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -46,18 +48,15 @@ public class NewsFeedConnector implements NewsFeedClient {
     private final RestClient restClient;
     private final XmlMapper xmlMapper;
     private final NewsFeedMapper newsFeedMapper;
-    private final Semaphore secRateLimiter = new Semaphore(5, true);
+    private final AtomicLong nextAllowedRequestTime = new AtomicLong(System.currentTimeMillis());
+    private static final long REQUEST_INTERVAL_MS = 1000;
+    @Value("${sec.useragent:}")
+    private String userAgent;
 
     public NewsFeedConnector(RestClient restClient, XmlMapper xmsMapper, NewsFeedMapper newsFeedMapper) {
         this.restClient = restClient;
         this.xmlMapper = xmsMapper;
         this.newsFeedMapper = newsFeedMapper;
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            int releaseCount = 5 - secRateLimiter.availablePermits();
-            if (releaseCount > 0) {
-                secRateLimiter.release(releaseCount);
-            }
-        }, 1, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -72,8 +71,7 @@ public class NewsFeedConnector implements NewsFeedClient {
 
     @Override
     public List<CompanyReportWrapper> importSecEdgarUsGaapNewsFeed() {
-        this.acquireToken();
-        var result = this.loadFile(SEC_EDGAR_USGAAP, String.class);        
+        var result = this.loadFile(SEC_EDGAR_USGAAP, String.class);
         RssDto rssDto = null;
         rssDto = this.xmlMapper.readValue(result, RssDto.class);
         //LOGGER.info("Xml length: "+this.xmlMapper.writeValueAsString(rssDto).length());
@@ -89,12 +87,17 @@ public class NewsFeedConnector implements NewsFeedClient {
         return this.loadFile(url, byte[].class);
     }
 
-    private <T> T loadFile(String url, Class<T> classType) {
-        var result = this.restClient.get().uri(url)                
-                .header("Accept-Encoding", "gzip, deflate")    
-                .header("Host", "www.sec.gov")
-                .header("User-Agent","Sven Smith Privat (sven@gmx.de)")
-                .retrieve().body(classType);
+    private <T> T loadFile(String sourceUrl, Class<T> classType) {
+        var url = Optional.ofNullable(sourceUrl).orElseThrow();
+        var isSecRequest = url.toLowerCase().contains("sec.gov");
+        var client = this.restClient.get().uri(url)
+                .header("Accept-Encoding", "gzip, deflate");
+        if (isSecRequest) {
+            this.acquireToken();
+            client.header("Host", Optional.ofNullable(URI.create(url).getHost()).orElseThrow())
+                    .header("User-Agent", this.userAgent);
+        }
+        var result = client.retrieve().body(classType);
         return result;
     }
 
@@ -109,11 +112,17 @@ public class NewsFeedConnector implements NewsFeedClient {
     }
 
     private void acquireToken() {
-        try {
-            secRateLimiter.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Das Rate-Limiting wurde unerwartet unterbrochen", e);
+        long now = System.currentTimeMillis();
+        long targetTime = nextAllowedRequestTime.getAndUpdate(existing -> Math.max(existing, now) + REQUEST_INTERVAL_MS);
+
+        long delay = targetTime - now;
+        if (delay > 0) {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Unexpected interruption of ratelimiting.", e);
+            }
         }
     }
 }

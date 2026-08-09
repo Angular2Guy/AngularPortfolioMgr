@@ -41,7 +41,8 @@ import ch.xxx.manager.findata.entity.FinancialElement;
 import ch.xxx.manager.findata.entity.SymbolFinancials;
 
 @DataJpaTest(showSql = false, properties = { "spring.jpa.hibernate.ddl-auto=create-drop",
-		"spring.liquibase.enabled=false" })
+		"spring.liquibase.enabled=false",
+		"spring.autoconfigure.exclude=org.springframework.modulith.runtime.autoconfigure.SpringModulithRuntimeAutoConfiguration" })
 @ContextConfiguration(classes = TestDataJpaConfig.class)
 public class SymbolFinancialsRepositoryTest {
 	@Autowired
