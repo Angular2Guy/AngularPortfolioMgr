@@ -24,6 +24,7 @@ import { MatRadioModule } from "@angular/material/radio";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatCardModule } from "@angular/material/card";
 import { PortfoliosOverviewRoutingModule } from "./portfolio-overview-routing.module";
 import { PortfolioTimechartComponent } from "./components/portfolio-timechart/portfolio-timechart.component";
 import { CalendarService } from "./service/calendar.service";
@@ -55,6 +56,7 @@ import { JsonPipe } from "@angular/common";
     MatRadioModule,
     MatCheckboxModule,
     MatTooltipModule,
+    MatCardModule,
     JsonPipe,
     PortfoliosOverviewRoutingModule,
   ],

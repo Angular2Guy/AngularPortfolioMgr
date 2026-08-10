@@ -13,7 +13,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from "@angular/core";
 import { CompanyReportService } from "../../service/company-report.service";
 import { CompanyReport } from "../../model/company-report";
-import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: "app-company-reports",

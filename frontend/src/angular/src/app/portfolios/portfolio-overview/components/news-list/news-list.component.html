@@ -1,9 +1,9 @@
 <div class="container">
-  @for (item of newsItems; track item) {
+  @for (item of newsItems; track item.link) {
     <div class="news-item">
       <h2>{{ item.title }}</h2>
       <div>{{ item.publishedDate | date: "dd-MM-yyyy" }}</div>
-      <a [href]="item.link" target="_blank">Open article</a>
+      <a [href]="item.link" target="_blank" i18n="@@openArticle">Open article</a>
     </div>
   }
 </div>
