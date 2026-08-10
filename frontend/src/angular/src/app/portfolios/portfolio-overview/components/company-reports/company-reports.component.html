@@ -1,17 +1,18 @@
 <div>
-    @for(report of companyReports(); track report.reportUrl) {
-        <mat-card class="report-card" appearance="outlined">
-  <mat-card-header>
-    <mat-card-title-group>
-      <mat-card-title>{{ report.crSymbol.symbol }} - {{ report.crSymbol.name }}</mat-card-title>
-      <mat-card-subtitle>{{ report.reportType }} - {{ report.reportDate  | date: "dd-MM-yyyy" }}</mat-card-subtitle>      
-    </mat-card-title-group>
-  </mat-card-header>
-  <mat-card-content>
-    <a [href]="report.reportUrl" target="_blank" i18n="@@openCompanyReport">Open company report</a>    
-  </mat-card-content>
-</mat-card>
-    }
+  @for(report of companyReports(); track report.reportUrl) {
+  <mat-card class="report-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title>{{ report.crSymbol.symbol }} - {{ report.crSymbol.name }}</mat-card-title>
+        <mat-card-subtitle>{{ report.reportType }} - {{ report.reportDate | date: "dd-MM-yyyy" }}</mat-card-subtitle>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <a [href]="report.reportUrl" target="_blank" i18n="@@openCompanyReport">Open company report</a>
+    </mat-card-content>
+  </mat-card>
+  <br />
+  }
 </div>
 <!--
 <div>
