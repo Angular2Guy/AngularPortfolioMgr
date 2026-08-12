@@ -23,7 +23,7 @@ import { SfSymbolName } from "../model/sf-symbol-name";
 import { FeIdInfo } from "../model/fe-id-info";
 import { ImportData } from "../../model/import-data";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class FinancialDataService {
   private quarters: QuarterData[] = [];
   private feConcepts: FeConcept[] = [];

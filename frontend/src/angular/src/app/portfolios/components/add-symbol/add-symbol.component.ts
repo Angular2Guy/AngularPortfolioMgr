@@ -23,8 +23,14 @@ import {
   AbstractControlOptions,
   Validators,
   ValidationErrors,
+  FormsModule,
+  ReactiveFormsModule,
 } from "@angular/forms";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+} from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
 import { PortfolioData } from "../../../model/portfolio-data";
 import { Portfolio } from "../../../model/portfolio";
@@ -40,8 +46,28 @@ import {
 } from "rxjs/operators";
 import { QuoteImportService } from "../../../service/quote-import.service";
 import { DateTime } from "luxon";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import {
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+  MatAutocomplete,
+} from "@angular/material/autocomplete";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import {
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatOption } from "@angular/material/select";
+import {
+  MatDatepickerInput,
+  MatDatepickerToggle,
+  MatDatepicker,
+} from "@angular/material/datepicker";
+import { MatButton } from "@angular/material/button";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { AsyncPipe } from "@angular/common";
 
 enum FormFields {
   SymbolSymbol = "symbolSymbol",
@@ -55,7 +81,25 @@ enum FormFields {
   templateUrl: "./add-symbol.component.html",
   styleUrls: ["./add-symbol.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    CdkScrollable,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatInput,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatOption,
+    MatLabel,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatButton,
+    MatProgressSpinner,
+    AsyncPipe,
+  ],
 })
 export class AddSymbolComponent implements OnInit {
   private portfolio!: Portfolio;
@@ -91,7 +135,9 @@ export class AddSymbolComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.symbolsName = this.symbolForm.get(FormFields.SymbolName)?.valueChanges.pipe(
+    this.symbolsName = this.symbolForm
+      .get(FormFields.SymbolName)
+      ?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
         tap(() => (this.loading = true)),
@@ -108,7 +154,9 @@ export class AddSymbolComponent implements OnInit {
         ),
         tap(() => (this.loading = false)),
       );
-    this.symbolsSymbol = this.symbolForm.get(FormFields.SymbolSymbol)?.valueChanges.pipe(
+    this.symbolsSymbol = this.symbolForm
+      .get(FormFields.SymbolSymbol)
+      ?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
         tap(() => (this.loading = true)),

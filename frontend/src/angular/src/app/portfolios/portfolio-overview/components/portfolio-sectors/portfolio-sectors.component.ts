@@ -28,8 +28,15 @@ import {
   query,
   group,
 } from "@angular/animations";
-import { ChartSlices, ChartSlice } from "ngx-simple-charts/donut";
+import {
+  ChartSlices,
+  ChartSlice,
+  NgxDonutChartsModule,
+} from "ngx-simple-charts/donut";
 import { Portfolio } from "../../../../model/portfolio";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatIcon } from "@angular/material/icon";
+import { NgStyle, DecimalPipe } from "@angular/common";
 
 interface CalcPortfolioElement {
   name: string;
@@ -53,7 +60,13 @@ interface CalcPortfolioElement {
     ]),
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatProgressSpinner,
+    MatIcon,
+    NgStyle,
+    NgxDonutChartsModule,
+    DecimalPipe,
+  ],
 })
 export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
   localSelPortfolio: Portfolio = {} as Portfolio;

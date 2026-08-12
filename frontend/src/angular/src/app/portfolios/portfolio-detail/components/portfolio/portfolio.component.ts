@@ -27,13 +27,37 @@ import { TokenService } from "ngx-simple-charts/base-service";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { Subscription, Subject } from "rxjs";
 import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatButton } from "@angular/material/button";
+import {
+  MatSidenavContainer,
+  MatSidenav,
+  MatSidenavContent,
+} from "@angular/material/sidenav";
+import { NgStyle } from "@angular/common";
+import { MatActionList, MatListItem } from "@angular/material/list";
+import { SymbolComponent } from "../symbol/symbol.component";
+import { SymbolOverviewComponent } from "../symbol-overview/symbol-overview.component";
 
 @Component({
   selector: "app-portfolio",
   templateUrl: "./portfolio.component.html",
   styleUrls: ["./portfolio.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatToolbar,
+    MatProgressSpinner,
+    MatButton,
+    MatSidenavContainer,
+    NgStyle,
+    MatSidenav,
+    MatActionList,
+    MatListItem,
+    MatSidenavContent,
+    SymbolComponent,
+    SymbolOverviewComponent,
+  ],
 })
 export class PortfolioComponent implements OnInit {
   symbols: Symbol[] = [];

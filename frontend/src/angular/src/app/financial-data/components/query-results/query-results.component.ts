@@ -19,15 +19,49 @@ import {
 } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
-import { MatTableDataSource } from "@angular/material/table";
-import { MatSort } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import { ResultTreeComponent } from "../result-tree/result-tree.component";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
   selector: "app-query-results",
   templateUrl: "./query-results.component.html",
   styleUrls: ["./query-results.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    ResultTreeComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatSortHeader,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+  ],
 })
 export class QueryResultsComponent implements AfterViewInit {
   treeSymbolFinancials: SymbolFinancials[] = [];

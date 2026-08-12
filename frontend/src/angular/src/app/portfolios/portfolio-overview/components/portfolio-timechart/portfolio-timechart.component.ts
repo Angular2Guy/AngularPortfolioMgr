@@ -22,7 +22,10 @@ import { Portfolio } from "../../../../model/portfolio";
 import { Symbol } from "../../../../model/symbol";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { PortfolioService } from "../../../../service/portfolio.service";
-import { ChartItem } from "ngx-simple-charts/date-time";
+import {
+  ChartItem,
+  NgxDateTimeChartsModule,
+} from "ngx-simple-charts/date-time";
 import { Item } from "../../model/item";
 import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 
@@ -31,7 +34,7 @@ import { takeUntilDestroyed } from "../../../../base/utils/funtions";
   templateUrl: "./portfolio-timechart.component.html",
   styleUrls: ["./portfolio-timechart.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [NgxDateTimeChartsModule],
 })
 export class PortfolioTimechartComponent implements OnInit {
   @Input({ required: true })
@@ -57,7 +60,9 @@ export class PortfolioTimechartComponent implements OnInit {
               !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER),
           )
           .reduce((acc, mySymbol) => {
-            const myValue = !acc.get(mySymbol.symbol) ? [] : acc.get(mySymbol.symbol) as Symbol[];
+            const myValue = !acc.get(mySymbol.symbol)
+              ? []
+              : (acc.get(mySymbol.symbol) as Symbol[]);
             myValue.push(mySymbol);
             acc.set(mySymbol.symbol, myValue);
             return acc;
@@ -79,7 +84,7 @@ export class PortfolioTimechartComponent implements OnInit {
           let myItem = new ChartItem<Event>();
           myItem.id = myIndex;
           myItem.lineId = myKey;
-          myItem.details = myValue[0].description ?? '';
+          myItem.details = myValue[0].description ?? "";
           myItem.name = myValue[0].name;
           myItem.start = myStart;
           myItem.end = myEnd;

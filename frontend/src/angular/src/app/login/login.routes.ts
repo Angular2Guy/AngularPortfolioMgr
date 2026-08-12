@@ -10,17 +10,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
+import { Routes } from "@angular/router";
 import { MainComponent } from "./component/main/main.component";
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: "login", component: MainComponent },
   { path: "**", redirectTo: "login" },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class LoginRoutingModule {}

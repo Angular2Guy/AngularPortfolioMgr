@@ -17,7 +17,7 @@ import {
   EventEmitter,
   OnInit,
   Inject,
-  LOCALE_ID,  
+  LOCALE_ID,
   DestroyRef,
   DOCUMENT,
   ChangeDetectionStrategy,
@@ -30,8 +30,16 @@ import {
 import { Quote } from "../../../../model/quote";
 import { ServiceUtils } from "../../../../model/service-utils";
 import { forkJoin } from "rxjs";
-import { ChartPoint, ChartPoints } from "ngx-simple-charts/line";
+import {
+  ChartPoint,
+  ChartPoints,
+  NgxLineChartsModule,
+} from "ngx-simple-charts/line";
 import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { MatRadioGroup, MatRadioButton } from "@angular/material/radio";
+import { FormsModule } from "@angular/forms";
+import { MatCheckbox } from "@angular/material/checkbox";
+import { DecimalPipe, DatePipe } from "@angular/common";
 
 const enum QuotePeriodKey {
   Month,
@@ -67,7 +75,15 @@ interface SymbolData {
   templateUrl: "./symbol.component.html",
   styleUrls: ["./symbol.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatRadioGroup,
+    FormsModule,
+    MatRadioButton,
+    MatCheckbox,
+    NgxLineChartsModule,
+    DecimalPipe,
+    DatePipe,
+  ],
 })
 export class SymbolComponent implements OnInit {
   private readonly dayInMs = 24 * 60 * 60 * 1000;
@@ -112,8 +128,8 @@ export class SymbolComponent implements OnInit {
       yScaleWidth: 50,
     } as ChartPoints,
   ];
-  portfolioName: string = '';
-  portfolioSymbol: string = '';
+  portfolioName: string = "";
+  portfolioSymbol: string = "";
   serviceUtils = ServiceUtils;
 
   constructor(
@@ -198,13 +214,15 @@ export class SymbolComponent implements OnInit {
   }
 
   private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {
-    return this.compIndexes.get(comparisonIndex)?.map(
-      (myQuote) =>
-        ({
-          x: new Date(Date.parse(myQuote.timestamp)),
-          y: myQuote.close,
-        }) as ChartPoint,
-    ) || [];
+    return (
+      this.compIndexes.get(comparisonIndex)?.map(
+        (myQuote) =>
+          ({
+            x: new Date(Date.parse(myQuote.timestamp)),
+            y: myQuote.close,
+          }) as ChartPoint,
+      ) || []
+    );
   }
 
   private updateSymbolData(): void {
@@ -339,14 +357,23 @@ export class SymbolComponent implements OnInit {
             ),
           ])
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(([myQuotesES50, myQuotesMsciCh, myQuotesSP500]: [Quote[], Quote[], Quote[]]) => {
-              this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
-              this.compIndexes.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
-              this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
-              this.updateChartData();
-              this.loadingData.emit(false);
-              this.quotesLoading = false;
-            });
+            .subscribe(
+              ([myQuotesES50, myQuotesMsciCh, myQuotesSP500]: [
+                Quote[],
+                Quote[],
+                Quote[],
+              ]) => {
+                this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
+                this.compIndexes.set(
+                  ComparisonIndex.MSCI_CHINA,
+                  myQuotesMsciCh,
+                );
+                this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
+                this.updateChartData();
+                this.loadingData.emit(false);
+                this.quotesLoading = false;
+              },
+            );
         } else {
           this.showES50 = false;
           this.showMsciCH = false;
@@ -387,10 +414,10 @@ export class SymbolComponent implements OnInit {
       this.localSymbol = mySymbol;
       this.portfolioName = ServiceUtils.isPortfolioSymbol(mySymbol)
         ? mySymbol.name
-        : '';
+        : "";
       this.portfolioSymbol = ServiceUtils.isPortfolioSymbol(mySymbol)
         ? mySymbol.symbol
-        : '';
+        : "";
       this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
     }
   }

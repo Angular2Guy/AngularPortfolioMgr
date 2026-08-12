@@ -16,7 +16,19 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from "@angular/core";
-import { MatTableDataSource } from "@angular/material/table";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
 import { Portfolio, CommonValues } from "../../../model/portfolio";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap, tap, filter, mergeMap } from "rxjs/operators";
@@ -25,13 +37,28 @@ import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
 import { PortfolioElement } from "../../../model/portfolio-element";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { MatIcon } from "@angular/material/icon";
+import { DecimalPipe } from "@angular/common";
 
 @Component({
   selector: "app-portfolio-table",
   templateUrl: "./portfolio-table.component.html",
   styleUrls: ["./portfolio-table.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIcon,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    DecimalPipe,
+  ],
 })
 export class PortfolioTableComponent implements OnInit {
   private myLocalPortfolio!: Portfolio;
@@ -59,7 +86,10 @@ export class PortfolioTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
-        filter((params: ParamMap) => parseInt(params.get("portfolioId") ?? "-1") >= 0),
+        filter(
+          (params: ParamMap) =>
+            parseInt(params.get("portfolioId") ?? "-1") >= 0,
+        ),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
@@ -87,13 +117,13 @@ export class PortfolioTableComponent implements OnInit {
       .subscribe((result: PortfolioElement) => {
         //console.log(result);
         const myPortfolio = {
-          createdAt: this.localPortfolio?.createdAt ?? '',
-          currencyKey: this.localPortfolio?.currencyKey ?? '',
+          createdAt: this.localPortfolio?.createdAt ?? "",
+          currencyKey: this.localPortfolio?.currencyKey ?? "",
           id: this.localPortfolio?.id ?? -1,
-          name: this.localPortfolio?.name ?? '',
+          name: this.localPortfolio?.name ?? "",
           portfolioElements: [],
           symbols: [],
-          userId: this.localPortfolio?.userId ?? '',
+          userId: this.localPortfolio?.userId ?? "",
         } as unknown as Portfolio;
         if (!!result && result.weight > 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
@@ -104,10 +134,12 @@ export class PortfolioTableComponent implements OnInit {
               myPortfolio,
               mySymbol.id,
               result.weight,
-              result.changedAt ?? '',
+              result.changedAt ?? "",
             )
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((myResult: Portfolio) => (this.localPortfolio = myResult));
+            .subscribe(
+              (myResult: Portfolio) => (this.localPortfolio = myResult),
+            );
         } else if (!!result && result.weight <= 0) {
           const mySymbol = this.localPortfolio.symbols.filter(
             (mySymbol) => mySymbol.symbol === result.symbol,
@@ -116,7 +148,7 @@ export class PortfolioTableComponent implements OnInit {
             .deleteSymbolFromPortfolio(
               myPortfolio,
               mySymbol.id,
-              result.changedAt ?? '',
+              result.changedAt ?? "",
             )
             .pipe(
               mergeMap(() =>
@@ -124,7 +156,9 @@ export class PortfolioTableComponent implements OnInit {
               ),
               takeUntilDestroyed(this.destroyRef),
             )
-            .subscribe((myResult: Portfolio) => (this.localPortfolio = myResult));
+            .subscribe(
+              (myResult: Portfolio) => (this.localPortfolio = myResult),
+            );
         }
       });
   }

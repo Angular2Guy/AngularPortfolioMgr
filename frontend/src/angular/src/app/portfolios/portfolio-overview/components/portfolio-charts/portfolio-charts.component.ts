@@ -23,13 +23,30 @@ import { PortfolioService } from "../../../../service/portfolio.service";
 import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 import { NewsItem } from "../../model/news-item";
 import { NewsService } from "../../service/news.service";
+import { MatTabGroup, MatTab, MatTabContent } from "@angular/material/tabs";
+import { PortfolioComparisonComponent } from "../portfolio-comparison/portfolio-comparison.component";
+import { PortfolioSectorsComponent } from "../portfolio-sectors/portfolio-sectors.component";
+import { PortfolioTimechartComponent } from "../portfolio-timechart/portfolio-timechart.component";
+import { PortfolioStatsComponent } from "../portfolio-stats/portfolio-stats.component";
+import { NewsListComponent } from "../news-list/news-list.component";
+import { CompanyReportsComponent } from "../company-reports/company-reports.component";
 
 @Component({
   selector: "app-portfolio-charts",
   templateUrl: "./portfolio-charts.component.html",
   styleUrls: ["./portfolio-charts.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatTabGroup,
+    MatTab,
+    MatTabContent,
+    PortfolioComparisonComponent,
+    PortfolioSectorsComponent,
+    PortfolioTimechartComponent,
+    PortfolioStatsComponent,
+    NewsListComponent,
+    CompanyReportsComponent,
+  ],
 })
 export class PortfolioChartsComponent implements OnInit {
   protected cnbcFinanceNews: NewsItem[] = [];
@@ -54,7 +71,10 @@ export class PortfolioChartsComponent implements OnInit {
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        filter((params: ParamMap) => parseInt(params.get("portfolioId") ?? "-1") >= 0),
+        filter(
+          (params: ParamMap) =>
+            parseInt(params.get("portfolioId") ?? "-1") >= 0,
+        ),
         tap(() => (this.reloadData = true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(

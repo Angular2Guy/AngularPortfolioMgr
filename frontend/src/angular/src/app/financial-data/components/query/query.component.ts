@@ -25,12 +25,28 @@ import {
   FinancialsDataUtils,
   ItemType,
 } from "../../model/financials-data-utils";
-import { FormArray, FormGroup, FormBuilder, Validators } from "@angular/forms";
+import {
+  FormArray,
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
 import { debounceTime } from "rxjs/operators";
 import { ConfigService } from "../../../service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { FeConcept } from "../../model/fe-concept";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatSelect, MatOption } from "@angular/material/select";
+import { MatInput } from "@angular/material/input";
+import {
+  MatAutocompleteTrigger,
+  MatAutocomplete,
+} from "@angular/material/autocomplete";
+import { MatIconButton } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
 
 export enum QueryFormFields {
   QueryOperator = "queryOperator",
@@ -46,7 +62,19 @@ export enum QueryFormFields {
   templateUrl: "./query.component.html",
   styleUrls: ["./query.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption,
+    MatInput,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatIconButton,
+    MatIcon,
+  ],
 })
 export class QueryComponent implements OnInit {
   protected readonly containsOperator = "*=*";

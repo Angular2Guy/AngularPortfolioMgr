@@ -20,7 +20,7 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { TokenService } from "ngx-simple-charts/base-service";
-import { Router } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { Portfolio } from "../../../model/portfolio";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -39,13 +39,36 @@ import {
   DialogSpinnerComponent,
 } from "../../../base/components/dialog-spinner/dialog-spinner.component";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatButton } from "@angular/material/button";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import {
+  MatSidenavContainer,
+  MatSidenav,
+  MatSidenavContent,
+} from "@angular/material/sidenav";
+import { NgStyle } from "@angular/common";
+import { MatActionList, MatListItem } from "@angular/material/list";
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: "app-overview",
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatToolbar,
+    MatButton,
+    MatProgressSpinner,
+    MatSidenavContainer,
+    NgStyle,
+    MatSidenav,
+    MatActionList,
+    MatListItem,
+    MatIcon,
+    MatSidenavContent,
+    RouterOutlet,
+  ],
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = 0;
@@ -65,7 +88,7 @@ export class OverviewComponent implements OnInit {
   //limit 250
   countPortfolioSymbolsByUserId = 1000000;
   private timeoutId = -1;
-  protected profiles: string = '';
+  protected profiles: string = "";
   private showPortfolioTable = true;
 
   constructor(
@@ -217,7 +240,7 @@ export class OverviewComponent implements OnInit {
               portfolio,
               symbol.id,
               symbol.weight,
-              symbol.changedAt ?? '',
+              symbol.changedAt ?? "",
             )
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((result: Portfolio) => {
@@ -248,22 +271,30 @@ export class OverviewComponent implements OnInit {
       this.quoteImportService.importFxDailyQuotes("HKD"),
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([resultUs, resultHk, resultDe, resultUSD, resultHKD]: [string, string, string, string, string]) => {
-        console.log(
-          `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`,
-        );
-        this.timeoutId = setTimeout(
-          () =>
-            this.symbolImportService
-              .getIndexSymbols()
-              .pipe(takeUntilDestroyed(this.destroyRef))
-              .subscribe((resultIndex: string) => {
-                console.log(`Index Symbols: ${resultIndex}`);
-                this.importingSymbols = false;
-              }),
-          60000,
-        ) as unknown as number;
-      });
+      .subscribe(
+        ([resultUs, resultHk, resultDe, resultUSD, resultHKD]: [
+          string,
+          string,
+          string,
+          string,
+          string,
+        ]) => {
+          console.log(
+            `Us symbols: ${resultUs}, Hk symbols: ${resultHk}, De symbols: ${resultDe}, Usd quotes: ${resultUSD}, Hkd quotes: ${resultHKD}`,
+          );
+          this.timeoutId = setTimeout(
+            () =>
+              this.symbolImportService
+                .getIndexSymbols()
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe((resultIndex: string) => {
+                  console.log(`Index Symbols: ${resultIndex}`);
+                  this.importingSymbols = false;
+                }),
+            60000,
+          ) as unknown as number;
+        },
+      );
   }
 
   logout(): void {

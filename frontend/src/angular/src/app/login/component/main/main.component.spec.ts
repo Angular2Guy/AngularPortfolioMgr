@@ -26,7 +26,6 @@ import { Login } from "../../model/login";
 import { LoginService } from "../../service/login.service";
 
 import { MainComponent } from "./main.component";
-import { BaseModule } from "../../../base/base.module";
 import { LoginComponent } from "../login/login.component";
 import { MatInputModule } from "@angular/material/input";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
@@ -45,7 +44,6 @@ describe("MainComponent", () => {
     tokenService = jasmine.createSpyObj("tokenService", ["logout"]);
     TestBed.configureTestingModule({
       imports: [
-        BaseModule,
         MatDialogModule,
         MatToolbarModule,
         MatInputModule,
@@ -55,8 +53,9 @@ describe("MainComponent", () => {
         RouterTestingModule.withRoutes([
           { path: "portfolios/overview", redirectTo: "/" },
         ]),
+        MainComponent,
+        LoginComponent,
       ],
-      declarations: [MainComponent, LoginComponent],
       providers: [
         FormBuilder,
         { provide: TokenService, useValue: tokenService },

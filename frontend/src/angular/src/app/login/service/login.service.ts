@@ -17,7 +17,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { TokenService } from "ngx-simple-charts/base-service";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class LoginService {
   constructor(
     private http: HttpClient,

@@ -12,7 +12,7 @@
  */
 import { Injectable } from "@angular/core";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class CalendarService {
   public static readonly DAY_WIDTH = 20;
   public static readonly MONTH_WIDTH = 100;

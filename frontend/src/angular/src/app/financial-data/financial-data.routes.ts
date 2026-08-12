@@ -10,17 +10,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
-import { Portfolio } from "../../../../model/portfolio";
+import { Routes } from "@angular/router";
+import { OverviewComponent } from "./components/overview/overview.component";
 
-@Component({
-  selector: "app-portfolio-stats",
-  templateUrl: "./portfolio-stats.component.html",
-  styleUrl: "./portfolio-stats.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
-})
-export class PortfolioStatsComponent {
-  protected readonly years = [1, 2, 5, 10];
-  @Input()
-  selPortfolio!: Portfolio;
-}
+export const routes: Routes = [
+  { path: "overview", component: OverviewComponent },
+  { path: "**", redirectTo: "overview" },
+];

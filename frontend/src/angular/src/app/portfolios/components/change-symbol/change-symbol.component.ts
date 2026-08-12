@@ -23,13 +23,33 @@ import {
   FormGroup,
   ValidationErrors,
   Validators,
+  FormsModule,
+  ReactiveFormsModule,
 } from "@angular/forms";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+} from "@angular/material/dialog";
 import { DateTime, Duration } from "luxon";
 import { filter } from "rxjs";
 import { PortfolioElement } from "../../../model/portfolio-element";
 import { PortfolioTableComponent } from "../portfolio-table/portfolio-table.component";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import {
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import {
+  MatDatepickerInput,
+  MatDatepickerToggle,
+  MatDatepicker,
+} from "@angular/material/datepicker";
+import { MatButton } from "@angular/material/button";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 enum FormFields {
   SymbolWeight = "symbolWeight",
@@ -41,7 +61,21 @@ enum FormFields {
   templateUrl: "./change-symbol.component.html",
   styleUrls: ["./change-symbol.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    CdkScrollable,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatButton,
+    MatProgressSpinner,
+  ],
 })
 export class ChangeSymbolComponent implements OnInit {
   protected FormFields = FormFields;

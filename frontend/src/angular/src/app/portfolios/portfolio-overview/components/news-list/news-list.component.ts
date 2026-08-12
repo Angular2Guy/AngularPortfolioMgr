@@ -10,19 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import {
-  Component,
-  Input,  
-  ChangeDetectionStrategy,
-} from "@angular/core";
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 import { NewsItem } from "../../model/news-item";
+import { DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-news-list",
   templateUrl: "./news-list.component.html",
   styleUrl: "./news-list.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [DatePipe],
 })
 export class NewsListComponent {
   @Input()

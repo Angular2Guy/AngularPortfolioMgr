@@ -18,12 +18,17 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { DateTime, Duration } from "luxon";
-import { ChartBars, ChartBar } from "ngx-simple-charts/bar";
+import { ChartBars, ChartBar, NgxBarChartsModule } from "ngx-simple-charts/bar";
 import { takeUntilDestroyed } from "../../../../base/utils/funtions";
 import { Portfolio } from "../../../../model/portfolio";
 import { PortfolioBars } from "../../../../model/portfolio-bars";
 import { PortfolioService } from "../../../../service/portfolio.service";
 import { ComparisonIndex } from "../../../../service/quote.service";
+import { MatRadioGroup, MatRadioButton } from "@angular/material/radio";
+import { FormsModule } from "@angular/forms";
+import { MatCheckbox } from "@angular/material/checkbox";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { DatePipe } from "@angular/common";
 
 const enum ChartPeriodKey {
   Month,
@@ -46,7 +51,15 @@ interface ChartPeriod {
   templateUrl: "./portfolio-comparison.component.html",
   styleUrls: ["./portfolio-comparison.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatRadioGroup,
+    FormsModule,
+    MatRadioButton,
+    MatCheckbox,
+    MatProgressSpinner,
+    NgxBarChartsModule,
+    DatePipe,
+  ],
 })
 export class PortfolioComparisonComponent implements OnInit {
   localSelPortfolio: Portfolio = {} as Portfolio;

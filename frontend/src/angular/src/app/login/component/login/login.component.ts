@@ -17,13 +17,30 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+} from "@angular/material/dialog";
 import { MainComponent } from "../main/main.component";
 import { LoginService } from "../../service/login.service";
 import { Login } from "../../model/login";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
+import { NgTemplateOutlet } from "@angular/common";
+import { MatFormField } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatButton } from "@angular/material/button";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 enum FormFields {
   Username = "username",
@@ -39,7 +56,19 @@ enum FormFields {
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    CdkScrollable,
+    MatDialogContent,
+    MatTabGroup,
+    MatTab,
+    NgTemplateOutlet,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatInput,
+    MatButton,
+    MatProgressSpinner,
+  ],
 })
 export class LoginComponent implements OnInit {
   signinForm: FormGroup;
@@ -103,12 +132,12 @@ export class LoginComponent implements OnInit {
 
   onSigninClick(): void {
     const login: Login = {
-      emailAddress: '',
-      token: '',
-      password: '',
-      username: '',
-      alphavantageKey: '',
-      rapidApiKey: '',
+      emailAddress: "",
+      token: "",
+      password: "",
+      username: "",
+      alphavantageKey: "",
+      rapidApiKey: "",
     };
     login.username = this.signinForm.get(FormFields.Username)?.value;
     login.password = this.signinForm.get(FormFields.Password)?.value;
@@ -129,10 +158,10 @@ export class LoginComponent implements OnInit {
 
   onLoginClick(): void {
     const login: Login = {
-      emailAddress: '',
-      token: '',
-      password: '',
-      username: '',
+      emailAddress: "",
+      token: "",
+      password: "",
+      username: "",
     };
     login.username = this.loginForm.get(FormFields.Username)?.value;
     login.password = this.loginForm.get(FormFields.Password)?.value;

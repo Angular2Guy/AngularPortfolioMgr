@@ -10,37 +10,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
+import { Routes } from "@angular/router";
 import { SpinnerComponent } from "./spinner/spinner.component";
 import { MainGuard } from "./service/main.guard";
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: "spinner", component: SpinnerComponent },
   {
     path: "portfolios",
     canActivate: [MainGuard],
     loadChildren: () =>
-      import("./portfolios/portfolios.module").then((m) => m.PortfoliosModule),
+      import("./portfolios/portfolios.routes").then((m) => m.routes),
   },
   {
     path: "financialdata",
     canActivate: [MainGuard],
     loadChildren: () =>
-      import("./financial-data/financial-data.module").then(
-        (m) => m.FinancialDataModule,
-      ),
+      import("./financial-data/financial-data.routes").then((m) => m.routes),
   },
   {
     path: "login",
-    loadChildren: () =>
-      import("./login/login.module").then((m) => m.LoginModule),
+    loadChildren: () => import("./login/login.routes").then((m) => m.routes),
   },
   { path: "**", redirectTo: "spinner" },
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes, {})],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}

@@ -21,6 +21,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 export interface SpinnerData {
   title: string;
@@ -31,7 +32,7 @@ export interface SpinnerData {
   templateUrl: "./dialog-spinner.component.html",
   styleUrls: ["./dialog-spinner.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [MatProgressSpinner],
 })
 export class DialogSpinnerComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) {}

@@ -19,13 +19,14 @@ import {
 import { ServiceUtils } from "../../../../model/service-utils";
 import { Symbol } from "../../../../model/symbol";
 import { Portfolio, CommonValues } from "../../../../model/portfolio";
+import { DecimalPipe, DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-symbol-overview",
   templateUrl: "./symbol-overview.component.html",
   styleUrls: ["./symbol-overview.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [DecimalPipe, DatePipe],
 })
 export class SymbolOverviewComponent {
   @Input()

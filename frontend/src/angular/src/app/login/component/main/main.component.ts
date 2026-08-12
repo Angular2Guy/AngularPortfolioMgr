@@ -23,13 +23,16 @@ import { LoginComponent } from "../login/login.component";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatButton } from "@angular/material/button";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: "app-main",
   templateUrl: "./main.component.html",
   styleUrls: ["./main.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [MatToolbar, MatButton, MatProgressSpinner],
 })
 export class MainComponent {
   login: Login | null = null;

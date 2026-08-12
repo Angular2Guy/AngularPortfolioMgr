@@ -10,24 +10,49 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from "@angular/core";
 import { CompanyReportService } from "../../service/company-report.service";
 import { CompanyReport } from "../../model/company-report";
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitleGroup,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+} from "@angular/material/card";
+import { DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-company-reports",
   templateUrl: "./company-reports.component.html",
   styleUrl: "./company-reports.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatCard,
+    MatCardHeader,
+    MatCardTitleGroup,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    DatePipe,
+  ],
 })
 export class CompanyReportsComponent implements OnInit {
   private companyReportService = inject(CompanyReportService);
   protected companyReports = signal<CompanyReport[]>([]);
 
   ngOnInit(): void {
-    this.companyReportService.getCompanyReports().subscribe((reports: CompanyReport[]) => {
-      this.companyReports.set(reports);
-    });
+    this.companyReportService
+      .getCompanyReports()
+      .subscribe((reports: CompanyReport[]) => {
+        this.companyReports.set(reports);
+      });
   }
 }

@@ -33,13 +33,17 @@ import {
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
 import { ImportData, ImportDataType } from "../../../model/import-data";
 import { QuoteImportService } from "../../../service/quote-import.service";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatButton } from "@angular/material/button";
+import { CreateQueryComponent } from "../create-query/create-query.component";
+import { QueryResultsComponent } from "../query-results/query-results.component";
 
 @Component({
   selector: "app-overview",
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [MatToolbar, MatButton, CreateQueryComponent, QueryResultsComponent],
 })
 export class OverviewComponent implements OnInit {
   protected windowHeight: number = 0;

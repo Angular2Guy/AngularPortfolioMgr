@@ -22,12 +22,22 @@ import {
   FormBuilder,
   AbstractControlOptions,
   Validators,
+  FormsModule,
+  ReactiveFormsModule,
 } from "@angular/forms";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+} from "@angular/material/dialog";
 import { OverviewComponent } from "../overview/overview.component";
 import { ConfigService } from "../../../service/config.service";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
 import { ImportData, ImportDataType } from "../../../model/import-data";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatButton } from "@angular/material/button";
 
 enum FormFields {
   Filename = "filename",
@@ -38,13 +48,22 @@ enum FormFields {
   templateUrl: "./import-financials.component.html",
   styleUrls: ["./import-financials.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    CdkScrollable,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatButton,
+  ],
 })
 export class ImportFinancialsComponent implements OnInit {
   protected financialsForm: FormGroup;
   protected FormFields = FormFields;
-  protected filepath: string = '';
-  protected filename: string = '';
+  protected filepath: string = "";
+  protected filename: string = "";
   protected ImportDataType = ImportDataType;
 
   constructor(

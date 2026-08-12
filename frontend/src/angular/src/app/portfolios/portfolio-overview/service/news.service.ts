@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { NewsItem } from "../model/news-item";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class NewsService {
   constructor(private httpClient: HttpClient) {}
 

@@ -10,12 +10,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
+import { Routes } from "@angular/router";
 import { OverviewComponent } from "./components/overview/overview.component";
 import { PortfolioTableComponent } from "./components/portfolio-table/portfolio-table.component";
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: "overview",
     component: OverviewComponent,
@@ -27,8 +26,8 @@ const routes: Routes = [
       {
         path: "portfolio-overview",
         loadChildren: () =>
-          import("./portfolio-overview/portfolio-overview.module").then(
-            (m) => m.PortfolioOverviewModule,
+          import("./portfolio-overview/portfolio-overview.routes").then(
+            (m) => m.routes,
           ),
       },
       { path: "**", redirectTo: "table" },
@@ -37,15 +36,9 @@ const routes: Routes = [
   {
     path: "portfolio-detail",
     loadChildren: () =>
-      import("./portfolio-detail/portfolio-detail.module").then(
-        (m) => m.PortfolioDetailModule,
+      import("./portfolio-detail/portfolio-detail.routes").then(
+        (m) => m.routes,
       ),
   },
   { path: "**", redirectTo: "overview" },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class PortfoliosRoutingModule {}

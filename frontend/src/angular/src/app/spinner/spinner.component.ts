@@ -24,6 +24,7 @@ import {
   style,
 } from "@angular/animations";
 import { Router } from "@angular/router";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: "app-spinner",
@@ -38,7 +39,7 @@ import { Router } from "@angular/router";
     ]),
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [MatProgressSpinner],
 })
 export class SpinnerComponent implements OnInit, AfterViewInit {
   myState = false;

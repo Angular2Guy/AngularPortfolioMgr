@@ -18,7 +18,14 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { MatTree, MatTreeNestedDataSource } from "@angular/material/tree";
+import {
+  MatTree,
+  MatTreeNestedDataSource,
+  MatTreeNodeDef,
+  MatNestedTreeNode,
+  MatTreeNodeToggle,
+  MatTreeNodeOutlet,
+} from "@angular/material/tree";
 import { FeIdInfo } from "../../model/fe-id-info";
 import {
   FinancialElement,
@@ -27,6 +34,22 @@ import {
 import { FinancialsDataUtils } from "../../model/financials-data-utils";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialDataService } from "../../service/financial-data.service";
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTooltip } from "@angular/material/tooltip";
+import { MatIcon } from "@angular/material/icon";
+import { MatIconButton } from "@angular/material/button";
+import { MatDivider } from "@angular/material/list";
 
 interface ElementNode {
   name: string;
@@ -53,7 +76,27 @@ interface BySymbolElements extends ElementNode {
   templateUrl: "./result-tree.component.html",
   styleUrls: ["./result-tree.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    MatTree,
+    MatTreeNodeDef,
+    MatNestedTreeNode,
+    MatTreeNodeToggle,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatIcon,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatIconButton,
+    MatTreeNodeOutlet,
+    MatDivider,
+  ],
 })
 export class ResultTreeComponent {
   private _symbolFinancials: SymbolFinancials[] = [];
@@ -84,12 +127,14 @@ export class ResultTreeComponent {
 
   protected conceptClick(element: FinancialElement): void {
     //console.log(element);
-    this.financialDataService.getFeInfo(element.id).subscribe((value: FeIdInfo) => {
-      //console.log(value);
-      this.financialElement = element;
-      this.financialElement.info = value.info;
-      this.bottomSheet.open(this.bsTemplate);
-    });
+    this.financialDataService
+      .getFeInfo(element.id)
+      .subscribe((value: FeIdInfo) => {
+        //console.log(value);
+        this.financialElement = element;
+        this.financialElement.info = value.info;
+        this.bottomSheet.open(this.bsTemplate);
+      });
   }
 
   protected toggleNode(node: ByElements): void {

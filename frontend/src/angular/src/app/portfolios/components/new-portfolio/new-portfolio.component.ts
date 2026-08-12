@@ -11,13 +11,36 @@
    limitations under the License.
  */
 import { Component, Inject, ChangeDetectionStrategy } from "@angular/core";
-import { FormGroup, Validators, FormBuilder } from "@angular/forms";
+import {
+  FormGroup,
+  Validators,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
 import { OverviewComponent } from "../overview/overview.component";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+} from "@angular/material/dialog";
 import { Portfolio } from "../../../model/portfolio";
 import { PortfolioData } from "../../../model/portfolio-data";
 import { DateTime } from "luxon";
 import { TokenService } from "ngx-simple-charts/base-service";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import {
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import {
+  MatDatepickerInput,
+  MatDatepickerToggle,
+  MatDatepicker,
+} from "@angular/material/datepicker";
+import { MatButton } from "@angular/material/button";
 
 enum FormFields {
   PortfolioName = "portfolioName",
@@ -29,7 +52,20 @@ enum FormFields {
   templateUrl: "./new-portfolio.component.html",
   styleUrls: ["./new-portfolio.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    CdkScrollable,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatInput,
+    MatLabel,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatButton,
+  ],
 })
 export class NewPortfolioComponent {
   portfolioForm: FormGroup;
@@ -57,7 +93,8 @@ export class NewPortfolioComponent {
   }
 
   onAddClick(): void {
-    const createdAt = this.portfolioForm.get(FormFields.CreatedAt)?.value as DateTime;
+    const createdAt = this.portfolioForm.get(FormFields.CreatedAt)
+      ?.value as DateTime;
     //createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
     const portfolio: Portfolio = {
       id: -1,
@@ -100,7 +137,8 @@ export class NewPortfolioComponent {
         this.formValid = true;
       } else {
         formGroup
-          .get(FormFields.PortfolioName)?.setErrors({ MatchPassword: true });
+          .get(FormFields.PortfolioName)
+          ?.setErrors({ MatchPassword: true });
         this.formValid = false;
       }
     }

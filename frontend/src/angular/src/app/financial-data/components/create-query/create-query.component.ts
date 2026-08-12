@@ -24,6 +24,9 @@ import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
+  CdkDropListGroup,
+  CdkDropList,
+  CdkDrag,
 } from "@angular/cdk/drag-drop";
 import {
   FormGroup,
@@ -32,6 +35,8 @@ import {
   Validators,
   ValidationErrors,
   ValidatorFn,
+  FormsModule,
+  ReactiveFormsModule,
 } from "@angular/forms";
 import {
   FinancialsDataUtils,
@@ -48,12 +53,20 @@ import { switchMap, debounceTime, delay, filter } from "rxjs/operators";
 import { SymbolService } from "../../../service/symbol.service";
 import { ConfigService } from "../../../service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
-import { QueryFormFields } from "../query/query.component";
+import { QueryFormFields, QueryComponent } from "../query/query.component";
 import { Symbol } from "../../../model/symbol";
 import { SfSymbolName } from "../../model/sf-symbol-name";
 import { takeUntilDestroyed } from "../../../base/utils/funtions";
 import { QuarterData } from "../../model/quarter-data";
 import { FeCountry } from "../../model/fe-country";
+import { MatButton } from "@angular/material/button";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatSelect, MatOption } from "@angular/material/select";
+import { MatInput } from "@angular/material/input";
+import {
+  MatAutocompleteTrigger,
+  MatAutocomplete,
+} from "@angular/material/autocomplete";
 
 export interface MyItem {
   queryItemType: ItemType;
@@ -83,7 +96,22 @@ enum FormFields {
   templateUrl: "./create-query.component.html",
   styleUrls: ["./create-query.component.scss"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatButton,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption,
+    MatInput,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    CdkDropListGroup,
+    CdkDropList,
+    QueryComponent,
+    CdkDrag,
+  ],
 })
 export class CreateQueryComponent implements OnInit {
   private readonly availableInit: MyItem[] = [
@@ -159,7 +187,9 @@ export class CreateQueryComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         debounceTime(200),
         filter((myValue: string) => !!myValue),
-        switchMap((myValue: string) => this.symbolService.getSymbolBySymbol(myValue)),
+        switchMap((myValue: string) =>
+          this.symbolService.getSymbolBySymbol(myValue),
+        ),
       )
       .subscribe((myValue: Symbol[]) => (this.symbols = myValue));
     this.queryForm.controls[FormFields.Name].valueChanges
@@ -184,14 +214,18 @@ export class CreateQueryComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values: QuarterData[]) =>
-          (this.quarterQueryItems = values.map((myValue: QuarterData) => myValue.quarter)),
+          (this.quarterQueryItems = values.map(
+            (myValue: QuarterData) => myValue.quarter,
+          )),
       );
     this.financialDataService
       .getCountries()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (values: FeCountry[]) =>
-          (this.countryQueryItems = values.map((myValue: FeCountry) => myValue.country)),
+          (this.countryQueryItems = values.map(
+            (myValue: FeCountry) => myValue.country,
+          )),
       );
   }
 
@@ -202,13 +236,14 @@ export class CreateQueryComponent implements OnInit {
         event.previousIndex,
         event.currentIndex,
       );
-      const queryItemsArray = this.queryForm.controls[FormFields.QueryItems] as FormArray;
-      const myFormArrayItem = queryItemsArray.value.splice(event.previousIndex, 1)[0];
-      queryItemsArray.value.splice(
-        event.currentIndex,
-        0,
-        myFormArrayItem,
-      );
+      const queryItemsArray = this.queryForm.controls[
+        FormFields.QueryItems
+      ] as FormArray;
+      const myFormArrayItem = queryItemsArray.value.splice(
+        event.previousIndex,
+        1,
+      )[0];
+      queryItemsArray.value.splice(event.currentIndex, 0, myFormArrayItem);
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -247,7 +282,8 @@ export class CreateQueryComponent implements OnInit {
       financialElementParams: !!this.queryForm.controls[FormFields.QueryItems]
         ?.value?.length
         ? this.queryForm.controls[FormFields.QueryItems].value.map(
-            (myFormGroup: FormGroup) => this.createFinancialElementParam(myFormGroup),
+            (myFormGroup: FormGroup) =>
+              this.createFinancialElementParam(myFormGroup),
           )
         : [],
     } as SymbolFinancialsQueryParams;
