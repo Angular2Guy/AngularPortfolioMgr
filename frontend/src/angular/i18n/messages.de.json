@@ -145,6 +145,9 @@
     "portfolioStatsSigmaMsciChina": "Year{$INTERPOLATION}SigmaMsciChina",
     "portfolioStatsSigmaEuroStoxx50": "Year{$INTERPOLATION}SigmaEuroStoxx50",
     "portfolioStatsSigmaPortfolio": "Year{$INTERPOLATION}SigmaPortfolio",
-    "spinnerWelcome": "Welcome to AngularPortfolioManager_de"
+    "spinnerWelcome": "Welcome to AngularPortfolioManager_de",
+    "openArticle":"Open Article",
+    "openCompanyReport":"Open Company Report",
+    "portfolioChartsCompanyReports": "Company Reports"
   }
 }
