@@ -1,13 +1,13 @@
 <div class="container">
-  @if (!!treeSymbolFinancials && treeSymbolFinancials.length > 0) {
+  @if (!!treeSymbolFinancials() && treeSymbolFinancials().length > 0) {
     <div>
       <app-result-tree
-        [symbolFinancials]="treeSymbolFinancials"
+        [symbolFinancials]="treeSymbolFinancials()"
       ></app-result-tree>
     </div>
   }
 
-  <div [class.no-display]="!financialElements || financialElements.length <= 0">
+  <div [class.no-display]="!financialElements() || financialElements().length <= 0">
     <mat-form-field>
       <mat-label>Filter</mat-label>
       <input
@@ -89,9 +89,5 @@
                       >
                     </div>
                   }
-                  <!--
-                  {{ symbolFinancials | json }}
-                  {{ financialElements | json }}
-                  -->
                 </div>
               </div>

@@ -12,9 +12,9 @@
  */
 import {
   Component,
-  OnInit,
-  OnDestroy,
+  inject,
   DestroyRef,
+  signal,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { Login } from "../../model/login";
@@ -22,7 +22,7 @@ import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginComponent } from "../login/login.component";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router } from "@angular/router";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatToolbar } from "@angular/material/toolbar";
 import { MatButton } from "@angular/material/button";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -31,32 +31,30 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
   selector: "app-main",
   templateUrl: "./main.component.html",
   styleUrls: ["./main.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatToolbar, MatButton, MatProgressSpinner],
 })
 export class MainComponent {
-  login: Login | null = null;
+  login = signal<Login | null>(null);
 
-  constructor(
-    private dialog: MatDialog,
-    private tokenService: TokenService,
-    private router: Router,
-    private destroyRef: DestroyRef,
-  ) {}
+  private dialog = inject(MatDialog);
+  private tokenService = inject(TokenService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   openLoginDialog(): MatDialogRef<LoginComponent, Login> {
     const dialogRef = this.dialog.open(LoginComponent, {
       width: "600px",
       hasBackdrop: true,
       disableClose: true,
-      data: { login: this.login },
+      data: { login: this.login() },
     });
     dialogRef
       .beforeClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: Login) => {
-        this.login = typeof result == "undefined" ? null : result;
-        if (this.login) {
+        this.login.set(typeof result == "undefined" ? null : result);
+        if (this.login()) {
           this.router.navigate(["/portfolios/overview"]);
         }
       });

@@ -13,13 +13,15 @@
 import {
   Component,
   DestroyRef,
-  Input,
-  OnInit,
   ChangeDetectionStrategy,
+  inject,
+  signal,
+  input,
+  effect,
 } from "@angular/core";
 import { DateTime, Duration } from "luxon";
 import { ChartBars, ChartBar, NgxBarChartsModule } from "ngx-simple-charts/bar";
-import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Portfolio } from "../../../../model/portfolio";
 import { PortfolioBars } from "../../../../model/portfolio-bars";
 import { PortfolioService } from "../../../../service/portfolio.service";
@@ -50,7 +52,7 @@ interface ChartPeriod {
   selector: "app-portfolio-comparison",
   templateUrl: "./portfolio-comparison.component.html",
   styleUrls: ["./portfolio-comparison.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatRadioGroup,
     FormsModule,
@@ -61,26 +63,24 @@ interface ChartPeriod {
     DatePipe,
   ],
 })
-export class PortfolioComparisonComponent implements OnInit {
-  localSelPortfolio: Portfolio = {} as Portfolio;
-  startDate!: Date;
-  chartPeriods: ChartPeriod[] = [];
-  chartsLoading = true;
+export class PortfolioComparisonComponent {
+  selPortfolio = input.required<Portfolio>();
+  startDate = signal(new Date());
+  chartPeriods = signal<ChartPeriod[]>([]);
+  chartsLoading = signal(true);
   readonly ComparisonIndex = ComparisonIndex;
-  showSP500 = false;
-  showMsciCH = false;
-  showES50 = false;
-  selChartPeriod: ChartPeriod = {} as ChartPeriod;
-  chartBars!: ChartBars;
-  selCompIndexes: ComparisonIndex[] = [];
+  showSP500 = signal(false);
+  showMsciCH = signal(false);
+  showES50 = signal(false);
+  selChartPeriod = signal<ChartPeriod>({} as ChartPeriod);
+  chartBars = signal<ChartBars>({} as ChartBars);
+  selCompIndexes = signal<ComparisonIndex[]>([]);
 
-  constructor(
-    private portfolioService: PortfolioService,
-    private destroyRef: DestroyRef,
-  ) {}
+  private portfolioService = inject(PortfolioService);
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
-    this.chartPeriods = [
+  constructor() {
+    const periods: ChartPeriod[] = [
       {
         chartPeriodKey: ChartPeriodKey.Month,
         periodText: $localize`:@@month1:1 Month`,
@@ -117,34 +117,34 @@ export class PortfolioComparisonComponent implements OnInit {
         periodDuration: { years: 10 },
       },
     ];
-    this.selChartPeriod = this.chartPeriods[0];
-    this.startDate = DateTime.now()
-      .minus(this.selChartPeriod.periodDuration)
-      .toJSDate();
+    this.chartPeriods.set(periods);
+    this.selChartPeriod.set(periods[0]);
+    this.startDate.set(
+      DateTime.now().minus(periods[0].periodDuration).toJSDate(),
+    );
     this.chartPeriodChanged();
-  }
 
-  get selPortfolio(): Portfolio {
-    return this.localSelPortfolio;
-  }
-
-  @Input()
-  set selPortfolio(myPortfolio: Portfolio) {
-    this.localSelPortfolio = myPortfolio;
-    this.chartPeriodChanged();
+    effect(() => {
+      const portfolio = this.selPortfolio();
+      if (portfolio?.id) {
+        this.chartPeriodChanged();
+      }
+    });
   }
 
   chartPeriodChanged(): void {
-    if (!!this.selPortfolio?.id && !!this.selChartPeriod?.periodDuration) {
-      this.chartsLoading = true;
-      this.startDate = DateTime.now()
-        .minus(this.selChartPeriod.periodDuration)
-        .toJSDate();
+    const portfolio = this.selPortfolio();
+    const period = this.selChartPeriod();
+    if (!!portfolio?.id && !!period?.periodDuration) {
+      this.chartsLoading.set(true);
+      this.startDate.set(
+        DateTime.now().minus(period.periodDuration).toJSDate(),
+      );
       this.portfolioService
         .getPortfolioBarsByIdAndStart(
-          this.selPortfolio.id,
-          this.startDate,
-          this.selCompIndexes,
+          portfolio.id,
+          this.startDate(),
+          this.selCompIndexes(),
         )
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result: PortfolioBars) => this.updateChartData(result));
@@ -152,27 +152,25 @@ export class PortfolioComparisonComponent implements OnInit {
   }
 
   private updateChartData(portfolioBars: PortfolioBars) {
-    this.chartsLoading = false;
-    //console.log(portfolioBars);
+    this.chartsLoading.set(false);
     const chartBars = portfolioBars.portfolioBars.map(
       (value) => ({ x: value.name, y: value.value }) as ChartBar,
     );
-    this.chartBars = {
+    this.chartBars.set({
       title: portfolioBars.title,
-      from: this.startDate.toLocaleDateString(),
+      from: this.startDate().toLocaleDateString(),
       yScaleWidth: 50,
       xScaleHeight: 50,
       chartBars: chartBars,
-    } as ChartBars;
-    //console.log(this.chartBars);
+    } as ChartBars);
   }
 
   compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
-    this.selCompIndexes = !value
-      ? this.selCompIndexes.filter((ci) => comparisonIndex !== ci)
-      : this.selCompIndexes
-          .filter((ci) => comparisonIndex !== ci)
-          .concat(comparisonIndex);
+    this.selCompIndexes.update((indexes) =>
+      !value
+        ? indexes.filter((ci) => comparisonIndex !== ci)
+        : indexes.filter((ci) => comparisonIndex !== ci).concat(comparisonIndex),
+    );
     this.chartPeriodChanged();
   }
 }

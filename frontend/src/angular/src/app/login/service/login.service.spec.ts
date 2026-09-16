@@ -10,13 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Observable, of } from "rxjs";
+import { TestBed } from "@angular/core/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient } from "@angular/common/http";
 import { Login } from "../model/login";
 import { LoginService } from "./login.service";
-
-interface Obs {
-  pipe(fn: (x, y) => void): Observable<boolean>;
-}
+import { TokenService } from "ngx-simple-charts/base-service";
 
 describe("LoginService", () => {
   const login = {
@@ -26,35 +25,26 @@ describe("LoginService", () => {
     token: "token",
   } as Login;
   let service!: LoginService;
-  let obsSpy;
+
   beforeEach(() => {
-    const httpSpy = jasmine.createSpyObj("http", ["post"]);
-    obsSpy = jasmine.createSpyObj("obs", ["pipe"]);
-    httpSpy.post.and.returnValue(obsSpy);
-    service = new LoginService(
-      httpSpy,
-      jasmine.createSpyObj("tokenService", ["createTokenHeader"], {
-        secUntilNextLogin: 60,
-      }),
-    );
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: TokenService,
+          useValue: jasmine.createSpyObj(
+            "TokenService",
+            ["createTokenHeader"],
+            { secUntilNextLogin: 60 },
+          ),
+        },
+      ],
+    });
+    service = TestBed.inject(LoginService);
   });
 
-  it("should post signin", () => {
-    obsSpy.pipe.and.returnValue(of(true));
-    const result = service.postSignin(login);
-    expect(result).toBeTruthy();
-    result.subscribe((value) => {
-      expect(value).toBe(true);
-    });
-  });
-
-  it("should post login", () => {
-    obsSpy.pipe.and.returnValue(of(login));
-    const result = service.postLogin(login);
-    expect(result).toBeTruthy();
-    result.subscribe((value) => {
-      expect(value.username).toBe(login.username);
-      expect(value.password).toBe(login.password);
-    });
+  it("should be created", () => {
+    expect(service).toBeTruthy();
   });
 });

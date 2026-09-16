@@ -1,11 +1,11 @@
 <form [formGroup]="itemFormGroup" novalidate class="myform">
   <div class="query-item base-query">
-    @if (queryItemType === ItemType.Query && showType) {
+    @if (queryItemType() === ItemType.Query && showType()) {
       <div>
         <div i18n="@@query">Query</div>
       </div>
     }
-    @if (queryItemType === ItemType.Query && !showType) {
+    @if (queryItemType() === ItemType.Query && !showType()) {
       <div>
         <mat-form-field class="string-operator">
           <mat-label i18n="@@operator">Operator</mat-label>
@@ -14,7 +14,7 @@
             name="ConceptOperator"
             class="operator"
             >
-            @for (item of stringQueryItems; track item) {
+            @for (item of stringQueryItems(); track item) {
               <mat-option
                 [value]="item"
                 class="operator"
@@ -34,7 +34,7 @@
               placeholder="concept"
               />
             <mat-autocomplete #autoConcept="matAutocomplete" autoActiveFirstOption>
-              @for (concept of concepts; track concept) {
+              @for (concept of concepts(); track concept) {
                 <mat-option
                   [value]="concept.concept"
                   class="symbol-text"
@@ -46,7 +46,7 @@
           </mat-form-field>
         </div>
       }
-      @if (queryItemType === ItemType.Query && !showType) {
+      @if (queryItemType() === ItemType.Query && !showType()) {
         <div>
           <mat-form-field class="number-operator">
             <mat-label i18n="@@operator">Operator</mat-label>
@@ -55,7 +55,7 @@
               name="NumberOperator"
               class="operator"
               >
-              @for (item of numberQueryItems; track item) {
+              @for (item of numberQueryItems(); track item) {
                 <mat-option
                   [value]="item"
                   class="operator"
@@ -76,7 +76,7 @@
           </div>
         }
 
-        @if (queryItemType === ItemType.TermStart && !showType) {
+        @if (queryItemType() === ItemType.TermStart && !showType()) {
           <div>
             <mat-form-field class="term-operator">
               <mat-label i18n="@@operator">Operator</mat-label>
@@ -85,7 +85,7 @@
                 name="TermOperator"
                 class="operator"
                 >
-                @for (item of termQueryItems; track item) {
+                @for (item of termQueryItems(); track item) {
                   <mat-option
                     [value]="item"
                     class="operator"
@@ -96,13 +96,13 @@
               </mat-form-field>
             </div>
           }
-          @if (queryItemType === ItemType.TermStart) {
+          @if (queryItemType() === ItemType.TermStart) {
             <div>
               <div i18n="@@queryTermStart">Term Start</div>
             </div>
           }
 
-          @if (queryItemType === ItemType.TermEnd && !showType) {
+          @if (queryItemType() === ItemType.TermEnd && !showType()) {
             <div>
               <mat-form-field class="term-operator">
                 <mat-label i18n="@@operator">Operator</mat-label>
@@ -118,12 +118,12 @@
                 </mat-form-field>
               </div>
             }
-            @if (queryItemType === ItemType.TermEnd) {
+            @if (queryItemType() === ItemType.TermEnd) {
               <div>
                 <div i18n="@@queryTermEnd">Term End</div>
               </div>
             }
-            @if (!showType) {
+            @if (!showType()) {
               <div>
                 <button mat-icon-button (click)="itemRemove()">
                   <mat-icon>close</mat-icon>

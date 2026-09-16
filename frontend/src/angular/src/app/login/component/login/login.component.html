@@ -1,12 +1,12 @@
 <div mat-dialog-content>
   <mat-tab-group>
     <mat-tab i18n-label="@@loginLogin" label="Login">
-      @if (waitingForResponse) {
+      @if (waitingForResponse()) {
         <ng-container
           [ngTemplateOutlet]="waitingSpinner"
         ></ng-container>
       }
-      @if (!waitingForResponse) {
+      @if (!waitingForResponse()) {
         <form [formGroup]="loginForm" novalidate>
           <ul>
             <li>
@@ -32,7 +32,7 @@
                   />
               </mat-form-field>
             </li>
-            @if (loginFailed) {
+            @if (loginFailed()) {
               <li i18n="@@loginLoginFailed" class="errorText">
             Login Failed
           </li>
@@ -61,12 +61,12 @@
       }
     </mat-tab>
     <mat-tab i18n-label="@@signin" label="Signin">
-      @if (waitingForResponse) {
+      @if (waitingForResponse()) {
         <ng-container
           [ngTemplateOutlet]="waitingSpinner"
         ></ng-container>
       }
-      @if (!waitingForResponse) {
+      @if (!waitingForResponse()) {
         <form [formGroup]="signinForm" novalidate>
           <ul>
             <li>
@@ -102,7 +102,7 @@
                   />
               </mat-form-field>
             </li>
-            @if (!pwMatching) {
+            @if (!pwMatching()) {
               <li
                 i18n="@@loginPasswordsNoMatch"
                 class="errorText"
@@ -143,7 +143,7 @@
                   />
               </mat-form-field>
             </li>
-            @if (signinFailed) {
+            @if (signinFailed()) {
               <li i18n="@@loginSigninFailed" class="errorText">
             Signin Failed
           </li>

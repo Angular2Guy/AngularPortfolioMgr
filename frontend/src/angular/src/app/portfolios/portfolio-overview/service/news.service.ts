@@ -1,11 +1,11 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { NewsItem } from "../model/news-item";
 
 @Injectable({ providedIn: "root" })
 export class NewsService {
-  constructor(private httpClient: HttpClient) {}
+  private httpClient = inject(HttpClient);
 
   getSeekingAlphaNews(): Observable<NewsItem[]> {
     return this.httpClient.get<NewsItem[]>("/rest/newsfeed/seeking-alpha");

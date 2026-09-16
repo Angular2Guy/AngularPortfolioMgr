@@ -1,5 +1,5 @@
 <div mat-dialog-content>
-  @if (!importingQuotes) {
+  @if (!importingQuotes()) {
     <form [formGroup]="symbolForm" novalidate>
       <ul class="list-style">
         <li>
@@ -86,15 +86,15 @@
             <mat-datepicker #picker1></mat-datepicker>
           </mat-form-field>
         </li>
-        @if (!selSymbol && !loading) {
+        @if (!selSymbol && !loading()) {
           <li i18n="@@addSymbolNoSymbol">
         No Symbol selected.
       </li>
         }
-        @if (loading) {
+        @if (loading()) {
           <li i18n="@@loading">Loading...</li>
         }
-        @if (selSymbol && !loading) {
+        @if (selSymbol && !loading()) {
           <li>
             <div class="symbol-element" i18n="@@symbol">
           Symbol: {{ selSymbol.symbol }}
@@ -129,7 +129,7 @@
       </ul>
     </form>
   }
-  @if (importingQuotes) {
+  @if (importingQuotes()) {
     <div>
       <div class="container">
         <div i18n="@@addSymbolImportingQuotes">Importing Quotes...</div>

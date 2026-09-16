@@ -1,5 +1,5 @@
 <div class="my-container">
-  @if (chartsLoading) {
+  @if (chartsLoading()) {
     <div class="center-div">
       <mat-progress-spinner
         mode="indeterminate"
@@ -7,19 +7,19 @@
       ></mat-progress-spinner>
     </div>
   }
-  @if (!chartsLoading) {
+  @if (!chartsLoading()) {
     <div class="chart-container">
       <div class="chart-legend">
         <h2 class="my-header" i18n="@@portfolioSectorsLegendTitle">
         Portfolio sector distribution
       </h2>
         <ol type="1">
-          @for (chartSlice of chartSlices.chartSlices; track chartSlice) {
+          @for (chartSlice of chartSlices().chartSlices; track chartSlice) {
             <li>
               <span class="my-span">{{ chartSlice.name }}: </span>
               <span
                 >{{
-                (chartSlice.value / slicesSum) * 100 | number: "1.0-2"
+                (chartSlice.value / slicesSum()) * 100 | number: "1.0-2"
                 }}
                 %</span
                 >
@@ -38,8 +38,8 @@
           <sc-donut-chart
             class="donut-chart"
             #myDonutChart
-            [chartState]="chartState"
-            [chartSlices]="chartSlices"
+            [chartState]="chartState()"
+            [chartSlices]="chartSlices()"
           ></sc-donut-chart>
         </div>
       }

@@ -10,13 +10,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class SymbolImportService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getSymbolImportUs(): Observable<string> {
     return this.http.get("/rest/symbol/importus/all", { responseType: "text" });

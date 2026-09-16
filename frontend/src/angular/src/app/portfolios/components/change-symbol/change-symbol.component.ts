@@ -14,7 +14,9 @@ import {
   Component,
   DestroyRef,
   Inject,
+  inject,
   OnInit,
+  signal,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import {
@@ -35,7 +37,7 @@ import { DateTime, Duration } from "luxon";
 import { filter } from "rxjs";
 import { PortfolioElement } from "../../../model/portfolio-element";
 import { PortfolioTableComponent } from "../portfolio-table/portfolio-table.component";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import {
   MatFormField,
@@ -60,7 +62,7 @@ enum FormFields {
   selector: "app-change-symbol",
   templateUrl: "./change-symbol.component.html",
   styleUrls: ["./change-symbol.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkScrollable,
     MatDialogContent,
@@ -80,16 +82,16 @@ enum FormFields {
 export class ChangeSymbolComponent implements OnInit {
   protected FormFields = FormFields;
   protected symbolForm: FormGroup;
-  protected updatingQuotes = false;
-  protected deleteSymbol = false;
+  protected updatingQuotes = signal(false);
+  protected deleteSymbol = signal(false);
   private newWeight = -1;
   private changedAt = DateTime.now();
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioTableComponent>,
-    private destroyRef: DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioElement,
-    private fb: FormBuilder,
   ) {
     this.symbolForm = this.fb.group({
       [FormFields.SymbolWeight]: [
@@ -121,7 +123,7 @@ export class ChangeSymbolComponent implements OnInit {
   }
 
   updateClick() {
-    if (!this.deleteSymbol) {
+    if (!this.deleteSymbol()) {
       const startChangedAt = DateTime.now().minus(
         Duration.fromObject({ years: 100 }),
       );
@@ -140,7 +142,6 @@ export class ChangeSymbolComponent implements OnInit {
         this.data.changedAt = DateTime.now().toISO().split("+")[0];
       }
       this.data.weight = 0;
-      //console.log(this.data);
       this.dialogRef.close(this.data);
     }
   }
@@ -150,7 +151,7 @@ export class ChangeSymbolComponent implements OnInit {
   }
 
   deleteClick() {
-    this.deleteSymbol = true;
+    this.deleteSymbol.set(true);
   }
 
   private validateWeight(control: AbstractControl): ValidationErrors {

@@ -1,5 +1,4 @@
-import { OnInit, ChangeDetectionStrategy } from "@angular/core";
-import { Component } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialogRef, MatDialogContent } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { ProdAppInfoService } from "../../service/prod-app-info.service";
@@ -13,18 +12,16 @@ import { AsyncPipe } from "@angular/common";
   selector: "app-prod-config",
   templateUrl: "./prod-config.component.html",
   styleUrls: ["./prod-config.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CdkScrollable, MatDialogContent, MatLabel, MatButton, AsyncPipe],
 })
-export class ProdConfigComponent implements OnInit {
+export class ProdConfigComponent {
   classNameObs: Observable<string>;
 
-  constructor(
-    private dialogRef: MatDialogRef<OverviewComponent>,
-    private prodAppInfoService: ProdAppInfoService,
-  ) {}
+  private dialogRef = inject(MatDialogRef<OverviewComponent>);
+  private prodAppInfoService = inject(ProdAppInfoService);
 
-  ngOnInit(): void {
+  constructor() {
     this.classNameObs = this.prodAppInfoService.getClassName();
   }
 

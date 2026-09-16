@@ -6,14 +6,14 @@
     >
       <ng-template matTabContent>
         <app-portfolio-comparison
-          [selPortfolio]="selPortfolio"
+          [selPortfolio]="selPortfolio()"
         ></app-portfolio-comparison>
       </ng-template>
     </mat-tab>
     <mat-tab i18n-label="@@portfolioChartsSectors" label="Portfolio Sectors">
       <ng-template matTabContent>
         <app-portfolio-sectors
-          [selPortfolio]="selPortfolio"
+          [selPortfolio]="selPortfolio()"
         ></app-portfolio-sectors>
       </ng-template>
     </mat-tab>
@@ -23,7 +23,7 @@
     >
       <ng-template matTabContent>
         <app-portfolio-timechart
-          [selPortfolio]="selPortfolio"
+          [selPortfolio]="selPortfolio()"
         ></app-portfolio-timechart>
       </ng-template>
     </mat-tab>
@@ -31,15 +31,15 @@
       label="Portfolio Stats">
     	<ng-template matTabContent>
         <app-portfolio-stats
-          [selPortfolio]="selPortfolio"
+          [selPortfolio]="selPortfolio()"
         ></app-portfolio-stats>
       </ng-template>
     </mat-tab>
     <mat-tab label="Seeking Alpha" i18n-label="@@portfolioChartsSeekingAlpha"
-      ><app-news-list [newsItems]="seekingAlphaNews"></app-news-list
+      ><app-news-list [newsItems]="seekingAlphaNews()"></app-news-list
     ></mat-tab>
     <mat-tab label="Cnbc Finance" i18n-label="@@portfolioChartsCnbcFinance"
-      ><app-news-list [newsItems]="cnbcFinanceNews"></app-news-list
+      ><app-news-list [newsItems]="cnbcFinanceNews()"></app-news-list
     ></mat-tab>
     <mat-tab label="Company Reports" i18n-label="@@portfolioChartsCompanyReports"
       ><app-company-reports></app-company-reports

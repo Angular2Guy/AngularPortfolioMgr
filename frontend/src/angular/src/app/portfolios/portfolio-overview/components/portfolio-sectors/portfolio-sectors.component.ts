@@ -12,12 +12,14 @@
  */
 import {
   Component,
-  Input,
-  OnInit,
-  ViewChild,
   ElementRef,
-  AfterViewInit,
   ChangeDetectionStrategy,
+  signal,
+  viewChild,
+  input,
+  effect,
+  DestroyRef,
+  inject,
 } from "@angular/core";
 import {
   trigger,
@@ -59,7 +61,7 @@ interface CalcPortfolioElement {
       ]),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatProgressSpinner,
     MatIcon,
@@ -68,21 +70,19 @@ interface CalcPortfolioElement {
     DecimalPipe,
   ],
 })
-export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
-  localSelPortfolio: Portfolio = {} as Portfolio;
-  chartSlices: ChartSlices = {
+export class PortfolioSectorsComponent {
+  selPortfolio = input.required<Portfolio>();
+  divHideMe = viewChild<ElementRef>("hideMe");
+  chartSlices = signal<ChartSlices>({
     title: "",
     from: "",
     xScaleHeight: 0,
     yScaleWidth: 0,
     chartSlices: [],
-  };
-  chartsLoading = true;
-  @ViewChild("hideMe")
-  divHideMe!: ElementRef;
-  afterViewInitCalled = false;
-  chartState: "ready" | "not-ready" = "not-ready";
-  slicesSum = 1;
+  });
+  chartsLoading = signal(true);
+  chartState = signal<"ready" | "not-ready">("not-ready");
+  slicesSum = signal(1);
 
   private readonly colorKeys = [
     "--red",
@@ -95,31 +95,34 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
     "--gray",
   ];
 
-  constructor() {}
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
-    this.chartSlices.title = this.selPortfolio.name;
-    this.chartSlices.chartSlices = [];
-    this.chartsLoading = false;
-    this.chartState = "not-ready";
-  }
-
-  ngAfterViewInit(): void {
-    this.afterViewInitCalled = true;
-    this.drawDonut();
+  constructor() {
+    effect(() => {
+      const portfolio = this.selPortfolio();
+      const divHideMe = this.divHideMe();
+      if (portfolio?.id) {
+        this.chartSlices.update((s) => ({ ...s, title: portfolio.name, chartSlices: [] }));
+        this.chartsLoading.set(false);
+        this.chartState.set("not-ready");
+        if (divHideMe) {
+          this.drawDonut();
+        }
+      }
+    });
   }
 
   private drawDonut(): void {
-    if (!this.afterViewInitCalled || !this.selPortfolio?.id) {
+    const divHideMe = this.divHideMe();
+    if (!divHideMe || !this.selPortfolio()?.id) {
       return;
     }
     const sliceColors = window
-      .getComputedStyle(this.divHideMe.nativeElement, ":before")
+      .getComputedStyle(divHideMe.nativeElement, ":before")
       ["content"].replace('"', "")
       .replace('"', "")
       .split(",");
-    //console.log(sliceColors);
-    const valueMap = this.selPortfolio.portfolioElements
+    const valueMap = this.selPortfolio().portfolioElements
       .map(
         (pe) =>
           ({
@@ -138,36 +141,25 @@ export class PortfolioSectorsComponent implements OnInit, AfterViewInit {
     while (calcColors.length < valueMap.size) {
       calcColors = calcColors.concat(sliceColors);
     }
+    const newChartSlices: ChartSlice[] = [];
     let i = 0;
     valueMap.forEach((myValue, myKey) => {
       i = i + 1;
-      this.chartSlices.chartSlices.push({
+      newChartSlices.push({
         name: myKey,
         value: myValue,
         color: calcColors[i],
       } as ChartSlice);
     });
-    this.slicesSum = this.chartSlices.chartSlices.reduce(
+    const sum = newChartSlices.reduce(
       (acc, mySlice) => (acc = acc + mySlice.value),
       0,
     );
-    this.chartSlices.chartSlices = this.chartSlices.chartSlices
-      .sort((chartSliceA, chartSliceB) => chartSliceA.value - chartSliceB.value)
-      .reverse();
+    this.slicesSum.set(sum);
+    newChartSlices.sort((a, b) => b.value - a.value);
+    this.chartSlices.update((s) => ({ ...s, chartSlices: newChartSlices }));
     setTimeout(() => {
-      this.chartState = "ready";
+      this.chartState.set("ready");
     });
-    //console.log(this.chartSlices.chartSlices);
-  }
-
-  get selPortfolio(): Portfolio {
-    return this.localSelPortfolio;
-  }
-
-  @Input()
-  set selPortfolio(myPortfolio: Portfolio) {
-    this.localSelPortfolio = myPortfolio;
-    this.chartState = "not-ready";
-    this.drawDonut();
   }
 }

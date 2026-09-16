@@ -7,7 +7,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell symbol-name"
       >
         {{ element.name }}
@@ -21,14 +21,14 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell table-cell-hover"
-        [class.table-cell-hover]="element.id !== localPortfolio.id"
+        [class.table-cell-hover]="element.id !== localPortfolio()?.id"
       >
         <div class="my-stocks" (click)="updateStock($event, element)">
           <div class="my-stock-amount">
             {{
-              !element?.portfolioElements || element.id !== localPortfolio.id
+              !element?.portfolioElements || element.id !== localPortfolio()?.id
                 ? !!element?.weight
                   ? element.weight
                   : "--"
@@ -38,7 +38,7 @@
           <mat-icon
             fontIcon="more_vert"
             [class.icon-disabled]="
-              !!element.symbols && element.id === localPortfolio.id
+              !!element.symbols && element.id === localPortfolio()?.id
             "
           ></mat-icon>
         </div>
@@ -50,7 +50,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.month1 ? "--" : (element.month1 | number: "1.2-5") }}
@@ -62,7 +62,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.month6 ? "--" : (element.month6 | number: "1.2-5") }}
@@ -74,7 +74,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.year1 ? "--" : (element.year1 | number: "1.2-5") }}
@@ -86,7 +86,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.year2 ? "--" : (element.year2 | number: "1.2-5") }}
@@ -98,7 +98,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.year5 ? "--" : (element.year5 | number: "1.2-5") }}
@@ -110,7 +110,7 @@
       <td
         mat-cell
         *matCellDef="let element"
-        [class.portfolio-line]="element.id === localPortfolio.id"
+        [class.portfolio-line]="element.id === localPortfolio()?.id"
         class="table-cell"
       >
         {{ !element.year10 ? "--" : (element.year10 | number: "1.2-5") }}

@@ -11,7 +11,7 @@
    limitations under the License.
  */
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { of } from "rxjs";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
@@ -27,7 +27,7 @@ export class ConfigService {
   private queryOperators: string[] = [];
   private termOperators: string[] = [];
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getProfiles(): Observable<string> {
     if (!this.profiles) {

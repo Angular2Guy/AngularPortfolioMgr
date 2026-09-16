@@ -10,20 +10,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { TestBed, inject, waitForAsync } from "@angular/core/testing";
+import { mainGuard } from "./main.guard";
 
-import { MainGuard } from "./main.guard";
-
-/*
-describe('MainGuard', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [MainGuard]
-    });
+describe("mainGuard", () => {
+  it("should be defined", () => {
+    expect(mainGuard).toBeDefined();
   });
-
-  it('should ...', inject([MainGuard], (guard: MainGuard) => {
-    expect(guard).toBeTruthy();
-  }));
 });
-*/

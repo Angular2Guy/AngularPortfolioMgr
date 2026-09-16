@@ -10,17 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ChangeDetectionStrategy, input } from "@angular/core";
 import { Portfolio } from "../../../../model/portfolio";
 
 @Component({
   selector: "app-portfolio-stats",
   templateUrl: "./portfolio-stats.component.html",
   styleUrl: "./portfolio-stats.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStatsComponent {
   protected readonly years = [1, 2, 5, 10];
-  @Input()
-  selPortfolio!: Portfolio;
+  selPortfolio = input.required<Portfolio>();
 }

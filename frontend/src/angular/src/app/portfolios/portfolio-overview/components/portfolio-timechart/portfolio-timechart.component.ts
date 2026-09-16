@@ -13,9 +13,11 @@
 import {
   Component,
   DestroyRef,
-  Input,
-  OnInit,
   ChangeDetectionStrategy,
+  inject,
+  signal,
+  input,
+  effect,
 } from "@angular/core";
 import { DateTime } from "luxon";
 import { Portfolio } from "../../../../model/portfolio";
@@ -27,102 +29,73 @@ import {
   NgxDateTimeChartsModule,
 } from "ngx-simple-charts/date-time";
 import { Item } from "../../model/item";
-import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-portfolio-timechart",
   templateUrl: "./portfolio-timechart.component.html",
   styleUrls: ["./portfolio-timechart.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgxDateTimeChartsModule],
 })
-export class PortfolioTimechartComponent implements OnInit {
-  @Input({ required: true })
-  public selPortfolio!: Portfolio;
-  protected start = new Date();
-  protected items: ChartItem<Event>[] = [];
-  protected showDays = false;
+export class PortfolioTimechartComponent {
+  selPortfolio = input.required<Portfolio>();
+  protected start = signal(new Date());
+  protected items = signal<ChartItem<Event>[]>([]);
+  protected showDays = signal(false);
 
-  constructor(
-    private portfolioService: PortfolioService,
-    private destroyRef: DestroyRef,
-  ) {}
+  private portfolioService = inject(PortfolioService);
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
-    this.portfolioService
-      .getPortfolioByIdWithHistory(this.selPortfolio.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result: Portfolio) => {
-        //console.log(result);
-        const myMap = result.symbols
-          .filter(
-            (mySymbol) =>
-              !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER),
-          )
-          .reduce((acc, mySymbol) => {
-            const myValue = !acc.get(mySymbol.symbol)
-              ? []
-              : (acc.get(mySymbol.symbol) as Symbol[]);
-            myValue.push(mySymbol);
-            acc.set(mySymbol.symbol, myValue);
-            return acc;
-          }, new Map<string, Symbol[]>());
-        const myItems: ChartItem<Event>[] = [];
-        let myIndex = 0;
-        myMap.forEach((myValue, myKey) => {
-          const myStart = myValue
-            .map((mySym) => new Date(mySym.changedAt))
-            .reduce((acc, value) =>
-              acc.valueOf() < value.valueOf() ? value : acc,
-            );
-          const myEndItem = myValue.reduce((acc, value) =>
-            acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc,
-          );
-          const myEnd = !myEndItem?.removedAt
-            ? null
-            : new Date(myEndItem.removedAt);
-          let myItem = new ChartItem<Event>();
-          myItem.id = myIndex;
-          myItem.lineId = myKey;
-          myItem.details = myValue[0].description ?? "";
-          myItem.name = myValue[0].name;
-          myItem.start = myStart;
-          myItem.end = myEnd;
-          myItem.id = myIndex;
-          myIndex = myIndex++;
-          myItems.push(myItem);
-        });
-        //console.log(myItems);
-        this.items = myItems;
-      });
-    //this.testData();
-  }
-
-  private testData(): void {
-    this.start = DateTime.now().minus({ year: 4 }).toJSDate();
-    let myItem = new Item<Event>();
-    myItem.id = 1;
-    myItem.lineId = "1";
-    myItem.name = "MyName1";
-    myItem.details = "MyDetails1";
-    myItem.start = this.start;
-    myItem.end = DateTime.now().minus({ year: 3 }).toJSDate();
-    this.items.push(myItem);
-    myItem = new Item<Event>();
-    myItem.id = 2;
-    myItem.lineId = "1";
-    myItem.name = "MyName1";
-    myItem.details = "MyDetails1";
-    myItem.start = DateTime.now().minus({ year: 1 }).toJSDate();
-    myItem.end = new Date();
-    this.items.push(myItem);
-    myItem = new Item<Event>();
-    myItem.id = 3;
-    myItem.lineId = "2";
-    myItem.name = "MyName2";
-    myItem.details = "MyDetails2";
-    myItem.start = DateTime.now().minus({ year: 2 }).toJSDate();
-    myItem.end = new Date();
-    this.items.push(myItem);
+  constructor() {
+    effect(() => {
+      const portfolio = this.selPortfolio();
+      if (portfolio?.id) {
+        this.portfolioService
+          .getPortfolioByIdWithHistory(portfolio.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((result: Portfolio) => {
+            const myMap = result.symbols
+              .filter(
+                (mySymbol) =>
+                  !mySymbol.symbol.includes(ServiceUtils.PORTFOLIO_MARKER),
+              )
+              .reduce((acc, mySymbol) => {
+                const myValue = !acc.get(mySymbol.symbol)
+                  ? []
+                  : (acc.get(mySymbol.symbol) as Symbol[]);
+                myValue.push(mySymbol);
+                acc.set(mySymbol.symbol, myValue);
+                return acc;
+              }, new Map<string, Symbol[]>());
+            const myItems: ChartItem<Event>[] = [];
+            let myIndex = 0;
+            myMap.forEach((myValue, myKey) => {
+              const myStart = myValue
+                .map((mySym) => new Date(mySym.changedAt))
+                .reduce((acc, value) =>
+                  acc.valueOf() < value.valueOf() ? value : acc,
+                );
+              const myEndItem = myValue.reduce((acc, value) =>
+                acc.changedAt.valueOf() < value.changedAt.valueOf() ? value : acc,
+              );
+              const myEnd = !myEndItem?.removedAt
+                ? null
+                : new Date(myEndItem.removedAt);
+              let myItem = new ChartItem<Event>();
+              myItem.id = myIndex;
+              myItem.lineId = myKey;
+              myItem.details = myValue[0].description ?? "";
+              myItem.name = myValue[0].name;
+              myItem.start = myStart;
+              myItem.end = myEnd;
+              myItem.id = myIndex;
+              myIndex = myIndex++;
+              myItems.push(myItem);
+            });
+            this.items.set(myItems);
+          });
+      }
+    });
   }
 }

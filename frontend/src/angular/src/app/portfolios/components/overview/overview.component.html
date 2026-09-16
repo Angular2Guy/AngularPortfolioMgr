@@ -12,13 +12,13 @@
         Config
       </button></span
     >
-    @if (importingSymbols) {
+    @if (importingSymbols()) {
       <span class="custom-spinner header-space">
         <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
         </mat-progress-spinner>
       </span>
     }
-    @if (!!profiles && profiles.includes('dev')) {
+    @if (!!profiles() && profiles().includes('dev')) {
       <span class="header-space"
         ><button
         mat-flat-button
@@ -30,7 +30,7 @@
       </button></span
       >
     }
-    @if (!!profiles && profiles.includes('dev')) {
+    @if (!!profiles() && profiles().includes('dev')) {
       <span class="header-space"
         ><button
         mat-flat-button
@@ -55,7 +55,7 @@
   </mat-toolbar>
   <mat-sidenav-container
     class="container"
-    [ngStyle]="{ 'height.px': windowHeight }"
+    [ngStyle]="{ 'height.px': windowHeight() }"
     >
     <mat-sidenav opened mode="side" class="portfolio-list">
       <div class="new-portfolio">
@@ -76,14 +76,14 @@
           To Financial Data
         </button>
       </div>
-      @for (portfolio of portfolios; track portfolio) {
+      @for (portfolio of portfolios(); track portfolio) {
         <mat-action-list>
           <div class="portfolio-line">
             <button mat-list-item (click)="selPortfolio(portfolio)">
               {{ portfolio.name }}
             </button>
             <button
-              [disabled]="countPortfolioSymbolsByUserId > 200"
+              [disabled]="countPortfolioSymbolsByUserId() > 200"
               mat-list-item
               (click)="addSymbol(portfolio)"
               class="add-button"

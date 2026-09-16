@@ -12,15 +12,16 @@
  */
 import {
   Component,
-  OnInit,
   DestroyRef,
   ChangeDetectionStrategy,
+  inject,
+  signal,
 } from "@angular/core";
 import { Portfolio } from "../../../../model/portfolio";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap, tap, filter } from "rxjs/operators";
 import { PortfolioService } from "../../../../service/portfolio.service";
-import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { NewsItem } from "../../model/news-item";
 import { NewsService } from "../../service/news.service";
 import { MatTabGroup, MatTab, MatTabContent } from "@angular/material/tabs";
@@ -35,7 +36,7 @@ import { CompanyReportsComponent } from "../company-reports/company-reports.comp
   selector: "app-portfolio-charts",
   templateUrl: "./portfolio-charts.component.html",
   styleUrls: ["./portfolio-charts.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTabGroup,
     MatTab,
@@ -48,26 +49,24 @@ import { CompanyReportsComponent } from "../company-reports/company-reports.comp
     CompanyReportsComponent,
   ],
 })
-export class PortfolioChartsComponent implements OnInit {
-  protected cnbcFinanceNews: NewsItem[] = [];
-  protected seekingAlphaNews: NewsItem[] = [];
-  selPortfolio: Portfolio = {} as Portfolio;
-  reloadData = false;
+export class PortfolioChartsComponent {
+  protected cnbcFinanceNews = signal<NewsItem[]>([]);
+  protected seekingAlphaNews = signal<NewsItem[]>([]);
+  selPortfolio = signal<Portfolio>({} as Portfolio);
+  reloadData = signal(false);
 
-  constructor(
-    private route: ActivatedRoute,
-    private portfolioService: PortfolioService,
-    private destroyRef: DestroyRef,
-    private newsService: NewsService,
-  ) {}
+  private route = inject(ActivatedRoute);
+  private portfolioService = inject(PortfolioService);
+  private destroyRef = inject(DestroyRef);
+  private newsService = inject(NewsService);
 
-  ngOnInit(): void {
+  constructor() {
     this.newsService
       .getCnbcFinanceNews()
-      .subscribe((result: NewsItem[]) => (this.cnbcFinanceNews = result));
+      .subscribe((result: NewsItem[]) => this.cnbcFinanceNews.set(result));
     this.newsService
       .getSeekingAlphaNews()
-      .subscribe((result: NewsItem[]) => (this.seekingAlphaNews = result));
+      .subscribe((result: NewsItem[]) => this.seekingAlphaNews.set(result));
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -75,14 +74,14 @@ export class PortfolioChartsComponent implements OnInit {
           (params: ParamMap) =>
             parseInt(params.get("portfolioId") ?? "-1") >= 0,
         ),
-        tap(() => (this.reloadData = true)),
+        tap(() => this.reloadData.set(true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
             parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
-        tap(() => (this.reloadData = false)),
+        tap(() => this.reloadData.set(false)),
       )
-      .subscribe((myData: Portfolio) => (this.selPortfolio = myData));
+      .subscribe((myData: Portfolio) => this.selPortfolio.set(myData));
   }
 }

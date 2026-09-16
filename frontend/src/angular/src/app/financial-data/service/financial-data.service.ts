@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
@@ -30,7 +30,7 @@ export class FinancialDataService {
   private feCountries: FeCountry[] = [];
   private sfSymbolNames: SfSymbolName[] = [];
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   putImportFinancialsData(
     importFinancialsData: ImportData,

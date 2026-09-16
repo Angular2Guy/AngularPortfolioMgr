@@ -3,7 +3,7 @@
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-	   http://www.apache.org/licenses/LICENSE-2.0
+   	   http://www.apache.org/licenses/LICENSE-2.0
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,15 +12,15 @@
  */
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnInit,
-  Inject,
+  input,
+  output,
+  signal,
+  inject,
   LOCALE_ID,
   DestroyRef,
   DOCUMENT,
   ChangeDetectionStrategy,
+  effect,
 } from "@angular/core";
 import { Symbol } from "../../../../model/symbol";
 import {
@@ -35,7 +35,7 @@ import {
   ChartPoints,
   NgxLineChartsModule,
 } from "ngx-simple-charts/line";
-import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatRadioGroup, MatRadioButton } from "@angular/material/radio";
 import { FormsModule } from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
@@ -74,7 +74,7 @@ interface SymbolData {
   selector: "app-symbol",
   templateUrl: "./symbol.component.html",
   styleUrls: ["./symbol.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatRadioGroup,
     FormsModule,
@@ -85,23 +85,28 @@ interface SymbolData {
     DatePipe,
   ],
 })
-export class SymbolComponent implements OnInit {
+export class SymbolComponent {
   private readonly dayInMs = 24 * 60 * 60 * 1000;
   private readonly hourInMs = 1 * 60 * 60 * 1000;
-  @Input()
-  portfolioId!: number;
-  private localShowSymbol = false;
-  quotePeriods: QuotePeriod[] = [];
-  selQuotePeriod!: QuotePeriod;
-  private localSymbol!: Symbol;
-  quotes: Quote[] = [];
-  compIndexes = new Map<string, Quote[]>([
-    [ComparisonIndex.SP500, []],
-    [ComparisonIndex.EUROSTOXX50, []],
-    [ComparisonIndex.MSCI_CHINA, []],
-  ]);
-  quotesLoading = true;
-  symbolData = {
+
+  portfolioId = input.required<number>();
+  symbol = input.required<Symbol>();
+  showSymbol = input<boolean>(false);
+  loadingData = output<boolean>();
+
+  readonly ComparisonIndex = ComparisonIndex;
+  serviceUtils = ServiceUtils;
+
+  quotes = signal<Quote[]>([]);
+  compIndexes = signal<Map<string, Quote[]>>(
+    new Map([
+      [ComparisonIndex.SP500, []],
+      [ComparisonIndex.EUROSTOXX50, []],
+      [ComparisonIndex.MSCI_CHINA, []],
+    ]),
+  );
+  quotesLoading = signal(true);
+  symbolData = signal<SymbolData>({
     avgVolume: 0,
     close: 0,
     end: new Date(),
@@ -113,31 +118,29 @@ export class SymbolComponent implements OnInit {
     avgClose: 0,
     medianClose: 0,
     volatilityClose: 0,
-  } as SymbolData;
-  @Output()
-  loadingData = new EventEmitter<boolean>();
-  readonly ComparisonIndex = ComparisonIndex;
-  showSP500 = false;
-  showMsciCH = false;
-  showES50 = false;
-  chartPoints: ChartPoints[] = [
+  });
+  chartPoints = signal<ChartPoints[]>([
     {
       chartPointList: [],
       name: "",
       xScaleHeight: 20,
       yScaleWidth: 50,
     } as ChartPoints,
-  ];
-  portfolioName: string = "";
-  portfolioSymbol: string = "";
-  serviceUtils = ServiceUtils;
+  ]);
+  showSP500 = signal(false);
+  showMsciCH = signal(false);
+  showES50 = signal(false);
+  portfolioName = signal("");
+  portfolioSymbol = signal("");
+  quotePeriods: QuotePeriod[] = [];
+  selQuotePeriod!: QuotePeriod;
 
-  constructor(
-    private quoteService: QuoteService,
-    private destroyRef: DestroyRef,
-    @Inject(DOCUMENT) private document: Document,
-    @Inject(LOCALE_ID) private locale: string,
-  ) {
+  private quoteService = inject(QuoteService);
+  private destroyRef = inject(DestroyRef);
+  private document = inject(DOCUMENT);
+  private locale = inject(LOCALE_ID);
+
+  constructor() {
     this.quotePeriods = [
       {
         quotePeriodKey: QuotePeriodKey.Month,
@@ -168,54 +171,80 @@ export class SymbolComponent implements OnInit {
         periodText: $localize`:@@year10:10 Years`,
       },
     ];
-  }
 
-  ngOnInit(): void {
-    console.log(this.selQuotePeriod);
+    effect(() => {
+      const mySymbol = this.symbol();
+      if (mySymbol) {
+        this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol)
+          ? this.quotePeriods[1]
+          : this.quotePeriods[0];
+        this.portfolioName.set(
+          ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.name : "",
+        );
+        this.portfolioSymbol.set(
+          ServiceUtils.isPortfolioSymbol(mySymbol) ? mySymbol.symbol : "",
+        );
+        this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
+      }
+    });
+
+    effect(() => {
+      const show = this.showSymbol();
+      const loading = this.quotesLoading();
+      if (!loading && show) {
+        this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(
+          this.symbol(),
+        )
+          ? this.quotePeriods[1]
+          : this.quotePeriods[0];
+        this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
+      }
+    });
   }
 
   quotePeriodChanged() {
     this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
-    //console.log(this.selQuotePeriod);
   }
 
   isIntraDayDataAvailiable(mySymbol: Symbol): boolean {
-    //console.log(ServiceUtils.isIntraDayDataAvailiable(mySymbol));
     return ServiceUtils.isIntraDayDataAvailiable(mySymbol);
   }
 
   compIndexUpdate(value: boolean, comparisonIndex: ComparisonIndex): void {
     if (value) {
-      if (
-        this.chartPoints.filter(
-          (myChartPoints) => myChartPoints.name === comparisonIndex,
-        ).length > 0
-      ) {
-        this.chartPoints.filter(
-          (myChartPoints) => myChartPoints.name === comparisonIndex,
-        )[0].chartPointList = this.createChartPoints(comparisonIndex);
-        this.chartPoints = [...this.chartPoints];
+      const currentPoints = this.chartPoints();
+      const existing = currentPoints.filter(
+        (myChartPoints) => myChartPoints.name === comparisonIndex,
+      );
+      if (existing.length > 0) {
+        this.chartPoints.update((points) =>
+          points.map((p) =>
+            p.name === comparisonIndex
+              ? { ...p, chartPointList: this.createChartPoints(comparisonIndex) }
+              : p,
+          ),
+        );
       } else {
-        this.chartPoints.push({
-          name: comparisonIndex,
-          xScaleHeight: 20,
-          yScaleWidth: 50,
-          chartPointList: this.createChartPoints(comparisonIndex),
-        } as ChartPoints);
-        this.chartPoints = [...this.chartPoints];
+        this.chartPoints.update((points) => [
+          ...points,
+          {
+            name: comparisonIndex,
+            xScaleHeight: 20,
+            yScaleWidth: 50,
+            chartPointList: this.createChartPoints(comparisonIndex),
+          } as ChartPoints,
+        ]);
       }
     } else {
-      this.chartPoints = this.chartPoints.filter(
-        (myChartPoints) => myChartPoints.name !== comparisonIndex,
+      this.chartPoints.update((points) =>
+        points.filter((myChartPoints) => myChartPoints.name !== comparisonIndex),
       );
     }
-    //console.log(`Value: ${value}, ComparisonIndex: ${comparisonIndex}`);
-    //console.log(this.chartPoints);
   }
 
   private createChartPoints(comparisonIndex: ComparisonIndex): ChartPoint[] {
     return (
-      this.compIndexes.get(comparisonIndex)?.map(
+      this.compIndexes().get(comparisonIndex)?.map(
         (myQuote) =>
           ({
             x: new Date(Date.parse(myQuote.timestamp)),
@@ -226,55 +255,60 @@ export class SymbolComponent implements OnInit {
   }
 
   private updateSymbolData(): void {
-    const localQuotes =
-      this.quotes && this.quotes.length > 0 ? this.quotes : null;
-    this.symbolData.start =
-      localQuotes && localQuotes.length > 0
-        ? new Date(localQuotes[0].timestamp)
-        : new Date();
-    this.symbolData.end =
-      localQuotes && localQuotes.length > 0
-        ? new Date(localQuotes[localQuotes.length - 1].timestamp)
-        : new Date();
-    this.symbolData.open =
-      localQuotes && localQuotes.length > 0 ? localQuotes[0].open : 0;
-    this.symbolData.close =
-      localQuotes && localQuotes.length > 0
-        ? localQuotes[localQuotes.length - 1].close
-        : 0;
-    this.symbolData.high =
-      localQuotes && localQuotes.length > 0
-        ? Math.max(...localQuotes.map((quote) => quote.high))
-        : 0;
-    this.symbolData.low =
-      localQuotes && localQuotes.length > 0
-        ? Math.min(...localQuotes.map((quote) => quote.low))
-        : 0;
-    this.symbolData.avgVolume =
-      localQuotes && localQuotes.length > 0
-        ? localQuotes
-            .map((quote) => quote.volume)
-            .reduce((result, volume) => result + volume, 0) / localQuotes.length
-        : 0;
-    this.symbolData.accDividend =
-      localQuotes && localQuotes.length > 0
-        ? localQuotes
-            .map((quote) => quote.dividend)
-            .reduce((result, dividend) => result + dividend, 0)
-        : 0;
-    this.symbolData.avgClose =
-      localQuotes && localQuotes.length > 0
-        ? localQuotes
-            .map((quote) => quote.close)
-            .reduce((result, close) => result + close, 0) / localQuotes.length
-        : 0;
-    this.symbolData.medianClose =
-      localQuotes && localQuotes.length > 0
-        ? localQuotes.map((quote) => quote.close).sort((a, b) => a - b)[
-            Math.round(localQuotes.length / 2)
-          ]
-        : 0;
-    this.symbolData.volatilityClose = this.calcVolatility(localQuotes ?? []);
+    const localQuotes = this.quotes();
+    const safeQuotes =
+      localQuotes && localQuotes.length > 0 ? localQuotes : null;
+    this.symbolData.update((data) => ({
+      ...data,
+      start:
+        safeQuotes && safeQuotes.length > 0
+          ? new Date(safeQuotes[0].timestamp)
+          : new Date(),
+      end:
+        safeQuotes && safeQuotes.length > 0
+          ? new Date(safeQuotes[safeQuotes.length - 1].timestamp)
+          : new Date(),
+      open: safeQuotes && safeQuotes.length > 0 ? safeQuotes[0].open : 0,
+      close:
+        safeQuotes && safeQuotes.length > 0
+          ? safeQuotes[safeQuotes.length - 1].close
+          : 0,
+      high:
+        safeQuotes && safeQuotes.length > 0
+          ? Math.max(...safeQuotes.map((quote) => quote.high))
+          : 0,
+      low:
+        safeQuotes && safeQuotes.length > 0
+          ? Math.min(...safeQuotes.map((quote) => quote.low))
+          : 0,
+      avgVolume:
+        safeQuotes && safeQuotes.length > 0
+          ? safeQuotes
+              .map((quote) => quote.volume)
+              .reduce((result, volume) => result + volume, 0) /
+            safeQuotes.length
+          : 0,
+      accDividend:
+        safeQuotes && safeQuotes.length > 0
+          ? safeQuotes
+              .map((quote) => quote.dividend)
+              .reduce((result, dividend) => result + dividend, 0)
+          : 0,
+      avgClose:
+        safeQuotes && safeQuotes.length > 0
+          ? safeQuotes
+              .map((quote) => quote.close)
+              .reduce((result, close) => result + close, 0) /
+            safeQuotes.length
+          : 0,
+      medianClose:
+        safeQuotes && safeQuotes.length > 0
+          ? safeQuotes.map((quote) => quote.close).sort((a, b) => a - b)[
+              Math.round(safeQuotes.length / 2)
+            ]
+          : 0,
+      volatilityClose: this.calcVolatility(safeQuotes ?? []),
+    }));
   }
 
   private calcVolatility(localQuotes: Quote[]): number {
@@ -294,63 +328,60 @@ export class SymbolComponent implements OnInit {
   }
 
   private updateChartData(): void {
-    this.chartPoints = [
+    this.chartPoints.set([
       {
-        name: this.symbol.symbol,
+        name: this.symbol().symbol,
         chartPointList: this.createChartValues(),
         xScaleHeight: 20,
         yScaleWidth: 50,
       } as ChartPoints,
-    ];
-    this.compIndexUpdate(this.showMsciCH, ComparisonIndex.MSCI_CHINA);
-    this.compIndexUpdate(this.showES50, ComparisonIndex.EUROSTOXX50);
-    this.compIndexUpdate(this.showSP500, ComparisonIndex.SP500);
-    this.chartPoints = [...this.chartPoints];
-    //console.log(this.chartPoints);
+    ]);
+    this.compIndexUpdate(this.showMsciCH(), ComparisonIndex.MSCI_CHINA);
+    this.compIndexUpdate(this.showES50(), ComparisonIndex.EUROSTOXX50);
+    this.compIndexUpdate(this.showSP500(), ComparisonIndex.SP500);
   }
 
   private createChartValues(): ChartPoint[] {
-    const myChartValues = this.quotes.map(
+    return this.quotes().map(
       (quote) =>
         ({
           x: new Date(Date.parse(quote.timestamp)),
           y: quote.close,
         }) as ChartPoint,
     );
-    return myChartValues;
   }
 
   private updateQuotes(selPeriod: QuotePeriodKey): void {
-    if (!this.symbol) {
+    if (!this.symbol()) {
       return;
     }
     this.loadingData.emit(true);
-    this.quotesLoading = true;
+    this.quotesLoading.set(true);
     const startDate = this.createStartDate(selPeriod);
     const endDate = new Date();
     this.quoteService
-      .getDailyQuotesFromStartToEnd(this.symbol.symbol, startDate, endDate)
+      .getDailyQuotesFromStartToEnd(this.symbol().symbol, startDate, endDate)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((myQuotes: Quote[]) => {
-        this.quotes = myQuotes;
+        this.quotes.set(myQuotes);
         this.updateSymbolData();
-        if (ServiceUtils.isPortfolioSymbol(this.symbol.symbol)) {
+        if (ServiceUtils.isPortfolioSymbol(this.symbol().symbol)) {
           console.log("add comparison index quotes.");
           forkJoin([
             this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(
-              this.portfolioId,
+              this.portfolioId(),
               ComparisonIndex.EUROSTOXX50,
               startDate,
               endDate,
             ),
             this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(
-              this.portfolioId,
+              this.portfolioId(),
               ComparisonIndex.MSCI_CHINA,
               startDate,
               endDate,
             ),
             this.quoteService.getDailyQuotesForComparisonIndexFromStartToEnd(
-              this.portfolioId,
+              this.portfolioId(),
               ComparisonIndex.SP500,
               startDate,
               endDate,
@@ -363,24 +394,23 @@ export class SymbolComponent implements OnInit {
                 Quote[],
                 Quote[],
               ]) => {
-                this.compIndexes.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
-                this.compIndexes.set(
-                  ComparisonIndex.MSCI_CHINA,
-                  myQuotesMsciCh,
-                );
-                this.compIndexes.set(ComparisonIndex.SP500, myQuotesSP500);
+                const newMap = new Map(this.compIndexes());
+                newMap.set(ComparisonIndex.EUROSTOXX50, myQuotesES50);
+                newMap.set(ComparisonIndex.MSCI_CHINA, myQuotesMsciCh);
+                newMap.set(ComparisonIndex.SP500, myQuotesSP500);
+                this.compIndexes.set(newMap);
                 this.updateChartData();
                 this.loadingData.emit(false);
-                this.quotesLoading = false;
+                this.quotesLoading.set(false);
               },
             );
         } else {
-          this.showES50 = false;
-          this.showMsciCH = false;
-          this.showSP500 = false;
+          this.showES50.set(false);
+          this.showMsciCH.set(false);
+          this.showSP500.set(false);
           this.updateChartData();
           this.loadingData.emit(false);
-          this.quotesLoading = false;
+          this.quotesLoading.set(false);
         }
       });
   }
@@ -403,45 +433,5 @@ export class SymbolComponent implements OnInit {
       startDate.setMonth(startDate.getMonth() - 120);
     }
     return startDate;
-  }
-
-  @Input()
-  set symbol(mySymbol: Symbol) {
-    if (!!mySymbol) {
-      this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol)
-        ? this.quotePeriods[1]
-        : this.quotePeriods[0];
-      this.localSymbol = mySymbol;
-      this.portfolioName = ServiceUtils.isPortfolioSymbol(mySymbol)
-        ? mySymbol.name
-        : "";
-      this.portfolioSymbol = ServiceUtils.isPortfolioSymbol(mySymbol)
-        ? mySymbol.symbol
-        : "";
-      this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
-    }
-  }
-
-  get symbol(): Symbol {
-    return this.localSymbol;
-  }
-
-  @Input()
-  set showSymbol(showSymbol: boolean) {
-    if (
-      !this.quotesLoading &&
-      !!showSymbol &&
-      this.localShowSymbol !== showSymbol
-    ) {
-      this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(this.symbol)
-        ? this.quotePeriods[1]
-        : this.quotePeriods[0];
-      this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
-    }
-    this.localShowSymbol = showSymbol;
-  }
-
-  get showSymbol(): boolean {
-    return this.showSymbol;
   }
 }

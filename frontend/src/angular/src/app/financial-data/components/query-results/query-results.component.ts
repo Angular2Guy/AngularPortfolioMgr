@@ -11,11 +11,13 @@
    limitations under the License.
  */
 import {
-  AfterViewInit,
   Component,
-  Input,
-  ViewChild,
   ChangeDetectionStrategy,
+  effect,
+  signal,
+  viewChild,
+  input,
+  AfterViewInit,
 } from "@angular/core";
 import { SymbolFinancials } from "../../model/symbol-financials";
 import { FinancialElementExt } from "../../model/financial-element";
@@ -42,7 +44,7 @@ import { MatTooltip } from "@angular/material/tooltip";
   selector: "app-query-results",
   templateUrl: "./query-results.component.html",
   styleUrls: ["./query-results.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ResultTreeComponent,
     MatFormField,
@@ -64,9 +66,10 @@ import { MatTooltip } from "@angular/material/tooltip";
   ],
 })
 export class QueryResultsComponent implements AfterViewInit {
-  treeSymbolFinancials: SymbolFinancials[] = [];
-  private _symbolFinancials: SymbolFinancials[] = [];
-  @ViewChild(MatSort) tableSort!: MatSort;
+  treeSymbolFinancials = signal<SymbolFinancials[]>([]);
+  symbolFinancials = input<SymbolFinancials[]>([]);
+  financialElements = input<FinancialElementExt[]>([]);
+  tableSort = viewChild.required<MatSort>(MatSort);
   protected displayedColumns: string[] = [
     "concept",
     "value",
@@ -76,41 +79,31 @@ export class QueryResultsComponent implements AfterViewInit {
     "symbol",
   ];
   protected dataSource = new MatTableDataSource<FinancialElementExt>([]);
-  private _financialElements: FinancialElementExt[] = [];
+
+  constructor() {
+    effect(() => {
+      const sf = this.symbolFinancials();
+      this.dataSource.data = [];
+      this.treeSymbolFinancials.set(sf);
+    });
+
+    effect(() => {
+      const fe = this.financialElements();
+      this.dataSource.data = this.removeFetDublicates(fe);
+    });
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.filterPredicate = (
       data: FinancialElementExt,
       filter: string,
     ) => data?.symbol?.trim().toLowerCase().includes(filter);
-    this.dataSource.sort = this.tableSort;
+    this.dataSource.sort = this.tableSort();
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  get financialElements(): FinancialElementExt[] {
-    return this._financialElements;
-  }
-
-  @Input()
-  set financialElements(financialElementExt: FinancialElementExt[]) {
-    this._symbolFinancials = [];
-    this._financialElements = this.removeFetDublicates(financialElementExt);
-    this.dataSource.data = this._financialElements;
-  }
-
-  get symbolFinancials(): SymbolFinancials[] {
-    return this._symbolFinancials;
-  }
-
-  @Input()
-  set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
-    this._financialElements = [];
-    this._symbolFinancials = symbolFinancials;
-    this.treeSymbolFinancials = symbolFinancials;
   }
 
   private removeFetDublicates(

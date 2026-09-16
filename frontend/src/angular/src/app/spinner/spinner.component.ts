@@ -12,9 +12,10 @@
  */
 import {
   Component,
-  OnInit,
-  AfterViewInit,
   ChangeDetectionStrategy,
+  signal,
+  inject,
+  AfterViewInit,
 } from "@angular/core";
 import {
   trigger,
@@ -38,16 +39,16 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
       transition("0 => 1", animate("750ms")),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatProgressSpinner],
 })
-export class SpinnerComponent implements OnInit, AfterViewInit {
-  myState = false;
+export class SpinnerComponent implements AfterViewInit {
+  myState = signal(false);
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
-  ngOnInit(): void {
-    this.myState = true;
+  constructor() {
+    this.myState.set(true);
   }
 
   ngAfterViewInit(): void {

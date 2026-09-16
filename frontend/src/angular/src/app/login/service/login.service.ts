@@ -13,16 +13,14 @@
 import { Observable, of } from "rxjs";
 import { Login } from "../model/login";
 import { catchError, map, tap } from "rxjs/operators";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { TokenService } from "ngx-simple-charts/base-service";
 
 @Injectable({ providedIn: "root" })
 export class LoginService {
-  constructor(
-    private http: HttpClient,
-    private tokenService: TokenService,
-  ) {}
+  private http = inject(HttpClient);
+  private tokenService = inject(TokenService);
 
   postLogin(login: Login): Observable<Login> {
     return this.http

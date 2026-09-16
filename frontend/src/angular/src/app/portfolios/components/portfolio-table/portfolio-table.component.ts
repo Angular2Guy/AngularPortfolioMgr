@@ -12,9 +12,11 @@
  */
 import {
   Component,
-  OnInit,
   DestroyRef,
   ChangeDetectionStrategy,
+  signal,
+  inject,
+  effect,
 } from "@angular/core";
 import {
   MatTableDataSource,
@@ -36,7 +38,7 @@ import { PortfolioService } from "../../../service/portfolio.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ChangeSymbolComponent } from "../change-symbol/change-symbol.component";
 import { PortfolioElement } from "../../../model/portfolio-element";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { DecimalPipe } from "@angular/common";
 
@@ -44,7 +46,7 @@ import { DecimalPipe } from "@angular/common";
   selector: "app-portfolio-table",
   templateUrl: "./portfolio-table.component.html",
   styleUrls: ["./portfolio-table.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTable,
     MatColumnDef,
@@ -60,7 +62,7 @@ import { DecimalPipe } from "@angular/common";
     DecimalPipe,
   ],
 })
-export class PortfolioTableComponent implements OnInit {
+export class PortfolioTableComponent {
   private myLocalPortfolio!: Portfolio;
   portfolioElements = new MatTableDataSource<CommonValues>([]);
   displayedColumns = [
@@ -73,33 +75,43 @@ export class PortfolioTableComponent implements OnInit {
     "year5",
     "year10",
   ];
-  reloadData = false;
+  reloadData = signal(false);
+  localPortfolio = signal<Portfolio>({} as Portfolio);
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private portfolioService: PortfolioService,
-    private dialog: MatDialog,
-    private destroyRef: DestroyRef,
-  ) {}
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private portfolioService = inject(PortfolioService);
+  private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
+  constructor() {
     this.route.paramMap
       .pipe(
         filter(
           (params: ParamMap) =>
             parseInt(params.get("portfolioId") ?? "-1") >= 0,
         ),
-        tap(() => (this.reloadData = true)),
+        tap(() => this.reloadData.set(true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
             parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
-        tap(() => (this.reloadData = false)),
+        tap(() => this.reloadData.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((myData: Portfolio) => (this.localPortfolio = myData));
+      .subscribe((myData: Portfolio) => this.setLocalPortfolio(myData));
+
+    effect(() => {
+      const portfolio = this.localPortfolio();
+      this.myLocalPortfolio = portfolio;
+      const myPortfolioElements: CommonValues[] = [];
+      if (!!portfolio?.portfolioElements) {
+        myPortfolioElements.push(portfolio);
+        myPortfolioElements.push(...portfolio?.portfolioElements);
+      }
+      this.portfolioElements.connect().next(myPortfolioElements);
+    });
   }
 
   updateStock(event: MouseEvent, element: CommonValues) {
@@ -115,18 +127,17 @@ export class PortfolioTableComponent implements OnInit {
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: PortfolioElement) => {
-        //console.log(result);
         const myPortfolio = {
-          createdAt: this.localPortfolio?.createdAt ?? "",
-          currencyKey: this.localPortfolio?.currencyKey ?? "",
-          id: this.localPortfolio?.id ?? -1,
-          name: this.localPortfolio?.name ?? "",
+          createdAt: this.myLocalPortfolio?.createdAt ?? "",
+          currencyKey: this.myLocalPortfolio?.currencyKey ?? "",
+          id: this.myLocalPortfolio?.id ?? -1,
+          name: this.myLocalPortfolio?.name ?? "",
           portfolioElements: [],
           symbols: [],
-          userId: this.localPortfolio?.userId ?? "",
+          userId: this.myLocalPortfolio?.userId ?? "",
         } as unknown as Portfolio;
         if (!!result && result.weight > 0) {
-          const mySymbol = this.localPortfolio.symbols.filter(
+          const mySymbol = this.myLocalPortfolio.symbols.filter(
             (mySymbol) => mySymbol.symbol === result.symbol,
           )[0];
           this.portfolioService
@@ -138,10 +149,10 @@ export class PortfolioTableComponent implements OnInit {
             )
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(
-              (myResult: Portfolio) => (this.localPortfolio = myResult),
+              (myResult: Portfolio) => this.setLocalPortfolio(myResult),
             );
         } else if (!!result && result.weight <= 0) {
-          const mySymbol = this.localPortfolio.symbols.filter(
+          const mySymbol = this.myLocalPortfolio.symbols.filter(
             (mySymbol) => mySymbol.symbol === result.symbol,
           )[0];
           this.portfolioService
@@ -157,7 +168,7 @@ export class PortfolioTableComponent implements OnInit {
               takeUntilDestroyed(this.destroyRef),
             )
             .subscribe(
-              (myResult: Portfolio) => (this.localPortfolio = myResult),
+              (myResult: Portfolio) => this.setLocalPortfolio(myResult),
             );
         }
       });
@@ -171,17 +182,7 @@ export class PortfolioTableComponent implements OnInit {
     ]);
   }
 
-  set localPortfolio(localPortfolio: Portfolio) {
-    this.myLocalPortfolio = localPortfolio;
-    const myPortfolioElements: CommonValues[] = [];
-    if (!!localPortfolio?.portfolioElements) {
-      myPortfolioElements.push(localPortfolio);
-      myPortfolioElements.push(...localPortfolio?.portfolioElements);
-    }
-    this.portfolioElements.connect().next(myPortfolioElements);
-  }
-
-  get localPortfolio(): Portfolio {
-    return this.myLocalPortfolio;
+  private setLocalPortfolio(portfolio: Portfolio) {
+    this.localPortfolio.set(portfolio);
   }
 }

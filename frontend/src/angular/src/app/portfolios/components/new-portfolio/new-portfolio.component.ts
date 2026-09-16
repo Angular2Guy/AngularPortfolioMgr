@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Inject, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import {
   FormGroup,
   Validators,
@@ -51,7 +51,7 @@ enum FormFields {
   selector: "app-new-portfolio",
   templateUrl: "./new-portfolio.component.html",
   styleUrls: ["./new-portfolio.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkScrollable,
     MatDialogContent,
@@ -69,14 +69,14 @@ enum FormFields {
 })
 export class NewPortfolioComponent {
   portfolioForm: FormGroup;
-  formValid = true;
+  formValid = signal(true);
   FormFields = FormFields;
+  private tokenService = inject(TokenService);
+  private fb = inject(FormBuilder);
 
   constructor(
     public dialogRef: MatDialogRef<OverviewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioData,
-    private tokenService: TokenService,
-    private fb: FormBuilder,
   ) {
     this.portfolioForm = this.fb.group(
       {
@@ -95,7 +95,6 @@ export class NewPortfolioComponent {
   onAddClick(): void {
     const createdAt = this.portfolioForm.get(FormFields.CreatedAt)
       ?.value as DateTime;
-    //createdAt.setMinutes(createdAt.getMinutes() - createdAt.getTimezoneOffset());
     const portfolio: Portfolio = {
       id: -1,
       createdAt: new Date(createdAt.toMillis()).toISOString(),
@@ -112,17 +111,6 @@ export class NewPortfolioComponent {
       year5: 0,
     };
     this.dialogRef.close(portfolio);
-    /*
-	private BigDecimal month1;
-	private BigDecimal month6;
-	private BigDecimal year1;
-	private BigDecimal year2;
-	private BigDecimal year5;
-	private BigDecimal year10;	
-	private CurrencyKey currencyKey;
-	private List<SymbolDto> symbols = new ArrayList<>();
-	private List<PortfolioElementDto> portfolioElements = new ArrayList<>();
-	*/
   }
 
   onCancelClick(): void {
@@ -134,12 +122,12 @@ export class NewPortfolioComponent {
       const myValue: string = formGroup.get(FormFields.PortfolioName)?.value;
       if (myValue && myValue.trim().length > 4) {
         formGroup.get(FormFields.PortfolioName)?.setErrors(null);
-        this.formValid = true;
+        this.formValid.set(true);
       } else {
         formGroup
           .get(FormFields.PortfolioName)
           ?.setErrors({ MatchPassword: true });
-        this.formValid = false;
+        this.formValid.set(false);
       }
     }
   }

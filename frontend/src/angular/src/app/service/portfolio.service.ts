@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable, shareReplay } from "rxjs";
 import { Portfolio } from "../model/portfolio";
 import { PortfolioBars } from "../model/portfolio-bars";
@@ -19,7 +19,7 @@ import { ComparisonIndex } from "./quote.service";
 
 @Injectable({ providedIn: "root" })
 export class PortfolioService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getPortfolioByUserId(userId: number): Observable<Portfolio[]> {
     return this.http

@@ -1,10 +1,10 @@
 <div class="my-container">
   <div class="text-container">
     <span class="my-span" i18n="@@portfolioChartsName"
-      >Portfolio: {{ selPortfolio?.name }}</span
+      >Portfolio: {{ selPortfolio()?.name }}</span
       >
       <span class="my-span" i18n="@@portfolioChartsStartDate"
-        >Start Date: {{ startDate | date: "d.M.yyyy" }}</span
+        >Start Date: {{ startDate() | date: "d.M.yyyy" }}</span
         >
       </div>
       <div class="text-container">
@@ -15,13 +15,14 @@
             aria-labelledby="my-radio-group-label"
             class="my-radio-group"
             (change)="chartPeriodChanged()"
-            [(ngModel)]="selChartPeriod"
+            [ngModel]="selChartPeriod()"
+            (ngModelChange)="selChartPeriod.set($event)"
             >
-            @for (myChartPeriod of chartPeriods; track myChartPeriod) {
+            @for (myChartPeriod of chartPeriods(); track myChartPeriod) {
               <mat-radio-button
                 class="my-radio-button"
                 [value]="myChartPeriod"
-                [disabled]="chartsLoading"
+                [disabled]="chartsLoading()"
                 >
                 {{ myChartPeriod.periodText }}
               </mat-radio-button>
@@ -35,31 +36,34 @@
             <span>
               <mat-checkbox
                 class="my-checkbox"
-                [(ngModel)]="showES50"
-                [disabled]="chartsLoading"
+                [ngModel]="showES50()"
+                (ngModelChange)="showES50.set($event)"
+                [disabled]="chartsLoading()"
                 (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)"
                 i18n="@@es50"
                 >EuroStoxx 50</mat-checkbox
                 >
                 <mat-checkbox
                   class="my-checkbox"
-                  [(ngModel)]="showMsciCH"
-                  [disabled]="chartsLoading"
+                  [ngModel]="showMsciCH()"
+                  (ngModelChange)="showMsciCH.set($event)"
+                  [disabled]="chartsLoading()"
                   (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)"
                   i18n="@@msciChina"
                   >Msci China</mat-checkbox
                   >
                   <mat-checkbox
                     class="my-checkbox"
-                    [(ngModel)]="showSP500"
-                    [disabled]="chartsLoading"
+                    [ngModel]="showSP500()"
+                    (ngModelChange)="showSP500.set($event)"
+                    [disabled]="chartsLoading()"
                     (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)"
                     i18n="@@sAndP500"
                     >S&P 500</mat-checkbox
                     >
                   </span>
                 </div>
-                @if (chartsLoading) {
+                @if (chartsLoading()) {
                   <div class="center-div">
                     <mat-progress-spinner
                       mode="indeterminate"
@@ -67,9 +71,9 @@
                     ></mat-progress-spinner>
                   </div>
                 }
-                @if (!chartsLoading) {
+                @if (!chartsLoading()) {
                   <div class="chart-container">
-                    <sc-bar-chart [chartBars]="chartBars"></sc-bar-chart>
+                    <sc-bar-chart [chartBars]="chartBars()"></sc-bar-chart>
                   </div>
                 }
               </div>

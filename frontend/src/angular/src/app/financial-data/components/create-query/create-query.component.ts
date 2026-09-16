@@ -12,13 +12,12 @@
  */
 import {
   Component,
-  OnInit,
-  OnDestroy,
-  Output,
-  EventEmitter,
   DestroyRef,
   inject,
   ChangeDetectionStrategy,
+  signal,
+  output,
+  OnInit,
 } from "@angular/core";
 import {
   CdkDragDrop,
@@ -56,7 +55,7 @@ import { FinancialDataService } from "../../service/financial-data.service";
 import { QueryFormFields, QueryComponent } from "../query/query.component";
 import { Symbol } from "../../../model/symbol";
 import { SfSymbolName } from "../../model/sf-symbol-name";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { QuarterData } from "../../model/quarter-data";
 import { FeCountry } from "../../model/fe-country";
 import { MatButton } from "@angular/material/button";
@@ -95,7 +94,7 @@ enum FormFields {
   selector: "app-create-query",
   templateUrl: "./create-query.component.html",
   styleUrls: ["./create-query.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -119,10 +118,10 @@ export class CreateQueryComponent implements OnInit {
     { queryItemType: ItemType.TermStart, title: "Term Start" },
     { queryItemType: ItemType.TermEnd, title: "Term End" },
   ];
-  protected availableItems: MyItem[] = [];
-  protected queryItems: MyItem[] = [
+  protected availableItems = signal<MyItem[]>([]);
+  protected queryItems = signal<MyItem[]>([
     { queryItemType: ItemType.Query, title: "Query" },
-  ];
+  ]);
   protected readonly availableItemParams = {
     showType: true,
     formArray: new FormArray([] as any[]),
@@ -137,25 +136,22 @@ export class CreateQueryComponent implements OnInit {
   protected yearOperators: string[] = [];
   protected quarterQueryItems: string[] = [];
   protected countryQueryItems: string[] = [];
-  protected symbols: Symbol[] = [];
-  protected sfSymbolNames: SfSymbolName[] = [];
+  protected symbols = signal<Symbol[]>([]);
+  protected sfSymbolNames = signal<SfSymbolName[]>([]);
   protected FormFields = FormFields;
-  protected formStatus = "";
-  @Output()
-  symbolFinancials = new EventEmitter<SymbolFinancials[]>();
-  @Output()
-  financialElements = new EventEmitter<FinancialElementExt[]>();
-  @Output()
-  showSpinner = new EventEmitter<boolean>();
+  protected formStatus = signal("");
+  symbolFinancials = output<SymbolFinancials[]>();
+  financialElements = output<FinancialElementExt[]>();
+  showSpinner = output<boolean>();
 
-  constructor(
-    private fb: FormBuilder,
-    private symbolService: SymbolService,
-    private configService: ConfigService,
-    private financialDataService: FinancialDataService,
-    private destroyRef: DestroyRef,
-  ) {
-    this.queryForm = fb.group(
+  private fb = inject(FormBuilder);
+  private symbolService = inject(SymbolService);
+  private configService = inject(ConfigService);
+  private financialDataService = inject(FinancialDataService);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.queryForm = this.fb.group(
       {
         [FormFields.YearOperator]: "",
         [FormFields.Year]: [0, Validators.pattern("^\\d*$")],
@@ -163,7 +159,7 @@ export class CreateQueryComponent implements OnInit {
         [FormFields.Quarter]: [""],
         [FormFields.Name]: "",
         [FormFields.Country]: "",
-        [FormFields.QueryItems]: fb.array([]),
+        [FormFields.QueryItems]: this.fb.array([]),
       },
       {
         validators: [this.validateItemTypes()],
@@ -172,16 +168,15 @@ export class CreateQueryComponent implements OnInit {
     this.queryItemParams.formArray = this.queryForm.controls[
       FormFields.QueryItems
     ] as FormArray;
-    //delay(0) fixes "NG0100: Expression has changed after it was checked" exception
     this.queryForm.statusChanges
       .pipe(delay(0))
-      .subscribe((result: string) => (this.formStatus = result));
+      .subscribe((result: string) => this.formStatus.set(result));
   }
 
   ngOnInit(): void {
     this.symbolFinancials.emit([]);
     this.financialElements.emit([]);
-    this.availableInit.forEach((myItem) => this.availableItems.push(myItem));
+    this.availableItems.set([...this.availableInit]);
     this.queryForm.controls[FormFields.Symbol].valueChanges
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -191,7 +186,7 @@ export class CreateQueryComponent implements OnInit {
           this.symbolService.getSymbolBySymbol(myValue),
         ),
       )
-      .subscribe((myValue: Symbol[]) => (this.symbols = myValue));
+      .subscribe((myValue: Symbol[]) => this.symbols.set(myValue));
     this.queryForm.controls[FormFields.Name].valueChanges
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -201,7 +196,9 @@ export class CreateQueryComponent implements OnInit {
           this.financialDataService.getSymbolNamesByCompanyName(myValue),
         ),
       )
-      .subscribe((myValue: SfSymbolName[]) => (this.sfSymbolNames = myValue));
+      .subscribe((myValue: SfSymbolName[]) =>
+        this.sfSymbolNames.set(myValue),
+      );
 
     this.configService.getNumberOperators().subscribe((values: string[]) => {
       this.yearOperators = values;
@@ -251,21 +248,19 @@ export class CreateQueryComponent implements OnInit {
         event.previousIndex,
         event.currentIndex,
       );
-      //console.log(event.container.data === this.todo);
-      while (this.availableItems.length > 0) {
-        this.availableItems.pop();
-      }
-      this.availableInit.forEach((myItem) => this.availableItems.push(myItem));
+      this.availableItems.set([...this.availableInit]);
     }
   }
 
   public removeItem(index: number): void {
-    //console.log(index);
-    this.queryItems.splice(index, 1);
+    this.queryItems.update((items) => {
+      const newItems = [...items];
+      newItems.splice(index, 1);
+      return newItems;
+    });
   }
 
   public search(): void {
-    //console.log(this.queryForm.controls[FormFields.QueryItems].value);
     const symbolFinancialsParams = {
       yearFilter: {
         operation: this.queryForm.controls[FormFields.YearOperator].value,
@@ -287,7 +282,6 @@ export class CreateQueryComponent implements OnInit {
           )
         : [],
     } as SymbolFinancialsQueryParams;
-    //console.log(symbolFinancials);
     this.showSpinner.emit(true);
     this.financialDataService
       .postSymbolFinancialsParam(symbolFinancialsParams)
@@ -335,7 +329,6 @@ export class CreateQueryComponent implements OnInit {
   private createFinancialElementParam(
     formGroup: FormGroup,
   ): FinancialElementParams {
-    //console.log(formGroup);
     return {
       conceptFilter: {
         operation: formGroup.get(QueryFormFields.ConceptOperator)?.value,
@@ -352,10 +345,10 @@ export class CreateQueryComponent implements OnInit {
 
   private validateItemTypes(): ValidatorFn {
     const validateItemTypesFn = (form: FormGroup): ValidationErrors | null => {
-      let termStartCount = this.queryItems.filter(
+      let termStartCount = this.queryItems().filter(
         (myTerm) => myTerm.queryItemType === ItemType.TermStart,
       ).length;
-      let termEndCount = this.queryItems.filter(
+      let termEndCount = this.queryItems().filter(
         (myTerm) => myTerm.queryItemType === ItemType.TermEnd,
       ).length;
       return termStartCount != termEndCount ? { termItemsValid: false } : null;

@@ -1,5 +1,5 @@
 <div mat-dialog-content>
-  @if (!updatingQuotes) {
+  @if (!updatingQuotes()) {
     <form [formGroup]="symbolForm" novalidate>
       <div class="grid-container">
         <div><span i18n="@@changeSymbolName">Name: </span></div>
@@ -16,7 +16,7 @@
         </div>
       </div>
       <ul class="list-style">
-        @if (!deleteSymbol) {
+        @if (!deleteSymbol()) {
           <li>
             <mat-form-field class="form-field">
               <mat-label i18n="@@changeSymbolWeight">Weight</mat-label>
@@ -71,9 +71,7 @@
           <button
             mat-button
             (click)="updateClick()"
-          [disabled]="
-            !deleteSymbol && (symbolForm.pristine || symbolForm.invalid)
-          "
+            [disabled]="!deleteSymbol() && (symbolForm.pristine || symbolForm.invalid)"
             tabindex="-1"
             i18n="@@ok"
             >
@@ -87,7 +85,7 @@
             >
           Cancel
         </button>
-          @if (!deleteSymbol) {
+          @if (!deleteSymbol()) {
             <button
               class="delete-button"
               mat-button
@@ -100,10 +98,9 @@
           }
         </li>
       </ul>
-      <!-- {symbolForm.pristine}} {{symbolForm.valid}} -->
     </form>
   }
-  @if (updatingQuotes) {
+  @if (updatingQuotes()) {
     <div>
       <div class="container">
         <div i18n="@@changeSymbolUpdatingQuotes">Updating Quotes...</div>

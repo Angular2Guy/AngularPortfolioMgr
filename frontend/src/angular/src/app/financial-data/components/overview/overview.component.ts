@@ -12,10 +12,11 @@
  */
 import {
   Component,
-  OnInit,
   HostListener,
   DestroyRef,
   ChangeDetectionStrategy,
+  inject,
+  signal,
 } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
@@ -30,7 +31,7 @@ import {
   DialogSpinnerComponent,
   SpinnerData,
 } from "../../../base/components/dialog-spinner/dialog-spinner.component";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ImportData, ImportDataType } from "../../../model/import-data";
 import { QuoteImportService } from "../../../service/quote-import.service";
 import { MatToolbar } from "@angular/material/toolbar";
@@ -42,32 +43,30 @@ import { QueryResultsComponent } from "../query-results/query-results.component"
   selector: "app-overview",
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatToolbar, MatButton, CreateQueryComponent, QueryResultsComponent],
 })
-export class OverviewComponent implements OnInit {
-  protected windowHeight: number = 0;
-  protected symbolFinancials: SymbolFinancials[] = [];
-  protected financialElements: FinancialElementExt[] = [];
+export class OverviewComponent {
+  protected windowHeight = signal(0);
+  protected symbolFinancials = signal<SymbolFinancials[]>([]);
+  protected financialElements = signal<FinancialElementExt[]>([]);
   private spinnerDialogRef!: MatDialogRef<DialogSpinnerComponent, any> | null;
 
-  constructor(
-    private financialDataService: FinancialDataService,
-    private quoteImportService: QuoteImportService,
-    private tokenService: TokenService,
-    private dialog: MatDialog,
-    private configService: ConfigService,
-    private router: Router,
-    private destroyRef: DestroyRef,
-  ) {}
+  private financialDataService = inject(FinancialDataService);
+  private quoteImportService = inject(QuoteImportService);
+  private tokenService = inject(TokenService);
+  private dialog = inject(MatDialog);
+  private configService = inject(ConfigService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
-    this.windowHeight = window.innerHeight - 84;
+  constructor() {
+    this.windowHeight.set(window.innerHeight - 84);
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
-    this.windowHeight = event.target.innerHeight - 84;
+    this.windowHeight.set(event.target.innerHeight - 84);
   }
 
   showSpinner(show: boolean): void {
@@ -87,11 +86,11 @@ export class OverviewComponent implements OnInit {
   }
 
   updateSymbolFinancials(event: SymbolFinancials[]): void {
-    this.symbolFinancials = event;
+    this.symbolFinancials.set(event);
   }
 
   updateFinancialElements(event: FinancialElementExt[]): void {
-    this.financialElements = event;
+    this.financialElements.set(event);
   }
 
   showFinancialsImport(): void {
@@ -116,7 +115,6 @@ export class OverviewComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((result) => console.log(result));
     });
-    //console.log('showFinancialsConfig()');
   }
 
   showDailyQuotesImport(): void {

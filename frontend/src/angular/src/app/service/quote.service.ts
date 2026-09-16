@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Quote } from "../model/quote";
@@ -23,7 +23,7 @@ export enum ComparisonIndex {
 
 @Injectable({ providedIn: "root" })
 export class QuoteService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getAllDailyQuotes(symbol: string): Observable<Quote[]> {
     return this.http.get<Quote[]>(`/rest/quote/daily/all/symbol/${symbol}`);

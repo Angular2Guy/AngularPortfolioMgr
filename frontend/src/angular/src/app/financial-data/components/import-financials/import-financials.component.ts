@@ -12,10 +12,10 @@
  */
 import {
   Component,
-  OnInit,
-  Inject,
   DestroyRef,
   ChangeDetectionStrategy,
+  inject,
+  OnInit,
 } from "@angular/core";
 import {
   FormGroup,
@@ -30,14 +30,14 @@ import {
   MAT_DIALOG_DATA,
   MatDialogContent,
 } from "@angular/material/dialog";
-import { OverviewComponent } from "../overview/overview.component";
 import { ConfigService } from "../../../service/config.service";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ImportData, ImportDataType } from "../../../model/import-data";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatButton } from "@angular/material/button";
+import { Inject } from "@angular/core";
 
 enum FormFields {
   Filename = "filename",
@@ -47,7 +47,7 @@ enum FormFields {
   selector: "app-import-financials",
   templateUrl: "./import-financials.component.html",
   styleUrls: ["./import-financials.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkScrollable,
     MatDialogContent,
@@ -66,14 +66,13 @@ export class ImportFinancialsComponent implements OnInit {
   protected filename: string = "";
   protected ImportDataType = ImportDataType;
 
-  constructor(
-    private dialogRef: MatDialogRef<OverviewComponent>,
-    private configService: ConfigService,
-    private destroyRef: DestroyRef,
-    @Inject(MAT_DIALOG_DATA) public data: ImportData,
-    private fb: FormBuilder,
-  ) {
-    this.financialsForm = fb.group({
+  private dialogRef = inject(MatDialogRef);
+  private configService = inject(ConfigService);
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: ImportData) {
+    this.financialsForm = this.fb.group({
       [FormFields.Filename]: [
         "",
         [Validators.required, Validators.minLength(5)],

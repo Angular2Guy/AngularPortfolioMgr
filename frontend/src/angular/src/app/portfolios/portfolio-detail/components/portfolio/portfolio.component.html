@@ -1,13 +1,13 @@
 <mat-toolbar color="primary">
-  <span i18n="@@portfolioPortfolio">Portfolio {{ portfolio?.name }}</span>
+  <span i18n="@@portfolioPortfolio">Portfolio {{ portfolio()?.name }}</span>
   <span class="example-fill-remaining-space"></span>
-  @if (reloadData) {
+  @if (reloadData()) {
     <span class="custom-spinner">
       <mat-progress-spinner diameter="32" mode="indeterminate" color="primary">
       </mat-progress-spinner>
     </span>
   }
-  @if (reloadData) {
+  @if (reloadData()) {
     <span class="spinner-text" i18n="@@loading">Loading...</span>
   }
   <span
@@ -26,7 +26,7 @@
   [ngStyle]="{ 'height.px': windowHeight }"
 >
   <mat-sidenav opened mode="side" class="symbol-list">
-    @for (symbol of symbols; track symbol) {
+    @for (symbol of symbols(); track symbol) {
       <mat-action-list>
         <div class="symbol-line">
           <button mat-list-item (click)="selectSymbol(symbol)">
@@ -37,18 +37,18 @@
     }
   </mat-sidenav>
   <mat-sidenav-content opened mode="side">
-    @if (showSymbol) {
+    @if (showSymbol()) {
       <app-symbol
-        [portfolioId]="$safeNavigationMigration(portfolio?.id)"
-        [symbol]="selSymbol"
-        [showSymbol]="showSymbol"
+        [portfolioId]="$safeNavigationMigration(portfolio()?.id)"
+        [symbol]="selSymbol()"
+        [showSymbol]="showSymbol()"
         (loadingData)="updateReloadData($event)"
       ></app-symbol>
     }
-    @if (!showSymbol) {
+    @if (!showSymbol()) {
       <app-symbol-overview
-        [portfolio]="portfolio"
-        [symbol]="selSymbol"
+        [portfolio]="portfolio()"
+        [symbol]="selSymbol()"
       ></app-symbol-overview>
     }
   </mat-sidenav-content>

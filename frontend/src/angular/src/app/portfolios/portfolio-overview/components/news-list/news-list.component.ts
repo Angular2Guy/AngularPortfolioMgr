@@ -3,14 +3,14 @@
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-	   http://www.apache.org/licenses/LICENSE-2.0
+   	   http://www.apache.org/licenses/LICENSE-2.0
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ChangeDetectionStrategy, input } from "@angular/core";
 import { NewsItem } from "../../model/news-item";
 import { DatePipe } from "@angular/common";
 
@@ -18,10 +18,9 @@ import { DatePipe } from "@angular/common";
   selector: "app-news-list",
   templateUrl: "./news-list.component.html",
   styleUrl: "./news-list.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe],
 })
 export class NewsListComponent {
-  @Input()
-  protected newsItems: NewsItem[] = [];
+  protected newsItems = input<NewsItem[]>([]);
 }

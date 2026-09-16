@@ -1,7 +1,7 @@
 <mat-toolbar color="primary">
   <span i18n="@@mainPortfolioManager">Portfolio Manager</span>
   <span class="example-fill-remaining-space"></span>
-  @if (login === null) {
+  @if (login() === null) {
     <span
       ><button
       mat-flat-button
@@ -13,7 +13,7 @@
     </button></span
     >
   }
-  @if (login !== null) {
+  @if (login() !== null) {
     <span
       ><button mat-flat-button color="primary" (click)="logout()" i18n="@@logout">
       Logout
@@ -21,12 +21,12 @@
     >
   }
 </mat-toolbar>
-@if (login !== null) {
+@if (login() !== null) {
   <div class="content-container">
     <h2 class="content-margin">Loading</h2>
   </div>
 }
-@if (login !== null) {
+@if (login() !== null) {
   <div class="content-container">
     <mat-progress-spinner
       class="content-margin"

@@ -6,7 +6,7 @@
         <button
           mat-raised-button
           color="primary"
-          [disabled]="!formStatus || formStatus.toLowerCase() != 'valid'"
+          [disabled]="!formStatus() || formStatus().toLowerCase() != 'valid'"
           (click)="search()"
           i18n="@@search"
           >
@@ -44,7 +44,7 @@
             placeholder="symbol"
             />
           <mat-autocomplete #autoSymbol="matAutocomplete" autoActiveFirstOption>
-            @for (symbol of symbols; track symbol) {
+            @for (symbol of symbols(); track symbol) {
               <mat-option [value]="symbol.symbol">
                 {{ symbol.symbol }}
               </mat-option>
@@ -79,7 +79,7 @@
           placeholder="name"
           />
         <mat-autocomplete #autoName="matAutocomplete" autoActiveFirstOption>
-          @for (sfSymbolName of sfSymbolNames; track sfSymbolName) {
+          @for (sfSymbolName of sfSymbolNames(); track sfSymbolName) {
             <mat-option
               [value]="sfSymbolName.name"
               >
@@ -110,11 +110,11 @@
 
         <div
           cdkDropList
-          [cdkDropListData]="availableItems"
+          [cdkDropListData]="availableItems()"
           class="query-list"
           (cdkDropListDropped)="drop($event)"
           >
-          @for (item of availableItems; track item) {
+          @for (item of availableItems(); track item) {
             <app-query
               cdkDrag
               [queryItemType]="item.queryItemType"
@@ -134,11 +134,11 @@
 
         <div
           cdkDropList
-          [cdkDropListData]="queryItems"
+          [cdkDropListData]="queryItems()"
           class="query-list"
           (cdkDropListDropped)="drop($event)"
           >
-          @for (item of queryItems; track item; let i = $index) {
+          @for (item of queryItems(); track item; let i = $index) {
             <app-query
               class="query-item"
               cdkDrag
@@ -153,5 +153,5 @@
       </div>
     </div>
   </form>
-  {{ formStatus }}
+  {{ formStatus() }}
 </div>

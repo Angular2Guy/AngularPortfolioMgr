@@ -12,14 +12,14 @@
  */
 import {
   Component,
-  Input,
-  OnInit,
-  OnDestroy,
-  Output,
-  EventEmitter,
   DestroyRef,
   inject,
   ChangeDetectionStrategy,
+  signal,
+  effect,
+  input,
+  output,
+  OnInit,
 } from "@angular/core";
 import {
   FinancialsDataUtils,
@@ -37,7 +37,7 @@ import { debounceTime } from "rxjs/operators";
 import { ConfigService } from "../../../service/config.service";
 import { FinancialDataService } from "../../service/financial-data.service";
 import { FeConcept } from "../../model/fe-concept";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatInput } from "@angular/material/input";
@@ -61,7 +61,7 @@ export enum QueryFormFields {
   selector: "app-query",
   templateUrl: "./query.component.html",
   styleUrls: ["./query.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -78,36 +78,32 @@ export enum QueryFormFields {
 })
 export class QueryComponent implements OnInit {
   protected readonly containsOperator = "*=*";
-  @Input()
-  public baseFormArray!: FormArray;
-  @Input()
-  public formArrayIndex!: number;
-  @Input()
-  public queryItemType!: ItemType;
-  @Output()
-  public removeItem = new EventEmitter<number>();
-  private _showType!: boolean;
+  baseFormArray = input.required<FormArray>();
+  formArrayIndex = input.required<number>();
+  queryItemType = input.required<ItemType>();
+  showType = input<boolean>(true);
+  removeItem = output<number>();
   private timeoutRef = null as any;
-  protected termQueryItems: string[] = [];
-  protected stringQueryItems: string[] = [];
-  protected numberQueryItems: string[] = [];
-  protected concepts: FeConcept[] = [];
+  protected termQueryItems = signal<string[]>([]);
+  protected stringQueryItems = signal<string[]>([]);
+  protected numberQueryItems = signal<string[]>([]);
+  protected concepts = signal<FeConcept[]>([]);
   protected QueryFormFields = QueryFormFields;
   protected itemFormGroup: FormGroup;
   protected ItemType = ItemType;
 
-  constructor(
-    private fb: FormBuilder,
-    private configService: ConfigService,
-    private financialDataService: FinancialDataService,
-    private destroyRef: DestroyRef,
-  ) {
+  private fb = inject(FormBuilder);
+  private configService = inject(ConfigService);
+  private financialDataService = inject(FinancialDataService);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
     this.destroyRef.onDestroy(() => {
-      if (!this.showType) {
-        this.baseFormArray.removeAt(this.formArrayIndex);
+      if (!this.showType()) {
+        this.baseFormArray().removeAt(this.formArrayIndex());
       }
     });
-    this.itemFormGroup = fb.group({
+    this.itemFormGroup = this.fb.group({
       [QueryFormFields.QueryOperator]: "",
       [QueryFormFields.ConceptOperator]: "",
       [QueryFormFields.Concept]: ["", [Validators.required]],
@@ -117,6 +113,29 @@ export class QueryComponent implements OnInit {
         [Validators.required, Validators.pattern("^[+-]?(\\d+[\\,\\.])*\\d+$")],
       ],
       [QueryFormFields.ItemType]: ItemType.Query,
+    });
+
+    effect(() => {
+      const show = this.showType();
+      const baseArr = this.baseFormArray();
+      const idx = this.formArrayIndex();
+      if (!show) {
+        const formIndex =
+          baseArr?.controls?.findIndex(
+            (myControl) => myControl === this.itemFormGroup,
+          ) || -1;
+        if (formIndex < 0) {
+          baseArr.insert(idx, this.itemFormGroup);
+        }
+      } else {
+        const formIndex =
+          baseArr?.controls?.findIndex(
+            (myControl) => myControl === this.itemFormGroup,
+          ) || -1;
+        if (formIndex >= 0) {
+          baseArr.removeAt(formIndex);
+        }
+      }
     });
   }
 
@@ -128,22 +147,24 @@ export class QueryComponent implements OnInit {
           .getConcepts()
           .subscribe(
             (myConceptList: FeConcept[]) =>
-              (this.concepts = myConceptList.filter((myConcept) =>
-                FinancialsDataUtils.compareStrings(
-                  myConcept.concept,
-                  myValue,
-                  this.itemFormGroup.controls[QueryFormFields.ConceptOperator]
-                    .value,
+              this.concepts.set(
+                myConceptList.filter((myConcept) =>
+                  FinancialsDataUtils.compareStrings(
+                    myConcept.concept,
+                    myValue,
+                    this.itemFormGroup.controls[QueryFormFields.ConceptOperator]
+                      .value,
+                  ),
                 ),
-              )),
+              ),
           ),
       );
     this.itemFormGroup.controls[QueryFormFields.ItemType].patchValue(
-      this.queryItemType,
+      this.queryItemType(),
     );
     if (
-      this.queryItemType === ItemType.TermStart ||
-      this.queryItemType === ItemType.TermEnd
+      this.queryItemType() === ItemType.TermStart ||
+      this.queryItemType() === ItemType.TermEnd
     ) {
       this.itemFormGroup.controls[QueryFormFields.ConceptOperator].patchValue(
         this.containsOperator,
@@ -154,8 +175,7 @@ export class QueryComponent implements OnInit {
       );
       this.itemFormGroup.controls[QueryFormFields.NumberValue].patchValue(0);
     }
-    //make service caching work
-    if (this.formArrayIndex === 0) {
+    if (this.formArrayIndex() === 0) {
       this.getOperators(0);
     } else {
       this.getOperators(400);
@@ -170,14 +190,12 @@ export class QueryComponent implements OnInit {
       this.financialDataService
         .getConcepts()
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe
-        //myValues => console.log(myValues)
-        ();
+        .subscribe();
       this.configService
         .getNumberOperators()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((values: string[]) => {
-          this.numberQueryItems = values;
+          this.numberQueryItems.set(values);
           this.itemFormGroup.controls[
             QueryFormFields.NumberOperator
           ].patchValue(values.filter((myValue) => "=" === myValue)[0]);
@@ -186,14 +204,14 @@ export class QueryComponent implements OnInit {
         .getStringOperators()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((values: string[]) => {
-          this.stringQueryItems = values;
+          this.stringQueryItems.set(values);
           this.itemFormGroup.controls[
             QueryFormFields.ConceptOperator
           ].patchValue(
             values.filter((myValue) => this.containsOperator === myValue)[0],
           );
         });
-      if (ItemType.TermEnd === this.queryItemType) {
+      if (ItemType.TermEnd === this.queryItemType()) {
         this.itemFormGroup.controls[QueryFormFields.QueryOperator].patchValue(
           "End",
         );
@@ -203,7 +221,7 @@ export class QueryComponent implements OnInit {
           .getQueryOperators()
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe((values: string[]) => {
-            this.termQueryItems = values;
+            this.termQueryItems.set(values);
             this.itemFormGroup.controls[
               QueryFormFields.QueryOperator
             ].patchValue(values.filter((myValue) => "And" === myValue)[0]);
@@ -213,34 +231,6 @@ export class QueryComponent implements OnInit {
   }
 
   itemRemove(): void {
-    this.removeItem.emit(this.formArrayIndex);
-  }
-
-  get showType(): boolean {
-    return this._showType;
-  }
-
-  @Input()
-  set showType(showType: boolean) {
-    this._showType = showType;
-    if (!this.showType) {
-      const formIndex =
-        this?.baseFormArray?.controls?.findIndex(
-          (myControl) => myControl === this.itemFormGroup,
-        ) || -1;
-      if (formIndex < 0) {
-        console.log("showType showType(...)");
-        this.baseFormArray.insert(this.formArrayIndex, this.itemFormGroup);
-      }
-    } else {
-      const formIndex =
-        this?.baseFormArray?.controls?.findIndex(
-          (myControl) => myControl === this.itemFormGroup,
-        ) || -1;
-      if (formIndex >= 0) {
-        console.log("showType remove showType(...)");
-        this.baseFormArray.removeAt(formIndex);
-      }
-    }
+    this.removeItem.emit(this.formArrayIndex());
   }
 }

@@ -12,10 +12,13 @@
  */
 import {
   Component,
-  Input,
   TemplateRef,
-  ViewChild,
   ChangeDetectionStrategy,
+  effect,
+  signal,
+  viewChild,
+  input,
+  inject,
 } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import {
@@ -75,7 +78,7 @@ interface BySymbolElements extends ElementNode {
   selector: "app-result-tree",
   templateUrl: "./result-tree.component.html",
   styleUrls: ["./result-tree.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTree,
     MatTreeNodeDef,
@@ -99,7 +102,8 @@ interface BySymbolElements extends ElementNode {
   ],
 })
 export class ResultTreeComponent {
-  private _symbolFinancials: SymbolFinancials[] = [];
+  symbolFinancials = input<SymbolFinancials[]>([]);
+  bsTemplate = viewChild<TemplateRef<HTMLElement>>("bottomSheet");
   protected dataSource = new MatTreeNestedDataSource<ElementNode>();
   protected displayedColumns: string[] = [
     "concept",
@@ -110,30 +114,33 @@ export class ResultTreeComponent {
   ];
   protected financialElement!: FinancialElement;
 
-  @ViewChild("bottomSheet") bsTemplate!: TemplateRef<HTMLElement>;
+  private financialDataService = inject(FinancialDataService);
+  private bottomSheet = inject(MatBottomSheet);
 
-  constructor(
-    private financialDataService: FinancialDataService,
-    private bottomSheet: MatBottomSheet,
-  ) {}
+  constructor() {
+    effect(() => {
+      const sf = this.symbolFinancials();
+      this.dataSource.data = this.createElementNodeTree(sf);
+    });
+  }
 
   protected childrenAccessor = (node: ElementNode) => {
     return node.children ?? [];
   };
   protected hasChild = (_: number, node: ElementNode) => {
-    //console.log(node);
     return !!node.children && node.children.length > 0;
   };
 
   protected conceptClick(element: FinancialElement): void {
-    //console.log(element);
     this.financialDataService
       .getFeInfo(element.id)
       .subscribe((value: FeIdInfo) => {
-        //console.log(value);
         this.financialElement = element;
         this.financialElement.info = value.info;
-        this.bottomSheet.open(this.bsTemplate);
+        const tpl = this.bsTemplate();
+        if (tpl) {
+          this.bottomSheet.open(tpl);
+        }
       });
   }
 
@@ -147,7 +154,6 @@ export class ResultTreeComponent {
         }
       }
     });
-    //console.log(node);
   }
 
   protected formatFinancialType(type: string): string {
@@ -158,17 +164,6 @@ export class ResultTreeComponent {
         : "IC";
   }
 
-  get symbolFinancials(): SymbolFinancials[] {
-    return this._symbolFinancials;
-  }
-
-  @Input()
-  set symbolFinancials(symbolFinancials: SymbolFinancials[]) {
-    this._symbolFinancials = symbolFinancials;
-    //console.log(symbolFinancials);
-    this.dataSource.data = this.createElementNodeTree(symbolFinancials);
-  }
-
   private createElementNodeTree(
     symbolFinancials: SymbolFinancials[],
   ): BySymbolElements[] {
@@ -176,7 +171,6 @@ export class ResultTreeComponent {
       FinancialElementExt,
       string
     >(FinancialsDataUtils.toFinancialElementsExt(symbolFinancials), "symbol");
-    //console.log(bySymbolElementExtsMap);
     const myBySymbolElements: BySymbolElements[] = [];
     bySymbolElementExtsMap.forEach((value, key) => {
       const byYearElementsMap = FinancialsDataUtils.groupByKey<
@@ -206,7 +200,6 @@ export class ResultTreeComponent {
       } as BySymbolElements;
       myBySymbolElements.push(myBySymbolElement);
     });
-    //console.log(myBySymbolElements);
     return myBySymbolElements;
   }
 }

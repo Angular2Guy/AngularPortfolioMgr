@@ -14,7 +14,9 @@ import {
   Component,
   OnInit,
   Inject,
+  inject,
   DestroyRef,
+  signal,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import {
@@ -33,7 +35,7 @@ import { MainComponent } from "../main/main.component";
 import { LoginService } from "../../service/login.service";
 import { Login } from "../../model/login";
 import { TokenService } from "ngx-simple-charts/base-service";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { NgTemplateOutlet } from "@angular/common";
@@ -55,7 +57,7 @@ enum FormFields {
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkScrollable,
     MatDialogContent,
@@ -73,21 +75,22 @@ enum FormFields {
 export class LoginComponent implements OnInit {
   signinForm: FormGroup;
   loginForm: FormGroup;
-  loginFailed = false;
-  signinFailed = false;
-  pwMatching = true;
+  loginFailed = signal(false);
+  signinFailed = signal(false);
+  pwMatching = signal(true);
   FormFields = FormFields;
-  protected waitingForResponse = false;
+  protected waitingForResponse = signal(false);
+
+  private loginService = inject(LoginService);
+  private tokenService = inject(TokenService);
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
 
   constructor(
     public dialogRef: MatDialogRef<MainComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private loginService: LoginService,
-    private tokenService: TokenService,
-    private destroyRef: DestroyRef,
-    fb: FormBuilder,
   ) {
-    this.signinForm = fb.group(
+    this.signinForm = this.fb.group(
       {
         [FormFields.Username]: ["", Validators.required],
         [FormFields.Password]: ["", Validators.required],
@@ -100,7 +103,7 @@ export class LoginComponent implements OnInit {
         validator: this.validate.bind(this),
       },
     );
-    this.loginForm = fb.group({
+    this.loginForm = this.fb.group({
       [FormFields.Username]: ["", Validators.required],
       [FormFields.Password]: ["", Validators.required],
     });
@@ -115,11 +118,12 @@ export class LoginComponent implements OnInit {
       group.get(FormFields.Password)?.touched ||
       group.get(FormFields.Password2)?.touched
     ) {
-      this.pwMatching =
+      this.pwMatching.set(
         group.get(FormFields.Password)?.value ===
           group.get(FormFields.Password2)?.value &&
-        group.get(FormFields.Password)?.value !== "";
-      if (!this.pwMatching) {
+          group.get(FormFields.Password)?.value !== "",
+      );
+      if (!this.pwMatching()) {
         group.get(FormFields.Password)?.setErrors({ MatchPassword: true });
         group.get(FormFields.Password2)?.setErrors({ MatchPassword: true });
       } else {
@@ -127,7 +131,7 @@ export class LoginComponent implements OnInit {
         group.get(FormFields.Password2)?.setErrors(null);
       }
     }
-    return this.pwMatching;
+    return this.pwMatching();
   }
 
   onSigninClick(): void {
@@ -146,7 +150,7 @@ export class LoginComponent implements OnInit {
       FormFields.AlphavantageKey,
     )?.value;
     login.rapidApiKey = this.signinForm.get(FormFields.RapidApiKey)?.value;
-    this.waitingForResponse = true;
+    this.waitingForResponse.set(true);
     this.loginService
       .postSignin(login)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -165,7 +169,7 @@ export class LoginComponent implements OnInit {
     };
     login.username = this.loginForm.get(FormFields.Username)?.value;
     login.password = this.loginForm.get(FormFields.Password)?.value;
-    this.waitingForResponse = true;
+    this.waitingForResponse.set(true);
     this.loginService
       .postLogin(login)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -177,25 +181,25 @@ export class LoginComponent implements OnInit {
 
   private signin(login: boolean): void {
     this.data.login = null;
-    this.waitingForResponse = false;
+    this.waitingForResponse.set(false);
     if (login) {
-      this.signinFailed = false;
+      this.signinFailed.set(false);
       this.dialogRef.close();
     } else {
-      this.signinFailed = true;
+      this.signinFailed.set(true);
     }
   }
 
   private login(login: Login): void {
-    this.waitingForResponse = false;
+    this.waitingForResponse.set(false);
     if (login && login.token && login.id) {
       this.tokenService.token = login.token;
       this.tokenService.userId = login.id;
       this.data.login = login;
-      this.loginFailed = false;
+      this.loginFailed.set(false);
       this.dialogRef.close(this.data.login);
     } else {
-      this.loginFailed = true;
+      this.loginFailed.set(true);
     }
   }
 

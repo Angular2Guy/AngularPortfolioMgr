@@ -14,7 +14,9 @@ import {
   Component,
   OnInit,
   Inject,
+  inject,
   DestroyRef,
+  signal,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import {
@@ -51,7 +53,7 @@ import {
   MatAutocompleteTrigger,
   MatAutocomplete,
 } from "@angular/material/autocomplete";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import {
   MatFormField,
@@ -80,7 +82,7 @@ enum FormFields {
   selector: "app-add-symbol",
   templateUrl: "./add-symbol.component.html",
   styleUrls: ["./add-symbol.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkScrollable,
     MatDialogContent,
@@ -107,18 +109,18 @@ export class AddSymbolComponent implements OnInit {
   selSymbol!: Symbol;
   symbolsName: Observable<Symbol[]> = of([]);
   symbolsSymbol: Observable<Symbol[]> = of([]);
-  loading = false;
-  importingQuotes = false;
-  formValid = true;
+  loading = signal(false);
+  importingQuotes = signal(false);
+  formValid = signal(true);
   FormFields = FormFields;
+  private symbolService = inject(SymbolService);
+  private quoteImportService = inject(QuoteImportService);
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
 
   constructor(
     public dialogRef: MatDialogRef<OverviewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioData,
-    private symbolService: SymbolService,
-    private quoteImportService: QuoteImportService,
-    private destroyRef: DestroyRef,
-    private fb: FormBuilder,
   ) {
     this.symbolForm = this.fb.group(
       {
@@ -140,7 +142,7 @@ export class AddSymbolComponent implements OnInit {
       ?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((name: string) =>
           name && name.length > 2
             ? this.symbolService
@@ -152,14 +154,14 @@ export class AddSymbolComponent implements OnInit {
                 )
             : this.clearSymbol(),
         ),
-        tap(() => (this.loading = false)),
+        tap(() => this.loading.set(false)),
       );
     this.symbolsSymbol = this.symbolForm
       .get(FormFields.SymbolSymbol)
       ?.valueChanges.pipe(
         debounceTime(400),
         distinctUntilChanged(),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((name: string) =>
           name && name.length >= 2
             ? this.symbolService
@@ -171,7 +173,7 @@ export class AddSymbolComponent implements OnInit {
                 )
             : this.clearSymbol(),
         ),
-        tap(() => (this.loading = false)),
+        tap(() => this.loading.set(false)),
       );
   }
 
@@ -189,7 +191,6 @@ export class AddSymbolComponent implements OnInit {
   }
 
   symbolSelected(event: MatAutocompleteSelectedEvent): void {
-    //console.log(event.option.value);
     this.selSymbol = event.option.value;
     this.symbolForm.controls[FormFields.SymbolSymbol].patchValue(
       this.selSymbol.symbol,
@@ -209,12 +210,11 @@ export class AddSymbolComponent implements OnInit {
 
   onAddClick(): void {
     if (this.selSymbol) {
-      this.importingQuotes = true;
+      this.importingQuotes.set(true);
       this.selSymbol.weight =
         this.symbolForm.controls[FormFields.SymbolWeight].value;
       const changedAt = this.symbolForm.controls[FormFields.CreatedAt]
         .value as DateTime;
-      //changedAt.setMinutes(changedAt.getMinutes() - changedAt.getTimezoneOffset());
       this.selSymbol.changedAt = new Date(changedAt.toMillis()).toISOString();
       forkJoin(
         this.quoteImportService.importDailyQuotes(this.selSymbol.symbol),
@@ -225,7 +225,7 @@ export class AddSymbolComponent implements OnInit {
           console.log(
             `Daily quotes: ${resultDaily}, Intraday quotes: ${resultIntraDay}`,
           );
-          this.importingQuotes = false;
+          this.importingQuotes.set(false);
           this.dialogRef.close(this.selSymbol);
         });
     }
@@ -236,17 +236,6 @@ export class AddSymbolComponent implements OnInit {
   }
 
   validate(formGroup: FormGroup): ValidationErrors {
-    /*	if (formGroup.get('portfolioName').touched) {
-		const myValue: string = formGroup.get('portfolioName').value;
-		if(myValue && myValue.trim().length > 4) {
-			formGroup.get('portfolioName').setErrors(null);
-			this.formValid = true;
-		} else {
-			formGroup.get('portfolioName').setErrors({ MatchPassword: true });
-			this.formValid = false;			
-		}
-	}
-	return { MatchPassword: true } as ValidationErrors;*/
     return { xxx: true } as ValidationErrors;
   }
 }

@@ -12,19 +12,19 @@
  */
 import { Routes } from "@angular/router";
 import { SpinnerComponent } from "./spinner/spinner.component";
-import { MainGuard } from "./service/main.guard";
+import { mainGuard } from "./service/main.guard";
 
 export const routes: Routes = [
   { path: "spinner", component: SpinnerComponent },
   {
     path: "portfolios",
-    canActivate: [MainGuard],
+    canActivate: [mainGuard],
     loadChildren: () =>
       import("./portfolios/portfolios.routes").then((m) => m.routes),
   },
   {
     path: "financialdata",
-    canActivate: [MainGuard],
+    canActivate: [mainGuard],
     loadChildren: () =>
       import("./financial-data/financial-data.routes").then((m) => m.routes),
   },

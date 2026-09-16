@@ -10,37 +10,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { Injectable } from "@angular/core";
-import {
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  UrlTree,
-  Router,
-} from "@angular/router";
-import { Observable } from "rxjs";
+import { inject } from "@angular/core";
+import { CanActivateFn, Router } from "@angular/router";
 import { TokenService } from "ngx-simple-charts/base-service";
 
-@Injectable({
-  providedIn: "root",
-})
-export class MainGuard {
-  constructor(
-    private tokenService: TokenService,
-    private router: Router,
-  ) {}
-
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot,
-  ):
-    | boolean
-    | UrlTree
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree> {
-    if (this.tokenService.token) {
-      return true;
-    } else {
-      return this.router.navigate(["/login"]);
-    }
+export const mainGuard: CanActivateFn = () => {
+  const tokenService = inject(TokenService);
+  const router = inject(Router);
+  if (tokenService.token) {
+    return true;
+  } else {
+    return router.navigate(["/login"]);
   }
-}
+};

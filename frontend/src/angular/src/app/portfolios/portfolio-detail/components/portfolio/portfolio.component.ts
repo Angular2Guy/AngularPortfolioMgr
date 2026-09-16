@@ -12,12 +12,10 @@
  */
 import {
   Component,
-  OnInit,
-  OnDestroy,
-  EventEmitter,
-  ChangeDetectorRef,
   DestroyRef,
   ChangeDetectionStrategy,
+  signal,
+  inject,
 } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { switchMap, tap } from "rxjs/operators";
@@ -25,8 +23,7 @@ import { Symbol } from "../../../../model/symbol";
 import { Portfolio } from "../../../../model/portfolio";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { PortfolioService } from "../../../../service/portfolio.service";
-import { Subscription, Subject } from "rxjs";
-import { takeUntilDestroyed } from "../../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatToolbar } from "@angular/material/toolbar";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatButton } from "@angular/material/button";
@@ -44,7 +41,7 @@ import { SymbolOverviewComponent } from "../symbol-overview/symbol-overview.comp
   selector: "app-portfolio",
   templateUrl: "./portfolio.component.html",
   styleUrls: ["./portfolio.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatToolbar,
     MatProgressSpinner,
@@ -59,59 +56,53 @@ import { SymbolOverviewComponent } from "../symbol-overview/symbol-overview.comp
     SymbolOverviewComponent,
   ],
 })
-export class PortfolioComponent implements OnInit {
-  symbols: Symbol[] = [];
-  reloadData = false;
+export class PortfolioComponent {
+  symbols = signal<Symbol[]>([]);
+  reloadData = signal(false);
   windowHeight = 0;
-  portfolio!: Portfolio;
-  selSymbol!: Symbol;
-  showSymbol = true;
+  portfolio = signal<Portfolio>({} as Portfolio);
+  selSymbol = signal<Symbol>({} as Symbol);
+  showSymbol = signal(true);
 
-  constructor(
-    private route: ActivatedRoute,
-    private tokenService: TokenService,
-    private portfolioService: PortfolioService,
-    private router: Router,
-    private changeDetectorRef: ChangeDetectorRef,
-    private destroyRef: DestroyRef,
-  ) {}
+  private route = inject(ActivatedRoute);
+  private tokenService = inject(TokenService);
+  private portfolioService = inject(PortfolioService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
+  constructor() {
     this.windowHeight = window.innerHeight - 84;
     this.route.paramMap
       .pipe(
-        tap(() => (this.reloadData = true)),
-        //tap((params: ParamMap) => this.portfolioId = parseInt(params.get('portfolioId'))),
+        tap(() => this.reloadData.set(true)),
         switchMap((params: ParamMap) =>
           this.portfolioService.getPortfolioById(
             parseInt(params.get("portfolioId") ?? "-1"),
           ),
         ),
-        tap(() => (this.reloadData = false)),
+        tap(() => this.reloadData.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((myPortfolio: Portfolio) => {
-        this.symbols = myPortfolio.symbols;
-        this.selSymbol =
+        this.symbols.set(myPortfolio.symbols);
+        this.selSymbol.set(
           myPortfolio?.symbols.length > 0
             ? myPortfolio.symbols[0]
-            : this.selSymbol;
-        this.portfolio = myPortfolio;
+            : this.selSymbol(),
+        );
+        this.portfolio.set(myPortfolio);
       });
   }
 
   updateReloadData(state: boolean) {
-    this.reloadData = state;
-    this.changeDetectorRef.detectChanges();
-    //console.log('loading:'+state);
+    this.reloadData.set(state);
   }
 
   selectSymbol(symbol: Symbol): void {
-    this.showSymbol =
-      this?.selSymbol?.symbol === symbol?.symbol
-        ? !this.showSymbol
-        : this.showSymbol;
-    this.selSymbol = symbol;
+    if (this.selSymbol()?.symbol === symbol?.symbol) {
+      this.showSymbol.set(!this.showSymbol());
+    }
+    this.selSymbol.set(symbol);
   }
 
   back(): void {

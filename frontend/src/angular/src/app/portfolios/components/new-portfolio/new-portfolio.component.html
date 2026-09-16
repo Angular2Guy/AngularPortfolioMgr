@@ -27,7 +27,7 @@
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
       </li>
-      @if (!formValid) {
+      @if (!formValid()) {
         <li
           i18n="@@newPortfolioInputInvalid"
           class="errorText"
@@ -39,7 +39,7 @@
         <button
           mat-button
           (click)="onAddClick()"
-          [disabled]="!formValid"
+          [disabled]="!formValid()"
           tabindex="-1"
           i18n="@@ok"
           >

@@ -10,17 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import {
-  Component,
-  OnInit,
-  Inject,
-  ChangeDetectionStrategy,
-} from "@angular/core";
-import {
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from "@angular/material/dialog";
+import { Component, ChangeDetectionStrategy, inject } from "@angular/core";
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 export interface SpinnerData {
@@ -31,13 +22,9 @@ export interface SpinnerData {
   selector: "app-dialog-spinner",
   templateUrl: "./dialog-spinner.component.html",
   styleUrls: ["./dialog-spinner.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatProgressSpinner],
 })
-export class DialogSpinnerComponent implements OnInit {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: SpinnerData) {}
-
-  ngOnInit(): void {
-    console.log("title: " + this.data.title);
-  }
+export class DialogSpinnerComponent {
+  data = inject<SpinnerData>(MAT_DIALOG_DATA);
 }

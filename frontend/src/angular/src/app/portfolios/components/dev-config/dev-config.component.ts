@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialogRef, MatDialogContent } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { DevAppInfoService } from "../../service/dev-app-info.service";
@@ -12,18 +12,16 @@ import { AsyncPipe } from "@angular/common";
   selector: "app-dev-config",
   templateUrl: "./dev-config.component.html",
   styleUrls: ["./dev-config.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CdkScrollable, MatDialogContent, MatLabel, MatButton, AsyncPipe],
 })
-export class DevConfigComponent implements OnInit {
+export class DevConfigComponent {
   classNameObs: Observable<string>;
 
-  constructor(
-    private dialogRef: MatDialogRef<OverviewComponent>,
-    private devAppInfoService: DevAppInfoService,
-  ) {}
+  private dialogRef = inject(MatDialogRef<OverviewComponent>);
+  private devAppInfoService = inject(DevAppInfoService);
 
-  ngOnInit(): void {
+  constructor() {
     this.classNameObs = this.devAppInfoService.getClassName();
   }
 

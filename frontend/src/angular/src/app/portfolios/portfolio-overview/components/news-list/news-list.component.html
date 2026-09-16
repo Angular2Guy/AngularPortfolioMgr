@@ -1,5 +1,5 @@
 <div class="container">
-  @for (item of newsItems; track item.link) {
+  @for (item of newsItems(); track item.link) {
     <div class="news-item">
       <h2>{{ item.title }}</h2>
       <div>{{ item.publishedDate | date: "dd-MM-yyyy" }}</div>

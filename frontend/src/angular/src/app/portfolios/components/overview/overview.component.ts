@@ -14,20 +14,19 @@ import {
   Component,
   OnInit,
   HostListener,
-  OnDestroy,
-  DestroyRef,
   inject,
+  signal,
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { TokenService } from "ngx-simple-charts/base-service";
 import { Router, RouterOutlet } from "@angular/router";
 import { PortfolioService } from "../../../service/portfolio.service";
 import { Portfolio } from "../../../model/portfolio";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { NewPortfolioComponent } from "../new-portfolio/new-portfolio.component";
 import { PortfolioData } from "../../../model/portfolio-data";
 import { SymbolImportService } from "../../../service/symbol-import.service";
-import { forkJoin, Subscription } from "rxjs";
+import { forkJoin } from "rxjs";
 import { AddSymbolComponent } from "../add-symbol/add-symbol.component";
 import { Symbol } from "../../../model/symbol";
 import { QuoteImportService } from "../../../service/quote-import.service";
@@ -38,7 +37,8 @@ import {
   SpinnerData,
   DialogSpinnerComponent,
 } from "../../../base/components/dialog-spinner/dialog-spinner.component";
-import { takeUntilDestroyed } from "../../../base/utils/funtions";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { DestroyRef } from "@angular/core";
 import { MatToolbar } from "@angular/material/toolbar";
 import { MatButton } from "@angular/material/button";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -55,7 +55,7 @@ import { MatIcon } from "@angular/material/icon";
   selector: "app-overview",
   templateUrl: "./overview.component.html",
   styleUrls: ["./overview.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatToolbar,
     MatButton,
@@ -71,9 +71,9 @@ import { MatIcon } from "@angular/material/icon";
   ],
 })
 export class OverviewComponent implements OnInit {
-  protected windowHeight: number = 0;
-  portfolios: Portfolio[] = [];
-  myPortfolio!: Portfolio;
+  protected windowHeight = signal(0);
+  portfolios = signal<Portfolio[]>([]);
+  myPortfolio = signal<Portfolio>({} as Portfolio);
   displayedColumns = [
     "name",
     "stocks",
@@ -84,40 +84,36 @@ export class OverviewComponent implements OnInit {
     "year5",
     "year10",
   ];
-  importingSymbols = false;
-  //limit 250
-  countPortfolioSymbolsByUserId = 1000000;
+  importingSymbols = signal(false);
+  countPortfolioSymbolsByUserId = signal(1000000);
   private timeoutId = -1;
-  protected profiles: string = "";
+  protected profiles = signal("");
   private showPortfolioTable = true;
 
-  constructor(
-    private tokenService: TokenService,
-    private configService: ConfigService,
-    private router: Router,
-    private portfolioService: PortfolioService,
-    private symbolImportService: SymbolImportService,
-    private quoteImportService: QuoteImportService,
-    private dialog: MatDialog,
-    private destroyRef: DestroyRef,
-  ) {}
+  private tokenService = inject(TokenService);
+  private configService = inject(ConfigService);
+  private router = inject(Router);
+  private portfolioService = inject(PortfolioService);
+  private symbolImportService = inject(SymbolImportService);
+  private quoteImportService = inject(QuoteImportService);
+  private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit() {
-    this.windowHeight = window.innerHeight - 84;
+    this.windowHeight.set(window.innerHeight - 84);
     this.refreshPortfolios();
     this.configService
       .getProfiles()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value: string) => {
-        this.profiles = !value ? "dev" : value.trim().toLowerCase();
-        //this.profiles = "dev " + this.profiles;
-        console.log(this.profiles);
+        this.profiles.set(!value ? "dev" : value.trim().toLowerCase());
+        console.log(this.profiles());
       });
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
-    this.windowHeight = event.target.innerHeight - 84;
+    this.windowHeight.set(event.target.innerHeight - 84);
   }
 
   newPortfolio() {
@@ -149,8 +145,8 @@ export class OverviewComponent implements OnInit {
           this.portfolioService
             .postPortfolio(result)
             .subscribe((myPortfolio) => {
-              this.portfolios = [...this.portfolios, myPortfolio];
-              this.myPortfolio = myPortfolio;
+              this.portfolios.set([...this.portfolios(), myPortfolio]);
+              this.myPortfolio.set(myPortfolio);
               this.selPortfolio(myPortfolio, true);
             });
         }
@@ -158,13 +154,11 @@ export class OverviewComponent implements OnInit {
   }
 
   selPortfolio(portfolio: Portfolio, showPortTab = false) {
-    this.myPortfolio = portfolio;
+    this.myPortfolio.set(portfolio);
     this.showPortfolioTable = showPortTab ? true : !this.showPortfolioTable;
     const myPath = !this.showPortfolioTable
       ? "portfolio-overview/portfolio-charts"
       : "table";
-    //console.log(this.showPortfolioTable, `/portfolios/overview/${myPath}`);
-    //the -1 portfolioId is filtered out and forces a update of the route
     if (showPortTab) {
       this.router
         .navigate([`/portfolios/overview/${myPath}`, -1])
@@ -198,17 +192,18 @@ export class OverviewComponent implements OnInit {
         myPortfolios.forEach(
           (port) => (port.symbols = !port.symbols ? [] : port.symbols),
         );
-        this.portfolios = myPortfolios;
-        this.myPortfolio =
-          myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio;
-        if (!!this.myPortfolio) {
-          this.selPortfolio(this.myPortfolio, true);
+        this.portfolios.set(myPortfolios);
+        this.myPortfolio.set(
+          myPortfolios.length > 0 ? myPortfolios[0] : this.myPortfolio(),
+        );
+        if (!!this.myPortfolio()) {
+          this.selPortfolio(this.myPortfolio(), true);
         }
       });
     this.portfolioService
       .countPortfolioSymbolsByUserId(this.tokenService.userId as number)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result) => (this.countPortfolioSymbolsByUserId = result));
+      .subscribe((result) => this.countPortfolioSymbolsByUserId.set(result));
   }
 
   addSymbol(portfolio: Portfolio) {
@@ -245,11 +240,11 @@ export class OverviewComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((result: Portfolio) => {
               if (result) {
-                const filteredPortfolios = this.portfolios.filter(
+                const filteredPortfolios = this.portfolios().filter(
                   (port) => port.id !== result.id,
                 );
-                this.portfolios = [...filteredPortfolios, result];
-                this.myPortfolio = result;
+                this.portfolios.set([...filteredPortfolios, result]);
+                this.myPortfolio.set(result);
                 this.selPortfolio(result, true);
                 dialogSpinnerRef.close();
               }
@@ -259,7 +254,7 @@ export class OverviewComponent implements OnInit {
   }
 
   importSymbols(): void {
-    this.importingSymbols = true;
+    this.importingSymbols.set(true);
     if (this.timeoutId !== -1) {
       clearTimeout(this.timeoutId);
     }
@@ -289,7 +284,7 @@ export class OverviewComponent implements OnInit {
                 .pipe(takeUntilDestroyed(this.destroyRef))
                 .subscribe((resultIndex: string) => {
                   console.log(`Index Symbols: ${resultIndex}`);
-                  this.importingSymbols = false;
+                  this.importingSymbols.set(false);
                 }),
             60000,
           ) as unknown as number;
@@ -302,9 +297,9 @@ export class OverviewComponent implements OnInit {
   }
 
   showConfig(): void {
-    if (this.profiles) {
+    if (this.profiles()) {
       const myOptions = { width: "700px" };
-      let dialogRef = this.profiles.toLowerCase().includes("prod")
+      let dialogRef = this.profiles().toLowerCase().includes("prod")
         ? this.dialog.open(ProdConfigComponent, myOptions)
         : this.dialog.open(DevConfigComponent, myOptions);
       dialogRef

@@ -4,83 +4,83 @@
       <span class="symbol-data" i18n="@@symbol"
         >Symbol:
         {{
-          !symbol
+          !symbol()
             ? "none"
             : serviceUtils.replacePortfolioSymbol(
-                $safeNavigationMigration(symbol?.symbol)
+                $safeNavigationMigration(symbol()?.symbol)
               )
         }}</span
       >
       <span class="symbol-data" i18n="@@name"
-        >Name: {{ !symbol ? "none" : symbol?.name }}</span
+        >Name: {{ !symbol() ? "none" : symbol()?.name }}</span
       >
     </div>
     <div class="text-container">
       <span class="symbol-data" i18n="@@symbolStartDate"
         >Start Date:
         {{
-          $safeNavigationMigration(symbolData?.start) | date: "mediumDate"
+          $safeNavigationMigration(symbolData()?.start) | date: "mediumDate"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolEndDate"
         >End Date:
         {{
-          $safeNavigationMigration(symbolData?.end) | date: "mediumDate"
+          $safeNavigationMigration(symbolData()?.end) | date: "mediumDate"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolOpen"
         >Open:
-        {{ $safeNavigationMigration(symbolData?.open) | number: "1.2-2" }}</span
+        {{ $safeNavigationMigration(symbolData()?.open) | number: "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolHigh"
         >High:
-        {{ $safeNavigationMigration(symbolData?.high) | number: "1.2-2" }}</span
+        {{ $safeNavigationMigration(symbolData()?.high) | number: "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolLow"
         >Low:
-        {{ $safeNavigationMigration(symbolData?.low) | number: "1.2-2" }}</span
+        {{ $safeNavigationMigration(symbolData()?.low) | number: "1.2-2" }}</span
       >
       <span class="symbol-data" i18n="@@symbolClose"
         >Close:
         {{
-          $safeNavigationMigration(symbolData?.close) | number: "1.2-2"
+          $safeNavigationMigration(symbolData()?.close) | number: "1.2-2"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolAccDividend">
         Acc. Dividends:
         {{
-          $safeNavigationMigration(symbolData?.accDividend) | number: "1.2-2"
+          $safeNavigationMigration(symbolData()?.accDividend) | number: "1.2-2"
         }}
       </span>
     </div>
     <div class="text-container">
       <span class="symbol-data" i18n="@@symbolCurrency"
-        >Currency: {{ symbol?.currencyKey }}</span
+        >Currency: {{ symbol()?.currencyKey }}</span
       >
       <span class="symbol-data" i18n="@@symbolAvgVolume"
         >Average Volume:
         {{
-          $safeNavigationMigration(symbolData?.avgVolume) | number: "1.0-0"
+          $safeNavigationMigration(symbolData()?.avgVolume) | number: "1.0-0"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolAvgClose"
         >Average Close:
         {{
-          $safeNavigationMigration(symbolData?.avgClose) | number: "1.2-2"
+          $safeNavigationMigration(symbolData()?.avgClose) | number: "1.2-2"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolMedClose"
         >Median Close:
         {{
-          $safeNavigationMigration(symbolData?.medianClose) | number: "1.2-2"
+          $safeNavigationMigration(symbolData()?.medianClose) | number: "1.2-2"
         }}</span
       >
       <span class="symbol-data" i18n="@@symbolVolClose"
         >Volatility Close:
         {{
-          !symbolData.volatilityClose
+          !symbolData()?.volatilityClose
             ? ""
-            : (symbolData.volatilityClose * 100 | number: "1.2-2")
+            : (symbolData()?.volatilityClose * 100 | number: "1.2-2")
         }}%</span
       >
     </div>
@@ -93,7 +93,7 @@
       aria-labelledby="my-radio-group-label"
       class="my-radio-group"
       (change)="quotePeriodChanged()"
-      [(ngModel)]="selQuotePeriod"
+      [ngModel]="selQuotePeriod"
     >
       @for (myQuotePeriod of quotePeriods; track myQuotePeriod) {
         <mat-radio-button class="my-radio-button" [value]="myQuotePeriod">
@@ -109,41 +109,44 @@
     <span>
       <mat-checkbox
         class="my-checkbox"
-        [(ngModel)]="showES50"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+        [ngModel]="showES50()"
+        (ngModelChange)="showES50.set($event)"
+        [disabled]="quotesLoading() || !serviceUtils.isPortfolioSymbol(symbol())"
         (change)="compIndexUpdate($event.checked, ComparisonIndex.EUROSTOXX50)"
         i18n="@@es50"
         >EuroStoxx 50</mat-checkbox
       >
       <mat-checkbox
         class="my-checkbox"
-        [(ngModel)]="showMsciCH"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+        [ngModel]="showMsciCH()"
+        (ngModelChange)="showMsciCH.set($event)"
+        [disabled]="quotesLoading() || !serviceUtils.isPortfolioSymbol(symbol())"
         (change)="compIndexUpdate($event.checked, ComparisonIndex.MSCI_CHINA)"
         i18n="@@msciChina"
         >Msci China</mat-checkbox
       >
       <mat-checkbox
         class="my-checkbox"
-        [(ngModel)]="showSP500"
-        [disabled]="quotesLoading || !serviceUtils.isPortfolioSymbol(symbol)"
+        [ngModel]="showSP500()"
+        (ngModelChange)="showSP500.set($event)"
+        [disabled]="quotesLoading() || !serviceUtils.isPortfolioSymbol(symbol())"
         (change)="compIndexUpdate($event.checked, ComparisonIndex.SP500)"
         i18n="@@sAndP500"
         >S&P 500</mat-checkbox
       >
     </span>
   </div>
-  @if (!symbol) {
+  @if (!symbol()) {
     <div class="chart-container center-div">
       <div i18="@@symbolSelectInstrument">Please select an instrument</div>
     </div>
   }
-  @if (symbol) {
+  @if (symbol()) {
     <div #chartContainer class="chart-container">
       <sc-line-chart
-        [chartPoints]="chartPoints"
-        [replaceName]="portfolioName"
-        [replaceSymbol]="portfolioSymbol"
+        [chartPoints]="chartPoints()"
+        [replaceName]="portfolioName()"
+        [replaceSymbol]="portfolioSymbol()"
       ></sc-line-chart>
     </div>
   }

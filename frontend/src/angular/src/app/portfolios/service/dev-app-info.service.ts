@@ -11,12 +11,12 @@
    limitations under the License.
  */
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class DevAppInfoService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getClassName(): Observable<string> {
     return this.http.get("/rest/dev/app-info/class-name", {
