@@ -1,5 +1,5 @@
 #!/bin/sh
-vacuumlo -U java -h localhost -v portfoliomgr
+vacuumlo -v -l 10000 -U java -h localhost -v portfoliomgr
 sudo -u postgres psql -d portfoliomgr -c "VACUUM FULL pg_largeobject;"
 pg_dump -U java -h localhost -d portfoliomgr -Fc --large-objects -f portfoliomgr_FULL_backup.dump
 #pg_dump -U java -h localhost -d portfoliomgr -Fc  --large-objects | gzip > mydb_$(date +%F).dump.gz
