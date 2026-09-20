@@ -93,7 +93,7 @@
       aria-labelledby="my-radio-group-label"
       class="my-radio-group"
       (change)="quotePeriodChanged()"
-      [ngModel]="selQuotePeriod"
+      [(ngModel)]="selQuotePeriod"
     >
       @for (myQuotePeriod of quotePeriods; track myQuotePeriod) {
         <mat-radio-button class="my-radio-button" [value]="myQuotePeriod">
