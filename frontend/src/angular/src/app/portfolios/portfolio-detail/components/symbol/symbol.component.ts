@@ -21,6 +21,7 @@ import {
   DOCUMENT,
   ChangeDetectionStrategy,
   effect,
+  untracked,
 } from "@angular/core";
 import { Symbol } from "../../../../model/symbol";
 import {
@@ -134,6 +135,7 @@ export class SymbolComponent {
   portfolioSymbol = signal("");
   quotePeriods: QuotePeriod[] = [];
   selQuotePeriod!: QuotePeriod;
+  private prevShowSymbol = false;
 
   private quoteService = inject(QuoteService);
   private destroyRef = inject(DestroyRef);
@@ -174,7 +176,7 @@ export class SymbolComponent {
 
     effect(() => {
       const mySymbol = this.symbol();
-      if (mySymbol) {
+      if (mySymbol?.symbol) {
         this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(mySymbol)
           ? this.quotePeriods[1]
           : this.quotePeriods[0];
@@ -190,14 +192,17 @@ export class SymbolComponent {
 
     effect(() => {
       const show = this.showSymbol();
-      const loading = this.quotesLoading();
-      if (!loading && show) {
-        this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(
-          this.symbol(),
-        )
-          ? this.quotePeriods[1]
-          : this.quotePeriods[0];
-        this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
+      const sym = this.symbol();
+      if (show && !this.prevShowSymbol && sym?.symbol) {
+        this.prevShowSymbol = true;
+        untracked(() => {
+          this.selQuotePeriod = !ServiceUtils.isIntraDayDataAvailiable(sym)
+            ? this.quotePeriods[1]
+            : this.quotePeriods[0];
+          this.updateQuotes(this.selQuotePeriod.quotePeriodKey);
+        });
+      } else {
+        this.prevShowSymbol = show;
       }
     });
   }

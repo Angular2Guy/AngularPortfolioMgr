@@ -122,7 +122,6 @@ export class PortfolioComparisonComponent {
     this.startDate.set(
       DateTime.now().minus(periods[0].periodDuration).toJSDate(),
     );
-    this.chartPeriodChanged();
 
     effect(() => {
       const portfolio = this.selPortfolio();
