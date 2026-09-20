@@ -12,7 +12,7 @@
       </li>
       <li class="file-path">
         <span class="mat-body" i18n="@@filepath">Filepath: </span
-        ><span class="mat-body">{{ filepath }}</span>
+        ><span class="mat-body">{{ filepath() }}</span>
       </li>
       <li>
         <mat-form-field class="form-field">
@@ -30,7 +30,7 @@
         <button
           mat-button
           (click)="okClick()"
-          [disabled]="!filepath || financialsForm.invalid"
+          [disabled]="!filepath() || formInvalid()"
           tabindex="-1"
           i18n="@@ok"
         >

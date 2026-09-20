@@ -15,7 +15,7 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
   inject,
-  OnInit,
+  signal,
 } from "@angular/core";
 import {
   FormGroup,
@@ -30,7 +30,6 @@ import {
   MAT_DIALOG_DATA,
   MatDialogContent,
 } from "@angular/material/dialog";
-import { ConfigService } from "../../../service/config.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ImportData, ImportDataType } from "../../../model/import-data";
 import { CdkScrollable } from "@angular/cdk/scrolling";
@@ -59,38 +58,35 @@ enum FormFields {
     MatButton,
   ],
 })
-export class ImportFinancialsComponent implements OnInit {
+export class ImportFinancialsComponent {
   protected financialsForm: FormGroup;
   protected FormFields = FormFields;
-  protected filepath: string = "";
-  protected filename: string = "";
+  protected filepath = signal("");
+  protected filename = signal("");
+  protected formInvalid = signal(true);
   protected ImportDataType = ImportDataType;
 
   private dialogRef = inject(MatDialogRef);
-  private configService = inject(ConfigService);
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: ImportData) {
+    this.filepath.set(data.path ?? "");
     this.financialsForm = this.fb.group({
       [FormFields.Filename]: [
         "",
         [Validators.required, Validators.minLength(5)],
       ],
     } as AbstractControlOptions);
-  }
-
-  ngOnInit(): void {
-    this.configService
-      .getImportPath()
+    this.financialsForm.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result) => (this.filepath = result));
+      .subscribe(() => this.formInvalid.set(this.financialsForm.invalid));
   }
 
   okClick(): void {
     this.dialogRef.close({
       filename: this.financialsForm.controls[FormFields.Filename].value,
-      path: this.filepath,
+      path: this.filepath(),
     } as ImportData);
   }
 
