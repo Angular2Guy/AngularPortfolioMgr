@@ -33,11 +33,12 @@ describe("LoginService", () => {
         provideHttpClientTesting(),
         {
           provide: TokenService,
-          useValue: jasmine.createSpyObj(
-            "TokenService",
-            ["createTokenHeader"],
-            { secUntilNextLogin: 60 },
-          ),
+          useValue: {
+            createTokenHeader: vi
+              .fn()
+              .mockName("TokenService.createTokenHeader"),
+            secUntilNextLogin: 60,
+          },
         },
       ],
     });

@@ -10,16 +10,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { TestBed, waitForAsync } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { AppComponent } from "./app.component";
 
 describe("AppComponent", () => {
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([]), AppComponent],
-    }).compileComponents();
-  }));
+    });
+    await TestBed.compileComponents();
+  });
 
   it("should create the app", () => {
     const fixture = TestBed.createComponent(AppComponent);

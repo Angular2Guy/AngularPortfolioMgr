@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormBuilder } from "@angular/forms";
 import {
   MatDialog,
@@ -40,8 +40,10 @@ describe("MainComponent", () => {
   let matDialog: MatDialog;
   let router: ActivatedRoute;
 
-  beforeEach(waitForAsync(() => {
-    tokenService = jasmine.createSpyObj("tokenService", ["logout"]);
+  beforeEach(async () => {
+    tokenService = {
+      logout: vi.fn().mockName("tokenService.logout"),
+    } as unknown as TokenService;
     TestBed.configureTestingModule({
       imports: [
         MatDialogModule,
@@ -61,8 +63,9 @@ describe("MainComponent", () => {
         { provide: TokenService, useValue: tokenService },
         { provide: LoginService, useValue: loginService },
       ],
-    }).compileComponents();
-  }));
+    });
+    await TestBed.compileComponents();
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MainComponent);
@@ -81,24 +84,24 @@ describe("MainComponent", () => {
     expect(tokenService.logout).toHaveBeenCalled();
   });
 
-  it("should open login", waitForAsync(() => {
-    spyOn(matDialog, "open").and.callThrough();
+  it("should open login", () => {
+    vi.spyOn(matDialog, "open");
     component.openLoginDialog();
     expect(matDialog.open).toHaveBeenCalled();
-  }));
+  });
   /*
-  it("should close login", waitForAsync(() => {
-    const matDialogRef = component.openLoginDialog();
-    const testLogin = {
-      emailAddress: "e",
-      password: "p",
-      username: "u",
-      token: "t",
-    } as Login;
-    matDialogRef.close(testLogin);
-    matDialog.afterAllClosed.subscribe(() =>
-      expect(component.login).toEqual(testLogin),
-    );
-  }));
-  */
+    it("should close login", waitForAsync(() => {
+      const matDialogRef = component.openLoginDialog();
+      const testLogin = {
+        emailAddress: "e",
+        password: "p",
+        username: "u",
+        token: "t",
+      } as Login;
+      matDialogRef.close(testLogin);
+      matDialog.afterAllClosed.subscribe(() =>
+        expect(component.login).toEqual(testLogin),
+      );
+    }));
+    */
 });
