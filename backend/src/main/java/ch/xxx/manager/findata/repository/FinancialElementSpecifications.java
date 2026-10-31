@@ -20,6 +20,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -62,8 +63,7 @@ public final class FinancialElementSpecifications {
 		}
 		final Deque<SubTerm> subTermStack = new ArrayDeque<>();
 		final Collection<Predicate> result = new LinkedList<>();
-		if (financialElementParamDtos != null) {
-			financialElementParamDtos.forEach(myDto -> {
+		Optional.ofNullable(financialElementParamDtos).stream().flatMap(Collection::stream).forEach(myDto -> {
 				switch (myDto.getTermType()) {
 				case TermStart -> subTermStack.push(new SubTerm(myDto.getOperation(), new ArrayList<>()));
 				case Query -> {
@@ -81,7 +81,7 @@ public final class FinancialElementSpecifications {
 				}
 				case TermEnd -> {
 					if (subTermStack.isEmpty()) {
-						throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
+						throw new RuntimeException(String.format("subPredicates: %d", 0));
 					}
 					SubTerm subTermColl = subTermStack.pop();
 					Collection<Predicate> myPredicates = subTermColl.subTerms();
@@ -98,7 +98,6 @@ public final class FinancialElementSpecifications {
 				}
 				}
 			});
-		}
 		// validate terms
 		if (!subTermStack.isEmpty()) {
 			throw new RuntimeException(String.format("subPredicates: %d", subTermStack.size()));
@@ -106,28 +105,11 @@ public final class FinancialElementSpecifications {
 		predicates.addAll(result);
 	}
 
-	private static Specification<FinancialElement> financialElementValue(FinancialElementParamDto myDto) {
-		return (root, query, criteriaBuilder) ->
-			Optional.ofNullable(myDto.getValueFilter()).stream().filter(myFilter -> myFilter.getOperation() != null)
-					.filter(myFilter -> myFilter.getValue() != null)
-					.filter(myFilter -> !BigDecimal.ZERO.equals(myFilter.getValue()))
-					.filter(myFilter -> !Operation.Equal.equals(myFilter.getOperation()))
-					.map(myFilter -> {
-						Expression<BigDecimal> joinPath = root.get(VALUE);
-						return switch (myFilter.getOperation()) {
-							case Equal -> criteriaBuilder.equal(joinPath, myFilter.getValue());
-							case SmallerEqual -> criteriaBuilder.lessThanOrEqualTo(joinPath, myFilter.getValue());
-							case LargerEqual -> criteriaBuilder.greaterThanOrEqualTo(joinPath, myFilter.getValue());
-						};
-					}).findFirst().orElse(null);
-	}
-
 	private static Optional<Predicate> financialElementValueClause(Path<FinancialElement> fePath,
 			FinancialElementParamDto myDto, CriteriaBuilder cb) {
 		return Optional.ofNullable(myDto.getValueFilter()).filter(myFilter -> myFilter.getOperation() != null)
 				.filter(myFilter -> myFilter.getValue() != null)
-				.filter(myFilter -> !BigDecimal.ZERO.equals(myFilter.getValue()))
-				.filter(myFilter -> !Operation.Equal.equals(myFilter.getOperation())).map(myFilter -> {
+				.filter(myFilter -> !BigDecimal.ZERO.equals(myFilter.getValue())).map(myFilter -> {
 					Expression<BigDecimal> joinPath = fePath.get(VALUE);
 					return switch (myFilter.getOperation()) {
 					case Equal -> cb.equal(joinPath, myFilter.getValue());
@@ -135,32 +117,6 @@ public final class FinancialElementSpecifications {
 					case LargerEqual -> cb.greaterThanOrEqualTo(joinPath, myFilter.getValue());
 					};
 				});
-	}
-
-	private static Specification<FinancialElement> financialElementConcept(FinancialElementParamDto myDto) {
-		return (root, query, criteriaBuilder) -> {
-			Optional<Predicate> result = Optional.empty();
-			if (myDto.getConceptFilter().getOperation() != null && myDto.getConceptFilter().getValue() != null
-					&& myDto.getConceptFilter().getValue().trim().length() > 2) {
-				Expression<String> lowerExp = criteriaBuilder.lower(root.get(CONCEPT));
-				if (!myDto.getConceptFilter().getOperation().equals(FilterStringDto.Operation.Equal)) {
-					String filterStr = switch (myDto.getConceptFilter().getOperation()) {
-						case Contains ->
-								String.format("%%%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
-						case StartsWith ->
-								String.format("%s%%", myDto.getConceptFilter().getValue().trim().toLowerCase());
-						case EndsWith ->
-								String.format("%%%s", myDto.getConceptFilter().getValue().trim().toLowerCase());
-						default ->
-								throw new IllegalArgumentException("Unexpected value: " + myDto.getConceptFilter().getOperation());
-					};
-					result = Optional.of(criteriaBuilder.like(lowerExp, filterStr));
-				} else {
-					result = Optional.of(criteriaBuilder.equal(lowerExp, myDto.getConceptFilter().getValue().trim().toLowerCase()));
-				}
-			}
-			return result.orElse(null);
-		};
 	}
 
 	private static Optional<Predicate> financialElementConceptClause(Path<FinancialElement> fePath,

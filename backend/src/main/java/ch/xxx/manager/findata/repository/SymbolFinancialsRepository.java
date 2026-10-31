@@ -151,10 +151,9 @@ public class SymbolFinancialsRepository extends SymbolFinancialsRepositoryBaseBe
 		List<FinancialElement> myfilteredFinancialElements = mySymbolFinancials.getFinancialElements().stream()
 				.peek(this.entityManager::detach)
 				.filter(StreamHelpers.distinctByKey(myFinancialElement -> ""
-						+ Optional.ofNullable(myFinancialElement.getConcept()).orElse("").trim()
+						+ Optional.ofNullable(myFinancialElement.getConcept()).stream().map(String::trim).findFirst().orElse("")
 						+ myFinancialElement.getCurrency()
-						+ (myFinancialElement.getValue() != null ? myFinancialElement.getValue().toString().trim()
-								: "")))
+						+ Optional.ofNullable(myFinancialElement.getValue()).stream().map(value -> value.toString().trim()).findFirst().orElse("")))
 				.toList();
 		mySymbolFinancials.getFinancialElements().clear();
 		mySymbolFinancials.getFinancialElements().addAll(myfilteredFinancialElements);
