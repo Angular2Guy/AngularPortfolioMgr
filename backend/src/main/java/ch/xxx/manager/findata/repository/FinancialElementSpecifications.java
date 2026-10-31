@@ -20,12 +20,10 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.springframework.data.jpa.domain.Specification;
 
 import ch.xxx.manager.common.utils.DataHelper;
-import ch.xxx.manager.findata.dto.FilterNumberDto.Operation;
 import ch.xxx.manager.findata.dto.FilterStringDto;
 import ch.xxx.manager.findata.dto.FinancialElementParamDto;
 import ch.xxx.manager.findata.entity.FinancialElement;

@@ -264,12 +264,21 @@ public class SymbolFinancialsRepositoryTest {
 	}
 
 	@Test
-	public void equalValueFilterIsIgnored() {
+	public void equalValueFilterIsApplied() {
+		seedBaseData();
+		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
+				"Revenu"), numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.valueOf(200))));
+		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
+		Assertions.assertEquals(Set.of("aapl"), symbolSet(result));
+	}
+
+	@Test
+	public void equalValueFilterWithoutMatchReturnsEmpty() {
 		seedBaseData();
 		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
 				"Revenu"), numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.valueOf(50))));
 		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
-		Assertions.assertEquals(Set.of("aapl", "abb", "baba"), symbolSet(result));
+		Assertions.assertTrue(result.isEmpty());
 	}
 
 	@Test
@@ -302,8 +311,8 @@ public class SymbolFinancialsRepositoryTest {
 	@Test
 	public void conceptShorterThanThreeCharsReturnsEmpty() {
 		seedBaseData();
-		SymbolFinancialsQueryParamsDto dto = feParams(queryParam(conceptFilter(FilterStringDto.Operation.Contains,
-				"Re"), numberFilter(FilterNumberDto.Operation.Equal, BigDecimal.valueOf(50))));
+		SymbolFinancialsQueryParamsDto dto = feParams(
+				queryParam(conceptFilter(FilterStringDto.Operation.Contains, "Re"), null));
 		List<SymbolFinancials> result = this.symbolFinancialsRepository.findSymbolFinancials(dto);
 		Assertions.assertTrue(result.isEmpty());
 	}
