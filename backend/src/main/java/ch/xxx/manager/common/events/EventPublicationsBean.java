@@ -15,23 +15,24 @@ package ch.xxx.manager.common.events;
 import java.time.Duration;
 
 import org.springframework.modulith.events.CompletedEventPublications;
-import org.springframework.modulith.events.IncompleteEventPublications;
+import org.springframework.modulith.events.FailedEventPublications;
+import org.springframework.modulith.events.ResubmissionOptions;
 import org.springframework.stereotype.Component;
 
 import ch.xxx.manager.common.producer.EventPublications;
 
 @Component
 public class EventPublicationsBean implements EventPublications {
-    private final IncompleteEventPublications incompleteEvents;
+    private final FailedEventPublications failedEvents;
     private final CompletedEventPublications completeEvents;
     
-    public EventPublicationsBean(IncompleteEventPublications incompleteEvents, CompletedEventPublications completeEvents) {
-    	this.incompleteEvents = incompleteEvents;
+    public EventPublicationsBean(FailedEventPublications failedEvents, CompletedEventPublications completeEvents) {
+    	this.failedEvents = failedEvents;
     	this.completeEvents = completeEvents;
     }
 	
     public void resubmitUnpublishedEvents() {
-        incompleteEvents.resubmitIncompletePublicationsOlderThan(Duration.ofHours(1));
+        failedEvents.resubmit(ResubmissionOptions.defaults().withMinAge(Duration.ofHours(1)));
     }
     
     public void clearPublishedEvents() {

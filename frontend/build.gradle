@@ -79,11 +79,7 @@ tasks.register('testAngular', NpmTask) {
     onlyIf {
         project.hasProperty('withAngular')
     }
-    if (project.hasProperty("useChromium")) {
-        args = ['run', 'test-chromium']
-    } else {
-        args = ['run', 'test']
-    }
+    args = ['run', 'test']
 
     dependsOn 'npmBuild'
 }
